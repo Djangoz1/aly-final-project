@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import './FactoryCV.sol';
-import "../Mission.sol";
+
 import "../lib/Milestone.sol";
 import "../lib/CommitWorker.sol";
 contract CV is Ownable{
@@ -33,12 +33,12 @@ contract CV is Ownable{
             missionsList[missionsLength] = _missionAddress;
     }
     
-    function getMission(uint _idMission) public view returns (Mission) {
+    function getMission(uint _idMission) public view returns (address) {
         require(isRegistred == true, "You must be registred");
         if(missionsList[_idMission] == address(0)){
             revert("You must be registred in this mission");
         }else{
-            Mission mission = Mission(missionsList[_idMission]);
+            address mission = missionsList[_idMission];
             return mission;
         }
     }

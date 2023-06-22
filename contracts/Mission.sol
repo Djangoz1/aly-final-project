@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 // import "./CV.sol";
 
 
-import "./SBToken/FactoryCV.sol";
-import './WorkflowStatusManager.sol';
+// import "./SBToken/FactoryCV.sol";
+// import './WorkflowStatusManager.sol';
 import './Employer.sol';
 
 contract Mission  is Employer {
@@ -16,9 +16,9 @@ contract Mission  is Employer {
     uint globalWadge;
 
     address public ownerCV;
-    address public factoryCVaddress;
+    // address public factoryCVaddress;
 
-    FactoryCV public factoryCV;
+    // FactoryCV public factoryCV;
 
     
 
@@ -36,11 +36,12 @@ contract Mission  is Employer {
     // ---------------------------------- //
 
     constructor(uint _amount, address _ownerCV, address _factoryCV) {
+        transferOwnership(_ownerCV);
         globalWadge += _amount;
-        missionStatus = WorkflowStatusManager.MissionStatus.Pending;
+
         ownerCV = _ownerCV;
         factoryCVaddress = _factoryCV;
-        // factoryCV = FactoryCV(factoryCVaddress);
+        factoryCV = FactoryCV(factoryCVaddress);
     }
 
    

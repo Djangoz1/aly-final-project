@@ -54,6 +54,8 @@ library Milestone {
     ) internal view returns (Feature memory) {
         if (_isInviteOnly) {
             require(_assignedWorker != address(0), "You must assign a worker");
+        }else {
+            require(_assignedWorker == address(0), "You cant assign a worker");
         }
         require( _estimatedDays > 0,"You must set a estimatedDays greater than 0");
         require(_wadge > 0, "You must set a wadge greater than 0");

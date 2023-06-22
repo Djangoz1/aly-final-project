@@ -8,7 +8,7 @@ contract WorkflowStatusManager is  Ownable {
     using Milestone for Milestone.FeatureStatus;
 
     enum MissionStatus {
-        Registred,
+        
         Pending,
         Approved,
         Aborted
@@ -18,10 +18,10 @@ contract WorkflowStatusManager is  Ownable {
     
 
 
-    modifier onlyMissionOpen(){
-        require(missionStatus == MissionStatus.Registred, "Mission not open");
-        _;
-    }
+    // modifier onlyMissionOpen(){
+    //     require(missionStatus == MissionStatus.Registred, "Mission not open");
+    //     _;
+    // }
     
     function  _changeMissionStatus(MissionStatus _status) internal onlyOwner {
         missionStatus = _status;

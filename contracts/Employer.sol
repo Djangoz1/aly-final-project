@@ -1,18 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./WorkflowStatusManager.sol";
 import './lib/Milestone.sol';
+// import './lib/CVLib.sol';
+import './SBToken/FactoryCV.sol';
+// import './Mission.sol';
+
+
 
 
 contract Employer is WorkflowStatusManager   {
     using Milestone for *;
     Milestone.Feature[] public features;
     Milestone.FeatureWeb3[] public featuresWeb3;
-    
-    
+    // using CVLib for *;
+    address public factoryCVaddress;
+    FactoryCV public factoryCV;
+
+
+    function getCV (address _addr, address _factoryCVAddr)public view returns (address){
+        FactoryCV factoryCV = FactoryCV(_factoryCVAddr);
+        address cvAddr = factoryCV.getCV(_addr);
+        return cvAddr;
+    }
 
     modifier onlyFeatureOpen(uint256 _id) {
         // require(missionStatus == MissionStatus.Pending, "Mission is not open");
@@ -22,6 +35,12 @@ contract Employer is WorkflowStatusManager   {
         _;
     }
 
+
+    modifier onlyEmployer() {
+
+        require(getCV(msg.sender, factoryCVaddress) == owner(), "Only employer can call this function");
+        _;
+    }
 
      // ********************************** //
     // *:::::::::::  GETTER  ::::::::::* //
@@ -60,7 +79,7 @@ contract Employer is WorkflowStatusManager   {
         string memory _description,
         address _assignedWorker,
         bool _isInviteOnly
-    ) public onlyOwner onlyMissionOpen {
+    ) public onlyEmployer  {
 
         Milestone.Feature memory _newFeature;
         _newFeature = Milestone.createFeature(_estimatedDays, _wadge, _description, _assignedWorker, _isInviteOnly);
@@ -75,7 +94,7 @@ contract Employer is WorkflowStatusManager   {
         address _assignedWorker,
         bool _isInviteOnly,
         address _addrOwner
-    ) public onlyOwner onlyMissionOpen {
+    ) public onlyOwner  {
         
         Milestone.FeatureWeb3 memory _newFeature;
         _newFeature = Milestone.createFeatureWeb3(_estimatedDays, _wadge, _description, _assignedWorker, _isInviteOnly, _addrOwner);
@@ -83,7 +102,7 @@ contract Employer is WorkflowStatusManager   {
         featuresWeb3.push(_newFeature);
     }
 
-    function setMissionStatusToPending() public onlyOwner onlyMissionOpen {
+    function setMissionStatusToPending() public onlyOwner  {
         require(features.length > 0 || featuresWeb3.length > 0, "You must add at least one feature");
         _changeMissionStatus(MissionStatus.Pending);
     }
