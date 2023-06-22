@@ -6,7 +6,7 @@ const CONTRACT_NAME = "FactoryCV";
 
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let factoryCV;
-  let cv;
+
   beforeEach(async () => {
     [
       this.owner,

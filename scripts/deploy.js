@@ -1,13 +1,13 @@
 const hre = require("hardhat");
-const CONTRACT_NAME = process.env.CONTRACT_NAME || "SimpleStorage";
+const CONTRACT_NAME = process.env.CONTRACT_NAME || "FactoryMission";
 
 async function main() {
-  const SimpleStorage = await hre.ethers.getContractFactory(CONTRACT_NAME);
-  const simpleStorage = await SimpleStorage.deploy(777);
+  const FactoryMission = await hre.ethers.getContractFactory(CONTRACT_NAME);
+  const factoryMission = await FactoryMission.deploy();
 
-  await simpleStorage.deployed();
+  await FactoryMission.deployed();
 
-  console.log(`SimpleStorage deployed to ${simpleStorage.address}`);
+  console.log(`FactoryMission deployed to ${factoryMission.address}`);
 }
 
 main().catch((error) => {

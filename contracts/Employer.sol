@@ -54,7 +54,7 @@ contract Employer is WorkflowStatusManager   {
 
 
 
-    function addFeature(
+    function setFeature(
         uint16 _estimatedDays,
         uint256 _wadge,
         string memory _description,
@@ -68,7 +68,7 @@ contract Employer is WorkflowStatusManager   {
         features.push(_newFeature);
     }
 
-    function addFeatureWeb3(
+    function setFeatureWeb3(
         uint16 _estimatedDays,
         uint256 _wadge,
         string memory _description,

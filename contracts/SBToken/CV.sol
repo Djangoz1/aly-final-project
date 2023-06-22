@@ -15,8 +15,8 @@ contract CV is Ownable{
        
     bool isRegistred;
     bool isBanned;
-    
-    mapping(address => bool) public missionsList;
+    uint missionsLength;
+    mapping(uint => address) public missionsList;
     mapping(uint => Milestone.Feature) public featuresList;
     mapping(uint => Milestone.FeatureWeb3) public featuresWeb3List;
     mapping(uint => CommitWorker.Commit) public commitsList;
@@ -27,19 +27,23 @@ contract CV is Ownable{
 
   
 
-    function setMission(address _missionAddress) public onlyOwner {
-        require(missionsList[_missionAddress] == false , "Mission already registred");
-            missionsList[_missionAddress] = true;
+    function setMission(address _missionAddress) public  {
+        require(missionsList[missionsLength + 1] == address(0) , "Mission already registred");
+            missionsLength++;
+            missionsList[missionsLength] = _missionAddress;
     }
     
-    function getMission(address _missionAddress) public view returns (Mission) {
+    function getMission(uint _idMission) public view returns (Mission) {
         require(isRegistred == true, "You must be registred");
-        if(missionsList[_missionAddress] != true){
+        if(missionsList[_idMission] == address(0)){
             revert("You must be registred in this mission");
         }else{
-            Mission mission = Mission(_missionAddress);
+            Mission mission = Mission(missionsList[_idMission]);
             return mission;
         }
     }
 
+    function getMissionsLength() public view returns (uint) {
+        return missionsLength;
+    }
 }
