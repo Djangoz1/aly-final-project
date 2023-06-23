@@ -65,12 +65,13 @@ export const Hero = () => {
                 </div>
               ))
             : heroEntreprise?.statistic?.map((stat) => (
-                <>
-                  <div className="w-[10vw] h-[10vh] flex flex-col bg-zinc-800 rounded shadow shadow-2xl m-1 items-center justify-center">
-                    <span className="text-white text-2xl">{stat.number}</span>
-                    <p>{stat.title}</p>
-                  </div>
-                </>
+                <div
+                  key={stat.title}
+                  className="w-[10vw] h-[10vh] flex flex-col bg-zinc-800 rounded shadow shadow-2xl m-1 items-center justify-center"
+                >
+                  <span className="text-white text-2xl">{stat.number}</span>
+                  <p>{stat.title}</p>
+                </div>
               ))}
         </div>
         <div className="flex flex-col ml-auto">
@@ -78,12 +79,16 @@ export const Hero = () => {
           <ul className="steps steps-vertical">
             {isWorker
               ? heroWorker?.steps?.map((step) => (
-                  <li className="step">{step}</li>
+                  <li className="step" key={step}>
+                    {step}
+                  </li>
                 ))
               : null}
             {!isWorker
               ? heroEntreprise?.steps?.map((step) => (
-                  <li className="step">{step}</li>
+                  <li className="step" key={step}>
+                    {step}
+                  </li>
                 ))
               : null}
           </ul>

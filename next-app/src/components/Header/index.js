@@ -1,3 +1,4 @@
+import { Drawer } from "components/Drawer";
 import React from "react";
 
 export const Header = () => {
@@ -7,7 +8,7 @@ export const Header = () => {
       <div className="text-white flex">
         <p>How it works</p>
         <p>FAQ</p>
-        <p>Connect</p>
+        <Drawer />
       </div>
     </div>
   );
