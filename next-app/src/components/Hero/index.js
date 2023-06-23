@@ -3,17 +3,13 @@ import React, { useState } from "react";
 import { heroEntreprise, heroWorker } from "constants/text";
 import { useAuthState } from "context/auth";
 import { _getCVsLength } from "utils/auth-tools";
+import { Workflow } from "components/Workflow";
+import { HeroStats } from "components/stats/HeroStats";
 
 export const Hero = () => {
   const [isWorker, setIsWorker] = useState(false);
   const heroStatus = [heroEntreprise, heroWorker];
 
-  const { factoryCv } = useAuthState();
-  const cvLength = async () => {
-    const length = await _getCVsLength(factoryCv);
-    return length;
-  };
-  // cvLength().then((res) => console.log(res));
   return (
     <div className="flex flex-col w-[70%]  justify-center mx-auto">
       <div className="tabs mb-5 flex   w-full justify-start">
@@ -61,46 +57,16 @@ export const Hero = () => {
             </button>
           </div>
         </div>
-        <div className="w-[21vw] h-fit flex flex-wrap">
-          {isWorker
-            ? heroWorker?.statistic?.map((stat) => (
-                <div
-                  key={stat.title}
-                  className="w-[10vw] h-[10vh] flex flex-col bg-zinc-800 rounded shadow shadow-2xl m-1 items-center justify-center"
-                >
-                  <span className="text-white text-2xl">{stat.number}</span>
-                  <p>{stat.title}</p>
-                </div>
-              ))
-            : heroEntreprise?.statistic?.map((stat) => (
-                <div
-                  key={stat.title}
-                  className="w-[10vw] h-[10vh] flex flex-col bg-zinc-800 rounded shadow shadow-2xl m-1 items-center justify-center"
-                >
-                  <span className="text-white text-2xl">{stat.number}</span>
-                  <p>{stat.title}</p>
-                </div>
-              ))}
-        </div>
-        <div className="flex flex-col ml-auto">
-          <h4 className="text-white text-2xl font-black">Workflow</h4>
-          <ul className="steps steps-vertical">
-            {isWorker
-              ? heroWorker?.steps?.map((step) => (
-                  <li className="step" key={step}>
-                    {step}
-                  </li>
-                ))
-              : null}
-            {!isWorker
-              ? heroEntreprise?.steps?.map((step) => (
-                  <li className="step" key={step}>
-                    {step}
-                  </li>
-                ))
-              : null}
-          </ul>
-        </div>
+        <HeroStats
+          statistics={
+            isWorker ? heroWorker.statistic : heroEntreprise.statistic
+          }
+        />
+        <Workflow
+          isWorker={isWorker}
+          workerSteps={heroWorker?.steps}
+          entrepriseSteps={heroEntreprise?.steps}
+        />
       </div>
     </div>
   );

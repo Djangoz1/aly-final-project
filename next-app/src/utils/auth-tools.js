@@ -21,16 +21,34 @@ export const _getAccount = async () => {
   }
 };
 
+export const _getName = async (cv) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    try {
+      const name = await cv.name();
+      return name;
+    } catch (error) {
+      return error;
+    }
+  }
+};
+export const _setName = async (cvAddr, name) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const cvContract = new ethers.Contract(cvAddr, CV.abi, signer);
+
+    const tx = await cvContract.setName(name);
+    await tx.wait();
+  }
+};
+
 export const _getContractCV = async (factoryCv, _address) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log("vc", _address);
-
       const cvAddr = await factoryCv.getCV(_address);
-
       const cv = new ethers.Contract(cvAddr, CV.abi, provider);
-      console.log("coucou", cv);
+
       return cv;
     } catch (error) {
       return { ok: false, error };
@@ -39,12 +57,9 @@ export const _getContractCV = async (factoryCv, _address) => {
 };
 
 export const _getCVsLength = async () => {
-  //   if (typeof window.ethereum !== "undefined") {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     const factoryCv = await _getContractFactoryCV();
 
-    // const address = await _getAccount();
-    // console.log(address);
     try {
       const length = await factoryCv.getCVsLength();
 
@@ -72,9 +87,6 @@ export const _getContractFactoryCV = async () => {
 };
 export const _createContractCv = async (address) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-    let _accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     try {

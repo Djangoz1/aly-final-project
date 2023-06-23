@@ -22,7 +22,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     let contract = await ethers.getContractFactory(CONTRACT_NAME);
     let factoryCVContract = await ethers.getContractFactory("FactoryCV");
     factoryCV = await factoryCVContract.deploy();
-    // console.log(factoryCV);
+
     await factoryCV.createCV(this.owner.address);
 
     let cvAddr = await factoryCV.getCV(this.owner.address);

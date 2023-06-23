@@ -7,12 +7,29 @@ import {
   useAuthState,
 } from "context/auth";
 import { IcHamburger } from "icones";
-import React from "react";
-import { _createContractCv } from "utils/auth-tools";
+import React, { useEffect, useState } from "react";
+import { _createContractCv, _getName } from "utils/auth-tools";
 
 export const Drawer = () => {
   const { address, cv, factoryCv } = useAuthState();
   const dispatch = useAuthDispatch();
+
+  const [name, setName] = useState();
+
+  const getName = async () => {
+    if (cv) {
+      let _name = await _getName(cv);
+      setName(_name);
+      return name;
+    }
+  };
+
+  useEffect(() => {
+    if (cv) {
+      getName();
+    }
+  }, [cv]);
+
   const connect = async () => {
     await doAuthSigner(dispatch);
   };
@@ -22,7 +39,6 @@ export const Drawer = () => {
     await doAuthCV(dispatch, factoryCv, address);
   };
 
-  console.log(cv);
   return (
     <div className="drawer  w-fit">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -53,8 +69,8 @@ export const Drawer = () => {
             <div className="stat">
               <div className="stat-title">User :</div>
               <div className="stat-value">
-                {cv ? (
-                  "Name"
+                {name ? (
+                  name
                 ) : (
                   <button className="btn" onClick={createCV}>
                     Create a CV
