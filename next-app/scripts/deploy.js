@@ -1,13 +1,12 @@
 const hre = require("hardhat");
-const CONTRACT_NAME = process.env.CONTRACT_NAME || "FactoryMission";
+const CONTRACT_NAME = "FactoryCV";
 
 async function main() {
-  const FactoryMission = await hre.ethers.getContractFactory(CONTRACT_NAME);
-  const factoryMission = await FactoryMission.deploy();
+  const FactoryCV = await hre.ethers.getContractFactory(CONTRACT_NAME);
 
-  await FactoryMission.deployed();
-
-  console.log(`FactoryMission deployed to ${factoryMission.address}`);
+  const factoryCV = await FactoryCV.deploy();
+  await factoryCV.deployed();
+  console.log(`FactoryCV deployed to ${factoryCV.address}`);
 }
 
 main().catch((error) => {

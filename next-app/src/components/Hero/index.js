@@ -1,11 +1,19 @@
 "use client";
 import React, { useState } from "react";
 import { heroEntreprise, heroWorker } from "constants/text";
+import { useAuthState } from "context/auth";
+import { _getCVsLength } from "utils/auth-tools";
 
 export const Hero = () => {
   const [isWorker, setIsWorker] = useState(false);
   const heroStatus = [heroEntreprise, heroWorker];
 
+  const { factoryCv } = useAuthState();
+  const cvLength = async () => {
+    const length = await _getCVsLength(factoryCv);
+    return length;
+  };
+  // cvLength().then((res) => console.log(res));
   return (
     <div className="flex flex-col w-[70%]  justify-center mx-auto">
       <div className="tabs mb-5 flex   w-full justify-start">

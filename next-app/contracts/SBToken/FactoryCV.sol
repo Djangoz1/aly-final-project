@@ -3,6 +3,7 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./CV.sol";
+
 contract FactoryCV is Ownable {
     mapping(address => CV) public listCV;
     uint length;
@@ -20,6 +21,8 @@ contract FactoryCV is Ownable {
     }
 
     function getCV(address _address) public view returns (address) {
+        CV cv = CV(listCV[_address]);
+        require(cv.isRegistred(), "CV not found");
         return address(listCV[_address]);
     }
 }

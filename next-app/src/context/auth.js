@@ -1,7 +1,11 @@
 "use client";
 
 import { createContext, useContext, useReducer } from "react";
-import { _getAccount } from "utils/auth-tools";
+import {
+  _getAccount,
+  _getContractCV,
+  _getContractFactoryCV,
+} from "utils/auth-tools";
 
 // Mise en place du reducer auth
 const reducer = (currentState, newState) => {
@@ -15,7 +19,8 @@ export const AuthDispatchContext = createContext();
 const initialState = {
   status: "idle",
   address: null,
-  cvContract: null,
+  cv: null,
+  factoryCv: null,
   error: null,
 };
 
@@ -31,19 +36,31 @@ export const doAuthSigner = async (dispatch) => {
   } catch (error) {
     dispatch({
       address: address,
+
       status: "error",
       error: "Error : Get Account",
     });
   }
 };
 
-export const doAuthCV = async (dispatch) => {
+export const doAuthFactoryCV = async (dispatch) => {
   dispatch({ status: "pending" });
   try {
-    console.log("test", cv);
-    let cv = await _getContractFactoryCV();
-    dispatch({ cvContract: cv, status: "idle", error: null });
+    let factoryCv = await _getContractFactoryCV();
+
+    dispatch({ factoryCv, status: "idle", error: null });
   } catch (error) {
+    dispatch({ status: "error", error: "Error : Get FactoryCV" });
+  }
+};
+
+export const doAuthCV = async (dispatch, factoryCV, address) => {
+  dispatch({ status: "pending" });
+  let cv = await _getContractCV(factoryCV, address);
+
+  if (!cv?.error) {
+    dispatch({ cv: cv, status: "idle", error: null });
+  } else {
     dispatch({ status: "error", error: "Error : Get CV" });
   }
 };

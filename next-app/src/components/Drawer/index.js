@@ -1,15 +1,28 @@
 "use client";
-import { doAuthSigner, useAuthDispatch, useAuthState } from "context/auth";
+import { ModalSetCV } from "components/modal/ModalSetCV";
+import {
+  doAuthCV,
+  doAuthSigner,
+  useAuthDispatch,
+  useAuthState,
+} from "context/auth";
 import { IcHamburger } from "icones";
 import React from "react";
+import { _createContractCv } from "utils/auth-tools";
 
 export const Drawer = () => {
-  const { address } = useAuthState();
+  const { address, cv, factoryCv } = useAuthState();
   const dispatch = useAuthDispatch();
   const connect = async () => {
     await doAuthSigner(dispatch);
   };
 
+  const createCV = async () => {
+    await _createContractCv(address);
+    await doAuthCV(dispatch, factoryCv, address);
+  };
+
+  console.log(cv);
   return (
     <div className="drawer  w-fit">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -39,7 +52,16 @@ export const Drawer = () => {
           <div className="stats shadow">
             <div className="stat">
               <div className="stat-title">User :</div>
-              <div className="stat-value">Nom</div>
+              <div className="stat-value">
+                {cv ? (
+                  "Name"
+                ) : (
+                  <button className="btn" onClick={createCV}>
+                    Create a CV
+                  </button>
+                )}
+              </div>
+              {cv && <ModalSetCV />}
               <div className="stat-desc text-[7px]">{address}</div>
             </div>
           </div>
