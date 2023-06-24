@@ -8,7 +8,7 @@ import {
 } from "context/auth";
 import { IcHamburger } from "icones";
 import React, { useEffect, useState } from "react";
-import { _createContractCv, _getName } from "utils/auth-tools";
+import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
 
 export const Drawer = () => {
   const { address, cv, factoryCv } = useAuthState();

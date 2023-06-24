@@ -131,6 +131,23 @@ export const _getContractFactoryMission = async () => {
     }
   }
 };
+export const _signerFactoryMission = async () => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    try {
+      const factoryMission = new ethers.Contract(
+        ADDR_FACTORY_MISSION,
+        FactoryMission.abi,
+        signer
+      );
+
+      return factoryMission;
+    } catch (error) {
+      return error;
+    }
+  }
+};
 
 export const _getMissionsLength = async () => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {

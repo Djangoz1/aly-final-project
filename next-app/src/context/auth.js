@@ -6,7 +6,7 @@ import {
   _getContractCV,
   _getContractFactoryCV,
   _getContractFactoryMission,
-} from "utils/auth-tools";
+} from "utils/ui-tools/auth-tools";
 
 // Mise en place du reducer auth
 const reducer = (currentState, newState) => {
@@ -36,12 +36,7 @@ export const doAuthSigner = async (dispatch) => {
 
     dispatch({ address: address, status: "idle", error: null });
   } catch (error) {
-    dispatch({
-      address: address,
-
-      status: "error",
-      error: "Error : Get Account",
-    });
+    dispatch({ status: "error", error: "Error : Get Account" });
   }
 };
 

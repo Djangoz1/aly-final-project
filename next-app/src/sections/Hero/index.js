@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { heroEntreprise, heroWorker } from "constants/text";
 import { useAuthState } from "context/auth";
-import { _getCVsLength } from "utils/auth-tools";
+import { _getCVsLength } from "utils/ui-tools/auth-tools";
 import { Workflow } from "components/Workflow";
 import { HeroStats } from "components/stats/HeroStats";
 import { ModalCreateMission } from "components/modal/ModalCreateMission";

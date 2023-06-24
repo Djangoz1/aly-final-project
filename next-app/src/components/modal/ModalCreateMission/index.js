@@ -1,20 +1,32 @@
 "use client";
-import { ChatBubble } from "components/ChatBubble";
+
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { InputAssignedWorker } from "components/inputs/inputsMission/AssignedWorker";
-import { ChatMission } from "components/inputs/inputsMission/ChatMission";
-import { InputDescription } from "components/inputs/inputsMission/Description";
-import { InputEstimatedDay } from "components/inputs/inputsMission/EstimatedDay";
-import { InputInviteOnly } from "components/inputs/inputsMission/InviteOnly";
-import { InputWadge } from "components/inputs/inputsMission/Wadge";
+
 import { useAuthState } from "context/auth";
+import { useMissionState } from "context/authMissions";
 import React, { useEffect, useState } from "react";
 import { CreationFeatures } from "sections/Features";
-import { _getName } from "utils/auth-tools";
+import { CreationMission } from "sections/Missions";
+import { _getName } from "utils/ui-tools/auth-tools";
+import { _getContractMissionByCv } from "utils/ui-tools/mission-tools";
 
 export const ModalCreateMission = () => {
   const [open, setOpen] = useState(false);
   const { cv } = useAuthState();
+  const { mission } = useMissionState();
+
+  const getMission = async (_id) => {
+    if (cv) {
+      let mission = await _getContractMissionByCv(cv, _id);
+      console.log(mission);
+    }
+  };
+
+  useEffect(() => {
+    if (cv) {
+      getMission(mission);
+    }
+  }, [cv]);
 
   return (
     <>
@@ -43,7 +55,8 @@ export const ModalCreateMission = () => {
                 "Hi, you should registred before continue"
               )}{" "}
             </h3>
-            <CreationFeatures />
+
+            {mission ? <CreationFeatures /> : <CreationMission />}
           </div>
         </>
       )}

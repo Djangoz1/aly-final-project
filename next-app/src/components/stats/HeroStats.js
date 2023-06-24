@@ -1,7 +1,7 @@
 import { useAuthState } from "context/auth";
 import { parseHex } from "helpers";
 import React, { useEffect, useState } from "react";
-import { _getCVsLength, _getMissionsLength } from "utils/auth-tools";
+import { _getCVsLength, _getMissionsLength } from "utils/ui-tools/auth-tools";
 
 export const HeroStats = ({ statistics }) => {
   const { factoryCv } = useAuthState();

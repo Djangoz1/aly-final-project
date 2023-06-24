@@ -1,6 +1,6 @@
 "use client";
 import { Header } from "components/Header";
-import { Hero } from "components/Hero";
+import { Hero } from "sections/Hero";
 import {
   doAuthCV,
   doAuthFactoryCV,

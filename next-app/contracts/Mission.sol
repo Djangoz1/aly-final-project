@@ -4,32 +4,23 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 // import "./CV.sol";
 
-
 // import "./SBToken/FactoryCV.sol";
 // import './WorkflowStatusManager.sol';
-import './Employer.sol';
+import "./Employer.sol";
 
-contract Mission  is Employer {
-    
-
-    
+contract Mission is Employer {
+    address public factoryMissionAddress;
     uint globalWadge;
 
     address public ownerCV;
+
     // address public factoryCVaddress;
 
     // FactoryCV public factoryCV;
 
-    
-
     // ********************************** //
     // *::::::::::: MODIFIERS ::::::::::* //
     // ---------------------------------- //
- 
-
-    
-
-  
 
     // ********************************** //
     // *:::::::::  CONSTRUCTOR  ::::::::* //
@@ -40,12 +31,10 @@ contract Mission  is Employer {
         globalWadge += _amount;
 
         ownerCV = _ownerCV;
+        factoryMissionAddress = msg.sender;
         factoryCVaddress = _factoryCV;
         factoryCV = FactoryCV(factoryCVaddress);
     }
-
-   
-    
 
     // ! Faire le SBT
     // ! Le SBT est un contrat qui représente le compte, le CV de l'utilisateur sur la plateforme. Chaque commit est indiqué dans le SBT

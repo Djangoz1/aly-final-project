@@ -1,5 +1,6 @@
 import { AuthProvider } from "context/auth";
 import "../styles/global.css";
+import { MissionProvider } from "context/authMissions";
 
 export const metadata = {
   title: "Create Next App",
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <AuthProvider>
-        <body>{children}</body>
+        <MissionProvider>
+          <body>{children}</body>
+        </MissionProvider>
       </AuthProvider>
     </html>
   );

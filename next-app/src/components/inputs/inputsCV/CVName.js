@@ -1,6 +1,6 @@
 import { useAuthState } from "context/auth";
 import React, { useEffect, useState } from "react";
-import { _getName } from "utils/auth-tools";
+import { _getName } from "utils/ui-tools/auth-tools";
 
 export const CVName = ({ styles }) => {
   const { cv } = useAuthState();
