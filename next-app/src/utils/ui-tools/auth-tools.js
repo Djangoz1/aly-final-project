@@ -91,6 +91,21 @@ export const _getContractCV = async (factoryCv, _address) => {
     }
   }
 };
+export const _signerContractCV = async (factoryCv, _address) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      console.log(factoryCv);
+      const cvAddr = await factoryCv.getCV(_address);
+      const cv = new ethers.Contract(cvAddr, CV.abi, signer);
+
+      return cv;
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+};
 
 export const _getName = async (cv) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {

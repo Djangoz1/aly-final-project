@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { _createContractMission } from "utils/ui-tools/mission-tools";
 
 export const CreationMission = () => {
-  const { factoryMission, cv } = useAuthState();
+  const { factoryMission, factoryCv, cv } = useAuthState();
   let [mission, setFeatures] = useState({
     amount: 0,
     features: [],
@@ -24,7 +24,7 @@ export const CreationMission = () => {
 
   const handleCreateMission = async () => {
     const value = 200;
-    const tx = await _createContractMission(value.toString(16));
+    const tx = await _createContractMission(factoryCv, 200);
     console.log(tx);
   };
   return (

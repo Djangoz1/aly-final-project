@@ -5,13 +5,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./CV.sol";
 
 contract FactoryCV is Ownable {
-    mapping(address => CV) public listCV;
+    mapping(address => address) public listCV;
     uint length;
 
     function createCV(address _owner) public returns (address) {
+        require(listCV[_owner] == address(0), "Can't have more than 1");
         CV newCV = new CV();
         newCV.transferOwnership(_owner);
-        listCV[_owner] = newCV;
+        listCV[_owner] = address(newCV);
         length++;
         return address(newCV);
     }

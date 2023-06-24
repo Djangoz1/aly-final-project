@@ -7,6 +7,12 @@ import "./FactoryCV.sol";
 import "../lib/Milestone.sol";
 import "../lib/CommitWorker.sol";
 
+interface IntFactoryMission {
+    function createMission(uint _amount) external returns (address);
+
+    function getPrice() external view returns (uint256);
+}
+
 contract CV is Ownable {
     using Milestone for *;
 
@@ -39,18 +45,29 @@ contract CV is Ownable {
             missionsList[missionsLength + 1] == address(0),
             "Mission already registred"
         );
-        missionsLength++;
         missionsList[missionsLength] = _missionAddress;
+        missionsLength++;
+    }
+
+    function buyMission(
+        address _factoryMission,
+        uint _amount
+    ) public onlyOwner {
+        IntFactoryMission factoryMission = IntFactoryMission(_factoryMission);
+        uint price = factoryMission.getPrice();
+        price += _amount;
+        factoryMission.createMission(price);
     }
 
     function getMission(uint _idMission) public view returns (address) {
         require(isRegistred == true, "You must be registred");
-        if (missionsList[_idMission] == address(0)) {
-            revert("You must be registred in this mission");
-        } else {
-            address mission = missionsList[_idMission];
-            return mission;
-        }
+        require(
+            missionsList[_idMission] != address(0),
+            "You must be registred in this mission"
+        );
+
+        address mission = missionsList[_idMission];
+        return mission;
     }
 
     function getMissionsLength() public view returns (uint) {

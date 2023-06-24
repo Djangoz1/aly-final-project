@@ -52,7 +52,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     it("Should  can create a mission", async () => {
       const amount = ethers.utils.parseEther("0.2");
-      let transaction = await factoryMission.createMission(amount);
+      let transaction = await cv.buyMission(factoryMission.address, amount);
       transaction.wait();
       let number = await factoryMission.getMissionsLength();
       expect(number.toString()).to.equal("1");
@@ -60,10 +60,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     it("Should  get a mission address", async () => {
       const amount = ethers.utils.parseEther("0.2");
-      let mission = await factoryMission.createMission(amount);
-      mission.wait();
-      let cvMissionLength = await cv.getMissionsLength();
-      expect(cvMissionLength).to.equal(1);
+      let transaction = await cv.buyMission(factoryMission.address, amount);
+      transaction.wait();
+
+      // mission.wait();
+      const length = await cv.getMissionsLength();
+      // console.log("test", length);
+
+      expect(await cv.getMission(length - 1));
     });
   });
   // -

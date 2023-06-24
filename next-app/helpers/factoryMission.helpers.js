@@ -11,8 +11,11 @@ const getContractFactoryMission = async ({ factoryCV }) => {
 const getContractMission = async ({ cv, factoryMission }) => {
   const amount = ethers.utils.parseEther("0.2");
 
-  await factoryMission.createMission(amount);
-  let missionAddr = await cv.getMission(1);
+  await cv.buyMission(factoryMission.address, amount);
+
+  let length = await cv.getMissionsLength();
+
+  let missionAddr = await cv.getMission(length - 1);
   const Mission = await ethers.getContractAt("Mission", missionAddr);
   return Mission;
 };

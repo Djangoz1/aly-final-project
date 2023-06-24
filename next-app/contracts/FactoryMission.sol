@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 // import './CV.sol';
 
 import "./Mission.sol";
-import './SBToken/FactoryCV.sol';
-import './SBToken/CV.sol';
+import "./SBToken/FactoryCV.sol";
+import "./SBToken/CV.sol";
+
 contract FactoryMission is Ownable {
     uint256 public price;
     uint256 public missionsLength;
@@ -14,7 +15,6 @@ contract FactoryMission is Ownable {
     address public factoryCVAddress;
     FactoryCV factoryCV;
     mapping(address => Mission) public listMission;
-
 
     // *::::::::: CONSTRUCTOR :::::::::* //
     constructor(address _factoryCVAddress) payable {
@@ -31,16 +31,17 @@ contract FactoryMission is Ownable {
 
     // *::::::::::::: SETTER :::::::::::: //
     function createMission(uint _amount) public returns (address) {
-        require(_amount > price, "Not enough ETH sent; check price!");
+        require(_amount >= price, "Not enough ETH sent; check price!");
         CV cv;
-        if(factoryCV.getCV(msg.sender) == address(0)){
-            cv = CV(factoryCV.createCV(msg.sender));
-        }else {
-            cv = CV(factoryCV.getCV(msg.sender));
-        }
+        cv = CV(msg.sender);
+        require(cv.isRegistred(), "Not registred");
         uint afterTxFoundation = _amount - price;
         balanceFoundation += price;
-        Mission newMission = new Mission(afterTxFoundation, address(cv), factoryCVAddress);
+        Mission newMission = new Mission(
+            afterTxFoundation,
+            address(cv),
+            factoryCVAddress
+        );
         address _address = address(newMission);
         cv.setMission(_address);
         listMission[_address] = newMission;
@@ -48,7 +49,6 @@ contract FactoryMission is Ownable {
         return _address;
     }
 
-    
     // *::::::::::::: GETTER :::::::::::: //
     function getBalance() public view returns (uint) {
         return address(this).balance;

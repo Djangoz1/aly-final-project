@@ -18,7 +18,6 @@ export const ModalCreateMission = () => {
   const getMission = async (_id) => {
     if (cv) {
       let mission = await _getContractMissionByCv(cv, _id);
-      console.log(mission);
     }
   };
 

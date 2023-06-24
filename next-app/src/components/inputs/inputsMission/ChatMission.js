@@ -47,7 +47,6 @@ export const ChatMission = ({ features }) => {
         _status = false;
       }
     }
-    console.log("status", _status);
 
     setStatus(_status);
   };

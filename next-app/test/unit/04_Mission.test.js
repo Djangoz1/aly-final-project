@@ -35,7 +35,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     cv = await getContractCV({ factoryCV, owner: this.owner.address });
 
     factoryMission = await getContractFactoryMission({ factoryCV });
-
     mission = await getContractMission({ cv, factoryMission });
   });
 

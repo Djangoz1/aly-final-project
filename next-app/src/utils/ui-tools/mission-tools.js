@@ -7,7 +7,11 @@ import CV from "artifacts/contracts/SBToken/CV.sol/CV.json";
 import FactoryMission from "artifacts/contracts/FactoryMission.sol/FactoryMission.json";
 
 import { ADDR_FACTORY_CV, ADDR_FACTORY_MISSION } from "constants/address";
-import { _signerFactoryMission } from "./auth-tools";
+import {
+  _getAccount,
+  _signerContractCV,
+  _signerFactoryMission,
+} from "./auth-tools";
 // import { ethers } from "hardhat";
 
 // *::::::::::::::: GET MISSION  :::::::::::::::*
@@ -23,11 +27,16 @@ export const _getContractMissionByCv = async (cv, id) => {
   }
 };
 
-export const _createContractMission = async (amount) => {
+export const _createContractMission = async (factoryCv, amount) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     try {
-      const factoryMission = await _signerFactoryMission();
-      factoryMission.createMission(amount);
+      const address = await _getAccount();
+
+      const cv = await _signerContractCV(factoryCv, address);
+      console.log("test", cv);
+
+      const tx = await cv.buyMission(ADDR_FACTORY_MISSION, amount);
+      console.log("tx", tx);
     } catch (error) {}
   }
 };

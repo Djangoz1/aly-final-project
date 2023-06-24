@@ -33,9 +33,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should create a CV", async () => {
-      let transaction = await factoryCV.createCV(this.addr1.address);
-      transaction.wait();
+      await factoryCV.createCV(this.addr1.address);
+
       let number = await factoryCV.getCVsLength();
+      console.log(number);
 
       expect(number.toString()).to.equal("1");
     });
