@@ -5,6 +5,7 @@ import { useAuthState } from "context/auth";
 import { _getCVsLength } from "utils/auth-tools";
 import { Workflow } from "components/Workflow";
 import { HeroStats } from "components/stats/HeroStats";
+import { ModalCreateMission } from "components/modal/ModalCreateMission";
 
 export const Hero = () => {
   const [isWorker, setIsWorker] = useState(false);
@@ -49,12 +50,8 @@ export const Hero = () => {
             {isWorker ? heroWorker.description : heroEntreprise.description}
           </p>
           <div className="join mt-4">
-            <button className="btn mr-4 btn-primary">
-              {isWorker ? heroWorker.button : heroEntreprise.button}
-            </button>
-            <button className="btn btn-outline btn-primary">
-              {isWorker ? heroWorker.button2 : heroEntreprise.button2}
-            </button>
+            <ModalCreateMission />
+            {/* <ModalCreateMission /> */}
           </div>
         </div>
         <HeroStats

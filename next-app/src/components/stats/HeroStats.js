@@ -1,23 +1,33 @@
 import { useAuthState } from "context/auth";
 import { parseHex } from "helpers";
 import React, { useEffect, useState } from "react";
-import { _getCVsLength } from "utils/auth-tools";
+import { _getCVsLength, _getMissionsLength } from "utils/auth-tools";
 
 export const HeroStats = ({ statistics }) => {
   const { factoryCv } = useAuthState();
   const [cvLength, setCvLength] = useState(null);
+  const [missionLength, setMissionLength] = useState(null);
   useEffect(() => {
     if (factoryCv && !cvLength) {
       getCvLength();
     }
+    if (factoryCv && !missionLength) {
+      getMissionLength();
+    }
   }, [factoryCv]);
   const getCvLength = async () => {
-    const length = await _getCVsLength(factoryCv);
+    const length = await _getCVsLength();
     const result = parseHex(length);
     setCvLength(result);
   };
 
-  const statsNumber = [100, 100, cvLength, "1000 USDT"];
+  const getMissionLength = async () => {
+    const length = await _getMissionsLength();
+    const result = parseHex(length);
+    setMissionLength(result);
+  };
+
+  const statsNumber = [missionLength, 100, cvLength, "1000 USDT"];
   return (
     <div className="w-[21vw] h-fit flex flex-wrap">
       {statistics?.map((stat, index) => (

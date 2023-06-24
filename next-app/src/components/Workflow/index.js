@@ -12,15 +12,15 @@ export const Workflow = ({ isWorker, workerSteps, entrepriseSteps }) => {
       registred();
     }
   }, [cv]);
-  console.log(isRegistred);
+
   return (
-    <div className="flex flex-col ml-auto">
+    <div className="flex relative -z-10 flex-col ml-auto">
       <h4 className="text-white text-2xl font-black">Workflow</h4>
-      <ul className="steps steps-vertical">
+      <ul className="steps  steps-vertical">
         {isWorker
           ? workerSteps.map((step, index) => (
               <li
-                className={`step ${
+                className={`step  ${
                   workerStatus?.[index] ? "step-primary" : null
                 }`}
                 key={step}

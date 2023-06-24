@@ -5,6 +5,7 @@ import {
   _getAccount,
   _getContractCV,
   _getContractFactoryCV,
+  _getContractFactoryMission,
 } from "utils/auth-tools";
 
 // Mise en place du reducer auth
@@ -21,6 +22,7 @@ const initialState = {
   address: null,
   cv: null,
   factoryCv: null,
+  factoryMission: null,
   error: null,
 };
 
@@ -51,6 +53,16 @@ export const doAuthFactoryCV = async (dispatch) => {
     dispatch({ factoryCv, status: "idle", error: null });
   } catch (error) {
     dispatch({ status: "error", error: "Error : Get FactoryCV" });
+  }
+};
+
+export const doAuthFactoryMission = async (dispatch) => {
+  dispatch({ status: "pending" });
+  try {
+    let factoryMission = await _getContractFactoryMission();
+    dispatch({ factoryMission, status: "idle", error: null });
+  } catch (error) {
+    dispatch({ status: "error", error: "Error : Get FactoryMission" });
   }
 };
 

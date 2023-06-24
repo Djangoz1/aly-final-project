@@ -1,3 +1,5 @@
+import { ModalCreateMission } from "components/modal/ModalCreateMission";
+
 export const heroWorker = {
   tab: "For Workers",
   title: "Find works.",
@@ -28,8 +30,8 @@ export const heroEntreprise = {
   subtitle: "Get your job done.",
   description:
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit, nesciunt id laborum eos exercitationem soluta possimus fuga sequi quas iure odio neque eligendi dolor minus!",
-  button: "Become an entreprise",
-  button2: "View workers",
+  button: <ModalCreateMission />,
+  button2: <ModalCreateMission />,
   statistic: [
     { title: "Jobs proposition", number: 100 },
     { title: "Jobs completed", number: 100 },
