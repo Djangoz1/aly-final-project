@@ -3,29 +3,38 @@
 import { CVName } from "components/inputs/inputsCV/CVName";
 
 import { useAuthState } from "context/auth";
-import { useMissionState } from "context/authMissions";
+import {
+  doMissionsState,
+  useMissionDispatch,
+  useMissionState,
+} from "context/authMissions";
 import React, { useEffect, useState } from "react";
-import { CreationFeatures } from "sections/Features";
-import { CreationMission } from "sections/Missions";
+import { CreationFeature, CreationFeatures } from "sections/Features";
+import { CreationMission, ListMission } from "components/inputs/inputsMission";
 import { _getName } from "utils/ui-tools/auth-tools";
 import { _getContractMissionByCv } from "utils/ui-tools/mission-tools";
 
 export const ModalCreateMission = () => {
   const [open, setOpen] = useState(false);
   const { cv } = useAuthState();
-  const { mission } = useMissionState();
-
-  const getMission = async (_id) => {
-    if (cv) {
-      let mission = await _getContractMissionByCv(cv, _id);
-    }
-  };
+  const { mission, missions } = useMissionState();
+  const dispatch = useMissionDispatch();
 
   useEffect(() => {
     if (cv) {
-      getMission(mission);
+      doMissionsState(dispatch, cv);
     }
   }, [cv]);
+
+  useEffect(() => {
+    if (mission) {
+      setIsMission(true);
+    } else {
+      setIsMission(false);
+    }
+  }, [mission]);
+
+  const [isMission, setIsMission] = useState(false);
 
   return (
     <>
@@ -54,8 +63,8 @@ export const ModalCreateMission = () => {
                 "Hi, you should registred before continue"
               )}{" "}
             </h3>
-
-            {mission ? <CreationFeatures /> : <CreationMission />}
+            {missions && <ListMission />}
+            {isMission ? <CreationFeatures /> : <CreationMission />}
           </div>
         </>
       )}

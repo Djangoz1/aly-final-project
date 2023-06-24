@@ -96,7 +96,7 @@ export const _signerContractCV = async (factoryCv, _address) => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      console.log(factoryCv);
+
       const cvAddr = await factoryCv.getCV(_address);
       const cv = new ethers.Contract(cvAddr, CV.abi, signer);
 
