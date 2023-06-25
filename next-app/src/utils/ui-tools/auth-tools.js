@@ -1,13 +1,10 @@
 "use client";
-// import CV from "../artifacts/contracts/CV.sol/CV.json";
 import { ethers } from "ethers";
 import CVFactory from "artifacts/contracts/SBToken/FactoryCV.sol/FactoryCV.json";
-// import { CONTRACT_ADDRESS } from "../constants";
 import CV from "artifacts/contracts/SBToken/CV.sol/CV.json";
 import FactoryMission from "artifacts/contracts/FactoryMission.sol/FactoryMission.json";
 
 import { ADDR_FACTORY_CV, ADDR_FACTORY_MISSION } from "constants/address";
-// import { ethers } from "hardhat";
 
 // *::::::::::::::: PROVIDER :::::::::::::::*
 

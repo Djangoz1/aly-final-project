@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { heroEntreprise, heroWorker } from "constants/text";
-import { useAuthState } from "context/auth";
+
 import { _getCVsLength } from "utils/ui-tools/auth-tools";
 import { Workflow } from "components/Workflow";
 import { HeroStats } from "components/stats/HeroStats";
-import { ModalCreateMission } from "components/modal/ModalCreateMission";
+
+import Link from "next/link";
 
 export const Hero = () => {
   const [isWorker, setIsWorker] = useState(false);
@@ -50,8 +51,9 @@ export const Hero = () => {
             {isWorker ? heroWorker.description : heroEntreprise.description}
           </p>
           <div className="join mt-4">
-            <ModalCreateMission />
-            {/* <ModalCreateMission /> */}
+            <div className="btn btn-primary">
+              <Link href={"profile/mission"}>Create a Mission</Link>
+            </div>
           </div>
         </div>
         <HeroStats

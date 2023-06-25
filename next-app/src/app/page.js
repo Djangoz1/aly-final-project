@@ -5,31 +5,33 @@ import {
   doAuthCV,
   doAuthFactoryCV,
   doAuthFactoryMission,
+  doAuthSigner,
   useAuthDispatch,
   useAuthState,
 } from "context/auth";
 import { useEffect } from "react";
+import { doMissionsState, useMissionDispatch } from "context/authMissions";
 export default function Home() {
-  const { address, cvContract, factoryMission, factoryCv, status, error } =
-    useAuthState();
+  const { address, cv, factoryMission, factoryCv } = useAuthState();
   const dispatch = useAuthDispatch();
-  useEffect(() => {
-    if (!factoryCv) {
-      doAuthFactoryCV(dispatch);
-    }
-    if (!factoryMission && factoryCv) {
-      doAuthFactoryMission(dispatch);
-    }
+  const missionDispatch = useMissionDispatch();
 
-    // if (address) {
-    // }
+  useEffect(() => {
+    doAuthSigner(dispatch);
+  }, [address]);
+
+  useEffect(() => {
+    if (!factoryCv) doAuthFactoryCV(dispatch);
+    if (!factoryMission && factoryCv) doAuthFactoryMission(dispatch);
   }, [factoryCv, factoryMission]);
 
   useEffect(() => {
-    if (factoryCv && address) {
-      doAuthCV(dispatch, factoryCv, address);
-    }
+    if (factoryCv && address) doAuthCV(dispatch, factoryCv, address);
   }, [factoryCv, address]);
+
+  useEffect(() => {
+    if (cv) doMissionsState(missionDispatch, cv);
+  }, [cv]);
 
   return (
     <main>

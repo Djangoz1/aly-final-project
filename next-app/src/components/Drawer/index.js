@@ -1,4 +1,5 @@
 "use client";
+import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
 import {
   doAuthCV,
@@ -14,22 +15,6 @@ export const Drawer = () => {
   const { address, cv, factoryCv } = useAuthState();
   const dispatch = useAuthDispatch();
 
-  const [name, setName] = useState();
-
-  const getName = async () => {
-    if (cv) {
-      let _name = await _getName(cv);
-      setName(_name);
-      return name;
-    }
-  };
-
-  useEffect(() => {
-    if (cv) {
-      getName();
-    }
-  }, [cv]);
-
   const connect = async () => {
     await doAuthSigner(dispatch);
   };
@@ -43,7 +28,6 @@ export const Drawer = () => {
     <div className="drawer  w-fit">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content ">
-        {/* Page content here */}
         {!address ? (
           <button className="btn btn-primary" onClick={connect}>
             Connect
@@ -57,7 +41,6 @@ export const Drawer = () => {
       <div className="drawer-side">
         <label htmlFor="my-drawer" className="drawer-overlay"></label>
         <ul className="menu p-4 w-80 h-full bg-base-200 text-base-content">
-          {/* Sidebar content here */}
           <li>
             <a>Sidebar Item 1</a>
           </li>
@@ -69,8 +52,8 @@ export const Drawer = () => {
             <div className="stat">
               <div className="stat-title">User :</div>
               <div className="stat-value">
-                {name ? (
-                  name
+                {cv ? (
+                  <CVName />
                 ) : (
                   <button className="btn" onClick={createCV}>
                     Create a CV

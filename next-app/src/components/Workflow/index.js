@@ -1,17 +1,24 @@
 import { useAuthState } from "context/auth";
+import { useMissionState } from "context/authMissions";
 import React, { useEffect, useState } from "react";
 
 export const Workflow = ({ isWorker, workerSteps, entrepriseSteps }) => {
   const { cv } = useAuthState();
+  const { missions } = useMissionState();
   const [isRegistred, setRegistred] = useState(false);
+  const [isProposeJob, setIsProposeJob] = useState(false);
   const registred = () => (cv ? setRegistred(true) : setRegistred(false));
-  const workerStatus = [isRegistred];
+  const proposeJob = () =>
+    missions?.length > 0 ? setIsProposeJob(true) : setIsProposeJob(false);
+  const workerStatus = [isRegistred, isProposeJob];
 
   useEffect(() => {
-    if (!isRegistred) {
-      registred();
-    }
+    if (!isRegistred) registred();
   }, [cv]);
+
+  useEffect(() => {
+    if (!isProposeJob) proposeJob();
+  }, [missions]);
 
   return (
     <div className="flex relative -z-10 flex-col ml-auto">

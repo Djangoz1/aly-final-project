@@ -1,5 +1,5 @@
 import { InputNumber } from "components/inputs";
-import { ChatMission } from "components/inputs/inputsMission/ChatMission";
+
 import { useAuthState } from "context/auth";
 import {
   doMissionStateById,
@@ -30,8 +30,7 @@ export const CreationMission = () => {
 
   const handleCreateMission = async () => {
     const value = 200;
-    const tx = await _createContractMission(factoryCv, 200);
-    console.log(tx);
+    await _createContractMission(factoryCv, 200);
   };
   return (
     <div className="flex justify-between">
