@@ -61,7 +61,7 @@ export const CreationFeatures = () => {
 export const CreationFeature = () => {
   let { mission } = useMissionState();
   let [features, setFeatures] = useState({
-    description: "",
+    description: { desc: "", dev: "" },
     estimatedDay: 0,
     wadge: 0,
     inviteOnly: false,

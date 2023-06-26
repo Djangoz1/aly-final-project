@@ -13,7 +13,7 @@ export const CVName = ({ styles }) => {
     }
   }, [cv]);
   const getName = async () => {
-    const _name = await _getName(cv);
+    const _name = await _getName(cv.address);
     setName(_name);
   };
   return <span className={styles}>{name}</span>;

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-
-
 import "./CommitWorker.sol";
 
 library Milestone {
@@ -39,13 +37,13 @@ library Milestone {
         Feature feature; // feature data
     }
 
- 
+    // *:::::::::::  GETTER  ::::::::::* //
 
- 
     // *:::::::::::  SETTER  ::::::::::* //
     // ?----------   OWNER   -----------? //
 
     function createFeature(
+        uint _id,
         uint16 _estimatedDays,
         uint256 _wadge,
         string memory _description,
@@ -54,10 +52,11 @@ library Milestone {
     ) internal view returns (Feature memory) {
         if (_isInviteOnly) {
             require(_assignedWorker != address(0), "You must assign a worker");
-        }else {
-            require(_assignedWorker == address(0), "You cant assign a worker");
         }
-        require( _estimatedDays > 0,"You must set a estimatedDays greater than 0");
+        require(
+            _estimatedDays > 0,
+            "You must set a estimatedDays greater than 0"
+        );
         require(_wadge > 0, "You must set a wadge greater than 0");
         require(bytes(_description).length > 0, "You must set a description");
 
@@ -69,7 +68,7 @@ library Milestone {
         _newFeature.assignedWorker = _assignedWorker;
         _newFeature.description = _description;
         _newFeature.isInviteOnly = _isInviteOnly;
-
+        _newFeature.id = _id;
         return _newFeature;
     }
 
@@ -80,12 +79,17 @@ library Milestone {
         address _assignedWorker,
         bool _isInviteOnly,
         address _addrOwner
-    ) internal view returns (FeatureWeb3 memory){
-
+    ) internal view returns (FeatureWeb3 memory) {
         if (_isInviteOnly) {
-            require(_assignedWorker != address(0),"You must assign a worker to this feature");
+            require(
+                _assignedWorker != address(0),
+                "You must assign a worker to this feature"
+            );
         }
-        require(_estimatedDays > 0,"You must set a estimatedDays greater than 0");
+        require(
+            _estimatedDays > 0,
+            "You must set a estimatedDays greater than 0"
+        );
         require(_wadge > 0, "You must set a wadge greater than 0");
         require(bytes(_description).length > 0, "You must set a description");
         FeatureWeb3 memory _newFeature;
@@ -100,4 +104,55 @@ library Milestone {
 
         return _newFeature;
     }
+
+    function _setFeature(
+        uint _id,
+        uint16 _estimatedDays,
+        uint256 _wadge,
+        string memory _description,
+        address _assignedWorker,
+        bool _isInviteOnly
+    ) public view returns (Feature memory) {
+        Feature memory _newFeature;
+        _newFeature = createFeature(
+            _id,
+            _estimatedDays,
+            _wadge,
+            _description,
+            _assignedWorker,
+            _isInviteOnly
+        );
+        return _newFeature;
+    }
+
+    function _setFeatureWeb3(
+        uint _id,
+        uint16 _estimatedDays,
+        uint256 _wadge,
+        string memory _description,
+        address _assignedWorker,
+        bool _isInviteOnly,
+        address _addrOwner
+    ) public view returns (FeatureWeb3 memory) {
+        FeatureWeb3 memory _newFeature = createFeatureWeb3(
+            _estimatedDays,
+            _wadge,
+            _description,
+            _assignedWorker,
+            _isInviteOnly,
+            _addrOwner
+        );
+
+        return _newFeature;
+    }
+
+    // // *:::::::::::  STATE  ::::::::::* //
+
+    // function _setMissionStatusToPending() public {
+    //     require(
+    //         features.length > 0 || featuresWeb3.length > 0,
+    //         "You must add at least one feature"
+    //     );
+    //     _changeMissionStatus(MissionStatus.Pending);
+    // }
 }

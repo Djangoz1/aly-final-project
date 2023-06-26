@@ -2,7 +2,6 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-// import './CV.sol';
 
 import "./Mission.sol";
 import "./SBToken/FactoryCV.sol";
@@ -14,7 +13,7 @@ contract FactoryMission is Ownable {
     uint256 balanceFoundation;
     address public factoryCVAddress;
     FactoryCV factoryCV;
-    mapping(address => Mission) public listMission;
+    mapping(uint => Mission) public listMission;
 
     // *::::::::: CONSTRUCTOR :::::::::* //
     constructor(address _factoryCVAddress) payable {
@@ -44,9 +43,11 @@ contract FactoryMission is Ownable {
         );
         address _address = address(newMission);
         cv.setMission(_address);
-        listMission[_address] = newMission;
+
+        listMission[missionsLength] = newMission;
         missionsLength++;
         return _address;
+        return address(this);
     }
 
     // *::::::::::::: GETTER :::::::::::: //
@@ -54,8 +55,9 @@ contract FactoryMission is Ownable {
         return address(this).balance;
     }
 
-    function getMission(address _address) public view returns (Mission) {
-        return listMission[_address];
+    function getMission(uint _id) public view returns (Mission) {
+        require(_id < missionsLength, "Mission does not exist");
+        return listMission[_id];
     }
 
     function getMissionsLength() public view returns (uint256) {

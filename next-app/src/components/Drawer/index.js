@@ -20,8 +20,10 @@ export const Drawer = () => {
   };
 
   const createCV = async () => {
-    await _createContractCv(address);
-    await doAuthCV(dispatch, factoryCv, address);
+    const tx = await _createContractCv(address).then((res) =>
+      doAuthCV(dispatch, factoryCv, address)
+    );
+    console.log(tx);
   };
 
   return (

@@ -6,6 +6,7 @@ import "./FactoryCV.sol";
 
 import "../lib/Milestone.sol";
 import "../lib/CommitWorker.sol";
+import "../Mission.sol";
 
 interface IntFactoryMission {
     function createMission(uint _amount) external returns (address);
@@ -26,6 +27,9 @@ contract CV is Ownable {
     bool public isRegistred;
     bool isBanned;
     uint missionsLength;
+
+    uint featuresLength;
+
     mapping(uint => address) public missionsList;
     mapping(uint => Milestone.Feature) public featuresList;
     mapping(uint => Milestone.FeatureWeb3) public featuresWeb3List;
@@ -35,9 +39,39 @@ contract CV is Ownable {
         isRegistred = true;
     }
 
+    // *::::::::::::: FEATURES :::::::::::::* //
+
+    function incrementFeatures(
+        Milestone.Feature memory _newFeature
+    ) public onlyOwner {
+        featuresList[featuresLength] = _newFeature;
+        featuresLength++;
+    }
+
+    function getFeaturesLength() public view returns (uint) {
+        return featuresLength;
+    }
+
+    function getFeature(
+        uint _id
+    ) public view returns (Milestone.Feature memory) {
+        return featuresList[_id];
+    }
+
     function setName(string memory _name) public onlyOwner {
         require(bytes(_name).length > 0, "Name is empty");
         name = _name;
+    }
+
+    function beAssignedWorker(
+        address _missionAddress,
+        uint _idFeature
+    ) public onlyOwner {
+        Mission mission = Mission(_missionAddress);
+        Milestone.Feature memory _newFeature = mission.beAssignedWorker(
+            _idFeature
+        );
+        incrementFeatures(_newFeature);
     }
 
     function setMission(address _missionAddress) public {

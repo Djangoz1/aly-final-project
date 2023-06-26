@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@iconify/react";
 import { Header } from "components/Header";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { CreationMission, ListMission } from "components/inputs/inputsMission";
@@ -64,6 +65,7 @@ const Mission = () => {
             "Hi, you should registred before continue"
           )}{" "}
         </h3>
+
         <ListMission />
         {isMission ? <CreationFeatures /> : <CreationMission />}
       </div>

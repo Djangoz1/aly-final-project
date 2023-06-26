@@ -1,3 +1,4 @@
+import { DEV_LANGUAGES } from "constants/languages";
 import { ethers } from "ethers";
 
 export const parseHex = (number) => {
@@ -48,4 +49,16 @@ export const calcTimestamp = (_timestamp, _dayValue) => {
   const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 
   return { days, hours, minutes };
+};
+
+export const selectLanguage = (string) => {
+  const newString = string.split(": ");
+  let result;
+  for (let index = 0; index < DEV_LANGUAGES.length; index++) {
+    const element = DEV_LANGUAGES[index];
+    if (element.name === newString[0]) {
+      result = element;
+    }
+  }
+  return result;
 };

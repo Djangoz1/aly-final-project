@@ -1,13 +1,9 @@
-const ADDR_FACTORY_CV = "0x68B1D87F95878fE05B998F19b66F4baba5De1aed";
-
 const hre = require("hardhat");
 const CONTRACT_NAME = "FactoryCV";
 
 async function main() {
-  const factoryCV = await hre.ethers.getContractAt(
-    CONTRACT_NAME,
-    ADDR_FACTORY_CV
-  );
+  const FactoryCV = await hre.ethers.getContractFactory(CONTRACT_NAME);
+  const factoryCV = await FactoryCV.deploy();
 
   await factoryCV.deployed();
   console.log(`FactoryCV deployed to ${factoryCV.address}`);

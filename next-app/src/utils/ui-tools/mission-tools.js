@@ -1,17 +1,37 @@
 "use client";
 
 import { ethers } from "ethers";
+// import { ethers } from "hardhat";
 import Mission from "artifacts/contracts/Mission.sol/Mission.json";
+
 import { ADDR_FACTORY_MISSION } from "constants/address";
 import { _getProvider, _getSigner } from "./web3-tools";
-import { parseHex } from "helpers";
+import { parseHex, selectLanguage } from "helpers";
 import {
   _getAccount,
+  _getContractCVByAddress,
+  _getContractFactoryMission,
+  _getName,
   _signerContractCV,
   _signerFactoryMission,
 } from "./auth-tools";
 
 // *::::::::::::::: GET MISSION  :::::::::::::::*
+
+export const _getAllContractsMissionByFactory = async () => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const factoryMission = await _getContractFactoryMission();
+    const length = parseHex(await factoryMission.getMissionsLength());
+    const arr = [];
+    for (let index = 0; index < length; index++) {
+      const element = await factoryMission.getMission(index);
+
+      arr.push(element);
+    }
+
+    return arr;
+  }
+};
 
 export const _getAllContractsMissionByCv = async (cv) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
@@ -49,6 +69,19 @@ export const _getContractMissionById = async (missions, id) => {
   }
 };
 
+export const _getContractMissionByAddress = async (address) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    try {
+      const provider = await _getProvider();
+      const mission = new ethers.Contract(address, Mission.abi, provider);
+
+      return mission;
+    } catch (error) {
+      return error;
+    }
+  }
+};
+
 export const _signerContractMission = async (mission) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     try {
@@ -76,7 +109,11 @@ export const _getContractMissionByCv = async (cv, id) => {
 
       const missionAddr = await cv.getMission(id);
 
-      const mission = new ethers.Contract(missionAddr, Mission.abi, provider);
+      const mission = new ethers.deployContract(
+        missionAddr,
+        Mission.abi,
+        provider
+      );
 
       return mission;
     } catch (error) {
@@ -97,10 +134,11 @@ export const _setFeature = async (_mission, feature) => {
         signer
       );
 
-      const { estimatedDay, wadge, description, assignedWorker, isInviteOnly } =
+      let { estimatedDay, wadge, description, assignedWorker, isInviteOnly } =
         feature;
+      description = feature?.description?.dev + ": " + feature.description.desc;
 
-      const tx = await mission.setFeature(
+      await mission.setFeature(
         estimatedDay,
         wadge,
         description,
@@ -142,6 +180,20 @@ export const _createContractMission = async (factoryCv, amount) => {
       tx.wait();
     } catch (error) {
       return error;
+    }
+  }
+};
+
+export const _getMissionsLength = async () => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const factoryMission = await _getContractFactoryMission();
+
+    try {
+      const length = await factoryMission.missionsLength();
+
+      return length;
+    } catch (error) {
+      return { ok: false, error };
     }
   }
 };

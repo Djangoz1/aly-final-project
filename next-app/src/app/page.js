@@ -11,6 +11,7 @@ import {
 } from "context/auth";
 import { useEffect } from "react";
 import { doMissionsState, useMissionDispatch } from "context/authMissions";
+import { Missions } from "sections/Missions";
 export default function Home() {
   const { address, cv, factoryMission, factoryCv } = useAuthState();
   const dispatch = useAuthDispatch();
@@ -38,6 +39,7 @@ export default function Home() {
       <Header />
       <section>
         <Hero />
+        <Missions />
       </section>
     </main>
   );

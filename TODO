@@ -3,10 +3,14 @@
 
 
 
-Implémenter le CV pour le worker et pour l'employer dans les fonctions  
+<!-- Implémenter le CV pour le worker et pour l'employer dans les fonctions   -->
 Tester 
 <!-- FAIRE le get mission par la fonction du cv -->
-Passer à la  création des commits 
++---
+Passer à la  création des commits : 
+- UX: Créer la list des cv 
+- UX: Ajouter un worker par son nom pour faciliter la recherche (côté front et côté back envoyé address)
+---+
 Tester
 Implémenter le paiement 
 Tester

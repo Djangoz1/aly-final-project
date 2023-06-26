@@ -5,6 +5,9 @@ import CV from "artifacts/contracts/SBToken/CV.sol/CV.json";
 import FactoryMission from "artifacts/contracts/FactoryMission.sol/FactoryMission.json";
 
 import { ADDR_FACTORY_CV, ADDR_FACTORY_MISSION } from "constants/address";
+import { _getProvider } from "./web3-tools";
+import { _getContractMissionByAddress } from "./mission-tools";
+import { parseHex } from "helpers";
 
 // *::::::::::::::: PROVIDER :::::::::::::::*
 
@@ -75,12 +78,24 @@ export const _getCVsLength = async () => {
 
 // *::::::::::::::: CV :::::::::::::::*
 
+export const _getContractCVByAddress = async (_address) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    try {
+      const provider = await _getProvider();
+      const cv = new ethers.Contract(_address, CV.abi, provider);
+      return cv;
+    } catch (error) {
+      return error;
+    }
+  }
+};
+
 export const _getContractCV = async (factoryCv, _address) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const cvAddr = await factoryCv.getCV(_address);
-      const cv = new ethers.Contract(cvAddr, CV.abi, provider);
+      const cv = await _getContractCVByAddress(cvAddr);
 
       return cv;
     } catch (error) {
@@ -104,16 +119,20 @@ export const _signerContractCV = async (factoryCv, _address) => {
   }
 };
 
-export const _getName = async (cv) => {
+export const _getName = async (cvAddr) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const provider = await _getProvider();
     try {
+      const cv = new ethers.Contract(cvAddr, CV.abi, provider);
       const name = await cv.name();
+
       return name;
     } catch (error) {
       return error;
     }
   }
 };
+
 export const _setName = async (cvAddr, name) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -122,6 +141,51 @@ export const _setName = async (cvAddr, name) => {
 
     const tx = await cvContract.setName(name);
     await tx.wait();
+  }
+};
+
+export const _getStateOwnerMission = async (missionAddr) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    try {
+      const contract = await _getContractMissionByAddress(missionAddr);
+      const objectOwner = {
+        cvAddress: await contract?.ownerCV(), //
+        address: "", //
+        name: "", //
+        missions: [], //
+        featuresLength: 0, //
+        amountDispersed: 0,
+      };
+
+      const cv = await _getContractCVByAddress(objectOwner?.cvAddress);
+
+      if (cv) {
+        let _name = await cv?.name();
+        objectOwner.name = _name;
+        let _address = await cv?.owner();
+        objectOwner.address = _address;
+        let missionsLength = await cv?.getMissionsLength();
+        for (let index = 0; index < missionsLength; index++) {
+          const missionAddr = await cv?.getMission(index);
+          objectOwner.missions.push(missionAddr);
+          const mission = await _getContractMissionByAddress(missionAddr);
+
+          let _featuresLength = parseHex(await mission?.getFeaturesLength()); //prettier-ignore
+          objectOwner.featuresLength += _featuresLength;
+
+          if (_featuresLength > 0) {
+            for (let index = 0; index < _featuresLength; index++) {
+              const feature = await mission.getFeature(index);
+              objectOwner.amountDispersed += parseHex(feature.wadge);
+            }
+          }
+        }
+      }
+
+      return objectOwner;
+    } catch (error) {
+      return error;
+    }
   }
 };
 
@@ -157,20 +221,6 @@ export const _signerFactoryMission = async () => {
       return factoryMission;
     } catch (error) {
       return error;
-    }
-  }
-};
-
-export const _getMissionsLength = async () => {
-  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-    const factoryMission = await _getContractFactoryMission();
-
-    try {
-      const length = await factoryMission.missionsLength();
-
-      return length;
-    } catch (error) {
-      return { ok: false, error };
     }
   }
 };

@@ -16,9 +16,9 @@ export const ChatMission = ({ features }) => {
 
   useEffect(() => {
     const _messages = messages;
-    if (description) {
+    if (description?.desc) {
       _messages[0].add = true;
-      _messages[0].text = `Feature is : ${description}`;
+      _messages[0].text = `Feature is : ${description?.dev} : ${description.desc}`;
     }
     if (estimatedDay > 0) {
       _messages[1].add = true;

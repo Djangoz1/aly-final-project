@@ -7,10 +7,15 @@ const {
   getContractCV,
 } = require("../../helpers/cv.helpers");
 const {
-  getContractFactoryMission,
   getContractMission,
   setFeature,
 } = require("../../helpers/factoryMission.helpers");
+const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
+const {
+  _testInitFactoryMission,
+  _testInitFeature,
+} = require("../../helpers/test_init");
+const { _testParseHex } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "Mission";
 
@@ -34,7 +39,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     factoryCV = await getContractFactoryCV();
     cv = await getContractCV({ factoryCV, owner: this.owner.address });
 
-    factoryMission = await getContractFactoryMission({ factoryCV });
+    factoryMission = await _testInitFactoryMission(factoryCV.address);
     mission = await getContractMission({ cv, factoryMission });
   });
 
@@ -44,48 +49,40 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should set a mission with worker", async () => {
-      const tx = await mission.setFeature(
-        30,
-        2000,
-        "Fais quelque chose",
-        this.addr2.address,
-        true
-      );
-      tx.wait();
-
-      let length = await mission.getFeaturesLength();
-      expect(length.toString()).to.equal("1");
+      await _testInitFeature({
+        mission,
+        values: { workerAddr: this.addr2.address, isInvite: true },
+      });
     });
 
     it("Should set a mission without worker", async () => {
-      const addressZero = ethers.constants.AddressZero;
-      await setFeature(mission, addressZero);
-
-      let length = await mission.getFeaturesLength();
-      expect(length.toString()).to.equal("1");
+      await _testInitFeature({ mission });
     });
 
     it("Should NOT set a mission without worker", async () => {
-      const addressZero = ethers.constants.AddressZero;
       await expect(
-        mission.setFeature(30, 2000, "Fais quelque chose", addressZero, true)
+        _testInitFeature({
+          mission,
+          values: { isInvite: true },
+        })
       ).to.be.revertedWith("You must assign a worker");
-
-      let length = await mission.getFeaturesLength();
-      expect(length).to.equal(0);
     });
 
-    it("Should get a mission", async () => {
-      const tx = await mission.setFeature(
-        30,
-        2000,
-        "Fais quelque chose",
-        this.addr2.address,
-        true
-      );
-      tx.wait();
+    it("Should get a feature", async () => {
+      await _testInitFeature({
+        mission,
+        values: { description: "its ok" },
+      });
+
       const feature = await mission.getFeature(0);
-      expect(feature.description).to.equal("Fais quelque chose");
+      expect(feature.description).to.equal("its ok");
+    });
+    it("Should be a worker", async () => {
+      const _length = await cv.getFeaturesLength();
+      const _id = await _testInitFeature({ mission });
+      await cv.beAssignedWorker(mission.address, _id);
+      const _newLength = await cv.getFeaturesLength();
+      expect(_length).to.be.equal(_newLength - 1);
     });
   });
 });
