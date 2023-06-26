@@ -166,8 +166,7 @@ contract Mission is WorkflowStatusManager {
         } else {
             require(_id < features.length, "Feature not found");
         }
-        CommitWorker.Commit memory _newCommit = CommitWorker._getNewCommit(
-            _id,
+        CommitWorker.Commit memory _newCommit = CommitWorker._createCommit(
             _assignedWorker
         );
 
@@ -214,8 +213,7 @@ contract Mission is WorkflowStatusManager {
     function createCommit(address _assignedWorker, uint _id) public {
         features[_id].commitLength++;
         features[_id].assignedWorker = _assignedWorker;
-        CommitWorker.Commit memory _newCommit = CommitWorker._getNewCommit(
-            _id,
+        CommitWorker.Commit memory _newCommit = CommitWorker._createCommit(
             _assignedWorker
         );
         commits[_id].push(_newCommit);

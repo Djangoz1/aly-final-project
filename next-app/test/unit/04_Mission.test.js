@@ -6,16 +6,12 @@ const {
   getContractFactoryCV,
   getContractCV,
 } = require("../../helpers/cv.helpers");
-const {
-  getContractMission,
-  setFeature,
-} = require("../../helpers/factoryMission.helpers");
+const { getContractMission } = require("../../helpers/factoryMission.helpers");
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
 const {
   _testInitFactoryMission,
   _testInitFeature,
 } = require("../../helpers/test_init");
-const { _testParseHex } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "Mission";
 

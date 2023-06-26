@@ -39,32 +39,4 @@ library CommitWorker {
 
         return _newCommit;
     }
-
-    function _beAssignedWorker(uint _id) public returns (Commit memory) {
-        CV cv = CV(msg.sender);
-        cv.setMission(address(this));
-
-        Milestone.Feature memory _newFeatures;
-        Commit memory _newCommit;
-
-        _newCommit.oppenedAt = block.timestamp;
-        _newCommit.featureId = _id;
-        _newCommit.assignedWorker = msg.sender;
-        _newCommit.status = CommitWorker.CommitStatus.Pending;
-        return _newCommit;
-    }
-
-    function _getNewCommit(
-        uint256 _id,
-        address _assignedWorker
-    ) public returns (Commit memory) {
-        CV cv = CV(_assignedWorker);
-        cv.setMission(address(this));
-        Commit memory _newCommit;
-        _newCommit.oppenedAt = block.timestamp;
-        _newCommit.featureId = _id;
-        _newCommit.assignedWorker = _assignedWorker;
-        _newCommit.status = CommitWorker.CommitStatus.Pending;
-        return _newCommit;
-    }
 }
