@@ -13,6 +13,7 @@ import {
   _getContractFactoryMission,
   _getName,
   _signerContractCV,
+  _signerCv,
   _signerFactoryMission,
 } from "./auth-tools";
 
@@ -85,7 +86,7 @@ export const _getContractMissionByAddress = async (address) => {
 export const _signerContractMission = async (mission) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     try {
-      const signer = await _getSigner();
+      const signer = await _signerCv();
 
       if (mission.address) {
         const mission = new ethers.Contract(
@@ -137,6 +138,7 @@ export const _setFeature = async (_mission, feature) => {
       let { estimatedDay, wadge, description, assignedWorker, isInviteOnly } =
         feature;
       description = feature?.description?.dev + ": " + feature.description.desc;
+      console.log("test", feature);
 
       await mission.setFeature(
         estimatedDay,
@@ -152,14 +154,17 @@ export const _setFeature = async (_mission, feature) => {
   }
 };
 
-export const _getFeatures = async (_mission) => {
+export const _getFeatures = async (_missionAddr) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const _mission = await _getContractMissionByAddress(_missionAddr);
+
     try {
       const length = parseHex(await _mission.getFeaturesLength());
       const _features = [];
       if (length > 0) {
         for (let index = 0; index < length; index++) {
           const _feature = await _mission.getFeature(index);
+
           _features.push(_feature);
         }
       }

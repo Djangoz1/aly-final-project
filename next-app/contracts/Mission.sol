@@ -115,7 +115,6 @@ contract Mission is WorkflowStatusManager {
     }
 
     function setFeature(
-        uint _id,
         uint16 _estimatedDays,
         uint256 _wadge,
         string memory _description,
@@ -123,7 +122,6 @@ contract Mission is WorkflowStatusManager {
         bool _isInviteOnly
     ) public onlyEmployer {
         Milestone.Feature memory _newFeature = Milestone._setFeature(
-            _id,
             _estimatedDays,
             _wadge,
             _description,

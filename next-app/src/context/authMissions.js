@@ -77,7 +77,7 @@ export const doFeaturesState = async (dispatch, mission) => {
   dispatch({ status: "pending" });
 
   try {
-    let features = await _getFeatures(mission);
+    let features = await _getFeatures(mission.address);
 
     dispatch({ features: features, status: "idle", error: null });
   } catch (error) {

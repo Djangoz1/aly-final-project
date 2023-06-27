@@ -5,6 +5,7 @@ import { useMissionState } from "context/authMissions";
 import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
 import { BtnWorkerJoinFeature } from "./btn";
 import { useAuthState } from "context/auth";
+import { ObjStatsOwner } from "./obj";
 
 export const StatsOwnerList = ({}) => {
   const [ownersList, setOwnersList] = useState();
@@ -33,12 +34,11 @@ export const StatsOwnerList = ({}) => {
   return (
     <div className=" flex flex-col ">
       {ownersList?.map((obj, index) => (
-        <div className="flex items-center  " key={obj?.address}>
-          <div className="stats border bg-primary/50  mr-5 flex w-[30vw] border-primary">
-            <StatOwnerCV obj={obj} />
-            <StatOwnerMission obj={obj} />
-          </div>
-          {obj?.cvAddress !== cv?.address && <BtnWorkerJoinFeature />}
+        <div className="flex items-center" key={obj?.cvAddress}>
+          <ObjStatsOwner obj={obj} />
+          {obj?.cvAddress !== cv?.address && (
+            <BtnWorkerJoinFeature cvAddress={obj?.cvAddress} />
+          )}
         </div>
       ))}
     </div>

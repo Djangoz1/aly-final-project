@@ -75,8 +75,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
     it("Should be a worker", async () => {
       const _length = await cv.getFeaturesLength();
-      const _id = await _testInitFeature({ mission });
-      await cv.beAssignedWorker(mission.address, _id);
+
+      await _testInitFeature({ mission });
+      await cv.beAssignedWorker(mission.address, _length);
       const _newLength = await cv.getFeaturesLength();
       expect(_length).to.be.equal(_newLength - 1);
     });

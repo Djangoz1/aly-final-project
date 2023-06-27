@@ -1,5 +1,5 @@
 // import { ADDR_FACTORY_CV } from "constants/address";
-const ADDR_FACTORY_CV = "0xf5059a5D33d5853360D16C683c16e67980206f36";
+const ADDR_FACTORY_CV = "0x4c5859f0F772848b2D91F1D83E2Fe57935348029";
 
 const hre = require("hardhat");
 const CONTRACT_NAME = "FactoryMission";
@@ -19,7 +19,6 @@ async function main() {
     },
   });
   const factoryMission = await FactoryMission.deploy(ADDR_FACTORY_CV);
-  console.log("test", factoryMission);
   console.log(`FactoryMission deployed to ${factoryMission.address}`);
 }
 

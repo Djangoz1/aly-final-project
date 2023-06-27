@@ -94,6 +94,7 @@ export const CreationFeature = () => {
 };
 
 export const FeatureDescription = ({ feature }) => {
+  console.log(feature);
   return (
     <div className="stats shadow">
       <FeatureInfo feature={feature} />

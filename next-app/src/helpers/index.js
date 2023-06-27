@@ -52,11 +52,11 @@ export const calcTimestamp = (_timestamp, _dayValue) => {
 };
 
 export const selectLanguage = (string) => {
-  const newString = string.split(": ");
+  const newString = string?.split(": ");
   let result;
   for (let index = 0; index < DEV_LANGUAGES.length; index++) {
     const element = DEV_LANGUAGES[index];
-    if (element.name === newString[0]) {
+    if (element.name === newString?.[0]) {
       result = element;
     }
   }

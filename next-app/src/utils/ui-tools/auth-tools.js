@@ -5,7 +5,7 @@ import CV from "artifacts/contracts/SBToken/CV.sol/CV.json";
 import FactoryMission from "artifacts/contracts/FactoryMission.sol/FactoryMission.json";
 
 import { ADDR_FACTORY_CV, ADDR_FACTORY_MISSION } from "constants/address";
-import { _getProvider } from "./web3-tools";
+import { _getProvider, _getSigner } from "./web3-tools";
 import { _getContractMissionByAddress } from "./mission-tools";
 import { parseHex } from "helpers";
 
@@ -119,6 +119,20 @@ export const _signerContractCV = async (factoryCv, _address) => {
   }
 };
 
+export const _signerCv = async (_address) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    try {
+      const signer = await _getSigner();
+
+      const cv = new ethers.Contract(_address, CV.abi, signer);
+
+      return cv;
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+};
+
 export const _getName = async (cvAddr) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     const provider = await _getProvider();
@@ -144,43 +158,50 @@ export const _setName = async (cvAddr, name) => {
   }
 };
 
+export const _getStateOwnerByCv = async (cvAddress) => {
+  if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+    const cv = await _getContractCVByAddress(cvAddress);
+    const objectOwner = {
+      cvAddress: cvAddress, //
+      address: "", //
+      name: "", //
+      missions: [], //
+      featuresLength: parseHex(await cv.getFeaturesLength()), //
+      amountDispersed: 0,
+    };
+    if (cv) {
+      let _name = await cv?.name();
+      objectOwner.name = _name;
+      let _address = await cv?.owner();
+      objectOwner.address = _address;
+      let missionsLength = await cv?.getMissionsLength();
+      for (let index = 0; index < missionsLength; index++) {
+        const missionAddr = await cv?.getMission(index);
+        objectOwner.missions.push(missionAddr);
+        const mission = await _getContractMissionByAddress(missionAddr);
+
+        // let _featuresLength = parseHex(await mission?.getFeaturesLength()); //prettier-ignore
+        // objectOwner.featuresLength += _featuresLength;
+
+        if (objectOwner?.featuresLength > 0) {
+          for (let index = 0; index < _featuresLength; index++) {
+            const feature = await mission.getFeature(index);
+            objectOwner.amountDispersed += parseHex(feature.wadge);
+          }
+        }
+      }
+    }
+
+    return objectOwner;
+  }
+};
+
 export const _getStateOwnerMission = async (missionAddr) => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
     try {
       const contract = await _getContractMissionByAddress(missionAddr);
-      const objectOwner = {
-        cvAddress: await contract?.ownerCV(), //
-        address: "", //
-        name: "", //
-        missions: [], //
-        featuresLength: 0, //
-        amountDispersed: 0,
-      };
-
-      const cv = await _getContractCVByAddress(objectOwner?.cvAddress);
-
-      if (cv) {
-        let _name = await cv?.name();
-        objectOwner.name = _name;
-        let _address = await cv?.owner();
-        objectOwner.address = _address;
-        let missionsLength = await cv?.getMissionsLength();
-        for (let index = 0; index < missionsLength; index++) {
-          const missionAddr = await cv?.getMission(index);
-          objectOwner.missions.push(missionAddr);
-          const mission = await _getContractMissionByAddress(missionAddr);
-
-          let _featuresLength = parseHex(await mission?.getFeaturesLength()); //prettier-ignore
-          objectOwner.featuresLength += _featuresLength;
-
-          if (_featuresLength > 0) {
-            for (let index = 0; index < _featuresLength; index++) {
-              const feature = await mission.getFeature(index);
-              objectOwner.amountDispersed += parseHex(feature.wadge);
-            }
-          }
-        }
-      }
+      const ownerAddr = await contract?.owner();
+      const objectOwner = await _getStateOwnerByCv(ownerAddr);
 
       return objectOwner;
     } catch (error) {

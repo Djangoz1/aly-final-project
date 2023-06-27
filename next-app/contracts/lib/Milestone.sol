@@ -20,7 +20,6 @@ library Milestone {
         string description;
         uint256 oppenedAt; // timestamp when feature was oppened
         uint256 wadge; // wadge in wei
-        uint id;
         uint16 estimatedDays; // estimated hours to complete this feature
         uint16 commitLength; // number of commits related to this feature
         bool isDone; // if true, feature is done
@@ -31,7 +30,6 @@ library Milestone {
     }
 
     struct FeatureWeb3 {
-        uint id;
         address addrContract; // address of the contract that deployed with this feature
         address addrOwner; // address of the owner of the contract that deployed with this feature
         Feature feature; // feature data
@@ -43,7 +41,6 @@ library Milestone {
     // ?----------   OWNER   -----------? //
 
     function createFeature(
-        uint _id,
         uint16 _estimatedDays,
         uint256 _wadge,
         string memory _description,
@@ -68,7 +65,7 @@ library Milestone {
         _newFeature.assignedWorker = _assignedWorker;
         _newFeature.description = _description;
         _newFeature.isInviteOnly = _isInviteOnly;
-        _newFeature.id = _id;
+
         return _newFeature;
     }
 
@@ -106,7 +103,6 @@ library Milestone {
     }
 
     function _setFeature(
-        uint _id,
         uint16 _estimatedDays,
         uint256 _wadge,
         string memory _description,
@@ -115,7 +111,6 @@ library Milestone {
     ) public view returns (Feature memory) {
         Feature memory _newFeature;
         _newFeature = createFeature(
-            _id,
             _estimatedDays,
             _wadge,
             _description,

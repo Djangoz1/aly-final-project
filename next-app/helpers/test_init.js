@@ -32,10 +32,8 @@ const _testInitFeature = async ({ mission, values }) => {
   }
   const { workerAddr, wadge, estimatedDay, description, isInvite } = values;
   let _length = _testParseHex(await mission.getFeaturesLength());
-  let _newId = _length === 0 ? _length : _length - 1;
 
   const tx = await mission.setFeature(
-    _newId,
     estimatedDay || 30,
     wadge || 2000,
     description || "Fais quelque chose",
@@ -47,7 +45,6 @@ const _testInitFeature = async ({ mission, values }) => {
 
   let _newLength = _testParseHex(await mission.getFeaturesLength());
   expect(_newLength).to.equal(_length + 1);
-  return _newId;
 };
 
 module.exports = {

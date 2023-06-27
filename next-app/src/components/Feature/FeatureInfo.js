@@ -12,12 +12,12 @@ export const FeatureInfo = ({ feature }) => {
         <div className="stat-title w-fit">{ENUMS_FEATURE_STATUS[status]}</div>
         <div className="stat-value text-primary w-fit flex flex-col">
           <span className=" text-xs">{ENUMS_FEATURE_TYPE[featureType]}</span>
-          <span className="capitalize">{description.split(": ")?.[0]}</span>
+          <span className="capitalize">{description?.split(": ")?.[0]}</span>
         </div>
         <div className="stat-desc flex flex-col ">
           <span>Description:</span>
           <span className="text-gray-200 w-[150px] truncate">
-            {description.split(": ")?.[1]}
+            {description?.split(": ")?.[1]}
           </span>
         </div>
       </div>
