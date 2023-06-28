@@ -34,10 +34,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     it("Should create a CV", async () => {
       await factoryCV.createCV(this.addr1.address);
-
       let number = await factoryCV.getCVsLength();
-      console.log(number);
-
       expect(number.toString()).to.equal("1");
     });
 
@@ -46,9 +43,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       transaction.wait();
       let cvAddr = await factoryCV.getCV(this.addr1.address);
       let cv = await ethers.getContractAt("CV", cvAddr);
-
-      let owner = await cv.owner();
-
       expect(await cv.owner()).to.equal(this.addr1.address);
     });
   });

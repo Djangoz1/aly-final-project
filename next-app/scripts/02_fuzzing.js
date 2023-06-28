@@ -48,7 +48,7 @@ async function main() {
         values: {
           workerAddr: this.addr1.address,
           wadge: 700,
-          description: "js : First Mission",
+          description: "js: First Mission",
           isInvite: true,
         },
       });
@@ -57,14 +57,16 @@ async function main() {
         mission,
         values: {
           wadge: 500,
-          description: "open : Fais toi plais'",
+          description: "open: Fais toi plais'",
+          isInvite: false,
         },
       });
       await _testInitFeature({
         mission,
         values: {
           wadge: 900,
-          description: "solidity : Contract",
+          description: "solidity: Contract",
+          isInvite: false,
         },
       });
       console.log("Feature create on ", mission.address);

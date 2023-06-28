@@ -128,6 +128,7 @@ contract Mission is WorkflowStatusManager {
             _assignedWorker,
             _isInviteOnly
         );
+        _newFeature.id = features.length;
         features.push(_newFeature);
     }
 

@@ -18,6 +18,7 @@ import { FeatureDescription } from "sections/Features";
 import { _getStateOwnerByCv } from "utils/ui-tools/auth-tools";
 import { _getFeatures } from "utils/ui-tools/mission-tools";
 import { _joinFeature } from "utils/ui-tools/worker-tools";
+import { parseHex } from "helpers";
 
 export default ({ params }) => {
   const cvRefAddress = params.address;
@@ -75,6 +76,7 @@ export default ({ params }) => {
     await _joinFeature(cv.address, _missionAddr, _idFeature);
   };
 
+  console.log(featuresList);
   return (
     <>
       <Header />
@@ -89,7 +91,9 @@ export default ({ params }) => {
               {elem?.assignedWorker === ZERO_ADDRESS && !elem?.isInviteOnly && (
                 <button
                   className="btn "
-                  onClick={() => handleSubmit(features?.mission, index)}
+                  onClick={() =>
+                    handleSubmit(features?.mission, parseHex(elem?.id))
+                  }
                 >
                   Join Feature
                 </button>

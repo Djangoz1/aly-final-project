@@ -17,6 +17,7 @@ library Milestone {
     }
 
     struct Feature {
+        uint id;
         string description;
         uint256 oppenedAt; // timestamp when feature was oppened
         uint256 wadge; // wadge in wei

@@ -20,6 +20,8 @@ import {
 // *::::::::::::::: GET MISSION  :::::::::::::::*
 
 export const _joinFeature = async (cvAddr, _missionAddr, _idFeature) => {
+  console.log("test", _idFeature);
   const cv = await _signerCv(cvAddr);
+
   await cv.beAssignedWorker(_missionAddr, _idFeature);
 };
