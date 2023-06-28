@@ -24,8 +24,6 @@ export const InputAssignedWorker = ({ features, setFeatures }) => {
     return arr;
   };
 
-  console.log(listNames);
-
   const handleChange = async (_assignedWorker) => {
     const _features = { ...features };
     console.log("test", _assignedWorker);

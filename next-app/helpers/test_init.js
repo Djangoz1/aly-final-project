@@ -5,6 +5,14 @@ const { _testParseHex } = require("./test_utils");
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
 const FactoryMission_NAME = "FactoryMission";
 
+const _testInitFactoryCV = async () => {
+  const FactoryCV = await hre.ethers.getContractFactory("FactoryCV");
+  const factoryCV = await FactoryCV.deploy();
+
+  await factoryCV.deployed();
+  return factoryCV;
+};
+
 // Need Factory CV address in constructor
 const _testInitFactoryMission = async (_fcvAddr) => {
   let factoryMission;
@@ -23,6 +31,7 @@ const _testInitFactoryMission = async (_fcvAddr) => {
   });
 
   factoryMission = await contract.deploy(_fcvAddr);
+  await factoryMission.deployed();
   return factoryMission;
 };
 
@@ -33,7 +42,7 @@ const _testInitFeature = async ({ mission, values }) => {
   const { workerAddr, wadge, estimatedDay, description, isInvite } = values;
   let _length = _testParseHex(await mission.getFeaturesLength());
 
-  const tx = await mission.setFeature(
+  let tx = await mission.setFeature(
     estimatedDay || 30,
     wadge || 2000,
     description || "Fais quelque chose",
@@ -41,13 +50,14 @@ const _testInitFeature = async ({ mission, values }) => {
     isInvite || false
   );
 
-  tx.wait();
-
+  await tx.wait();
   let _newLength = _testParseHex(await mission.getFeaturesLength());
   expect(_newLength).to.equal(_length + 1);
+  return tx;
 };
 
 module.exports = {
+  _testInitFactoryCV,
   _testInitFactoryMission,
   _testInitFeature,
 };
