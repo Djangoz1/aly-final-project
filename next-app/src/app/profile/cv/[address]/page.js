@@ -76,7 +76,6 @@ export default ({ params }) => {
     await _joinFeature(cv.address, _missionAddr, _idFeature);
   };
 
-  console.log(featuresList);
   return (
     <>
       <Header />
