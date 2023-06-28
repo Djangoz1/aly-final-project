@@ -12,6 +12,7 @@ import {
 import { useEffect } from "react";
 import { doMissionsState, useMissionDispatch } from "context/authMissions";
 import { Missions } from "sections/Missions";
+import { _getAllCVs } from "utils/ui-tools/cv-tools";
 export default function Home() {
   const { address, cv, factoryMission, factoryCv } = useAuthState();
   const dispatch = useAuthDispatch();

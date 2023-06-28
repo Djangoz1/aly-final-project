@@ -1,4 +1,5 @@
 "use client";
+import { v4 as uuidv4 } from "uuid";
 import { ZERO_ADDRESS } from "@openzeppelin/test-helpers/src/constants";
 import { Header } from "components/Header";
 import { ObjStatsOwner } from "components/inputs/inputsCV/owner/stats/obj";
@@ -80,23 +81,23 @@ export default ({ params }) => {
       <div className="bg-zinc-900 w-[90%] p-5 mx-auto">
         <ObjStatsOwner obj={ownerObj} />
 
-        {featuresList?.map((elem, index) => (
-          <div className="flex" key={elem?.feature?.[0]?.description}>
-            <FeatureDescription feature={elem?.feature?.[0]} />
+        {featuresList?.map((features, index) =>
+          features?.feature?.map((elem) => (
+            <div className="flex" key={uuidv4()}>
+              <FeatureDescription feature={elem} />
 
-            {elem?.feature?.[0]?.assignedWorker === ZERO_ADDRESS &&
-              !elem?.feature?.[0]?.isInviteOnly && (
+              {elem?.assignedWorker === ZERO_ADDRESS && !elem?.isInviteOnly && (
                 <button
                   className="btn "
-                  onClick={() => handleSubmit(elem?.mission, index)}
+                  onClick={() => handleSubmit(features?.mission, index)}
                 >
                   Join Feature
                 </button>
               )}
-          </div>
-        ))}
+            </div>
+          ))
+        )}
       </div>
-      <div>[{cvRefAddress}]</div>
     </>
   );
 };

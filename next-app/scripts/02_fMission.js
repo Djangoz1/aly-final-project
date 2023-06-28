@@ -1,5 +1,5 @@
 // import { ADDR_FACTORY_CV } from "constants/address";
-const ADDR_FACTORY_CV = "0x4c5859f0F772848b2D91F1D83E2Fe57935348029";
+const ADDR_FACTORY_CV = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 const hre = require("hardhat");
 const CONTRACT_NAME = "FactoryMission";

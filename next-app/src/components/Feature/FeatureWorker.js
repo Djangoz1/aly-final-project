@@ -21,7 +21,7 @@ export const FeatureWorker = ({ feature }) => {
         <IcCommunity />
       </div>
 
-      <div className="stat-title">
+      <div className="stat-title truncate w-[100px]">
         {assignedWorker === ZERO_ADDRESS
           ? "En attente d'un worker ..."
           : assignedWorker}

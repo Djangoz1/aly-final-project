@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { StatOwnerCV, StatOwnerMission } from "./element";
-import { _getStateOwnerMission } from "utils/ui-tools/auth-tools";
+import {
+  _getStateOwnerByCv,
+  _getStateOwnerMission,
+} from "utils/ui-tools/auth-tools";
 import { useMissionState } from "context/authMissions";
 import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
 import { BtnWorkerJoinFeature } from "./btn";
 import { useAuthState } from "context/auth";
 import { ObjStatsOwner } from "./obj";
+import Link from "next/link";
+import { _getAllCVs } from "utils/ui-tools/cv-tools";
 
 export const StatsOwnerList = ({}) => {
   const [ownersList, setOwnersList] = useState();
 
-  const { addres, cv } = useAuthState();
+  const { addres, cv, factoryMission } = useAuthState();
   const { missions } = useMissionState();
 
   const getAllOwnerCv = async () => {
@@ -34,12 +39,9 @@ export const StatsOwnerList = ({}) => {
   return (
     <div className=" flex flex-col ">
       {ownersList?.map((obj, index) => (
-        <div className="flex items-center" key={obj?.cvAddress}>
+        <Link href={`profile/cv/${obj?.cvAddress}`} key={obj?.cvAddress}>
           <ObjStatsOwner obj={obj} />
-          {obj?.cvAddress !== cv?.address && (
-            <BtnWorkerJoinFeature cvAddress={obj?.cvAddress} />
-          )}
-        </div>
+        </Link>
       ))}
     </div>
   );
