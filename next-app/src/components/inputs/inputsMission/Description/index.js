@@ -5,8 +5,11 @@ import { Icon } from "@iconify/react";
 import { icfyCODE } from "icones";
 import { ListDevDomains, ListDevLanguages } from "./list";
 import { InputAssignedWorker } from "../AssignedWorker";
+import { _setFeature } from "utils/ui-tools/mission-tools";
+import { useMissionState } from "context/authMissions";
 
 export const InputDescription = ({ features, setFeatures }) => {
+  const { mission } = useMissionState();
   const handleChange = (_description) => {
     const _features = { ...features };
     _features.description.desc = _description;
@@ -23,11 +26,20 @@ export const InputDescription = ({ features, setFeatures }) => {
     setFeatures(_features);
   };
 
+  const handleSubmit = async (_features) => {
+    await _setFeature(mission, features);
+  };
   return (
     <>
       <div className="flex">
-        <div className="mr-4">
+        <div className="mr-4 flex flex-col">
           <ListDevLanguages setter={handleClick} value={devLanguage} />
+          <button
+            className="btn  btn-info  mt-auto btn-outlined"
+            onClick={() => handleSubmit(features)}
+          >
+            Ajouter Feature
+          </button>
         </div>
         <div className="flex flex-col">
           <ListDevDomains />
@@ -47,10 +59,9 @@ export const InputDescription = ({ features, setFeatures }) => {
               <InputTextArea setter={handleChange} title="Description" />
             </div>
           </div>
+          <InputAssignedWorker features={features} setFeatures={setFeatures} />
         </div>
       </div>
-
-      <label className="label ">Description :</label>
     </>
   );
 };

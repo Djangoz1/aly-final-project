@@ -8,9 +8,10 @@ export const InputInviteOnly = ({ features, setFeatures }) => {
     setFeatures(_features);
   };
   return (
-    <>
-      <label className="label ">Invite Only :</label>
+    <div className="flex join p-0 items-center">
+      <label className="label text-[10px]">Locked feature:</label>
+
       <InputCheckbox value={features.inviteOnly} setter={handleChange} />
-    </>
+    </div>
   );
 };

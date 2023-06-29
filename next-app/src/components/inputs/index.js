@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 
-export const InputNumber = ({ increment, decrement, value }) => {
+export const InputNumber = ({ setter, value }) => {
   return (
     <>
-      <button className="btn join-item rounded-r-full" onClick={decrement}>
-        -
-      </button>
-      <div className="input input-bordered flex items-center join-item">
-        <span className="countdown font-mono text-3xl">
-          <span style={{ "--value": value }}></span>
-        </span>
-      </div>
-      <button className="btn join-item " onClick={increment}>
-        +
-      </button>
+      <input
+        className="input input-bordered flex items-center join-item"
+        onChange={(e) => setter(e.target.value)}
+        type="number"
+      />
     </>
   );
 };
@@ -22,7 +16,7 @@ export const InputText = ({ value, setter, title, style }) => {
   return (
     <div className={`join w-full `}>
       <input
-        className={`input input-bordered join-item input-${style?.input}`}
+        className={`input w-full input-bordered join-item input-${style?.input}`}
         placeholder={title}
         value={value}
         onChange={(e) => setter(e.target.value)}
@@ -50,21 +44,18 @@ export const InputTextArea = ({ value, setter, title }) => {
 
 export const InputCheckbox = ({ value, setter }) => {
   return (
-    <label className="swap w-fit">
+    <label className="swap  w-fit">
       <input
         type="checkbox"
         onChange={() => (value ? setter(true) : setter(false))}
       />
       <div
-        className="swap-on btn btn-sm btn-circle btn-success"
+        className="swap-on badge   btn-success"
         onClick={() => setter(false)}
       >
         ON
       </div>
-      <div
-        className="swap-off btn btn-sm btn-circle btn-error"
-        onClick={() => setter(true)}
-      >
+      <div className="swap-off badge  btn-error" onClick={() => setter(true)}>
         OFF
       </div>
     </label>

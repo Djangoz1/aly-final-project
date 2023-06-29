@@ -21,7 +21,7 @@ export const ListDevLanguages = ({ setter, value }) => {
         >
           <Icon icon={language?.icon} style={{ color: language?.color }} />
 
-          <a>{language?.name}</a>
+          <a className="text-xs">{language?.name}</a>
         </li>
       ))}
     </div>
@@ -51,7 +51,7 @@ export const ListDevDomains = ({ setter, value }) => {
         >
           <Icon icon={domain?.icon} style={{ color: domain?.color }} />
 
-          <p>{domain?.name}</p>
+          <p className="text-xs">{domain?.name}</p>
         </li>
       ))}
     </div>
