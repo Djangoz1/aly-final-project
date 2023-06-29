@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { InputText, InputTextArea } from "../..";
-import { DEV_DOMAIN, DEV_LANGUAGES } from "constants/languages";
 import { Icon } from "@iconify/react";
-import { icfyCODE } from "icones";
 import { ListDevDomains, ListDevLanguages } from "./list";
 import { InputAssignedWorker } from "../AssignedWorker";
 import { _setFeature } from "utils/ui-tools/mission-tools";

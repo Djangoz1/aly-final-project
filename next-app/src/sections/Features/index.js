@@ -5,12 +5,8 @@ import { FeatureInfo } from "components/Feature/FeatureInfo";
 import { FeatureTiming } from "components/Feature/FeatureTiming";
 import { FeatureWorker } from "components/Feature/FeatureWorker";
 
-import { InputAssignedWorker } from "components/inputs/inputsMission/AssignedWorker";
 import { ChatMission } from "components/inputs/inputsMission/ChatMission";
 import { InputDescription } from "components/inputs/inputsMission/Description";
-import { InputEstimatedDay } from "components/inputs/inputsMission/EstimatedDay";
-import { InputInviteOnly } from "components/inputs/inputsMission/InviteOnly";
-import { InputWadge } from "components/inputs/inputsMission/Wadge";
 
 import {
   doFeaturesState,

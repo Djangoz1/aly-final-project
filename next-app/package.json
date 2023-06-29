@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "deploy": "hardhat run scripts/01_deploy.js --network localhost && hardhat run scripts/02_fuzzing.js --network localhost",
     "lint": "next lint"
   },
   "dependencies": {

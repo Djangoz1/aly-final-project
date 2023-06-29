@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { InputNumber } from "..";
-import { InputEstimatedDay } from "./EstimatedDay";
 
 export const InputWadge = ({ features, setFeatures }) => {
   const handleChange = (value) => {
