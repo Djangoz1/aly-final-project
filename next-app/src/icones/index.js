@@ -2,6 +2,7 @@ import React from "react";
 
 export const icfyCV = "pepicons-pop:cv";
 export const icfyETHER = "mdi:ethereum";
+export const icfyCODE = "ant-design:code-outlined";
 
 export const IcHamburger = () => (
   <svg

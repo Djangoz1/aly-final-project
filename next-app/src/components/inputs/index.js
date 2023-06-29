@@ -18,16 +18,16 @@ export const InputNumber = ({ increment, decrement, value }) => {
   );
 };
 
-export const InputText = ({ value, setter, title }) => {
+export const InputText = ({ value, setter, title, style }) => {
   return (
-    <div className="join">
+    <div className={`join w-full `}>
       <input
-        className="input input-bordered join-item"
+        className={`input input-bordered join-item input-${style?.input}`}
         placeholder={title}
         value={value}
         onChange={(e) => setter(e.target.value)}
       />
-      <button className="btn join-item ">+</button>
+      <button className={`btn join-item btn-${style?.btn}`}>+</button>
     </div>
   );
 };
@@ -41,15 +41,9 @@ export const InputTextArea = ({ value, setter, title }) => {
       <textarea
         placeholder={title}
         value={value}
-        className="textarea   textarea-bordered  textarea-lg w-full max-w-xs"
+        className="textarea    textarea-bordered  textarea-xs w-full max-w-xs"
         onChange={(e) => handleChange(e)}
       ></textarea>
-      <button
-        className="btn btn-sm btn-primary absolute top-1 r-0 -translate-x-full z-10 "
-        onClick={() => setter(isValue)}
-      >
-        +
-      </button>
     </div>
   );
 };
