@@ -22,8 +22,6 @@ import { _getterCV, _getterMISSION } from "./web3-tools";
 // // *::::::::::::::: CV :::::::::::::::*
 
 export const _getStateOwnerByCv = async (cvAddress) => {
-  console.log("cvAddress", cvAddress);
-
   const objectOwner = {
     cvAddress: cvAddress, //
     address: "", //
@@ -37,52 +35,41 @@ export const _getStateOwnerByCv = async (cvAddress) => {
     await _getterCV(cvAddress, "getFeaturesLength")
   );
 
-  console.log("objectOwner.featuresLength", objectOwner.featuresLength);
+  objectOwner.address = await _getterCV(cvAddress, "owner");
+  objectOwner.name = await _getterCV(cvAddress, "name");
 
-  //   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-  //     const cv = await _getContractCVByAddress(cvAddress);
-  //     if (cv) {
-  //       let _name = await cv?.name();
-  //       objectOwner.name = _name;
-  //       let _address = await cv?.owner();
-  //       objectOwner.address = _address;
-  //       let missionsLength = await cv?.getMissionsLength();
-  //       for (let index = 0; index < missionsLength; index++) {
-  //         const missionAddr = await cv?.getMission(index);
-  //         objectOwner.missions.push(missionAddr);
-  //         const mission = await _getContractMissionByAddress(missionAddr);
+  let missionsLength = parseInt(
+    await _getterCV(cvAddress, "getMissionsLength")
+  );
 
-  //         // let _featuresLength = parseHex(await mission?.getFeaturesLength()); //prettier-ignore
-  //         // objectOwner.featuresLength += _featuresLength;
+  for (let index = 0; index < missionsLength; index++) {
+    const missionAddr = await _getterCV(cvAddress, "getMission", [index]);
 
-  //         if (objectOwner?.featuresLength > 0) {
-  //           for (let index = 0; index < _featuresLength; index++) {
-  //             const feature = await mission.getFeature(index);
-  //             objectOwner.amountDispersed += parseHex(feature.wadge);
-  //           }
-  //         }
-  //       }
-  //     }
+    objectOwner.missions.push(missionAddr);
 
-  //     return objectOwner;
-  //   }
+    let _featuresLength = await _getterMISSION(
+      missionAddr,
+      "getFeaturesLength"
+    );
+
+    if (_featuresLength > 0) {
+      for (let index = 0; index < _featuresLength; index++) {
+        const feature = await _getterMISSION(missionAddr, "getFeature", [
+          index,
+        ]);
+        objectOwner.amountDispersed += parseInt(feature.wadge);
+      }
+    }
+  }
+
+  return objectOwner;
 };
 
 export const _getStateOwnerMission = async (missionAddr) => {
-  console.log("missionAddr", missionAddr);
   const owner = await _getterMISSION(missionAddr, "owner");
-  console.log("owner", owner);
+
   const objectOwner = await _getStateOwnerByCv(owner);
   return objectOwner;
-  //   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-  //     try {
-  // const contract = await _getContractMissionByAddress(missionAddr);
-  //       const ownerAddr = await contract?.owner();
-
-  //     } catch (error) {
-  //       return error;
-  //     }
-  //   }
 };
 
 // // *::::::::::::::: FactoryMission :::::::::::::::*

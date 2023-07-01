@@ -21,13 +21,13 @@ export const StatsOwnerList = ({}) => {
     const arr = [];
 
     const addresses = await _getAllContractsMissionByFactory();
-    console.log("test", addresses);
+
     for (let index = 0; index < addresses.length; index++) {
       const state = await _getStateOwnerMission(addresses[index]);
       arr.push(state);
     }
 
-    // setOwnersList(arr);
+    setOwnersList(arr);
   };
 
   useEffect(() => {
