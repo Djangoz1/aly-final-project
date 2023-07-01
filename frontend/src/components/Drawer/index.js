@@ -2,39 +2,37 @@
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
 import {
-  doAuthCV,
-  doAuthSigner,
-  useAuthDispatch,
+  // doAuthCV,
+  // doAuthSigner,
+  // useAuthDispatch,
   useAuthState,
 } from "context/auth";
 import { IcHamburger } from "icones";
 import React, { useEffect, useState } from "react";
-import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
+// import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
+import { useAccount } from "wagmi";
 
 export const Drawer = () => {
-  const { address, cv, factoryCv } = useAuthState();
-  const dispatch = useAuthDispatch();
+  const { cv } = useAuthState();
+  // const dispatch = useAuthDispatch();
+  const { address, isConnected } = useAccount();
 
-  const connect = async () => {
-    await doAuthSigner(dispatch);
-  };
+  // const connect = async () => {
+  //   await doAuthSigner(dispatch);
+  // };
 
-  const createCV = async () => {
-    const tx = await _createContractCv(address).then((res) =>
-      doAuthCV(dispatch, factoryCv, address)
-    );
-    console.log(tx);
-  };
+  // const createCV = async () => {
+  //   const tx = await _createContractCv(address).then((res) =>
+  //     doAuthCV(dispatch, factoryCv, address)
+  //   );
+  //   console.log(tx);
+  // };
 
   return (
     <div className="drawer  w-fit">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content ">
-        {!address ? (
-          <button className="btn btn-primary" onClick={connect}>
-            Connect
-          </button>
-        ) : (
+        {isConnected && (
           <label htmlFor="my-drawer" className="btn bg-zinc-900 drawer-button">
             <IcHamburger />
           </label>
@@ -57,9 +55,10 @@ export const Drawer = () => {
                 {cv ? (
                   <CVName />
                 ) : (
-                  <button className="btn" onClick={createCV}>
-                    Create a CV
-                  </button>
+                  "dsqdsq"
+                  // <button className="btn" onClick={createCV}>
+                  //   Create a CV
+                  // </button>
                 )}
               </div>
               {cv && <ModalSetCV />}

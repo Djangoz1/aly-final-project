@@ -1,7 +1,7 @@
+import { ZERO_ADDRESS } from "constants/web3";
 import { useAuthState } from "context/auth";
 import { IcCommunity, IcLock, IcShieldCheck, IcUnlock } from "icones";
 import React from "react";
-import { ZERO_ADDRESS } from "../../../../backend/helpers/test_utils";
 
 export const FeatureWorker = ({ feature }) => {
   const { isDone, isInviteOnly, assignedWorker } = feature;

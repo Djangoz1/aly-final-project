@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@egoist/tailwindcss-icons": "^1.1.0",
-    "@openzeppelin/contracts": "^4.9.1",
     "@rainbow-me/rainbowkit": "^1.0.4",
     "autoprefixer": "^10.4.14",
     "daisyui": "^3.1.1",
@@ -22,14 +21,9 @@
     "tailwindcss": "^3.3.2",
     "uuid": "^9.0.0",
     "viem": "^1.2.6",
-    "wagmi": "^1.3.3"
-  },
-  "devDependencies": {
-    "@ethersproject/abi": "^5.4.7",
-    "@ethersproject/providers": "^5.4.7",
+    "wagmi": "^1.3.3",
     "@iconify/json": "^2.2.82",
     "@iconify/react": "^4.1.1",
-    "@iconify/tailwind": "^0.1.3",
-    "ethers": "^5.4.7"
+    "@iconify/tailwind": "^0.1.3"
   }
 }

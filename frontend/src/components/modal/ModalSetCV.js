@@ -1,5 +1,5 @@
 import { useAuthState } from "context/auth";
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 import React, { useState } from "react";
 import { _setName } from "utils/ui-tools/auth-tools";
 

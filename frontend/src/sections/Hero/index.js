@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { heroEntreprise, heroWorker } from "constants/text";
 
-import { _getCVsLength } from "utils/ui-tools/auth-tools";
 import { Workflow } from "components/Workflow";
 import { HeroStats } from "components/stats/HeroStats";
 

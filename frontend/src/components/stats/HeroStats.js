@@ -1,31 +1,31 @@
 import { useAuthState } from "context/auth";
-import { parseHex } from "helpers";
+// import { parseHex } from "helpers";
 import React, { useEffect, useState } from "react";
-import { _getCVsLength } from "utils/ui-tools/auth-tools";
-import { _getMissionsLength } from "utils/ui-tools/mission-tools";
+// import { _getCVsLength } from "utils/ui-tools/auth-tools";
+import {
+  _getAllContractsMissionByFactory,
+  // _getMissionsLength,
+} from "utils/ui-tools/mission-tools";
+import {
+  _getterFactoryCV,
+  _getterFactoryMISSION,
+} from "utils/ui-tools/web3-tools";
 
 export const HeroStats = ({ statistics }) => {
   const { factoryCv } = useAuthState();
   const [cvLength, setCvLength] = useState(null);
   const [missionLength, setMissionLength] = useState(null);
   useEffect(() => {
-    if (factoryCv && !cvLength) {
-      getCvLength();
-    }
-    if (factoryCv && !missionLength) {
-      getMissionLength();
-    }
+    getStats();
   }, [factoryCv]);
-  const getCvLength = async () => {
-    const length = await _getCVsLength();
-    const result = parseHex(length);
-    setCvLength(result);
-  };
 
-  const getMissionLength = async () => {
-    const length = await _getMissionsLength();
-    const result = parseHex(length);
-    setMissionLength(result);
+  const getStats = async () => {
+    const _cvLength = parseInt(await _getterFactoryCV("getCVsLength"));
+    const _missionLength = parseInt(
+      await _getterFactoryMISSION("getMissionsLength")
+    );
+    setCvLength(_cvLength);
+    setMissionLength(_missionLength);
   };
 
   const statsNumber = [missionLength, 100, cvLength, "1000 USDT"];

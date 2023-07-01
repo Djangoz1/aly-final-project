@@ -5,6 +5,7 @@ import { FeatureWorker } from "components/Feature/FeatureWorker";
 
 import { ChatMission } from "components/inputs/inputsMission/ChatMission";
 import { InputDescription } from "components/inputs/inputsMission/Description";
+import { ZERO_ADDRESS } from "constants/web3";
 
 import {
   doFeaturesState,
@@ -14,7 +15,6 @@ import {
 
 import React, { useEffect, useState } from "react";
 import { _getFeatures, _setFeature } from "utils/ui-tools/mission-tools";
-import { ZERO_ADDRESS } from "../../../../backend/helpers/test_utils";
 
 export const CreationFeatures = () => {
   const { features, mission } = useMissionState();

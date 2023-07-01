@@ -4,36 +4,35 @@ import {
   _getStateOwnerByCv,
   _getStateOwnerMission,
 } from "utils/ui-tools/auth-tools";
-import { useMissionState } from "context/authMissions";
+
 import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
 import { BtnWorkerJoinFeature } from "./btn";
 import { useAuthState } from "context/auth";
 import { ObjStatsOwner } from "./obj";
 import Link from "next/link";
-import { _getAllCVs } from "utils/ui-tools/cv-tools";
+// import { _getAllCVs } from "utils/ui-tools/cv-tools";
 
 export const StatsOwnerList = ({}) => {
   const [ownersList, setOwnersList] = useState();
 
-  const { addres, cv, factoryMission } = useAuthState();
-  const { missions } = useMissionState();
+  const { cv, missions } = useAuthState();
 
   const getAllOwnerCv = async () => {
     const arr = [];
 
-    if (missions) {
-      const addresses = await _getAllContractsMissionByFactory();
-      for (let index = 0; index < addresses.length; index++) {
-        const state = await _getStateOwnerMission(addresses[index]);
-        arr.push(state);
-      }
+    const addresses = await _getAllContractsMissionByFactory();
+    console.log("test", addresses);
+    for (let index = 0; index < addresses.length; index++) {
+      const state = await _getStateOwnerMission(addresses[index]);
+      arr.push(state);
     }
-    setOwnersList(arr);
+
+    // setOwnersList(arr);
   };
 
   useEffect(() => {
+    getAllOwnerCv();
     if (missions) {
-      getAllOwnerCv();
     }
   }, [missions]);
   return (

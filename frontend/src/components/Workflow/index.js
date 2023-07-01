@@ -3,10 +3,10 @@ import { useMissionState } from "context/authMissions";
 import React, { useEffect, useState } from "react";
 
 export const Workflow = ({ isWorker, workerSteps, entrepriseSteps }) => {
-  const { cv } = useAuthState();
-  const { missions } = useMissionState();
+  const { cv, missions } = useAuthState();
   const [isRegistred, setRegistred] = useState(false);
   const [isProposeJob, setIsProposeJob] = useState(false);
+
   const registred = () => (cv ? setRegistred(true) : setRegistred(false));
   const proposeJob = () =>
     missions?.length > 0 ? setIsProposeJob(true) : setIsProposeJob(false);

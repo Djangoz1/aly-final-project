@@ -1,12 +1,8 @@
 "use client";
 
 import { createContext, useContext, useReducer } from "react";
-import {
-  _getAccount,
-  _getContractCV,
-  _getContractFactoryCV,
-  _getContractFactoryMission,
-} from "utils/ui-tools/auth-tools";
+
+import { _getterCV, _getterFactoryCV } from "utils/ui-tools/web3-tools";
 
 // Mise en place du reducer auth
 const reducer = (currentState, newState) => {
@@ -19,54 +15,36 @@ export const AuthDispatchContext = createContext();
 
 const initialState = {
   status: "idle",
-  address: null,
+  missions: [],
   cv: null,
-  factoryCv: null,
-  factoryMission: null,
   error: null,
 };
 
 // Fonction appelé au moment du onClick
 
-export const doAuthSigner = async (dispatch) => {
+// *::::::::::::::: MANAGE STATE  :::::::::::::::*
+export const doAuthMission = async (dispatch, address) => {
   dispatch({ status: "pending" });
-
-  try {
-    let address = await _getAccount();
-
-    dispatch({ address: address, status: "idle", error: null });
-  } catch (error) {
-    dispatch({ status: "error", error: "Error : Get Account" });
+  let missionsLength = parseInt(await _getterCV(address, "getMissionsLength"));
+  if (missionsLength > 0) {
+    let missions = [];
+    for (let index = 0; index < missionsLength; index++) {
+      const mission = await _getterCV(address, "getMission", [index]);
+      missions.push(mission);
+    }
+    dispatch({ missions, status: "idle", error: null });
+  } else {
+    dispatch({ status: "error", error: "Error : Get CV" });
   }
 };
 
-export const doAuthFactoryCV = async (dispatch) => {
+export const doAuthCV = async (dispatch, address) => {
   dispatch({ status: "pending" });
-  try {
-    let factoryCv = await _getContractFactoryCV();
 
-    dispatch({ factoryCv, status: "idle", error: null });
-  } catch (error) {
-    dispatch({ status: "error", error: "Error : Get FactoryCV" });
-  }
-};
-
-export const doAuthFactoryMission = async (dispatch) => {
-  dispatch({ status: "pending" });
-  try {
-    let factoryMission = await _getContractFactoryMission();
-    dispatch({ factoryMission, status: "idle", error: null });
-  } catch (error) {
-    dispatch({ status: "error", error: "Error : Get FactoryMission" });
-  }
-};
-
-export const doAuthCV = async (dispatch, factoryCV, address) => {
-  dispatch({ status: "pending" });
-  let cv = await _getContractCV(factoryCV, address);
+  let cv = await _getterFactoryCV("getCV", [address]);
 
   if (!cv?.error) {
-    dispatch({ cv: cv, status: "idle", error: null });
+    dispatch({ cv, status: "idle", error: null });
   } else {
     dispatch({ status: "error", error: "Error : Get CV" });
   }
