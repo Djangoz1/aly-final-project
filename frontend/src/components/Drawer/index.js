@@ -2,6 +2,8 @@
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
 import {
+  doAuthCV,
+  useAuthDispatch,
   // doAuthCV,
   // doAuthSigner,
   // useAuthDispatch,
@@ -9,24 +11,19 @@ import {
 } from "context/auth";
 import { IcHamburger } from "icones";
 import React, { useEffect, useState } from "react";
-// import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
+import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
+import { _setterCV, _setterFactoryCV } from "utils/ui-tools/web3-tools";
 import { useAccount } from "wagmi";
 
 export const Drawer = () => {
   const { cv } = useAuthState();
-  // const dispatch = useAuthDispatch();
+
   const { address, isConnected } = useAccount();
-
-  // const connect = async () => {
-  //   await doAuthSigner(dispatch);
-  // };
-
-  // const createCV = async () => {
-  //   const tx = await _createContractCv(address).then((res) =>
-  //     doAuthCV(dispatch, factoryCv, address)
-  //   );
-  //   console.log(tx);
-  // };
+  const dispatch = useAuthDispatch();
+  const createCV = async () => {
+    await _setterFactoryCV("createCV", [address]);
+    doAuthCV(dispatch, address);
+  };
 
   return (
     <div className="drawer  w-fit">
@@ -55,10 +52,9 @@ export const Drawer = () => {
                 {cv ? (
                   <CVName />
                 ) : (
-                  "dsqdsq"
-                  // <button className="btn" onClick={createCV}>
-                  //   Create a CV
-                  // </button>
+                  <button className="btn" onClick={createCV}>
+                    Create a CV
+                  </button>
                 )}
               </div>
               {cv && <ModalSetCV />}

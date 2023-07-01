@@ -1,13 +1,18 @@
-import { useAuthState } from "context/auth";
+import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 // import { ethers } from "ethers";
 import React, { useState } from "react";
 import { _setName } from "utils/ui-tools/auth-tools";
+import { _setterCV } from "utils/ui-tools/web3-tools";
+import { useAccount } from "wagmi";
 
 export const ModalSetCV = () => {
   const { cv } = useAuthState();
+  const { address } = useAccount();
   const [name, setName] = useState();
+  const dispatch = useAuthDispatch();
   const onClickSetName = async () => {
-    _setName(cv.address, name);
+    await _setterCV(cv, "setName", [name]);
+    doAuthCV(dispatch, address);
   };
   return (
     <>

@@ -150,7 +150,6 @@ export const _setterCV = async (addr, funcName, args) => {
     });
     const { hash } = await writeContract(request);
 
-    console.log("fdsfsdfjkdiopsgjusgiopzeyiauziurhfjazbnjkzqdfsgv", hash);
     return hash;
   } catch (error) {
     console.log("error", error);

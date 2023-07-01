@@ -5,6 +5,8 @@ import {
   _getStateOwnerMission,
 } from "utils/ui-tools/auth-tools";
 
+import { v4 as uuid } from "uuid";
+
 import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
 import { BtnWorkerJoinFeature } from "./btn";
 import { useAuthState } from "context/auth";
@@ -38,7 +40,7 @@ export const StatsOwnerList = ({}) => {
   return (
     <div className=" flex flex-col ">
       {ownersList?.map((obj, index) => (
-        <Link href={`profile/cv/${obj?.cvAddress}`} key={obj?.cvAddress}>
+        <Link href={`profile/cv/${obj?.cvAddress}`} key={uuid()}>
           <ObjStatsOwner obj={obj} />
         </Link>
       ))}
