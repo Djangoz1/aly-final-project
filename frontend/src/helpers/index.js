@@ -1,4 +1,4 @@
-// import { DEV_LANGUAGES } from "constants/languages";
+import { DEV_LANGUAGES } from "constants/languages";
 // import { ethers } from "ethers";
 
 // export const parseHex = (number) => {
@@ -8,57 +8,54 @@
 
 // export const parseToHex = (number) => number && ethers?.utils?.hexlify(number);
 
-// export const parseTimestamp = (_timestamp) => {
-//   let timestamp;
-//   if (_timestamp?._hex) {
-//     timestamp = parseHex(_timestamp);
-//   } else {
-//     timestamp = _timestamp;
-//   }
-//   const date = new Date(timestamp * 1000);
-//   const year = date.getFullYear();
-//   const month = date.getMonth() + 1;
-//   const day = date.getDate();
-//   // const hours = date.getHours();
-//   // const minutes = date.getMinutes();
-//   // const seconds = date.getSeconds();
+export const parseTimestamp = (_timestamp) => {
+  let timestamp;
 
-//   const formattedDate = `${day}/${month}/${year}`;
+  timestamp = parseInt(_timestamp);
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  // const hours = date.getHours();
+  // const minutes = date.getMinutes();
+  // const seconds = date.getSeconds();
 
-//   return formattedDate;
-// };
+  const formattedDate = `${day}/${month}/${year}`;
 
-// export const calcTimestamp = (_timestamp, _dayValue) => {
-//   const oppenedAt = parseHex(_timestamp) * 1000;
-//   const duration = _dayValue * 24 * 60 * 60 * 1000;
-//   const closeTimestamp = oppenedAt + duration;
+  return formattedDate;
+};
 
-//   const now = new Date().getTime();
+export const calcTimestamp = (_timestamp, _dayValue) => {
+  const oppenedAt = parseInt(_timestamp) * 1000;
+  const duration = _dayValue * 24 * 60 * 60 * 1000;
+  const closeTimestamp = oppenedAt + duration;
 
-//   const distance = closeTimestamp - now;
+  const now = new Date().getTime();
 
-//   if (distance < 0) {
-//     // Le temps est écoulé
-//     return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-//   }
+  const distance = closeTimestamp - now;
 
-//   const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-//   const hours = Math.floor(
-//     (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-//   );
-//   const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  if (distance < 0) {
+    // Le temps est écoulé
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
 
-//   return { days, hours, minutes };
-// };
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(
+    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  );
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 
-// export const selectLanguage = (string) => {
-//   const newString = string?.split(": ");
-//   let result;
-//   for (let index = 0; index < DEV_LANGUAGES.length; index++) {
-//     const element = DEV_LANGUAGES[index];
-//     if (element.name === newString?.[0]) {
-//       result = element;
-//     }
-//   }
-//   return result;
-// };
+  return { days, hours, minutes };
+};
+
+export const selectLanguage = (string) => {
+  const newString = string?.split(": ");
+  let result;
+  for (let index = 0; index < DEV_LANGUAGES.length; index++) {
+    const element = DEV_LANGUAGES[index];
+    if (element.name === newString?.[0]) {
+      result = element;
+    }
+  }
+  return result;
+};

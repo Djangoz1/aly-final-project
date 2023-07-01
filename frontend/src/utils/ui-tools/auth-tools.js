@@ -11,7 +11,6 @@ import { _getterCV, _getterMISSION } from "./web3-tools";
 //   ADDR_FACTORY_MISSION,
 // } from "../../../../backend/constants/address";
 
-// import { _getProvider, _getSigner } from "./web3-tools";
 // import { _getContractMissionByAddress } from "./mission-tools";
 // import { parseHex } from "helpers";
 
@@ -63,6 +62,19 @@ export const _getStateOwnerByCv = async (cvAddress) => {
   }
 
   return objectOwner;
+};
+
+export const _getStateFeatures = async (missionAddr) => {
+  const length = parseInt(
+    await _getterMISSION(missionAddr, "getFeaturesLength")
+  );
+  const arr = [];
+  for (let index = 0; index < length; index++) {
+    const feature = await _getterMISSION(missionAddr, "getFeature", [index]);
+    arr.push(feature);
+  }
+
+  return arr;
 };
 
 export const _getStateOwnerMission = async (missionAddr) => {

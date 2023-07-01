@@ -70,19 +70,6 @@ export const _getAllContractsMissionByFactory = async () => {
 //   }
 // };
 
-// export const _getContractMissionByAddress = async (address) => {
-//   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-//     try {
-//       const provider = await _getProvider();
-//       const mission = new ethers.Contract(address, Mission.abi, provider);
-
-//       return mission;
-//     } catch (error) {
-//       return error;
-//     }
-//   }
-// };
-
 // export const _signerContractMission = async (mission) => {
 //   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
 //     try {

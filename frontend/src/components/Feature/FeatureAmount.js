@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { parseHex } from "helpers";
+
 import React from "react";
 
 export const FeatureAmount = ({ feature }) => {
@@ -10,7 +10,7 @@ export const FeatureAmount = ({ feature }) => {
         <Icon icon="mdi:ethereum" className=" w-12 h-12" />
       </div>
       <div className="stat-title">Amount</div>
-      <div className="stat-value text-secondary">{parseHex(wadge)}</div>
+      <div className="stat-value text-secondary">{parseInt(wadge)}</div>
       <div className="stat-desc text-secondary">ETH</div>
     </div>
   );
