@@ -30,37 +30,15 @@ import React, { useEffect, useState } from "react";
 import { CreationFeatures } from "sections/Features";
 
 const Mission = () => {
-  const { cv, missions, missionId, factoryCv } = useAuthState();
+  const { cv, missionId } = useAuthState();
   const dispatch = useAuthDispatch();
 
   const { address, isConnected } = useAccount();
 
-  const [isIndex, setIsIndex] = useState(null);
   useEffect(() => {
     if (isConnected) doAuthCV(dispatch, address);
     if (cv) doAuthMission(dispatch, cv);
   }, [address, isConnected, cv]);
-
-  // useEffect(() => {
-  //   if (!factoryCv) doAuthFactoryCV(dispatch);
-  //   if (!factoryMission && factoryCv) doAuthFactoryMission(dispatch);
-  // }, [factoryCv, factoryMission]);
-
-  // useEffect(() => {
-  //   if (factoryCv && address) doAuthCV(dispatch, factoryCv, address);
-  // }, [factoryCv, address]);
-
-  // useEffect(() => {
-  //   if (cv) doMissionsState(missionDispatch, cv);
-  // }, [cv]);
-
-  // useEffect(() => {
-  //   if (mission !== null) {
-  //     setIsMission(true);
-  //   } else {
-  //     setIsMission(false);
-  //   }
-  // }, [mission]);
 
   return (
     <div>
@@ -76,12 +54,8 @@ const Mission = () => {
           )}{" "}
         </h3>
 
-        <ListMission setIsIndex={setIsIndex} isIndex={isIndex} />
-        {missionId !== null ? (
-          <CreationFeatures isIndex={isIndex} />
-        ) : (
-          <CreationMission />
-        )}
+        <ListMission />
+        {missionId !== null ? <CreationFeatures /> : <CreationMission />}
       </div>
     </div>
   );

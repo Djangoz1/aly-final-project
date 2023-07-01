@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 import { _getStateFeatures } from "utils/ui-tools/auth-tools";
 import { _getFeatures, _setFeature } from "utils/ui-tools/mission-tools";
 
-export const CreationFeatures = ({ isIndex }) => {
+export const CreationFeatures = () => {
   const { missions, missionId } = useAuthState();
 
   const [features, setFeatures] = useState([]);
@@ -32,7 +32,7 @@ export const CreationFeatures = ({ isIndex }) => {
 
   useEffect(() => {
     getFeatures();
-  }, [missions, isIndex]);
+  }, [missions, missionId]);
 
   return (
     <div>

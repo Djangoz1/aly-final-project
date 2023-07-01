@@ -24,12 +24,17 @@ import {
   _getStateFeatures,
   _getStateOwnerByCv,
 } from "utils/ui-tools/auth-tools";
-import { _getterMISSION } from "utils/ui-tools/web3-tools";
+import {
+  _getterCV,
+  _getterMISSION,
+  _setterCV,
+} from "utils/ui-tools/web3-tools";
 import { useAccount } from "wagmi";
 // import { FeatureDescription } from "sections/Features";
 // import { _getStateOwnerByCv } from "utils/ui-tools/auth-tools";
 // import { _getFeatures } from "utils/ui-tools/mission-tools";
-// import { _joinFeature } from "utils/ui-tools/worker-tools";
+import { _joinFeature } from "utils/ui-tools/worker-tools";
+import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 // import { parseHex } from "helpers";
 // import { ZERO_ADDRESS } from "constants/web3";
 
@@ -37,17 +42,14 @@ export default ({ params }) => {
   const cvRefAddress = params.address;
   const [ownerObj, setOwnerObj] = useState(null);
   const { address } = useAccount();
-  // const { address, cv, factoryMission, factoryCv } = useAuthState();
-  // const dispatch = useAuthDispatch();
-  // const missionDispatch = useMissionDispatch();
+  const { cv } = useAuthState();
+  const dispatch = useAuthDispatch();
 
-  // useEffect(() => {
-  //   if (factoryCv && address) doAuthCV(dispatch, factoryCv, address);
-  // }, [factoryCv, address]);
-
-  // useEffect(() => {
-  //   if (cv) doMissionsState(missionDispatch, cv);
-  // }, [cv]);
+  useEffect(() => {
+    if (address) {
+      doAuthCV(dispatch, address);
+    }
+  }, [address]);
 
   const getOwnerObj = async () => {
     let _ownerObj = await _getStateOwnerByCv(cvRefAddress);
@@ -77,10 +79,10 @@ export default ({ params }) => {
     }
   }, [ownerObj]);
 
-  // const handleSubmit = async (_missionAddr, _idFeature) => {
-  //   await _joinFeature(cv.address, _missionAddr, _idFeature);
-  // };
-  console.log(featuresList);
+  const handleSubmit = async (_missionAddr, _idFeature) => {
+    await _setterCV(cv, "beAssignedWorker", [_missionAddr, _idFeature]);
+    getFeatures();
+  };
 
   return (
     <>
@@ -92,12 +94,12 @@ export default ({ params }) => {
           features?.feature?.map((elem) => (
             <div className="flex" key={uuidv4()}>
               <FeatureDescription feature={elem} />
-
+              {console.log("fdfd", features?.mission, parseInt(elem?.id))}
               {elem?.assignedWorker === ZERO_ADDRESS && !elem?.isInviteOnly && (
                 <button
                   className="btn "
                   onClick={() =>
-                    handleSubmit(features?.mission, parseHex(elem?.id))
+                    handleSubmit(features?.mission, parseInt(elem?.id))
                   }
                 >
                   Join Feature

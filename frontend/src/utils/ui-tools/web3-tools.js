@@ -139,14 +139,18 @@ export const _getterFactoryCV = async (funcName, args) => {
   }
 };
 
-export const _setterCV = async (funcName, args, addr) => {
+export const _setterCV = async (addr, funcName, args) => {
   try {
-    const hash = _setterCONTRACT({
-      funcName,
-      args,
-      addr: addr,
+    const { request } = await prepareWriteContract({
+      address: addr,
+
+      functionName: funcName,
       abi: ABI_CV,
+      args: args,
     });
+    const { hash } = await writeContract(request);
+
+    console.log("fdsfsdfjkdiopsgjusgiopzeyiauziurhfjazbnjkzqdfsgv", hash);
     return hash;
   } catch (error) {
     console.log("error", error);
@@ -161,7 +165,6 @@ export const _getterCV = async (addr, funcName, args) => {
       abi: ABI_CV,
       functionName: funcName,
     });
-    console.log(res);
     return res;
   } catch (error) {
     console.log("error", error);
