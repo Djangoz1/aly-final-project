@@ -21,12 +21,15 @@ export const StatsOwnerList = ({}) => {
 
   const getAllOwnerCv = async () => {
     const arr = [];
-
+    let addrOwner = [];
     const addresses = await _getAllContractsMissionByFactory();
 
     for (let index = 0; index < addresses.length; index++) {
       const state = await _getStateOwnerMission(addresses[index]);
-      arr.push(state);
+      if (!addrOwner.includes(state?.cvAddress)) {
+        arr.push(state);
+        addrOwner.push(state?.cvAddress);
+      }
     }
 
     setOwnersList(arr);
