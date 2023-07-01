@@ -1,8 +1,18 @@
 "use client";
-// import { Icon } from "@iconify/react";
+
+import { Header } from "components/Header";
+import {
+  doAuthCV,
+  doAuthMission,
+  useAuthDispatch,
+  useAuthState,
+} from "context/auth";
+import { useAccount } from "wagmi";
+
+import { Icon } from "@iconify/react";
 // import { Header } from "components/Header";
-// import { CVName } from "components/inputs/inputsCV/CVName";
-// import { CreationMission, ListMission } from "components/inputs/inputsMission";
+import { CVName } from "components/inputs/inputsCV/CVName";
+import { CreationMission, ListMission } from "components/inputs/inputsMission";
 // import {
 //   doAuthCV,
 //   doAuthFactoryCV,
@@ -16,19 +26,20 @@
 //   useMissionDispatch,
 //   useMissionState,
 // } from "context/authMissions";
-// import React, { useEffect, useState } from "react";
-// import { CreationFeatures } from "sections/Features";
+import React, { useEffect, useState } from "react";
+import { CreationFeatures } from "sections/Features";
 
 const Mission = () => {
-  // const { address, cv, factoryMission, factoryCv } = useAuthState();
-  // const dispatch = useAuthDispatch();
+  const { cv, missions, missionId, factoryCv } = useAuthState();
+  const dispatch = useAuthDispatch();
 
-  // const { missions, mission } = useMissionState();
-  // const missionDispatch = useMissionDispatch();
+  const { address, isConnected } = useAccount();
 
-  // useEffect(() => {
-  //   doAuthSigner(dispatch);
-  // }, [address]);
+  const [isIndex, setIsIndex] = useState(null);
+  useEffect(() => {
+    if (isConnected) doAuthCV(dispatch, address);
+    if (cv) doAuthMission(dispatch, cv);
+  }, [address, isConnected, cv]);
 
   // useEffect(() => {
   //   if (!factoryCv) doAuthFactoryCV(dispatch);
@@ -51,10 +62,9 @@ const Mission = () => {
   //   }
   // }, [mission]);
 
-  // const [isMission, setIsMission] = useState(false);
   return (
     <div>
-      {/* <Header />
+      <Header />
       <div className="fixed left-1/2 z-100 bg-zinc-900 -translate-x-1/2 -translate-y-1/2 top-1/2 p-5 w-[90vw] h-[85vh]">
         <h3 className="font-bold text-lg">
           {cv ? (
@@ -66,9 +76,13 @@ const Mission = () => {
           )}{" "}
         </h3>
 
-        <ListMission />
-        {isMission ? <CreationFeatures /> : <CreationMission />}
-      </div> */}
+        <ListMission setIsIndex={setIsIndex} isIndex={isIndex} />
+        {missionId !== null ? (
+          <CreationFeatures isIndex={isIndex} />
+        ) : (
+          <CreationMission />
+        )}
+      </div>
     </div>
   );
 };

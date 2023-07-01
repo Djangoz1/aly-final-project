@@ -1,11 +1,6 @@
 import { DEV_LANGUAGES } from "constants/languages";
 // import { ethers } from "ethers";
 
-// export const parseHex = (number) => {
-//   if (number?._hex)
-//     return number && ethers.BigNumber.from(number._hex).toNumber();
-// };
-
 // export const parseToHex = (number) => number && ethers?.utils?.hexlify(number);
 
 export const parseTimestamp = (_timestamp) => {

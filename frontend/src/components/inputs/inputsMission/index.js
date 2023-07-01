@@ -1,6 +1,11 @@
 import { InputNumber } from "components/inputs";
 
-import { useAuthState } from "context/auth";
+import {
+  doAuthMission,
+  doAuthMissionId,
+  useAuthDispatch,
+  useAuthState,
+} from "context/auth";
 import {
   doMissionStateById,
   useMissionDispatch,
@@ -52,25 +57,18 @@ export const CreationMission = () => {
 };
 
 export const ListMission = () => {
-  const { missions, mission } = useMissionState();
-  const [isIndex, setIsIndex] = useState(null);
-
-  const dispatch = useMissionDispatch();
-
+  const { missions, missionId } = useAuthState();
+  const dispatch = useAuthDispatch();
   const handleClick = (_index) => {
-    setIsIndex(_index);
+    doAuthMissionId(dispatch, missions, _index);
   };
-
-  useEffect(() => {
-    doMissionStateById(dispatch, missions, isIndex);
-  }, [isIndex]);
 
   return (
     <div className="tabs w-fit tabs-boxed">
       <a
         onClick={() => handleClick(null)}
         className={`tab tab-sm tab-success tab-lifted ${
-          isIndex === null && "tab-active"
+          missionId === null && "tab-active"
         }`}
       >
         Create mission
@@ -80,7 +78,7 @@ export const ListMission = () => {
           key={mission}
           onClick={() => handleClick(index)}
           className={`tab tab-sm tab-lifted ${
-            index === isIndex && "tab-active"
+            index === missionId && "tab-active"
           }`}
         >
           Mission #{index}

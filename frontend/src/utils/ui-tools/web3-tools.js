@@ -78,14 +78,17 @@ export const _getterFactoryMISSION = async (funcName, args) => {
   }
 };
 
-export const _setterMISSION = async (funcName, args, addr) => {
+export const _setterMISSION = async (addr, funcName, args) => {
   try {
-    const hash = await _setterCONTRACT({
-      funcName,
-      args,
-      addr: addr,
+    const { request } = await prepareWriteContract({
+      address: addr,
+
       abi: ABI_MISSION,
+      functionName: funcName,
+      args: args,
     });
+    const { hash } = await writeContract(request);
+
     return hash;
   } catch (error) {
     console.log("error", error);

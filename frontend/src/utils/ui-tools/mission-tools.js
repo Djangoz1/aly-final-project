@@ -1,6 +1,7 @@
 // "use client";
 
-import { _getterFactoryMISSION } from "./web3-tools";
+import { ZERO_ADDRESS } from "constants/web3";
+import { _getterFactoryMISSION, _setterMISSION } from "./web3-tools";
 
 // import { ethers } from "ethers";
 // // import { ethers } from "hardhat";
@@ -112,34 +113,25 @@ export const _getAllContractsMissionByFactory = async () => {
 
 // // *:::::::::::::::: Features ::::::::::::::::* //
 
-// export const _setFeature = async (_mission, feature) => {
-//   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-//     try {
-//       const signer = await _getSigner();
-//       const mission = new ethers.Contract(
-//         _mission.address,
-//         Mission.abi,
-//         signer
-//       );
+export const _setFeature = async (missionAddr, feature) => {
+  try {
+    let { estimatedDay, wadge, description, assignedWorker, inviteOnly } =
+      feature;
+    const _description =
+      feature?.description?.dev + ": " + feature.description.desc;
 
-//       let { estimatedDay, wadge, description, assignedWorker, isInviteOnly } =
-//         feature;
-//       description = feature?.description?.dev + ": " + feature.description.desc;
-//       console.log("test", feature);
-
-//       await mission.setFeature(
-//         estimatedDay,
-//         wadge,
-//         description,
-//         assignedWorker,
-//         isInviteOnly
-//       );
-//     } catch (error) {
-//       console.error(error);
-//       return error;
-//     }
-//   }
-// };
+    await _setterMISSION(missionAddr, "setFeature", [
+      parseInt(estimatedDay),
+      parseInt(wadge),
+      _description,
+      assignedWorker,
+      inviteOnly,
+    ]);
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
+};
 
 // export const _getFeatures = async (_missionAddr) => {
 //   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {

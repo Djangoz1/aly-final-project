@@ -21,6 +21,7 @@ import { _getterCV, _getterMISSION } from "./web3-tools";
 // // *::::::::::::::: CV :::::::::::::::*
 
 export const _getStateOwnerByCv = async (cvAddress) => {
+  if (!cvAddress) return;
   const objectOwner = {
     cvAddress: cvAddress, //
     address: "", //

@@ -16,6 +16,7 @@ export const AuthDispatchContext = createContext();
 const initialState = {
   status: "idle",
   missions: [],
+  missionId: null,
   cv: null,
   error: null,
 };
@@ -25,6 +26,7 @@ const initialState = {
 // *::::::::::::::: MANAGE STATE  :::::::::::::::*
 export const doAuthMission = async (dispatch, address) => {
   dispatch({ status: "pending" });
+  if (!address) return;
   let missionsLength = parseInt(await _getterCV(address, "getMissionsLength"));
   if (missionsLength > 0) {
     let missions = [];
@@ -33,6 +35,15 @@ export const doAuthMission = async (dispatch, address) => {
       missions.push(mission);
     }
     dispatch({ missions, status: "idle", error: null });
+  } else {
+    dispatch({ status: "error", error: "Error : Get CV" });
+  }
+};
+
+export const doAuthMissionId = async (dispatch, missions, missionId) => {
+  dispatch({ status: "pending" });
+  if (missions.length > missionId) {
+    dispatch({ missionId: missionId, status: "idle", error: null });
   } else {
     dispatch({ status: "error", error: "Error : Get CV" });
   }

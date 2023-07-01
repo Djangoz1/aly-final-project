@@ -6,6 +6,7 @@ import { FeatureWorker } from "components/Feature/FeatureWorker";
 import { ChatMission } from "components/inputs/inputsMission/ChatMission";
 import { InputDescription } from "components/inputs/inputsMission/Description";
 import { ZERO_ADDRESS } from "constants/web3";
+import { useAuthState } from "context/auth";
 
 import {
   doFeaturesState,
@@ -14,25 +15,29 @@ import {
 } from "context/authMissions";
 
 import React, { useEffect, useState } from "react";
+import { _getStateFeatures } from "utils/ui-tools/auth-tools";
 import { _getFeatures, _setFeature } from "utils/ui-tools/mission-tools";
 
-export const CreationFeatures = () => {
-  const { features, mission } = useMissionState();
-  const dispatch = useMissionDispatch();
+export const CreationFeatures = ({ isIndex }) => {
+  const { missions, missionId } = useAuthState();
+
+  const [features, setFeatures] = useState([]);
+
+  const getFeatures = async () => {
+    if (missions && missionId != null && missionId < missions.length) {
+      const _features = await _getStateFeatures(missions[missionId]);
+      setFeatures(_features);
+    }
+  };
 
   useEffect(() => {
-    if (mission) {
-      doFeaturesState(dispatch, mission);
-    }
-  }, [mission]);
+    getFeatures();
+  }, [missions, isIndex]);
 
   return (
     <div>
       {features?.map((feature, index) => (
-        <details
-          className="collapse bg-base-200"
-          key={feature?.oppenedAt?._hex}
-        >
+        <details className="collapse bg-base-200" key={feature?.oppenedAt}>
           <summary className="collapse-title text-xl font-medium">
             Feature #{index}
           </summary>
@@ -54,7 +59,6 @@ export const CreationFeatures = () => {
 };
 
 export const CreationFeature = () => {
-  let { mission } = useMissionState();
   let [features, setFeatures] = useState({
     description: { desc: "", dev: "" },
     estimatedDay: 0,

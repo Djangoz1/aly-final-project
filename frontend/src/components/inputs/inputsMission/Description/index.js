@@ -4,10 +4,13 @@ import { Icon } from "@iconify/react";
 import { ListDevDomains, ListDevLanguages } from "./list";
 import { InputAssignedWorker } from "../AssignedWorker";
 import { _setFeature } from "utils/ui-tools/mission-tools";
-import { useMissionState } from "context/authMissions";
+// import { useMissionState } from "context/authMiss
+import { useAuthState } from "context/auth";
+import { _setterMISSION } from "utils/ui-tools/web3-tools";
 
 export const InputDescription = ({ features, setFeatures }) => {
-  const { mission } = useMissionState();
+  const { missionId, missions } = useAuthState();
+  const mission = missions[missionId];
   const handleChange = (_description) => {
     const _features = { ...features };
     _features.description.desc = _description;
@@ -25,6 +28,7 @@ export const InputDescription = ({ features, setFeatures }) => {
   };
 
   const handleSubmit = async (_features) => {
+    // await _setterMISSION("setFeature")
     await _setFeature(mission, features);
   };
   return (
