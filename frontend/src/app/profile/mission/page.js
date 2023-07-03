@@ -8,25 +8,10 @@ import {
   useAuthState,
 } from "context/auth";
 import { useAccount } from "wagmi";
-
-import { Icon } from "@iconify/react";
-// import { Header } from "components/Header";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { CreationMission, ListMission } from "components/inputs/inputsMission";
-// import {
-//   doAuthCV,
-//   doAuthFactoryCV,
-//   doAuthFactoryMission,
-//   doAuthSigner,
-//   useAuthDispatch,
-//   useAuthState,
-// } from "context/auth";
-// import {
-//   doMissionsState,
-//   useMissionDispatch,
-//   useMissionState,
-// } from "context/authMissions";
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect } from "react";
 import { CreationFeatures } from "sections/Features";
 
 const Mission = () => {

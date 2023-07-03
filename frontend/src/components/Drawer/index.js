@@ -1,16 +1,9 @@
 "use client";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
-import {
-  doAuthCV,
-  useAuthDispatch,
-  // doAuthCV,
-  // doAuthSigner,
-  // useAuthDispatch,
-  useAuthState,
-} from "context/auth";
+import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { IcHamburger } from "icones";
-import React, { useEffect, useState } from "react";
+
 import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
 import { _setterCV, _setterFactoryCV } from "utils/ui-tools/web3-tools";
 import { useAccount } from "wagmi";

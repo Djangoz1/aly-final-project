@@ -1,5 +1,5 @@
 import { ZERO_ADDRESS } from "constants/web3";
-import { useAuthState } from "context/auth";
+
 import { IcCommunity, IcLock, IcShieldCheck, IcUnlock } from "icones";
 import React from "react";
 
@@ -9,10 +9,6 @@ export const FeatureWorker = ({ feature }) => {
     <div className="stat">
       <div className="stat-title">Worker</div>
 
-      {/* <div className={`stat-value text-success`}>
-        {isDone && <IcShieldCheck />}
-        {!isDone && isInviteOnly ? <IcLock /> : <IcUnlock />}
-      </div> */}
       <div
         className={`stat-figure ${
           isInviteOnly ? "text-error" : "text-success"

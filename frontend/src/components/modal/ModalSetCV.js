@@ -1,5 +1,5 @@
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
-// import { ethers } from "ethers";
+
 import React, { useState } from "react";
 import { _setName } from "utils/ui-tools/auth-tools";
 import { _setterCV } from "utils/ui-tools/web3-tools";

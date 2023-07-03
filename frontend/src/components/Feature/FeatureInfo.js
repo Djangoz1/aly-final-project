@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { ENUMS_FEATURE_STATUS, ENUMS_FEATURE_TYPE } from "constants/enums";
-import { parseHex, selectLanguage } from "helpers";
+import { selectLanguage } from "helpers";
 import React from "react";
 
 export const FeatureInfo = ({ feature }) => {

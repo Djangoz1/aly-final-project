@@ -1,24 +1,10 @@
-// "use client";
-// import { ethers } from "ethers";
-// import CVFactory from "artifacts/contracts/SBToken/FactoryCV.sol/FactoryCV.json";
-// import CV from "artifacts/contracts/SBToken/CV.sol/CV.json";
-// import FactoryMission from "artifacts/contracts/FactoryMission.sol/FactoryMission.json";
-
 import { _getterCV, _getterMISSION } from "./web3-tools";
-
-// import {
-//   ADDR_FACTORY_CV,
-//   ADDR_FACTORY_MISSION,
-// } from "../../../../backend/constants/address";
-
-// import { _getContractMissionByAddress } from "./mission-tools";
-// import { parseHex } from "helpers";
 
 // // *::::::::::::::: PROVIDER :::::::::::::::*
 
 // // *::::::::::::::: FactoryCV :::::::::::::::*
 
-// // *::::::::::::::: CV :::::::::::::::*
+// *::::::::::::::: CV :::::::::::::::*
 
 export const _getStateOwnerByCv = async (cvAddress) => {
   if (!cvAddress) return;
@@ -84,39 +70,3 @@ export const _getStateOwnerMission = async (missionAddr) => {
   const objectOwner = await _getStateOwnerByCv(owner);
   return objectOwner;
 };
-
-// // *::::::::::::::: FactoryMission :::::::::::::::*
-
-// export const _getContractFactoryMission = async () => {
-//   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-//     const provider = new ethers.providers.Web3Provider(window.ethereum);
-//     try {
-//       const factoryMission = new ethers.Contract(
-//         ADDR_FACTORY_MISSION,
-//         FactoryMission.abi,
-//         provider
-//       );
-
-//       return factoryMission;
-//     } catch (error) {
-//       return error;
-//     }
-//   }
-// };
-// export const _signerFactoryMission = async () => {
-//   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-//     const provider = new ethers.providers.Web3Provider(window.ethereum);
-//     const signer = provider.getSigner();
-//     try {
-//       const factoryMission = new ethers.Contract(
-//         ADDR_FACTORY_MISSION,
-//         FactoryMission.abi,
-//         signer
-//       );
-
-//       return factoryMission;
-//     } catch (error) {
-//       return error;
-//     }
-//   }
-// };

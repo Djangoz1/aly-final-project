@@ -1,7 +1,4 @@
 import { DEV_LANGUAGES } from "constants/languages";
-// import { ethers } from "ethers";
-
-// export const parseToHex = (number) => number && ethers?.utils?.hexlify(number);
 
 export const parseTimestamp = (_timestamp) => {
   let timestamp;

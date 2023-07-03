@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { InputText } from "..";
-import { _getAllCVs } from "utils/ui-tools/cv-tools";
+
 import { _getName } from "utils/ui-tools/auth-tools";
 
 import { Icon } from "@iconify/react";
 import { InputInviteOnly } from "./InviteOnly";
 import { InputWadge } from "./Wadge";
 import { ZERO_ADDRESS } from "constants/web3";
+import { _getAllCVs } from "utils/ui-tools/state-tools";
+import { _getterCV } from "utils/ui-tools/web3-tools";
 
 export const InputAssignedWorker = ({ features, setFeatures }) => {
   const [listNames, setListNames] = useState([]);
@@ -16,7 +18,9 @@ export const InputAssignedWorker = ({ features, setFeatures }) => {
     const arr = [];
     for (let index = 0; index < cvs.length; index++) {
       const element = cvs[index];
-      const name = await _getName(element);
+
+      const name = await _getterCV(element, "name");
+
       if (
         name.toLowerCase().includes(_name.toLowerCase()) ||
         element.toLowerCase().includes(_name.toLowerCase())

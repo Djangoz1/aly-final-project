@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StatOwnerCV, StatOwnerMission } from "./element";
+
 import {
   _getStateOwnerByCv,
   _getStateOwnerMission,
@@ -8,16 +8,15 @@ import {
 import { v4 as uuid } from "uuid";
 
 import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
-import { BtnWorkerJoinFeature } from "./btn";
+
 import { useAuthState } from "context/auth";
 import { ObjStatsOwner } from "./obj";
 import Link from "next/link";
-// import { _getAllCVs } from "utils/ui-tools/cv-tools";
 
 export const StatsOwnerList = ({}) => {
   const [ownersList, setOwnersList] = useState();
 
-  const { cv, missions } = useAuthState();
+  const { missions } = useAuthState();
 
   const getAllOwnerCv = async () => {
     const arr = [];

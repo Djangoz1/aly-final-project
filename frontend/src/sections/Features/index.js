@@ -8,12 +8,6 @@ import { InputDescription } from "components/inputs/inputsMission/Description";
 import { ZERO_ADDRESS } from "constants/web3";
 import { useAuthState } from "context/auth";
 
-import {
-  doFeaturesState,
-  useMissionDispatch,
-  useMissionState,
-} from "context/authMissions";
-
 import React, { useEffect, useState } from "react";
 import { _getStateFeatures } from "utils/ui-tools/auth-tools";
 import { _getFeatures, _setFeature } from "utils/ui-tools/mission-tools";
@@ -51,14 +45,14 @@ export const CreationFeatures = () => {
           Click to open/close
         </summary>
         <div className="collapse-content">
-          <CreationFeature />
+          <CreationFeature getter={getFeatures} />
         </div>
       </details>
     </div>
   );
 };
 
-export const CreationFeature = () => {
+export const CreationFeature = ({ getter }) => {
   let [features, setFeatures] = useState({
     description: { desc: "", dev: "" },
     estimatedDay: 0,
@@ -71,7 +65,11 @@ export const CreationFeature = () => {
     <>
       <div className="flex justify-between">
         <div className="flex flex-col">
-          <InputDescription features={features} setFeatures={setFeatures} />
+          <InputDescription
+            getter={getter}
+            features={features}
+            setFeatures={setFeatures}
+          />
         </div>
         <ChatMission features={features} />
       </div>
