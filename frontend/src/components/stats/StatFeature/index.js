@@ -6,9 +6,11 @@ import { StatFeatureBadges } from "./StatFeatureBadges";
 import { StatFeatureFooter } from "./StatFeatureFooter";
 
 import { StatFeatureHidden } from "./StatFeatureHidden";
+import { useAuthState } from "context/auth";
 
-export const StatFeature = ({ feature, mission, submit }) => {
+export const StatFeature = ({ feature, mission, submit, link }) => {
   const [isClicked, setIsClicked] = useState(false);
+  const { cv } = useAuthState();
   return (
     <div
       className={`flex  border shadow bg-white/90 hover:bg-white px-4 pt-4 pb-2 box-border  rounded ${
@@ -26,6 +28,7 @@ export const StatFeature = ({ feature, mission, submit }) => {
           feature={feature}
           mission={mission}
           submit={submit}
+          link={link}
         />
       </div>
       {isClicked && <StatFeatureHidden feature={feature} mission={mission} />}

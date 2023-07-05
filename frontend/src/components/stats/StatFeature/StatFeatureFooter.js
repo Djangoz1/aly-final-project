@@ -1,10 +1,12 @@
 import { Icon } from "@iconify/react";
+import { BtnJoinFeature } from "components/btn/BtnJoinFeature";
+import { BtnToProfileCV } from "components/btn/BtnToProfileCV";
 import { ZERO_ADDRESS } from "constants/web3";
 import { useAuthState } from "context/auth";
 import { icfyCODER, icfyETHER } from "icones";
 import React from "react";
 
-export const StatFeatureFooter = ({ feature, submit, mission }) => {
+export const StatFeatureFooter = ({ feature, submit, mission, link }) => {
   const { cv } = useAuthState();
   return (
     <div className="flex items-center mt-4">
@@ -24,15 +26,17 @@ export const StatFeatureFooter = ({ feature, submit, mission }) => {
       <p className="text-black"> {parseInt(feature?.wadge)} ETH</p>
 
       {cv &&
+        submit &&
         feature?.assignedWorker === ZERO_ADDRESS &&
         !feature?.isInviteOnly && (
-          <button
-            className="btn btn-xs btn-success btn-outline ml-auto"
-            onClick={() => submit(mission?.address, parseInt(feature?.id))}
-          >
-            Join Feature
-          </button>
+          <BtnJoinFeature
+            missionAddr={mission?.address}
+            featureId={parseInt(feature?.id)}
+            getter={submit}
+          />
         )}
+
+      {link && <BtnToProfileCV cvAddress={mission?.ownerAddress} />}
     </div>
   );
 };

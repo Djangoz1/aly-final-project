@@ -1,5 +1,5 @@
 "use client";
-import { Header } from "components/Header";
+import { Header } from "sections/Layout/Header";
 import {
   doAuthCV,
   doAuthMission,
@@ -10,6 +10,8 @@ import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Hero } from "sections/Hero";
 import { Missions } from "sections/Missions";
+import { Layout } from "sections/Layout";
+import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
 
 export default function Home() {
   const { address, isConnected } = useAccount();
@@ -28,12 +30,11 @@ export default function Home() {
   }, [cv]);
 
   return (
-    <main>
-      <Header />
-      <section>
+    <Layout>
+      <>
         <Hero />
         <Missions />
-      </section>
-    </main>
+      </>
+    </Layout>
   );
 }

@@ -21,13 +21,13 @@ export const Workflow = ({ isWorker, workerSteps, entrepriseSteps }) => {
   }, [missions]);
 
   return (
-    <div className="flex relative -z-10 flex-col ml-auto">
-      <h4 className="text-white text-2xl font-black">Workflow</h4>
-      <ul className="steps  steps-vertical">
+    <div className="flex relative  w-full flex-col ">
+      <h4 className="text-black text-2xl font-black">Workflow</h4>
+      <ul className="steps  w-full  steps-horizontal">
         {isWorker
           ? workerSteps.map((step, index) => (
               <li
-                className={`step  ${
+                className={`step text-black  ${
                   workerStatus?.[index] ? "step-primary" : null
                 }`}
                 key={step}
@@ -39,7 +39,7 @@ export const Workflow = ({ isWorker, workerSteps, entrepriseSteps }) => {
         {!isWorker
           ? entrepriseSteps?.map((step, index) => (
               <li
-                className={`step ${
+                className={`step text-black ${
                   workerStatus?.[index] ? "step-primary" : null
                 }`}
                 key={step}

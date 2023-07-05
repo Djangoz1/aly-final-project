@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "components/Header";
+import { Header } from "sections/Layout/Header";
 import {
   doAuthCV,
   doAuthMission,

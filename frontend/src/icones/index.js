@@ -1,5 +1,9 @@
 import React from "react";
 
+export const icfyINSTA = "skill-icons:instagram";
+export const icfyFB = "devicon:facebook";
+export const icfyTWITTER = "skill-icons:twitter";
+export const icfyLINKEDIN = "devicon:linkedin";
 export const icfyCV = "pepicons-pop:cv";
 export const icfyETHER = "mdi:ethereum";
 export const icfyCODE = "ant-design:code-outlined";

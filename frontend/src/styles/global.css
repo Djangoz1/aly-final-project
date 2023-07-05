@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  width: 100vw;
+  overflow-x: hidden;
+  height: fit-content;
+}
 
-.debug *   {
-    border: 1px solid red;
+.debug * {
+  border: 1px solid red;
 }
 .debug {
-    border: 1px solid white;
+  border: 1px solid rgb(4, 185, 235);
 }

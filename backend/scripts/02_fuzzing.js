@@ -46,12 +46,9 @@ async function main() {
       await _testInitFeature({
         mission,
         values: {
-          workerAddr: this.addr1.address,
           wadge: 700,
           description:
             "__/title:Jeu de plateforme__/dev:unity__/domain:gaming__/desc:Refais moi le jeu de Peter Molineux",
-
-          isInvite: true,
         },
       });
 

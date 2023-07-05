@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "components/Header";
+import { Header } from "sections/Layout/Header";
 import { ObjStatsOwner } from "components/inputs/inputsCV/owner/stats/obj";
 import { ZERO_ADDRESS } from "constants/web3";
 
@@ -21,75 +21,36 @@ import { useAccount } from "wagmi";
 
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { StatFeature } from "components/stats/StatFeature";
+import { Layout } from "sections/Layout";
+import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
 
 export default ({ params }) => {
   const cvRefAddress = params.address;
   const [ownerObj, setOwnerObj] = useState(null);
-  const { address } = useAccount();
-  const { cv } = useAuthState();
-  const dispatch = useAuthDispatch();
 
-  useEffect(() => {
-    if (address) {
-      doAuthCV(dispatch, address);
-    }
-  }, [address]);
+  const { cv } = useAuthState();
 
   const getOwnerObj = async () => {
     let _ownerObj = await _getStateOwnerByCv(cvRefAddress);
     setOwnerObj(_ownerObj);
   };
 
-  const getFeatures = async () => {
-    const arr = [];
-    for (let index = 0; index < ownerObj?.missions?.length; index++) {
-      const features = await _getStateFeatures(ownerObj?.missions[index]);
-      arr.push({ mission: ownerObj?.missions[index], feature: features });
-    }
-
-    setFeaturesList(arr);
-  };
-
-  const [featuresList, setFeaturesList] = useState(null);
   useEffect(() => {
     if (!ownerObj) {
       getOwnerObj();
     }
   }, [cvRefAddress]);
-
-  useEffect(() => {
-    if (ownerObj?.missions) {
-      getFeatures();
-    }
-  }, [ownerObj]);
-
   const handleSubmit = async (_missionAddr, _idFeature) => {
     await _setterCV(cv, "beAssignedWorker", [_missionAddr, _idFeature]);
-    getFeatures();
   };
-
   return (
-    <>
-      <Header />
-      <div className="bg-zinc-900 w-[90%] p-5 mx-auto">
+    <Layout>
+      <>
         <ObjStatsOwner obj={ownerObj} />
         <div className="flex flex-wrap mt-5">
-          {featuresList?.map((features, index) =>
-            features?.feature?.map((elem) => (
-              <div className="mr-5 my-2" key={uuidv4()}>
-                <StatFeature
-                  feature={elem}
-                  mission={{
-                    address: features?.mission,
-                    owner: ownerObj?.name,
-                  }}
-                  submit={handleSubmit}
-                />
-              </div>
-            ))
-          )}
+          <ListStatsFeature cvAddress={cvRefAddress} submit={handleSubmit} />
         </div>
-      </div>
-    </>
+      </>
+    </Layout>
   );
 };

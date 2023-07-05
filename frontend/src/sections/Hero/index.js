@@ -12,16 +12,16 @@ export const Hero = () => {
   const heroStatus = [heroEntreprise, heroWorker];
 
   return (
-    <div className="flex flex-col w-[70%]  justify-center mx-auto">
+    <div className="flex flex-col   justify-center mx-auto">
       <div className="tabs mb-5 flex   w-full justify-start">
         {heroStatus.map((status, index) => (
           <button
             key={index}
-            className={`tab tab-bordered ${
+            className={`tab tab-bordered text-black ${
               index === 0 && !isWorker
-                ? "border-primary text-white"
+                ? "border-primary  "
                 : index === 1 && isWorker
-                ? "border-primary text-white"
+                ? "border-primary  "
                 : ""
             }`}
             onClick={() =>
@@ -36,13 +36,13 @@ export const Hero = () => {
           </button>
         ))}
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between mb-5">
         <div className="w-[35vw] ">
           <div className="flex flex-col mb-5">
-            <h4 className="text-white text-2xl font-black">
+            <h4 className="text-black text-2xl font-black">
               {isWorker ? heroWorker.title : heroEntreprise.title}
             </h4>
-            <h4 className="text-white text-2xl font-black">
+            <h4 className="text-black text-2xl font-black">
               {isWorker ? heroWorker.subtitle : heroEntreprise.subtitle}
             </h4>
           </div>
@@ -60,12 +60,12 @@ export const Hero = () => {
             isWorker ? heroWorker.statistic : heroEntreprise.statistic
           }
         />
-        <Workflow
-          isWorker={isWorker}
-          workerSteps={heroWorker?.steps}
-          entrepriseSteps={heroEntreprise?.steps}
-        />
       </div>
+      <Workflow
+        isWorker={isWorker}
+        workerSteps={heroWorker?.steps}
+        entrepriseSteps={heroEntreprise?.steps}
+      />
     </div>
   );
 };
