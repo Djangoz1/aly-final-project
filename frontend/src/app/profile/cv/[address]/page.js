@@ -50,7 +50,6 @@ export default ({ params }) => {
     setFeaturesList(arr);
   };
 
-  console.log("ownerObj", ownerObj);
   const [featuresList, setFeaturesList] = useState(null);
   useEffect(() => {
     if (!ownerObj) {
@@ -77,7 +76,7 @@ export default ({ params }) => {
         <div className="flex flex-wrap mt-5">
           {featuresList?.map((features, index) =>
             features?.feature?.map((elem) => (
-              <div className="mr-5" key={uuidv4()}>
+              <div className="mr-5 my-2" key={uuidv4()}>
                 <StatFeature
                   feature={elem}
                   mission={{

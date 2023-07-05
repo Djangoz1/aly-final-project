@@ -45,7 +45,6 @@ export const InputAssignedWorker = ({ features, setFeatures }) => {
 
   const handleClick = async (_assignedWorker) => {
     const _features = { ...features };
-    console.log("test", _assignedWorker);
     _features.assignedWorker = _assignedWorker;
     setFeatures(_features);
   };

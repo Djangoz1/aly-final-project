@@ -6,7 +6,7 @@ import { recastDescription } from "utils/ux-tools";
 
 export const FeatureInfo = ({ feature }) => {
   const { description, id, status, featureType } = feature;
-  console.log(recastDescription(description));
+
   return (
     <div className="stat flex">
       <div className=" w-fit">
