@@ -15,9 +15,9 @@ export const ListDevLanguages = ({ setter, value }) => {
           key={language?.icon}
           className={`flex flex-col btn w-[100px] my-2 items-center
               justify-center text-white  ${
-                value?.name === language?.name ? "btn-primary" : null
+                value === language?.name ? "btn-primary" : null
               }`}
-          onClick={() => setter(language)}
+          onClick={() => setter(language.name)}
         >
           <Icon icon={language?.icon} style={{ color: language?.color }} />
 
@@ -29,9 +29,8 @@ export const ListDevLanguages = ({ setter, value }) => {
 };
 
 export const ListDevDomains = ({ setter, value }) => {
-  const [isDomain, setIsDomain] = useState();
   const handleClick = (value) => {
-    setIsDomain(value);
+    setter(value);
   };
   return (
     <div className="flex flex-wrap p-3 h-fit shadow bg-base-100 justify-between w-[340px] ">
@@ -45,9 +44,9 @@ export const ListDevDomains = ({ setter, value }) => {
           key={domain?.icon}
           className={`flex flex-col btn p-0 w-[100px] my-2 items-center
               justify-center text-white  ${
-                isDomain?.name === domain?.name ? "btn-primary" : null
+                value === domain?.name ? "btn-primary" : null
               }`}
-          onClick={() => handleClick(domain)}
+          onClick={() => handleClick(domain.name)}
         >
           <Icon icon={domain?.icon} style={{ color: domain?.color }} />
 

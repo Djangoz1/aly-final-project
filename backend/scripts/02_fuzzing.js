@@ -48,7 +48,9 @@ async function main() {
         values: {
           workerAddr: this.addr1.address,
           wadge: 700,
-          description: "js: First Mission",
+          description:
+            "__/title:Jeu de plateforme__/dev:unity__/domain:gaming__/desc:Refais moi le jeu de Peter Molineux",
+
           isInvite: true,
         },
       });
@@ -57,7 +59,8 @@ async function main() {
         mission,
         values: {
           wadge: 500,
-          description: "open: Fais toi plais'",
+          description:
+            "__/title:NFT__/dev:solidity__/domain:web3__/desc:Créer un Pass NFT qui sera nécessaire pour les joueur pour jouer au jeu de plateforme",
           isInvite: false,
         },
       });
@@ -65,7 +68,8 @@ async function main() {
         mission,
         values: {
           wadge: 900,
-          description: "solidity: Contract",
+          description:
+            "__/title:Rewards System__/dev:solidity__/domain:web3__/desc:Créer un Reward System pour récompenser les joueurs qui ont gagné le jeu de plateforme",
           isInvite: false,
         },
       });

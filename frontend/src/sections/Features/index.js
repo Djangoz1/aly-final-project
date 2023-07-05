@@ -54,7 +54,7 @@ export const CreationFeatures = () => {
 
 export const CreationFeature = ({ getter }) => {
   let [features, setFeatures] = useState({
-    description: { desc: "", dev: "" },
+    description: { title: "", desc: "", dev: "", domain: "" },
     estimatedDay: 0,
     wadge: 0,
     inviteOnly: false,

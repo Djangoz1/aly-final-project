@@ -591,7 +591,7 @@
   dependencies:
     "@tanstack/query-persist-client-core" "4.29.19"
 
-"@tanstack/react-query@^4.28.0":
+"@tanstack/react-query@^4.28.0", "@tanstack/react-query@^4.29.19":
   version "4.29.19"
   resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.29.19.tgz#6ba187f2d0ea36ae83ff1f67068f53c88ce7b228"
   integrity sha512-XiTIOHHQ5Cw1WUlHaD4fmVUMhoWjuNJlAeJGq7eM4BraI5z7y8WkZO+NR8PSuRnQGblpuVdjClQbDFtwxTtTUw==
@@ -1780,6 +1780,11 @@ graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.11.tgz#4183e4e8bf08bb6e05bbb2f7d2e0c8f712ca40e3"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
+graphql@^16.7.1:
+  version "16.7.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.7.1.tgz#11475b74a7bff2aefd4691df52a0eca0abd9b642"
+  integrity sha512-DRYR9tf+UGU0KOsMcKAlXeFfX89UiiIZ0dRU3mR0yJfu6OjZqUcp68NnFLnqQU5RexygFoDy1EW+ccOYcPfmHg==
+
 has-flag@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-4.0.0.tgz#944771fd9c81c81265c4d6941860da06bb59479b"
@@ -2951,6 +2956,11 @@ typedarray-to-buffer@3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
+
+typescript@^5.1.6:
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
+  integrity sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==
 
 uint8arrays@^3.0.0, uint8arrays@^3.1.0:
   version "3.1.1"

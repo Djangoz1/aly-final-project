@@ -11,19 +11,30 @@ import { _setterMISSION } from "utils/ui-tools/web3-tools";
 export const InputDescription = ({ getter, features, setFeatures }) => {
   const { missionId, missions } = useAuthState();
   const mission = missions[missionId];
+
+  // Change description
   const handleChange = (_description) => {
     const _features = { ...features };
     _features.description.desc = _description;
     setFeatures(_features);
   };
-
-  const [devLanguage, setDevLanguage] = useState(null);
-  const [isTitle, setIsTitle] = useState("");
-
-  const handleClick = (language) => {
-    setDevLanguage(language);
+  // Change language
+  const handleClick = (dev) => {
     const _features = { ...features };
-    _features.description.dev = language?.name;
+    _features.description.dev = dev;
+    setFeatures(_features);
+  };
+  // Change domain
+  const handleClickDomain = (domain) => {
+    const _features = { ...features };
+    _features.description.domain = domain;
+    setFeatures(_features);
+  };
+
+  // Change title
+  const handleChangeTitle = (title) => {
+    const _features = { ...features };
+    _features.description.title = title;
     setFeatures(_features);
   };
 
@@ -35,7 +46,10 @@ export const InputDescription = ({ getter, features, setFeatures }) => {
     <>
       <div className="flex">
         <div className="mr-4 flex flex-col">
-          <ListDevLanguages setter={handleClick} value={devLanguage} />
+          <ListDevLanguages
+            setter={handleClick}
+            value={features.description.dev}
+          />
           <button
             className="btn  btn-info  mt-auto btn-outlined"
             onClick={() => handleSubmit(features)}
@@ -44,7 +58,10 @@ export const InputDescription = ({ getter, features, setFeatures }) => {
           </button>
         </div>
         <div className="flex flex-col">
-          <ListDevDomains />
+          <ListDevDomains
+            setter={handleClickDomain}
+            value={features.description.domain}
+          />
           <div className="bg-base-100 p-3 h-fit flex flex-col w-[340px]">
             <span className="flex text-white items-center mb-4">
               <Icon icon={"icon-park-outline:text"} />
@@ -52,9 +69,9 @@ export const InputDescription = ({ getter, features, setFeatures }) => {
             </span>
             <InputText
               title={"Title"}
-              value={isTitle}
+              value={features.description.title}
               style={{ input: "xs w-full", btn: "xs" }}
-              setter={setIsTitle}
+              setter={handleChangeTitle}
             />
 
             <div className="mt-2">

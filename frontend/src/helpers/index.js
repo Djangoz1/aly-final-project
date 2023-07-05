@@ -1,4 +1,4 @@
-import { DEV_LANGUAGES } from "constants/languages";
+import { DEV_DOMAIN, DEV_LANGUAGES } from "constants/languages";
 
 export const parseTimestamp = (_timestamp) => {
   let timestamp;
@@ -41,11 +41,20 @@ export const calcTimestamp = (_timestamp, _dayValue) => {
 };
 
 export const selectLanguage = (string) => {
-  const newString = string?.split(": ");
   let result;
   for (let index = 0; index < DEV_LANGUAGES.length; index++) {
     const element = DEV_LANGUAGES[index];
-    if (element.name === newString?.[0]) {
+    if (element.name === string) {
+      result = element;
+    }
+  }
+  return result;
+};
+export const selectDevDomain = (string) => {
+  let result;
+  for (let index = 0; index < DEV_DOMAIN.length; index++) {
+    const element = DEV_DOMAIN[index];
+    if (element.name === string) {
       result = element;
     }
   }

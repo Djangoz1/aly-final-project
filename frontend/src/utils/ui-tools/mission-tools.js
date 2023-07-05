@@ -1,3 +1,4 @@
+import { recastDescription } from "utils/ux-tools";
 import { _getterFactoryMISSION, _setterMISSION } from "./web3-tools";
 
 // *::::::::::::::: GET MISSION  :::::::::::::::*
@@ -21,7 +22,14 @@ export const _setFeature = async (missionAddr, feature) => {
     let { estimatedDay, wadge, description, assignedWorker, inviteOnly } =
       feature;
     const _description =
-      feature?.description?.dev + ": " + feature.description.desc;
+      "__/title:" +
+      description?.title +
+      "__/dev:" +
+      description?.dev +
+      "__/domain:" +
+      description.domain +
+      "__/desc:" +
+      description.desc;
 
     await _setterMISSION(missionAddr, "setFeature", [
       parseInt(estimatedDay),
