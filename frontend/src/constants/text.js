@@ -1,5 +1,5 @@
 export const heroWorker = {
-  tab: "For Workers",
+  tab: "Workers Hub",
   title: "Find works.",
   subtitle: "Get paid.",
   description:
@@ -23,7 +23,7 @@ export const heroWorker = {
 };
 
 export const heroEntreprise = {
-  tab: "For Entreprises",
+  tab: "Entreprises Hub",
   title: "Find workers.",
   subtitle: "Get your job done.",
   description:
@@ -45,3 +45,5 @@ export const heroEntreprise = {
     "Upgrade your cv",
   ],
 };
+
+export const stateCV = [heroWorker, heroEntreprise];

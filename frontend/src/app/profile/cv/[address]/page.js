@@ -23,6 +23,8 @@ import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { StatFeature } from "components/stats/StatFeature";
 import { Layout } from "sections/Layout";
 import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
+import { TabsStateCV } from "components/tabs/TabsStateCV";
+import { InfoProfileCV } from "components/infos/InfoProfile";
 
 export default ({ params }) => {
   const cvRefAddress = params.address;
@@ -30,23 +32,24 @@ export default ({ params }) => {
 
   const { cv } = useAuthState();
 
-  const getOwnerObj = async () => {
-    let _ownerObj = await _getStateOwnerByCv(cvRefAddress);
-    setOwnerObj(_ownerObj);
-  };
-
   useEffect(() => {
     if (!ownerObj) {
-      getOwnerObj();
+      (async () => {
+        let _ownerObj = await _getStateOwnerByCv(cvRefAddress);
+        setOwnerObj(_ownerObj);
+      })();
     }
   }, [cvRefAddress]);
   const handleSubmit = async (_missionAddr, _idFeature) => {
     await _setterCV(cv, "beAssignedWorker", [_missionAddr, _idFeature]);
   };
+  const [isWorker, setIsWorker] = useState(false);
   return (
     <Layout>
       <>
-        <ObjStatsOwner obj={ownerObj} />
+        <TabsStateCV setIsWorker={setIsWorker} isWorker={isWorker} />
+        <InfoProfileCV infos={ownerObj} />
+        {/* <ObjStatsOwner obj={ownerObj} /> */}
         <div className="flex flex-wrap mt-5">
           <ListStatsFeature cvAddress={cvRefAddress} submit={handleSubmit} />
         </div>

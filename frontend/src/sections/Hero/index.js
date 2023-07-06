@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { heroEntreprise, heroWorker } from "constants/text";
+import { heroEntreprise, heroWorker, stateCV } from "constants/text";
 
 import { Workflow } from "components/Workflow";
 import { HeroStats } from "components/stats/HeroStats";
 
 import Link from "next/link";
+import { TabsStateCV } from "components/tabs/TabsStateCV";
 
 export const Hero = () => {
   const [isWorker, setIsWorker] = useState(false);
@@ -13,29 +14,7 @@ export const Hero = () => {
 
   return (
     <div className="flex flex-col   justify-center mx-auto">
-      <div className="tabs mb-5 flex   w-full justify-start">
-        {heroStatus.map((status, index) => (
-          <button
-            key={index}
-            className={`tab tab-bordered text-black ${
-              index === 0 && !isWorker
-                ? "border-primary  "
-                : index === 1 && isWorker
-                ? "border-primary  "
-                : ""
-            }`}
-            onClick={() =>
-              index === 0
-                ? setIsWorker(false)
-                : index === 1
-                ? setIsWorker(true)
-                : null
-            }
-          >
-            {status?.tab}
-          </button>
-        ))}
-      </div>
+      <TabsStateCV setIsWorker={setIsWorker} isWorker={isWorker} />
       <div className="flex justify-between mb-5">
         <div className="w-[35vw] ">
           <div className="flex flex-col mb-5">

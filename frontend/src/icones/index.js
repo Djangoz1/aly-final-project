@@ -4,10 +4,43 @@ export const icfyINSTA = "skill-icons:instagram";
 export const icfyFB = "devicon:facebook";
 export const icfyTWITTER = "skill-icons:twitter";
 export const icfyLINKEDIN = "devicon:linkedin";
+
 export const icfyCV = "pepicons-pop:cv";
 export const icfyETHER = "mdi:ethereum";
+export const icfyCOIN = "ph:coins-light";
 export const icfyCODE = "ant-design:code-outlined";
+
 export const icfyCODER = "iconoir:developer";
+export const icfyMISSION = "line-md:document-code";
+export const icfySETTINGS = "solar:settings-bold";
+export const icfyHAMBURGER = "mdi:hamburger-open";
+
+export const icfyGAMING = "pepicons-print:controller-circle-filled";
+export const icfyAI = "vscode-icons:file-type-ai2";
+export const icfySQL = "devicon:azuresqldatabase";
+export const icfyJAVA = "vscode-icons:file-type-java";
+export const icfyJS = "vscode-icons:file-type-js-official";
+export const icfyTS = "vscode-icons:file-type-typescript-official";
+export const icfyNEXT = "devicon:nextjs";
+export const icfyPOSTGRE = "devicon:postgresql-wordmark";
+
+export const icfyPYTHON = "vscode-icons:file-type-python";
+export const icfyC = "vscode-icons:file-type-c";
+export const icfyHTML = "devicon:html5-wordmark";
+export const icfyCSS = "devicon:css3-wordmark";
+export const icfyREACT = "vscode-icons:file-type-reactjs";
+export const icfyBLENDER = "devicon:blender";
+export const icfySOL = "vscode-icons:file-type-solidity";
+export const icfyPHP = "vscode-icons:file-type-php";
+export const icfyRUST = "vscode-icons:file-type-rust";
+export const icfyLUA = "devicon:lua-wordmark";
+export const icfyUNITY = "bxl:unity";
+export const icfyUNREAL = "file-icons:unrealscript";
+export const icfyFIGMA = "logos:figma";
+export const icfyWORDPRESS = "devicon:wordpress";
+
+export const icfySEARCH = "line-md:search-twotone";
+export const icfySEND = "fluent:send-24-regular";
 
 export const IcHamburger = () => (
   <svg

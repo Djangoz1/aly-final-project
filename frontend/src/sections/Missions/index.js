@@ -14,6 +14,8 @@ import { useAuthState } from "context/auth";
 import Link from "next/link";
 
 import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
+import { Icon } from "@iconify/react";
+import { icfySEARCH, icfySEND } from "icones";
 
 export const Missions = () => {
   const [ownersList, setOwnersList] = useState();
@@ -48,6 +50,19 @@ export const Missions = () => {
 
   return (
     <div className="flex flex-col  mt-20   justify-center mx-auto">
+      <div className="flex  items-end">
+        <h4 className="text-black text-2xl font-black">Features</h4>
+        <div className="join ml-10">
+          <input
+            placeholder="Search Features"
+            className="input input-xs  join-item"
+          />
+          <div className="btn join-item btn-xs btn-primary ">
+            <Icon icon={icfySEARCH} className="text-white" />
+          </div>
+        </div>
+      </div>
+
       <div className=" flex  flex-wrap w-full ">
         {ownersList?.map((obj, index) => (
           <ListStatsFeature

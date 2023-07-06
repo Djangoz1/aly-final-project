@@ -13,36 +13,26 @@ import { CreationMission, ListMission } from "components/inputs/inputsMission";
 
 import React, { useEffect } from "react";
 import { CreationFeatures } from "sections/Features";
+import { Layout } from "sections/Layout";
 
 const Mission = () => {
   const { cv, missionId } = useAuthState();
-  const dispatch = useAuthDispatch();
-
-  const { address, isConnected } = useAccount();
-
-  useEffect(() => {
-    if (isConnected) doAuthCV(dispatch, address);
-    if (cv) doAuthMission(dispatch, cv);
-  }, [address, isConnected, cv]);
 
   return (
-    <div>
-      <Header />
-      <div className="fixed left-1/2 z-100 bg-zinc-900 -translate-x-1/2 -translate-y-1/2 top-1/2 p-5 w-[90vw] h-[85vh]">
-        <h3 className="font-bold text-lg">
-          {cv ? (
-            <>
-              Hi , <CVName /> !
-            </>
-          ) : (
-            "Hi, you should registred before continue"
-          )}{" "}
-        </h3>
+    <Layout>
+      <h3 className="font-bold text-lg">
+        {cv ? (
+          <>
+            Hi , <CVName /> !
+          </>
+        ) : (
+          "Hi, you should registred before continue"
+        )}{" "}
+      </h3>
 
-        <ListMission />
-        {missionId !== null ? <CreationFeatures /> : <CreationMission />}
-      </div>
-    </div>
+      <ListMission />
+      {missionId !== null ? <CreationFeatures /> : <CreationMission />}
+    </Layout>
   );
 };
 

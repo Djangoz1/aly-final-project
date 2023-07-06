@@ -1,9 +1,10 @@
 "use client";
+import { Icon } from "@iconify/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
-import { IcHamburger } from "icones";
+import { IcHamburger, icfyHAMBURGER, icfySETTINGS } from "icones";
 
 import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
 import { _setterCV, _setterFactoryCV } from "utils/ui-tools/web3-tools";
@@ -29,7 +30,7 @@ export const Drawer = ({ setter, isOpen }) => {
             onClick={setter}
             className="btn bg-zinc-900 "
           >
-            <IcHamburger />
+            <Icon icon={icfyHAMBURGER} className="text-[30px] text-white" />
           </label>
         ) : (
           <ConnectButton />
@@ -57,7 +58,7 @@ export const Drawer = ({ setter, isOpen }) => {
                     </button>
                   )}
                 </div>
-                {cv && <ModalSetCV />}
+
                 <ConnectButton />
                 <div className="stat-desc text-[7px]">{address}</div>
               </div>

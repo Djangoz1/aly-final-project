@@ -1,3 +1,27 @@
+import {
+  icfyAI,
+  icfyBLENDER,
+  icfyC,
+  icfyCSS,
+  icfyFIGMA,
+  icfyGAMING,
+  icfyHTML,
+  icfyJAVA,
+  icfyJS,
+  icfyNEXT,
+  icfyPHP,
+  icfyPOSTGRE,
+  icfyPYTHON,
+  icfyREACT,
+  icfyRUST,
+  icfySOL,
+  icfySQL,
+  icfyTS,
+  icfyUNITY,
+  icfyUNREAL,
+  icfyWORDPRESS,
+} from "icones";
+
 export const DEV_LANGUAGES = [
   {
     name: "open",
@@ -6,7 +30,7 @@ export const DEV_LANGUAGES = [
   },
   {
     name: "js",
-    icon: "cib:js",
+    icon: icfyJS,
     color: "yellow",
   },
   {
@@ -16,53 +40,93 @@ export const DEV_LANGUAGES = [
   },
   {
     name: "ts",
-    icon: "akar-icons:typescript-fill",
+    icon: icfyTS,
     color: "green",
   },
   {
     name: "python",
-    icon: "devicon:python",
+    icon: icfyPYTHON,
     color: false,
   },
   {
     name: "php",
-    icon: "simple-icons:php",
+    icon: icfyPHP,
     color: "grey",
   },
   {
     name: "c++",
-    icon: "file-icons:c",
+    icon: icfyC,
     color: "blue",
   },
   {
     name: "java",
-    icon: "devicon:java-wordmark",
+    icon: icfyJAVA,
     color: false,
   },
 
   {
     name: "react",
-    icon: "logos:react",
+    icon: icfyREACT,
+    color: false,
+  },
+  {
+    name: "next",
+    icon: icfyNEXT,
+    color: false,
+  },
+  {
+    name: "css",
+    icon: icfyCSS,
+    color: false,
+  },
+  {
+    name: "html",
+    icon: icfyHTML,
     color: false,
   },
   {
     name: "solidity",
-    icon: "simple-icons:solidity",
+    icon: icfySOL,
     color: "blue",
   },
   {
+    name: "sql",
+    icon: icfySQL,
+    color: "red",
+  },
+  {
+    name: "postgresql",
+    icon: icfyPOSTGRE,
+    color: "red",
+  },
+  {
     name: "rust",
-    icon: "simple-icons:rust",
+    icon: icfyRUST,
     color: "red",
   },
   {
     name: "unreal",
-    icon: "fontisto:unreal-engine",
+    icon: icfyUNREAL,
     color: "white",
   },
   {
     name: "unity",
-    icon: "bxl:unity",
+    icon: icfyUNITY,
+    color: "black",
+  },
+  {
+    name: "blender",
+    icon: icfyBLENDER,
+    color: "black",
+  },
+  {
+    name: "figma",
+    icon: icfyFIGMA,
+    color: "black",
+  },
+  {
+    name: "wordpress",
+    icon: icfyWORDPRESS,
     color: "black",
   },
   {
@@ -91,12 +155,12 @@ export const DEV_DOMAIN = [
   {
     name: "gaming",
     color: "magenta",
-    icon: "ion:game-controller",
+    icon: icfyGAMING,
   },
   {
     name: "ai",
     color: "magenta",
-    icon: "eos-icons:ai",
+    icon: icfyAI,
   },
   {
     name: "designer",
