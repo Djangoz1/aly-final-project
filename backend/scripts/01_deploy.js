@@ -7,6 +7,7 @@ const CONTRACT_NAME = "FactoryCV";
 
 async function main() {
   const factoryCV = await _testInitFactoryCV();
+
   console.log(`FactoryCV deployed to ${factoryCV.target}`);
 
   const factoryMission = await _testInitFactoryMission(factoryCV.target);

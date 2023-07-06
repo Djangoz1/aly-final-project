@@ -7,7 +7,7 @@ const FactoryMission_NAME = "FactoryMission";
 
 const _testInitFactoryCV = async () => {
   const factoryCV = await ethers.deployContract("FactoryCV");
-
+  console.log("factoryCV", factoryCV);
   await factoryCV.waitForDeployment();
 
   return factoryCV;
