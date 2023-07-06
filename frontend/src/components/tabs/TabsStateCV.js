@@ -1,4 +1,5 @@
 import { stateCV } from "constants/text";
+import Link from "next/link";
 import React from "react";
 
 export const TabsStateCV = ({ setIsWorker, isWorker }) => {
@@ -25,6 +26,14 @@ export const TabsStateCV = ({ setIsWorker, isWorker }) => {
           {status?.tab}
         </button>
       ))}
+      <Link
+        className={`tab tab-bordered text-black 
+          
+          `}
+        href={"/profile/community"}
+      >
+        Community Hub
+      </Link>
     </div>
   );
 };
