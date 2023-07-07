@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 const APIURL = "https://api-mumbai.lens.dev";
 
@@ -362,25 +362,25 @@ fragment ReferenceModuleFields on ReferenceModule {
 }
 
 `;
-// export const createProfile = `
-// mutation CreateProfile {
-//   createProfile(request:{
-//                 handle: "wwwork3.test",
-//                 profilePictureUri: null,
-//                 followModule: {
-//                      freeFollowModule: true
-//                   }
-//                 }) {
-//     ... on RelayerResult {
-//       txHash
-//     }
-//     ... on RelayError {
-//       reason
-//     }
-//     __typename
-//   }
-// }
-// `;
+export const createProfile = `
+  mutation CreateProfile {
+    createProfile(
+      request: {
+        handle: null
+        profilePictureUri: null
+        followModule: { freeFollowModule: true }
+      }
+    ) {
+      ... on RelayerResult {
+        txHash
+      }
+      ... on RelayError {
+        reason
+      }
+      __typename
+    }
+  }
+`;
 
 export const getProfileById = `
 query Profile(

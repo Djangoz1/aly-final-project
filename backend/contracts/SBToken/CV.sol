@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./FactoryCV.sol";
@@ -7,6 +7,10 @@ import "./FactoryCV.sol";
 import "../lib/Milestone.sol";
 import "../lib/CommitWorker.sol";
 import "../Mission.sol";
+
+import {CreateProfileData} from "../../../core/contracts/libraries/DataTypes.sol";
+
+import {ILensHub} from "../../../core/contracts/interfaces/ILensHub.sol";
 
 interface IntFactoryMission {
     function createMission(uint _amount) external returns (address);
@@ -22,6 +26,10 @@ contract CV is Ownable {
         isNotKyc
     }
 
+    address factoryCV;
+    address lensHubAddr;
+    uint lensProfile;
+
     string public name;
 
     bool public isRegistred;
@@ -35,7 +43,20 @@ contract CV is Ownable {
     mapping(uint => Milestone.FeatureWeb3) public featuresWeb3List;
     mapping(uint => CommitWorker.Commit) public commitsList;
 
-    constructor() {
+    constructor(address _factoryCV, address _lensHubAddr) {
+        factoryCV = _factoryCV;
+        lensHubAddr = _lensHubAddr;
+        ILensHub lensHub = ILensHub(lensHubAddr);
+        require(
+            address(lensHub) == lensHubAddr,
+            "Something went wrong with lensHub"
+        );
+
+        lensHub.whitelistProfileCreator(msg.sender, bool);
+        // Data
+        CreateProfileData memory lensHubData;
+        lensHubData.to = owner();
+        lensHub.createProfile(lensHubData);
         isRegistred = true;
     }
 

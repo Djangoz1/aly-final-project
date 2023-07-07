@@ -1,18 +1,27 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./CV.sol";
 
 contract FactoryCV is Ownable {
-    mapping(address => address)  listCV;
+    mapping(address => address) listCV;
     uint length;
+    address lensHub;
 
-    address [] listAddress;
+    address[] listAddress;
+
+    constructor(address _lensHub) {
+        lensHub = _lensHub;
+    }
+
+    function getLensHub() public view returns (address) {
+        return lensHub;
+    }
 
     function createCV(address _owner) public returns (address) {
         require(listCV[_owner] == address(0), "Can't have more than 1");
-        CV newCV = new CV();
+        CV newCV = new CV(address(this), lensHub);
         newCV.transferOwnership(_owner);
         listCV[_owner] = address(newCV);
         listAddress.push(_owner);
@@ -30,11 +39,8 @@ contract FactoryCV is Ownable {
         return address(listCV[_address]);
     }
 
-    function getCVById(uint _id)public view returns(address){
+    function getCVById(uint _id) public view returns (address) {
         address _address = listAddress[_id];
         return listCV[_address];
     }
-
-
-    
 }

@@ -5,9 +5,8 @@ const { _testParseHex, ZERO_ADDRESS } = require("./test_utils");
 
 const FactoryMission_NAME = "FactoryMission";
 
-const _testInitFactoryCV = async () => {
-  const factoryCV = await ethers.deployContract("FactoryCV");
-  console.log("factoryCV", factoryCV);
+const _testInitFactoryCV = async (lensHubAddr) => {
+  const factoryCV = await ethers.deployContract("FactoryCV", [lensHubAddr]);
   await factoryCV.waitForDeployment();
 
   return factoryCV;
@@ -16,6 +15,7 @@ const _testInitFactoryCV = async () => {
 const _testInitCV = async ({ factoryCV, owner }) => {
   await factoryCV.createCV(owner);
   let cvAddr = await factoryCV.getCV(owner);
+
   const CV = await ethers.getContractAt("CV", cvAddr);
   await CV.waitForDeployment();
   return CV;

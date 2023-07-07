@@ -1,10 +1,12 @@
 const { ethers } = require("hardhat");
 const { expect, assert } = require("chai");
-
+const { LENS_ADDRS } = require("../../constants/address");
+const { _testInitFactoryCV } = require("../../helpers/test_init");
 const CONTRACT_NAME = "FactoryCV";
-
+const ABI_LENS_HUB = require("../../constants/abi/LensHub.sol/LensHub.json");
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let factoryCV;
+  let lensHubAddr = LENS_ADDRS["lensHub proxy"];
 
   beforeEach(async () => {
     [
@@ -17,18 +19,30 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       this.addr6,
       this.addr7,
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
-    factoryCV = await ethers.deployContract(CONTRACT_NAME);
-    await factoryCV.waitForDeployment();
+    factoryCV = await _testInitFactoryCV(lensHubAddr);
   });
 
   // *:::::::: INITIALISATION ::::::::* //
 
-  describe("Initialization", () => {
+  describe.only("Initialization", () => {
     it("Should deploy smart contract properly", async () => {
       expect(factoryCV.target).to.not.equal(0x0);
       expect(factoryCV.target).to.not.equal("");
       expect(factoryCV.target).to.not.equal(null);
       expect(factoryCV.target).to.not.equal(undefined);
+    });
+
+    it.only("Should set the true lens hub address", async () => {
+      const _lensHubAddr = await factoryCV.getLensHub();
+      expect(_lensHubAddr).to.not.equal(0x0);
+      expect(lensHubAddr).to.be.equal(lensHubAddr);
+      // console.log(ABI_LENS_HUB.abi);
+      const lens = new ethers.Contract(
+        _lensHubAddr,
+        ABI_LENS_HUB.abi,
+        this.owner
+      );
+      console.log(lens);
     });
 
     it("Should create a CV", async () => {

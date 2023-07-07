@@ -2,7 +2,7 @@
 import React from "react";
 import { Layout } from "sections/Layout";
 import { useState, useEffect } from "react";
-import { apolloClient, recommendProfiles } from "../../../api";
+import { apolloClient, createProfile, recommendProfiles } from "../../../api";
 import { gql } from "@apollo/client";
 import { ListSocialProfiles } from "components/social-media/profile/ListSocialProfiles";
 
@@ -24,10 +24,16 @@ const Community = () => {
     }
   }
 
-  async function createProfile() {
+  async function onCreateProfile() {
     try {
-      const response = await apolloClient.query({
-        query: gql(createProfile),
+      const response = await apolloClient.mutate({
+        mutation: gql(createProfile),
+        variables: {
+          request: {
+            handle: null,
+            profilePictureUri: null,
+          },
+        },
       });
 
       console.log(response);
@@ -39,7 +45,7 @@ const Community = () => {
   return (
     <Layout>
       <div>Community</div>
-      <button className="btn" onClick={createProfile}>
+      <button className="btn" onClick={onCreateProfile}>
         Create Profile
       </button>
       <ListSocialProfiles profiles={profiles} />

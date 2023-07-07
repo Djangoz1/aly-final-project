@@ -1,14 +1,15 @@
 // import { ADDR_FACTORY_CV } from "constants/address";
+const { main: deployMain } = require("./01_deploy");
 
-const {
-  ADDR_FACTORY_CV,
-  ADDR_FACTORY_MISSION,
-} = require("../constants/address");
 const hre = require("hardhat");
 const { _testInitFeature } = require("../helpers/test_init");
 const CONTRACT_NAME = "FactoryMission";
 
 async function main() {
+  const mainDeploy = await deployMain();
+
+  const ADDR_FACTORY_CV = mainDeploy.factoryCV;
+  const ADDR_FACTORY_MISSION = mainDeploy.factoryMission;
   [
     this.owner,
     this.addr1,
@@ -34,6 +35,7 @@ async function main() {
   for (let index = 0; index < addresses.length; index++) {
     const user = addresses[index];
     const tx = await factoryCV.connect(user).createCV(user.address);
+    console.log("ereerz", tx);
     await tx.wait();
     const cvAddr = await factoryCV.getCV(user.address);
     const cv = await ethers.getContractAt("CV", cvAddr);
@@ -82,3 +84,5 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+module.exports = { main };

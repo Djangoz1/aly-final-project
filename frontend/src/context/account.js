@@ -5,7 +5,11 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { hardhat, polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+import { LensClient, development } from "@lens-protocol/client";
 
+const lensClient = new LensClient({
+  environment: development,
+});
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   // [hardhat],
   [polygonMumbai],
