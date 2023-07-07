@@ -8,7 +8,7 @@ import { useAuthState } from "context/auth";
 
 export const Header = ({ setter, isOpen }) => {
   const { cv } = useAuthState();
-  let currentPath = window.location.pathname;
+  let currentPath = window?.location?.pathname;
 
   useEffect(() => {
     for (let index = 0; index < routes.length; index++) {

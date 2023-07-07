@@ -6,7 +6,7 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { hardhat, polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
-const { chains, publicClient } = configureChains(
+const { chains, publicClient, webSocketPublicClient } = configureChains(
   // [hardhat],
   [polygonMumbai],
   [
@@ -23,15 +23,18 @@ const { connectors } = getDefaultWallets({
 
 const wagmiConfig = createConfig({
   //
-  autoConnect: false,
-  connectors,
+  autoConnect: true,
   publicClient,
+  // webSocketPublicClient,
+  connectors,
 });
 
 export const AccountProvider = ({ children }) => {
   return (
     <WagmiConfig config={wagmiConfig}>
+      {/* <LensProvider config={lensConfig}> */}
       <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
+      {/* </LensProvider> */}
     </WagmiConfig>
   );
 };

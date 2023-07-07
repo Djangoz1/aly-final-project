@@ -24,10 +24,24 @@ const Community = () => {
     }
   }
 
+  async function createProfile() {
+    try {
+      const response = await apolloClient.query({
+        query: gql(createProfile),
+      });
+
+      console.log(response);
+    } catch (error) {
+      console.log({ error });
+    }
+  }
+
   return (
     <Layout>
       <div>Community</div>
-      {console.log("coucoui")}
+      <button className="btn" onClick={createProfile}>
+        Create Profile
+      </button>
       <ListSocialProfiles profiles={profiles} />
     </Layout>
   );

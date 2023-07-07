@@ -9,13 +9,29 @@ import {
 } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
-
+import ABI_LENS_HUB from "../../abi/abi_lens_hub.json";
+import { ADDR_LENS_HUB_PROXY } from "constants/web3";
 // ?----- viem client for events
 export const viemClient = createPublicClient({
   chain: hardhat,
   transport: http(),
 });
 
+export const _setterLENS = async ({ funcName, args }) => {
+  try {
+    const { request } = await prepareWriteContract({
+      address: ADDR_LENS_HUB_PROXY,
+      abi: ABI_LENS_HUB,
+      functionName: funcName,
+      args: args,
+    });
+    const { hash } = await writeContract(request);
+
+    return hash;
+  } catch (error) {
+    console.log("error", { error });
+  }
+};
 // *::::::::::::::: GLOBAL  :::::::::::::::*
 
 export const _setterCONTRACT = async ({ funcName, args, addr, abi }) => {
@@ -30,7 +46,7 @@ export const _setterCONTRACT = async ({ funcName, args, addr, abi }) => {
 
     return hash;
   } catch (error) {
-    console.log("error", error);
+    console.log("error", { error });
   }
 };
 
