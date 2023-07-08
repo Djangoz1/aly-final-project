@@ -8,11 +8,11 @@ contract FactoryCV is Ownable {
     mapping(address => address)  listCV;
     uint length;
 
-    address [] listAddress;
+    address[] listAddress;
 
     function createCV(address _owner) public returns (address) {
         require(listCV[_owner] == address(0), "Can't have more than 1");
-        CV newCV = new CV();
+        CV newCV = new CV(address(this));
         newCV.transferOwnership(_owner);
         listCV[_owner] = address(newCV);
         listAddress.push(_owner);

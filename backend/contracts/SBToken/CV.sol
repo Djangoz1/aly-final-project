@@ -4,15 +4,22 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./FactoryCV.sol";
 
-import "../lib/Milestone.sol";
-import "../lib/CommitWorker.sol";
+import "../libraries/Milestone.sol";
+import "../libraries/CommitWorker.sol";
 import "../Mission.sol";
+import {IMission} from "../interfaces/IMission.sol";
+import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
+import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
 
-interface IntFactoryMission {
-    function createMission(uint _amount) external returns (address);
+import {DataTypes} from "../libraries/DataTypes.sol";
+import {DataRecast} from "../libraries/DataRecast.sol";
+import {InteractionLogic} from "../libraries/InteractionLogic.sol";
 
-    function getPrice() external view returns (uint256);
-}
+
+
+
+
+
 
 contract CV is Ownable {
     using Milestone for *;
@@ -22,7 +29,13 @@ contract CV is Ownable {
         isNotKyc
     }
 
+    address public factoryCV;
     string public name;
+
+    DataTypes.ProfileData profile;
+
+
+
 
     bool public isRegistred;
     bool isBanned;
@@ -35,15 +48,68 @@ contract CV is Ownable {
     mapping(uint => Milestone.FeatureWeb3) public featuresWeb3List;
     mapping(uint => CommitWorker.Commit) public commitsList;
 
-    constructor() {
-        isRegistred = true;
+
+
+
+    modifier onlyByOwner (){
+        require(msg.sender == owner() || msg.sender == address(this), "Caller is not part of owner");
+        _;
     }
 
-    // *::::::::::::: FEATURES :::::::::::::* //
+    modifier onlyFactoryMision(){
+        address _factoryCV = IFactoryMission(msg.sender).getFactoryCV();
+        require(_factoryCV == factoryCV, "Not right to set");
+        _;
+    }
 
-    function incrementFeatures(
-        Milestone.Feature memory _newFeature
-    ) public onlyOwner {
+    constructor(address _factoryCV) {
+        isRegistred = true;
+        DataTypes.ProfileData memory defaultData;
+        factoryCV = _factoryCV;
+        profile = defaultData;
+    }
+   
+    // *:::::::::::: -------- ::::::::::::* //
+    // *:::::::::::: Profile :::::::::::::* //
+    // *:::::::::::: -------- ::::::::::::* //
+
+
+    function getProfile() external  view returns (DataTypes.ProfileData memory){
+        return profile;
+    }
+
+
+    /**
+     * @notice This function called by function setMission
+     *
+    */
+    function followMission(address _toFollow) public onlyByOwner {
+        require(_toFollow != address(0),"Should follow value address");
+        InteractionLogic._followMission(_toFollow, profile.followMissions);
+        // IMission(_toFollow).incrementFollower();
+        profile.followMissions.push(_toFollow);
+    }
+
+    function unfollowMission(address _toUnfollow) internal {
+
+    }
+    function setName(string memory _name) public onlyOwner {
+        require(bytes(_name).length > 0, "Name is empty");
+        DataTypes.ProfileData memory newData = profile;
+        newData.name = _name;
+        profile = newData;
+        name = _name;
+    }
+
+
+    // *:::::::::::: -------- ::::::::::::* //
+    // *:::::::::::: FEATURES ::::::::::::* //
+    // *:::::::::::: -------- ::::::::::::* //
+
+
+
+
+    function incrementFeatures(Milestone.Feature memory _newFeature) public onlyOwner {
         featuresList[featuresLength] = _newFeature;
         featuresLength++;
     }
@@ -58,10 +124,6 @@ contract CV is Ownable {
         return featuresList[_id];
     }
 
-    function setName(string memory _name) public onlyOwner {
-        require(bytes(_name).length > 0, "Name is empty");
-        name = _name;
-    }
 
     function beAssignedWorker(
         address _missionAddress,
@@ -74,20 +136,25 @@ contract CV is Ownable {
         incrementFeatures(_newFeature);
     }
 
-    function setMission(address _missionAddress) public {
+    function setMission(address _missionAddress) external onlyFactoryMision{
         require(
-            missionsList[missionsLength + 1] == address(0),
+            missionsList[missionsLength] == address(0),
             "Mission already registred"
         );
         missionsList[missionsLength] = _missionAddress;
         missionsLength++;
+        address[] memory followMissions = profile.followMissions;
+        address _toFollow = InteractionLogic._followMission(_missionAddress, followMissions);
+        profile.followMissions.push(_toFollow);
+        
+        // addresfollowMission(_missionAddress);
     }
 
     function buyMission(
         address _factoryMission,
         uint _amount
     ) public onlyOwner {
-        IntFactoryMission factoryMission = IntFactoryMission(_factoryMission);
+        IFactoryMission factoryMission = IFactoryMission(_factoryMission);
         uint price = factoryMission.getPrice();
         price += _amount;
         factoryMission.createMission(price);

@@ -11,15 +11,19 @@ contract FactoryMission is Ownable {
     uint256 public price;
     uint256 public missionsLength;
     uint256 balanceFoundation;
-    address public factoryCVAddress;
-    FactoryCV factoryCV;
+    address public factoryCV;
+    
     mapping(uint => Mission) public listMission;
 
     // *::::::::: CONSTRUCTOR :::::::::* //
-    constructor(address _factoryCVAddress) payable {
+    constructor(address _factoryCV) payable {
         price = 0.1 ether;
-        factoryCVAddress = _factoryCVAddress;
-        factoryCV = FactoryCV(factoryCVAddress);
+        factoryCV = _factoryCV;
+    }
+
+    // *:::::::::::: -------- ::::::::::::* //
+    function getFactoryCV() external view returns(address) {
+        return factoryCV;
     }
 
     // *:::::::::: TRANSACTION :::::::::* //
@@ -39,7 +43,7 @@ contract FactoryMission is Ownable {
         Mission newMission = new Mission(
             afterTxFoundation,
             address(cv),
-            factoryCVAddress
+            factoryCV
         );
         address _address = address(newMission);
         cv.setMission(_address);
@@ -47,7 +51,6 @@ contract FactoryMission is Ownable {
         listMission[missionsLength] = newMission;
         missionsLength++;
         return _address;
-        return address(this);
     }
 
     // *::::::::::::: GETTER :::::::::::: //

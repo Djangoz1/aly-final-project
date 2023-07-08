@@ -7,11 +7,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 // import "./SBToken/FactoryCV.sol";
 import "./WorkflowStatusManager.sol";
 
-import "./lib/Milestone.sol";
-import "./lib/CommitWorker.sol";
+import "./libraries/Milestone.sol";
+import "./libraries/CommitWorker.sol";
 import "./SBToken/FactoryCV.sol";
 
-contract Mission is WorkflowStatusManager {
+
+import {DataTypes} from "./libraries/DataTypes.sol";
+import {IMission} from "./interfaces/IMission.sol";
+
+
+
+contract Mission is WorkflowStatusManager, IMission {
     using CommitWorker for *;
     using Milestone for *;
     FactoryCV public factoryCV;
@@ -19,10 +25,17 @@ contract Mission is WorkflowStatusManager {
     address public factoryMissionAddress;
     address public ownerCV;
 
+    mapping(address => address) followers;
+
+    DataTypes.MissionData profile;
+
+
+
     Milestone.Feature[] public features;
     Milestone.FeatureWeb3[] public featuresWeb3;
-    mapping(uint => CommitWorker.Commit[]) commits; // commits related to this feature (commitId => featureId)
-    // using CVLib for *;
+    mapping(uint => CommitWorker.Commit[]) commits;
+    //  commits related to this feature (commitId => featureId)
+
     uint globalWadge;
 
     // ********************************** //
@@ -82,6 +95,16 @@ contract Mission is WorkflowStatusManager {
     }
 
     // *:::::::::::: EMPLOYER ::::::::::::* //
+
+    function incrementFollower() external{
+        require(followers[msg.sender] == address(0), "Already followed");
+        DataTypes.MissionData  storage _profile = profile;
+        followers[msg.sender] = msg.sender;
+        _profile.followersLength ++;
+        
+        profile = _profile;
+    }
+
 
     function getCV(
         address _addr,
