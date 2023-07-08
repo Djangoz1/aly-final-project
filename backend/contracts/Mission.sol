@@ -56,33 +56,25 @@ contract Mission is WorkflowStatusManager, IMission {
     modifier onlyFeatureOpen(uint256 _id) {
         // require(missionStatus == MissionStatus.Pending, "Mission is not open");
         require(_id < features.length, "Feature not found");
-        require(
-            features[_id].status == Milestone.FeatureStatus.Pending,
-            "Feature is not open"
-        );
+        require(features[_id].status == Milestone.FeatureStatus.Pending, "Feature is not open");
         require(features[_id].isDone == false, "Feature is already done");
         _;
     }
 
-    modifier onlyEmployer() {
-        require(
-            getCV(msg.sender, factoryCVaddress) == owner(),
-            "Only employer can call this function"
-        );
-        _;
-    }
+    //! modifier onlyEmployer() {
+    //     require(getCV(msg.sender, factoryCVaddress) == owner(), "Only employer can call this function");
+    //     _;
+    // }
 
-    modifier onlyWorkerOrOwner(uint _id) {
-        require(
-            features[_id].assignedWorker == msg.sender || msg.sender == owner(),
-            "Only workers or owner can call this function"
-        );
-        _;
-    }
+    //! modifier onlyWorkerOrOwner(uint _id) {
+    //     require(features[_id].assignedWorker == msg.sender || msg.sender == owner(),"Only workers or owner can call this function");
+    //     _;
+    // }
 
-    // ********************************** //
+    // *:::::::::  -----------  ::::::::* //
     // *:::::::::  CONSTRUCTOR  ::::::::* //
-    // ---------------------------------- //
+    // *:::::::::  -----------  ::::::::* //
+    
 
     constructor(uint _amount, address _ownerCV, address _factoryCV) {
         transferOwnership(_ownerCV);
@@ -106,14 +98,16 @@ contract Mission is WorkflowStatusManager, IMission {
     }
 
 
-    function getCV(
-        address _addr,
-        address _factoryCVAddr
-    ) public view returns (address) {
-        FactoryCV factoryCV = FactoryCV(_factoryCVAddr);
-        address cvAddr = factoryCV.getCV(_addr);
-        return cvAddr;
-    }
+
+
+    // function getCV(
+    //     address _addr,
+    //     address _factoryCVAddr
+    // ) public view returns (address) {
+    //     FactoryCV factoryCV = FactoryCV(_factoryCVAddr);
+    //     address cvAddr = factoryCV.getCV(_addr);
+    //     return cvAddr;
+    // }
 
     function getFeature(
         uint256 _id
@@ -143,7 +137,8 @@ contract Mission is WorkflowStatusManager, IMission {
         string memory _description,
         address _assignedWorker,
         bool _isInviteOnly
-    ) public onlyEmployer {
+    //! ) public onlyEmployer {
+    ) public {
         Milestone.Feature memory _newFeature = Milestone._setFeature(
             _estimatedDays,
             _wadge,

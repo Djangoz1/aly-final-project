@@ -9,6 +9,6 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 interface IFactoryCV {
      function createCV(address _owner) external returns (address);
      function getCVsLength() external view returns (uint);
-     function getCV(address _address) external view returns (address);
+     function getCVByAddress(address _ownerCV) external view returns (address);
      function getCVById(uint _id)external view returns(address);
 }

@@ -10,9 +10,14 @@ const _testInitAccessControl = async () => {
   await accessControl.waitForDeployment();
   return accessControl;
 };
+const _testInitPubHub = async (accessControl) => {
+  const pubHub = await ethers.deployContract("PubHub", [accessControl]);
+  await pubHub.waitForDeployment();
+  return pubHub;
+};
 
-const _testInitFactoryCV = async () => {
-  const factoryCV = await ethers.deployContract("FactoryCV");
+const _testInitFactoryCV = async (accessControl) => {
+  const factoryCV = await ethers.deployContract("FactoryCV", [accessControl]);
 
   await factoryCV.waitForDeployment();
 
@@ -42,9 +47,10 @@ const _testInitMission = async ({ cv, factoryMission }) => {
 };
 
 // Need Factory CV address in constructor
-const _testInitFactoryMission = async (_fcvAddr) => {
+const _testInitFactoryMission = async (_fcvAddr, _accessControl) => {
   const factoryMission = await ethers.deployContract(FactoryMission_NAME, [
     _fcvAddr,
+    _accessControl,
   ]);
 
   return factoryMission;
@@ -73,6 +79,7 @@ const _testInitFeature = async ({ mission, values }) => {
 
 module.exports = {
   _testInitAccessControl,
+  _testInitPubHub,
   _testInitFactoryCV,
   _testInitCV,
   _testInitFactoryMission,

@@ -36,17 +36,17 @@ contract PubHub is Ownable {
     }
 
 
-    function getLength() public view returns(uint){
+    function getLength() external view returns(uint){
         return length;
     }
 
 
-    function getIndexerByAddr(address _publisher) public view returns(uint[] memory) {
+    function getIndexerByAddr(address _publisher) external view returns(uint[] memory) {
         require(indexerPub[_publisher].length > 0, "Have no publication");
         return indexerPub[_publisher];
     }
 
-    function postPub(DataTypes.PubData memory _datas) public {
+    function postPub(DataTypes.PubData memory _datas) external {
         address newPub = Bindings.deployPub(_datas);
         indexerPub[msg.sender].push(length);
         pub[length]= newPub;
