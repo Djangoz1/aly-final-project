@@ -30,7 +30,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   // *:::::::: INITIALISATION ::::::::* //
 
-  describe.only("Initialization", () => {
+  describe("Initialization", () => {
     it("Should deploy smart contract properly", async () => {
       expect(cv.target).to.not.equal(0x0);
       expect(cv.target).to.not.equal("");
@@ -60,6 +60,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       const missionAddr = await cv.getMission(parseInt(length) - 1);
       const profile = await cv.getProfile();
       expect(profile.followMissions[0]).to.equal(missionAddr);
+    });
+    it("Should NOT followed mission twice", async () => {
+      await cv.connect(this.addr1).buyMission(factoryMission.target, 2000);
+      let length = await cv.getMissionsLength();
+      const missionAddr = await cv.getMission(parseInt(length) - 1);
+      await expect(
+        cv.connect(this.addr1).followMission(missionAddr)
+      ).to.be.revertedWith("Already followed");
     });
 
     it("Should not buy mission", async () => {

@@ -7,19 +7,28 @@ import "./Mission.sol";
 import "./SBToken/FactoryCV.sol";
 import "./SBToken/CV.sol";
 
+import {IAccessControl} from "./interfaces/IAccessControl.sol";
+
+
 contract FactoryMission is Ownable {
     uint256 public price;
     uint256 public missionsLength;
     uint256 balanceFoundation;
     address public factoryCV;
-    
+    IAccessControl accessControl;
+
     mapping(uint => Mission) public listMission;
 
     // *::::::::: CONSTRUCTOR :::::::::* //
-    constructor(address _factoryCV) payable {
+    constructor(address _factoryCV, address _accessControl) payable {
         price = 0.1 ether;
         factoryCV = _factoryCV;
+        accessControl = IAccessControl(_accessControl);
+        accessControl.setFactoryMission(address(this));
     }
+
+
+
 
     // *:::::::::::: -------- ::::::::::::* //
     function getFactoryCV() external view returns(address) {

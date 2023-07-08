@@ -11,6 +11,7 @@ import {IMission} from "../interfaces/IMission.sol";
 import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
 import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
 
+import {Bindings} from "../libraries/Bindings.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {DataRecast} from "../libraries/DataRecast.sol";
 import {InteractionLogic} from "../libraries/InteractionLogic.sol";
@@ -30,8 +31,12 @@ contract CV is Ownable {
     }
 
     address public factoryCV;
-    string public name;
+    
 
+
+    /**
+    *    @dev string name string imgURI, address[] posts, uint followers, address[] followAccounts, address[] followMissions
+    */
     DataTypes.ProfileData profile;
 
 
@@ -78,27 +83,29 @@ contract CV is Ownable {
         return profile;
     }
 
-
     /**
      * @notice This function called by function setMission
-     *
+     * @param _toFollow address mission want following
     */
     function followMission(address _toFollow) public onlyByOwner {
         require(_toFollow != address(0),"Should follow value address");
         InteractionLogic._followMission(_toFollow, profile.followMissions);
-        // IMission(_toFollow).incrementFollower();
         profile.followMissions.push(_toFollow);
     }
+    function unfollowMission(address _toUnfollow) internal {}
 
-    function unfollowMission(address _toUnfollow) internal {
-
+    function postPub(DataTypes.PubData memory _datas) external onlyOwner{
+        address _newPub = Bindings.deployPub(_datas);
+        profile.posts.push(_newPub);
     }
+
+
+
+
+
     function setName(string memory _name) public onlyOwner {
         require(bytes(_name).length > 0, "Name is empty");
-        DataTypes.ProfileData memory newData = profile;
-        newData.name = _name;
-        profile = newData;
-        name = _name;
+        profile.name = _name;
     }
 
 
@@ -125,29 +132,26 @@ contract CV is Ownable {
     }
 
 
-    function beAssignedWorker(
-        address _missionAddress,
-        uint _idFeature
-    ) public onlyOwner {
-        Mission mission = Mission(_missionAddress);
-        Milestone.Feature memory _newFeature = mission.beAssignedWorker(
-            _idFeature
-        );
-        incrementFeatures(_newFeature);
-    }
+    // function beAssignedWorker(
+    //     address _missionAddress,
+    //     uint _idFeature
+    // ) public onlyOwner {
+    //     Mission mission = Mission(_missionAddress);
+    //     Milestone.Feature memory _newFeature = mission.beAssignedWorker(
+    //         _idFeature
+    //     );
+    //     incrementFeatures(_newFeature);
+    // }
 
     function setMission(address _missionAddress) external onlyFactoryMision{
         require(
             missionsList[missionsLength] == address(0),
             "Mission already registred"
         );
+        address _toFollow = InteractionLogic._followMission(_missionAddress, profile.followMissions);
+        profile.followMissions.push(_toFollow);
         missionsList[missionsLength] = _missionAddress;
         missionsLength++;
-        address[] memory followMissions = profile.followMissions;
-        address _toFollow = InteractionLogic._followMission(_missionAddress, followMissions);
-        profile.followMissions.push(_toFollow);
-        
-        // addresfollowMission(_missionAddress);
     }
 
     function buyMission(

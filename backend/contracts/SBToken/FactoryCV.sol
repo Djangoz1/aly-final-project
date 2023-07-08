@@ -3,12 +3,23 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./CV.sol";
+import {IAccessControl} from "../interfaces/IAccessControl.sol";
 
 contract FactoryCV is Ownable {
-    mapping(address => address)  listCV;
+    mapping(address => address) listCV;
     uint length;
-
     address[] listAddress;
+
+    IAccessControl accessControl;
+
+
+
+    constructor(address _accessControl){
+        accessControl = IAccessControl(_accessControl);
+        accessControl.setFactoryCV(address(this));
+    }
+
+
 
     function createCV(address _owner) public returns (address) {
         require(listCV[_owner] == address(0), "Can't have more than 1");

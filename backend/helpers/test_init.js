@@ -5,6 +5,12 @@ const { _testParseHex, ZERO_ADDRESS } = require("./test_utils");
 
 const FactoryMission_NAME = "FactoryMission";
 
+const _testInitAccessControl = async () => {
+  const accessControl = await ethers.deployContract("AccessControl");
+  await accessControl.waitForDeployment();
+  return accessControl;
+};
+
 const _testInitFactoryCV = async () => {
   const factoryCV = await ethers.deployContract("FactoryCV");
 
@@ -66,6 +72,7 @@ const _testInitFeature = async ({ mission, values }) => {
 };
 
 module.exports = {
+  _testInitAccessControl,
   _testInitFactoryCV,
   _testInitCV,
   _testInitFactoryMission,
