@@ -8,9 +8,27 @@ import "../lib/Milestone.sol";
 import "../lib/CommitWorker.sol";
 import "../Mission.sol";
 
-import {CreateProfileData} from "../../../core/contracts/libraries/DataTypes.sol";
+// import {ILensHub} from "../../../core/contracts/interfaces/ILensHub.sol";
+// import {CreateProfileData} from "../../../core/contracts/libraries/DataTypes.sol";
+// struct CreateProfileData {
+//     address to;
+//     string handle;
+//     string imageURI;
+//     address followModule;
+//     bytes followModuleInitData;
+//     string followNFTURI;
+// }
 
-import {ILensHub} from "../../../core/contracts/interfaces/ILensHub.sol";
+// interface ILensHub {
+//     function createProfile(
+//         address to,
+//         string calldata handle,
+//         string calldata imageURI,
+//         address followModule,
+//         bytes calldata followModuleInitData,
+//         string calldata followNFTURI
+//     ) external returns (uint256);
+// }
 
 interface IntFactoryMission {
     function createMission(uint _amount) external returns (address);
@@ -27,7 +45,7 @@ contract CV is Ownable {
     }
 
     address factoryCV;
-    address lensHubAddr;
+    address public lensHubAddr;
     uint lensProfile;
 
     string public name;
@@ -46,18 +64,30 @@ contract CV is Ownable {
     constructor(address _factoryCV, address _lensHubAddr) {
         factoryCV = _factoryCV;
         lensHubAddr = _lensHubAddr;
-        ILensHub lensHub = ILensHub(lensHubAddr);
-        require(
-            address(lensHub) == lensHubAddr,
-            "Something went wrong with lensHub"
-        );
+        // ILensHub lensHub = ILensHub(lensHubAddr);
+        // require(
+        //     address(lensHub) == lensHubAddr,
+        //     "Something went wrong with lensHub"
+        // );
 
-        lensHub.whitelistProfileCreator(msg.sender, bool);
-        // Data
-        CreateProfileData memory lensHubData;
-        lensHubData.to = owner();
-        lensHub.createProfile(lensHubData);
+        // // lensHub.whitelistProfileCreator(msg.sender, bool);
+        // // Data
+        // CreateProfileData memory lensHubData;
+        // lensHubData.to = owner();
+        // lensHub.createProfile(
+        //     lensHubData.to,
+        //     lensHubData.handle,
+        //     lensHubData.imageURI,
+        //     lensHubData.followModule,
+        //     lensHubData.followModuleInitData,
+        //     lensHubData.followNFTURI
+        // );
         isRegistred = true;
+    }
+
+    // *::::::::::::: LENS PROTOCOLE :::::::::::::* //
+    function getLensHub() public view returns (address) {
+        return lensHubAddr;
     }
 
     // *::::::::::::: FEATURES :::::::::::::* //

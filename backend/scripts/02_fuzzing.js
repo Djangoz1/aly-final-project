@@ -35,7 +35,7 @@ async function main() {
   for (let index = 0; index < addresses.length; index++) {
     const user = addresses[index];
     const tx = await factoryCV.connect(user).createCV(user.address);
-    console.log("ereerz", tx);
+
     await tx.wait();
     const cvAddr = await factoryCV.getCV(user.address);
     const cv = await ethers.getContractAt("CV", cvAddr);
@@ -77,6 +77,9 @@ async function main() {
       await cv.connect(user).setName(`Testor${index}`);
     }
     console.log("CV create on ", cv.target);
+    console.log(await cv.getLensHub());
+    // const lensHub = await ethers.getContractAt("LensHub", cv.lensHubAddr());
+    console.log(lensHub);
   }
 }
 

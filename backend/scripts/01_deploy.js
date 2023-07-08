@@ -26,7 +26,7 @@ async function main() {
     "factory Mission": factoryMission.target,
   };
   const jsonString = JSON.stringify(jsonContent, null, 2);
-  await writeFileAsync("contract_addresses.json", jsonString);
+  await writeFileAsync("addresses.json", jsonString);
   console.log("JSON file created: addresses.json");
 
   return { factoryCV: factoryCV.target, factoryMission: factoryMission.target };

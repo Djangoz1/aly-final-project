@@ -3,7 +3,7 @@ const { expect, assert } = require("chai");
 const { LENS_ADDRS } = require("../../constants/address");
 const { _testInitFactoryCV } = require("../../helpers/test_init");
 const CONTRACT_NAME = "FactoryCV";
-const ABI_LENS_HUB = require("../../constants/abi/LensHub.sol/LensHub.json");
+const ABI_LENS_HUB = require("../../../core/artifacts/contracts/core/LensHub.sol/LensHub.json");
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let factoryCV;
   let lensHubAddr = LENS_ADDRS["lensHub proxy"];
@@ -32,17 +32,11 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       expect(factoryCV.target).to.not.equal(undefined);
     });
 
-    it.only("Should set the true lens hub address", async () => {
+    it("Should set the true lens hub address", async () => {
       const _lensHubAddr = await factoryCV.getLensHub();
       expect(_lensHubAddr).to.not.equal(0x0);
       expect(lensHubAddr).to.be.equal(lensHubAddr);
       // console.log(ABI_LENS_HUB.abi);
-      const lens = new ethers.Contract(
-        _lensHubAddr,
-        ABI_LENS_HUB.abi,
-        this.owner
-      );
-      console.log(lens);
     });
 
     it("Should create a CV", async () => {
