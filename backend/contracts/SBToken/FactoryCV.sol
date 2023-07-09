@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./CV.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 
 contract FactoryCV is Ownable {
 
@@ -40,22 +41,26 @@ contract FactoryCV is Ownable {
     constructor(address _accessControl){
         accessControl = IAccessControl(_accessControl);
         accessControl.setFactoryCV(address(this));
+        address genesis = Bindings._deployCV(address(this), address(this), length);
+        listIndexer[address(this)] = length;
+        listCV[listIndexer[address(this)]] = genesis;
+        length ++;
     }
 
 
 
-
-    function createCV(address _owner) public returns (address) {
-        require(listCV[length] == address(0), "Missmatch index in listCV");
-        CV newCV = new CV(address(this));
-        newCV.transferOwnership(_owner);
-
-        listIndexer[_owner] = length;
-        listCV[listIndexer[_owner]] = address(newCV);
-        
-
+    /**
+    * @param _toAddr is address of owner's newCV
+    * @return newCV address is new cv for _toAddr
+    */
+    function createCV(address _toAddr) public onlyProxy returns (address) {
+        require(listIndexer[_toAddr] == 0, "Already have a cv");
+        require(listCV[length] == address(0), "Missmatch index on listCV");
+        address newCV = Bindings._deployCV(_toAddr, address(this), length);
+        listIndexer[_toAddr] = length;
+        listCV[listIndexer[_toAddr]] = newCV;
         length++;
-        return address(newCV);
+        return newCV;
     }
 
     function getCVsLength() public view returns (uint) {
@@ -63,16 +68,25 @@ contract FactoryCV is Ownable {
     }
 
 
+    function checkRegistred(address _forAddr) external view  {
+        _checkRegistred(_forAddr);
+    }
+    function _checkRegistred(address _forAddr) internal view  {
+        require(listIndexer[_forAddr] != 0, "CV not found");
+    }
+
+
+
+
     /**
-    * @param _ownerCV address of owner cv
+    * @param _forAddr address of owner cv
     * @return cv address of owner cv
     * @notice must to pass through listIndexer && listCV to fetch cv
     */
-
-    function getCVByAddress(address _ownerCV) external view  onlyProxy returns (address) {
-        require(listIndexer[_ownerCV] != 0, "CV not found");
-        require(listCV[listIndexer[_ownerCV]] != address(0), "Missmatch index in listCV");
-        return listCV[listIndexer[_ownerCV]];
+    function getCVByAddress(address _forAddr) external view  onlyProxy returns (address) {
+        _checkRegistred(_forAddr);
+        require(listCV[listIndexer[_forAddr]] != address(0), "Missmatch index on listCV");
+        return listCV[listIndexer[_forAddr]];
     }
 
     /**

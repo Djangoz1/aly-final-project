@@ -6,7 +6,9 @@ const {
   _testInitFactoryMission,
   _testInitAccessControl,
   _testInitPubHub,
+  _testInitPub,
 } = require("../../helpers/test_init");
+const { PUB_DATAS_EXEMPLE } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "AccessControl";
 
@@ -105,6 +107,39 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       await expect(
         factoryCV.getCVByAddress(this.addr2.address)
       ).to.be.revertedWith("Must call function with proxy bindings");
+    });
+
+    it("Should buy CV", async () => {
+      expect(await _testInitCV(accessControl, this.addr1, 2000)).to.not.be
+        .reverted;
+    });
+
+    it("Should not buy CV", async () => {
+      await expect(
+        _testInitCV(accessControl, this.addr1, 0)
+      ).to.be.revertedWith("Value must be greater than price");
+    });
+
+    // *::::::::::::: ---- :::::::::::::* //
+    // *::::::::::::: INIT :::::::::::::* //
+    // *::::::::::::: ---- :::::::::::::* //
+
+    describe("Workflow : Init", () => {
+      let cv;
+
+      beforeEach(async () => {
+        cv = await _testInitCV(accessControl, this.owner, 2000);
+      });
+
+      it("Should  create Pub", async () => {
+        console.log(await factoryCV.getCVsLength());
+        // return;
+        console.log(cv.target);
+        let datas = PUB_DATAS_EXEMPLE;
+        datas.publisher = cv.target;
+        const pub = await _testInitPub(accessControl.target, datas);
+        // console.log(pub);
+      });
     });
   });
 });

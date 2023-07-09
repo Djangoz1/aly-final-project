@@ -11,6 +11,8 @@ import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
 
 contract AccessControl is Ownable {
 
+    uint cvPrice = 100;
+
     IFactoryMission public iFMI;
     IFactoryCV public iFCV;
     IPubHub public iPH;
@@ -37,6 +39,13 @@ contract AccessControl is Ownable {
         _;
     }
 
+
+    // *::::::::::::::: -------------- :::::::::::::::* //
+    // *::::::::::::::: Initialisation :::::::::::::::* //
+    // *::::::::::::::: -------------- :::::::::::::::* //
+    
+
+
     function setPubHub(address _pubHub) external onlyStart {
         iPH = IPubHub(_pubHub);
         if(hasInit()){
@@ -44,11 +53,20 @@ contract AccessControl is Ownable {
         }
     }
 
+    function getPubHub() external returns(address){
+        address pubHubAddr = address(iPH);
+        return pubHubAddr;
+    }
+
     function setFactoryCV(address _factoryCV) external onlyStart  {
         iFCV = IFactoryCV(_factoryCV);
         if(hasInit()){
             workflow = DataTypes.AccessControlStatus.Init;
         }
+    }
+    
+    function getFactoryCV() external onlyStart returns(address){
+        return address(iFCV);
     }
 
     function setFactoryMission(address _factoryMission) external onlyStart{
@@ -58,7 +76,47 @@ contract AccessControl is Ownable {
         }
     }
 
-    function getCVByAddress(address _addr) external onlyInit returns(address) {
+    function getFactoryMission() external onlyStart returns(address){
+        return address(iFMI);
+    }
+
+    // *::::::::::::::: ----------- :::::::::::::::* //
+    // *::::::::::::::: CV BINDINGS :::::::::::::::* //
+    // *::::::::::::::: ----------- :::::::::::::::* //
+
+    /**
+    * @notice This function can called only one time per address
+    * @dev Second call will be reverted by iFCV.createCV(_owner) because sender have already CV
+    * @return address target deployment cv
+    */
+    function buyCV() external payable onlyInit returns(address){
+        require(msg.value > cvPrice, "Value must be greater than price");
+        address newCV = iFCV.createCV(msg.sender);
+        return newCV;
+    }
+
+    /**
+    * @param _addr owner of cv
+    * @return address of cv
+    */
+    function getCVByAddress(address _addr) external view onlyInit returns(address) {
         return iFCV.getCVByAddress(_addr);
     }
+
+    // *::::::::::::::: ------------ :::::::::::::::* //
+    // *::::::::::::::: PUB BINDINGS :::::::::::::::* //
+    // *::::::::::::::: ------------ :::::::::::::::* //
+
+    function createPub(DataTypes.PubData memory _datas) external onlyInit returns(address){
+        iFCV.checkRegistred(msg.sender);
+        iPH.postPub(_datas);
+        // return newPub;
+    }
+
+    function getPubIndexers(address _addr)external onlyInit returns(uint[] memory){
+        iFCV.checkRegistred(_addr);
+        uint[] memory indexer = iPH.getIndexerByAddr(_addr);
+        return indexer;
+    }
+
 }

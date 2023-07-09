@@ -32,7 +32,7 @@ contract CV is Ownable {
 
     address public factoryCV;
     
-
+    uint public id;
 
     /**
     *    @dev string name string imgURI, address[] posts, uint followers, address[] followAccounts, address[] followMissions
@@ -45,6 +45,8 @@ contract CV is Ownable {
     bool public isRegistred;
     bool isBanned;
     uint missionsLength;
+
+
 
     uint featuresLength;
 
@@ -67,11 +69,10 @@ contract CV is Ownable {
         _;
     }
 
-    constructor(address _factoryCV) {
-        isRegistred = true;
-        DataTypes.ProfileData memory defaultData;
+    constructor(address _factoryCV, uint _id) {
         factoryCV = _factoryCV;
-        profile = defaultData;
+        id = _id;
+        isRegistred = true;
     }
    
     // *:::::::::::: -------- ::::::::::::* //
@@ -87,23 +88,19 @@ contract CV is Ownable {
      * @notice This function called by function setMission
      * @param _toFollow address mission want following
     */
-    function followMission(address _toFollow) public onlyByOwner {
+    function followMission(address _toFollow) external onlyByOwner {
         require(_toFollow != address(0),"Should follow value address");
         InteractionLogic._followMission(_toFollow, profile.followMissions);
         profile.followMissions.push(_toFollow);
     }
-    function unfollowMission(address _toUnfollow) internal {}
+    function unfollowMission(address _toUnfollow) external {}
 
-    function postPub(DataTypes.PubData memory _datas) external onlyOwner{
-        address _newPub = Bindings.deployPub(_datas);
-        profile.posts.push(_newPub);
-    }
+    
 
 
 
 
-
-    function setName(string memory _name) public onlyOwner {
+    function setName(string memory _name) external onlyOwner {
         require(bytes(_name).length > 0, "Name is empty");
         profile.name = _name;
     }
@@ -116,18 +113,18 @@ contract CV is Ownable {
 
 
 
-    function incrementFeatures(Milestone.Feature memory _newFeature) public onlyOwner {
+    function incrementFeatures(Milestone.Feature memory _newFeature) external onlyOwner {
         featuresList[featuresLength] = _newFeature;
         featuresLength++;
     }
 
-    function getFeaturesLength() public view returns (uint) {
+    function getFeaturesLength() external view returns (uint) {
         return featuresLength;
     }
 
     function getFeature(
         uint _id
-    ) public view returns (Milestone.Feature memory) {
+    ) external view returns (Milestone.Feature memory) {
         return featuresList[_id];
     }
 

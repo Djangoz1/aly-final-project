@@ -4,11 +4,16 @@ pragma solidity 0.8.20;
 
 
 import {DataTypes} from "../libraries/DataTypes.sol";
-// import {} from "./interfaces/..sol";
+import {IPubHub} from "../interfaces/IPubHub.sol";
+
 
 interface IAccessControl {
     function setPubHub(address _pubHub) external;
+    function getPubHub() external returns(address);
     function setFactoryCV(address _factoryCV) external;
+    function getFactoryCV() external returns(address);
     function setFactoryMission(address _factoryMission) external;
-    function hasCVAllowance() external;
+    function getFactoryMission() external returns(address);
+    function buyCV() external returns(address);
+    function getCVByAddress(address _addr) external view returns(address);
 }

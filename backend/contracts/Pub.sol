@@ -12,29 +12,15 @@ import {IPub} from "./interfaces/IPub.sol";
 
 
 contract Pub is Ownable, IPub{
-    // /**
-    // *    @param Social when publisher post on global access
-    // *    @param Work when publisher post on followers mission access
-    // *    @param Feed when publisher post on paid access
-    // *    @param Private when publisher post for a whitelisted address
-    // */
-    DataTypes.PubType pubType;
+
+    uint id;
+
     
-    // /**
-    // *    @dev string title, string content, address publisher, uint followers
-    // *    @param title
-    // *    @param content
-    // *    @param imgURI
-    // *    @param publisher
-    // *    @param followers
-    // */
-
-    // DataTypes.PubData informations;
-
-
+    DataTypes.PubType pubType;
     string metadata;
 
-    constructor(DataTypes.PubData memory _datas){
+    constructor(DataTypes.PubData memory _datas, uint _id ){
+        id = _id;
         setMetadata(_datas);
     }
 

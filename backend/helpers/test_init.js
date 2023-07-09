@@ -24,12 +24,44 @@ const _testInitFactoryCV = async (accessControl) => {
   return factoryCV;
 };
 
-const _testInitCV = async ({ factoryCV, owner }) => {
-  await factoryCV.createCV(owner);
-  let cvAddr = await factoryCV.getCV(owner);
-  const CV = await ethers.getContractAt("CV", cvAddr);
-  await CV.waitForDeployment();
-  return CV;
+// *:::::::::::::: -- ::::::::::::::*//
+// *:::::::::::::: CV ::::::::::::::*//
+// *:::::::::::::: -- ::::::::::::::*//
+
+const _testInitCV = async (accessControl, account, amount) => {
+  const newCV = await accessControl.connect(account).buyCV({
+    value: ethers.parseEther(`${amount}`),
+  });
+  const _cv = await accessControl
+    .connect(account)
+    .getCVByAddress(account.address);
+  const cv = await ethers.getContractAt("CV", _cv);
+  return cv;
+};
+
+// *:::::::::::::: --- ::::::::::::::*//
+// *:::::::::::::: PUB ::::::::::::::*//
+// *:::::::::::::: --- ::::::::::::::*//
+
+const _testInitPub = async (accessControlAdress, datas) => {
+  const accessControl = await ethers.getContractAt(
+    "AccessControl",
+    accessControlAdress
+  );
+  const pub = await accessControl.createPub(datas);
+  // const pubHub = await accessControl.getPubHub();
+  // ! finish verification
+  // !console.log("length", pubHub);
+  // const PubHub = await ethers.getContractAt("PubHub", pubHub);
+  // console.log("length", await PubHub.getLength());
+
+  return;
+
+  // expect();
+  // accessControl.getPubIndexers(cv.target);
+  // console.log("cv", cv);
+
+  return pub;
 };
 
 const _testInitMission = async ({ cv, factoryMission }) => {
@@ -82,6 +114,7 @@ module.exports = {
   _testInitPubHub,
   _testInitFactoryCV,
   _testInitCV,
+  _testInitPub,
   _testInitFactoryMission,
   _testInitMission,
   _testInitFeature,
