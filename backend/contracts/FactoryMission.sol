@@ -20,7 +20,10 @@ contract FactoryMission is Ownable {
     mapping(uint => address) public listMissions;
 
     modifier onlyProxy() {
-        require(msg.sender == address(accessControl));
+        require(
+            msg.sender == address(accessControl),
+            "Must call function with proxy bindings"
+        );
         _;
     }
 
@@ -40,9 +43,11 @@ contract FactoryMission is Ownable {
     }
 
     // *::::::::::::: GETTER :::::::::::: //
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
-    }
+
+    /**
+     * @param _for is cv address
+     * @return [] of missionIds
+     */
 
     function getIndexers(
         address _for
@@ -51,7 +56,7 @@ contract FactoryMission is Ownable {
         return listIndexers[_for];
     }
 
-    function getMission(uint _id) public view returns (address) {
+    function getMission(uint _id) public view onlyProxy returns (address) {
         require(_id < _missionIds.current(), "Mission does not exist");
         return listMissions[_id];
     }

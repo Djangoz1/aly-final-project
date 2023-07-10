@@ -15,6 +15,10 @@ interface IAccessControl {
 
     function getFactoryCV() external view returns (address);
 
+    function setFeaturesHub(address _featuresHub) external;
+
+    function getFeaturesHub() external view returns (address);
+
     function setFactoryMission(address _factoryMission) external;
 
     function getFactoryMission() external view returns (address);

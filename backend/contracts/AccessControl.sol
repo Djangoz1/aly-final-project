@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {DataTypes} from "./libraries/DataTypes.sol";
 import {IAccessControl} from "./interfaces/IAccessControl.sol";
 import {IFactoryMission} from "./interfaces/IFactoryMission.sol";
+import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
 import {IPubHub} from "./interfaces/IPubHub.sol";
 import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
 import {ICV} from "./interfaces/ICV.sol";
@@ -17,6 +18,7 @@ contract AccessControl is Ownable {
     IFactoryMission public iFMI;
     IFactoryCV public iFCV;
     IPubHub public iPH;
+    IFeaturesHub public iFH;
 
     DataTypes.AccessControlStatus public workflow;
 
@@ -40,6 +42,7 @@ contract AccessControl is Ownable {
         if (
             address(iFMI) != address(0) &&
             address(iFCV) != address(0) &&
+            address(iFH) != address(0) &&
             address(iPH) != address(0)
         ) {
             return true;
@@ -87,6 +90,13 @@ contract AccessControl is Ownable {
 
     function getFactoryMission() external view onlyInit returns (address) {
         return address(iFMI);
+    }
+
+    function setFeaturesHub(address _featuresHub) external onlyStart {
+        iFH = IFeaturesHub(_featuresHub);
+        if (hasInit()) {
+            workflow = DataTypes.AccessControlStatus.Init;
+        }
     }
 
     // *::::::::::::::: ----------- :::::::::::::::* //

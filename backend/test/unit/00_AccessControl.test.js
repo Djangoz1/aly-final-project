@@ -6,6 +6,7 @@ const {
   _testInitMission,
   _testInitFactoryMission,
   _testInitAccessControl,
+  _testInitFeaturesHub,
   _testInitPubHub,
   _testInitPub,
 } = require("../../helpers/test_init");
@@ -45,6 +46,12 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       const _fAddress = await accessControl.iFCV();
       expect(_fAddress).to.equal(factoryCV.target);
     });
+    
+    it('featuresHub deployment should set his address', async ()=>{
+      let featuresHub = await _testInitFeaturesHub(accessControl.target);
+      const _fAddress = await accessControl.iFH();
+      expect(_fAddress).to.equal(featuresHub.target);
+    })
 
     it("factoryMission deployment should set his address", async () => {
       let factoryCV = await _testInitFactoryCV(accessControl.target);
@@ -72,6 +79,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       let factoryCV = await _testInitFactoryCV(accessControl.target);
       await _testInitFactoryMission(factoryCV.target, accessControl.target);
       await _testInitPubHub(accessControl.target);
+       await _testInitFeaturesHub(accessControl.target);
       expect(parseInt(await accessControl.workflow())).to.equal(1);
     });
   });
@@ -84,6 +92,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     let factoryMission;
     let factoryCV;
     let pubHub;
+    let featuresHub
 
     beforeEach(async () => {
       factoryCV = await _testInitFactoryCV(accessControl.target);
@@ -91,6 +100,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         factoryCV.target,
         accessControl.target
       );
+      featuresHub = await _testInitFeaturesHub(accessControl.target);
       pubHub = await _testInitPubHub(accessControl.target);
     });
 

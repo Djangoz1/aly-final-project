@@ -84,6 +84,13 @@ const _testInitPub = async (accessControlAdress, datas) => {
   
 };
 
+const _testInitFeaturesHub = async (accessControlAdress) => {
+
+  const featuresHub = await ethers.deployContract("FeaturesHub", [accessControlAdress]);
+  return featuresHub
+  
+};
+
 const _testInitMission = async (_accessControl, _cv) => {
   const amount = ethers.parseEther("2");
   const accessControl = await getProxy(_accessControl)
@@ -138,6 +145,7 @@ const _testInitFeature = async ({ mission, values }) => {
 module.exports = {
   _testInitAccessControl,
   _testInitPubHub,
+  _testInitFeaturesHub,
   _testInitFactoryCV,
   _testInitCV,
   _testInitPub,
