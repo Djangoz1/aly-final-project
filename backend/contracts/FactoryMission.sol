@@ -2,6 +2,7 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 import "./Mission.sol";
 import "./SBToken/FactoryCV.sol";
@@ -9,57 +10,33 @@ import "./SBToken/CV.sol";
 
 import {IAccessControl} from "./interfaces/IAccessControl.sol";
 
-
 contract FactoryMission is Ownable {
-    uint256 public price;
-    uint256 public missionsLength;
-    uint256 balanceFoundation;
-    address public factoryCV;
+    using Counters for Counters.Counter;
+    Counters.Counter private _missionIds;
+
     IAccessControl accessControl;
 
-    mapping(uint => Mission) public listMission;
+    mapping(address => uint[]) listIndexers;
+    mapping(uint => address) public listMissions;
+
+    modifier onlyProxy() {
+        require(msg.sender == address(accessControl));
+        _;
+    }
 
     // *::::::::: CONSTRUCTOR :::::::::* //
     constructor(address _factoryCV, address _accessControl) payable {
-        price = 0.1 ether;
-        factoryCV = _factoryCV;
         accessControl = IAccessControl(_accessControl);
         accessControl.setFactoryMission(address(this));
     }
 
-
-
-
-    // *:::::::::::: -------- ::::::::::::* //
-    function getFactoryCV() external view returns(address) {
-        return factoryCV;
-    }
-
-    // *:::::::::: TRANSACTION :::::::::* //
-    function withdraw() public onlyOwner {
-        payable(owner()).transfer(balanceFoundation);
-        balanceFoundation = 0;
-    }
-
     // *::::::::::::: SETTER :::::::::::: //
-    function createMission(uint _amount) public returns (address) {
-        require(_amount >= price, "Not enough ETH sent; check price!");
-        CV cv;
-        cv = CV(msg.sender);
-        require(cv.isRegistred(), "Not registred");
-        uint afterTxFoundation = _amount - price;
-        balanceFoundation += price;
-        Mission newMission = new Mission(
-            afterTxFoundation,
-            address(cv),
-            factoryCV
-        );
-        address _address = address(newMission);
-        cv.setMission(_address);
+    function createMission(address _for) external onlyProxy {
+        Mission newMission = new Mission(_for, _missionIds.current());
 
-        listMission[missionsLength] = newMission;
-        missionsLength++;
-        return _address;
+        listIndexers[_for].push(_missionIds.current());
+        listMissions[_missionIds.current()] = address(newMission);
+        _missionIds.increment();
     }
 
     // *::::::::::::: GETTER :::::::::::: //
@@ -67,20 +44,19 @@ contract FactoryMission is Ownable {
         return address(this).balance;
     }
 
-    function getMission(uint _id) public view returns (Mission) {
-        require(_id < missionsLength, "Mission does not exist");
-        return listMission[_id];
+    function getIndexers(
+        address _for
+    ) external view onlyProxy returns (uint[] memory) {
+        require(listIndexers[_for].length > 0, "No missions index found");
+        return listIndexers[_for];
     }
 
-    function getMissionsLength() public view returns (uint256) {
-        return missionsLength;
+    function getMission(uint _id) public view returns (address) {
+        require(_id < _missionIds.current(), "Mission does not exist");
+        return listMissions[_id];
     }
 
-    function getPrice() public view returns (uint256) {
-        return price;
-    }
-
-    function setPrice(uint256 _price) public onlyOwner {
-        price = _price;
+    function getMissionIds() public view returns (uint256) {
+        return _missionIds.current();
     }
 }

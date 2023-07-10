@@ -2,11 +2,13 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "./CV.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
 contract FactoryCV is Ownable {
+    using Counters for Counters.Counter;
 
     /**
     *   @notice address of owner cv
@@ -21,9 +23,11 @@ contract FactoryCV is Ownable {
     mapping(uint => address) listCV;
 
     /**
-    *   @dev length of listCV. Need it to track forks of listCV
+    *   @dev _cvIds of listCV. Need it to track forks of listCV
     */
-    uint length;
+    Counters.Counter private _cvIds;
+    
+
 
     /**
     *   @dev instance of access control
@@ -41,10 +45,10 @@ contract FactoryCV is Ownable {
     constructor(address _accessControl){
         accessControl = IAccessControl(_accessControl);
         accessControl.setFactoryCV(address(this));
-        address genesis = Bindings._deployCV(address(this), address(this), length);
-        listIndexer[address(this)] = length;
+        address genesis = Bindings._deployCV(address(this), address(this), _cvIds.current());
+        listIndexer[address(this)] = _cvIds.current();
         listCV[listIndexer[address(this)]] = genesis;
-        length ++;
+        _cvIds.increment();
     }
 
 
@@ -55,16 +59,16 @@ contract FactoryCV is Ownable {
     */
     function createCV(address _toAddr) public onlyProxy returns (address) {
         require(listIndexer[_toAddr] == 0, "Already have a cv");
-        require(listCV[length] == address(0), "Missmatch index on listCV");
-        address newCV = Bindings._deployCV(_toAddr, address(this), length);
-        listIndexer[_toAddr] = length;
+        require(listCV[_cvIds.current()] == address(0), "Missmatch index on listCV");
+        address newCV = Bindings._deployCV(_toAddr, address(this), _cvIds.current());
+        listIndexer[_toAddr] = _cvIds.current();
         listCV[listIndexer[_toAddr]] = newCV;
-        length++;
+        _cvIds.increment();
         return newCV;
     }
 
-    function getCVsLength() public view returns (uint) {
-        return length;
+    function getCvIds() public view returns (uint) {
+        return _cvIds.current();
     }
 
 
@@ -96,7 +100,7 @@ contract FactoryCV is Ownable {
     */
     
     function getCVById(uint _id)public view onlyProxy returns(address){
-        require(_id < length, "ID out of range");
+        require(_id < _cvIds.current(), "ID out of range");
         return listCV[_id];
     }
 

@@ -5,6 +5,15 @@ const { _testParseHex, ZERO_ADDRESS } = require("./test_utils");
 
 const FactoryMission_NAME = "FactoryMission";
 
+const getProxy = async(accessControlAddr)=>{
+  const accessControl = await ethers.getContractAt(
+    "AccessControl",
+    accessControlAddr
+  );
+  return accessControl
+}
+
+
 const _testInitAccessControl = async () => {
   const accessControl = await ethers.deployContract("AccessControl");
   await accessControl.waitForDeployment();
@@ -28,6 +37,11 @@ const _testInitFactoryCV = async (accessControl) => {
 // *:::::::::::::: CV ::::::::::::::*//
 // *:::::::::::::: -- ::::::::::::::*//
 
+const getCV = async (_cv)=>{
+  const cv = await ethers.getContractAt("CV", _cv);
+  return cv;
+}
+
 const _testInitCV = async (accessControl, account, amount) => {
   const newCV = await accessControl.connect(account).buyCV({
     value: ethers.parseEther(`${amount}`),
@@ -35,9 +49,11 @@ const _testInitCV = async (accessControl, account, amount) => {
   const _cv = await accessControl
     .connect(account)
     .getCVByAddress(account.address);
-  const cv = await ethers.getContractAt("CV", _cv);
+  const cv = await getCV(_cv)
   return cv;
 };
+
+
 
 // *:::::::::::::: --- ::::::::::::::*//
 // *:::::::::::::: PUB ::::::::::::::*//
@@ -63,17 +79,22 @@ const _testInitPub = async (accessControlAdress, datas) => {
   const pub = await ethers.getContractAt("Pub", pubAddr);
   expect(await pub.owner()).to.be.equal(cv.target)
   expect(await pub.id()).to.be.equal(indexers[indexers.length - 1]);
-  // console.log(await pub.getMetadata())
   
   return pub
   
 };
 
-const _testInitMission = async ({ cv, factoryMission }) => {
+const _testInitMission = async (_accessControl, _cv) => {
   const amount = ethers.parseEther("2");
+  const accessControl = await getProxy(_accessControl)
+  const tx = await accessControl.buyMission({value: amount});
+  tx.wait()
+  const indexer = await accessControl.getMissionsIndexers(_cv)
+  console.log(indexer)
+  
+  return 
 
-  let transaction = await cv.buyMission(factoryMission.target, amount);
-  transaction.wait();
+
   const length = parseInt(await cv.getMissionsLength());
   expect(length.toString()).to.equal("1");
 

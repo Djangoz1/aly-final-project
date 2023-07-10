@@ -12,6 +12,7 @@ import {ICV} from "./interfaces/ICV.sol";
 
 contract AccessControl is Ownable {
     uint cvPrice = 100;
+    uint missionPrice = 200;
 
     IFactoryMission public iFMI;
     IFactoryCV public iFCV;
@@ -45,6 +46,10 @@ contract AccessControl is Ownable {
         } else {
             return false;
         }
+    }
+
+    function hasRegistred(address _forCheck) external view {
+        iFCV.checkRegistred(_forCheck);
     }
 
     // *::::::::::::::: -------------- :::::::::::::::* //
@@ -141,5 +146,28 @@ contract AccessControl is Ownable {
 
     function getPubById(uint _id) external view onlyInit returns (address) {
         return iPH.getPubById(_id);
+    }
+
+    // *:::::::::::: ----------------- ::::::::::::* //
+    // *:::::::::::: MISSIONS BINDINGS ::::::::::::* //
+    // *:::::::::::: ----------------- ::::::::::::* //
+
+    function buyMission() external payable {
+        require(msg.value >= missionPrice, "Value out of price range !");
+        iFCV.checkRegistred(msg.sender);
+        address cv = iFCV.getCVByAddress(msg.sender);
+        iFMI.createMission(cv);
+    }
+
+    /**
+     * @param _cvAddr address of cv owner
+     * @return indexer of missions id for this cv
+     */
+    function getMissionsIndexers(
+        address _cvAddr
+    ) external view onlyInit returns (uint[] memory) {
+        ICV icv = ICV(_cvAddr);
+        iFCV.checkRegistred(icv.owner());
+        return iFMI.getIndexers(_cvAddr);
     }
 }

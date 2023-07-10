@@ -3,6 +3,7 @@ const { expect, assert } = require("chai");
 const {
   _testInitFactoryCV,
   _testInitCV,
+  _testInitMission,
   _testInitFactoryMission,
   _testInitAccessControl,
   _testInitPubHub,
@@ -131,13 +132,20 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         cv = await _testInitCV(accessControl, this.owner, 2000);
       });
 
-      it("Should  create Pub", async () => {
+      it("Should  deploy Pub", async () => {
         let datas = PUB_DATAS_EXEMPLE;
         datas.publisher = cv.target;
-        const pub = await _testInitPub(accessControl.target, datas);
-        const metadata = await pub.getMetadata();
-        console.log(metadata);
+        await _testInitPub(accessControl.target, datas);
+        
+        
       });
+      it("Should  deploy Mission", async () => {
+        let mission = await _testInitMission(accessControl.target, cv.target)
+        
+        console.log(mission);
+      });
+
+
     });
   });
 });

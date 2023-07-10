@@ -2,6 +2,8 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
 // import "./CV.sol";
 
 // import "./SBToken/FactoryCV.sol";
@@ -20,10 +22,14 @@ import {IMission} from "./interfaces/IMission.sol";
 contract Mission is WorkflowStatusManager, IMission {
     using CommitWorker for *;
     using Milestone for *;
+    using Counters for Counters.Counter;
     FactoryCV public factoryCV;
     address public factoryCVaddress;
     address public factoryMissionAddress;
-    address public ownerCV;
+
+    uint public cvId;
+
+
 
     mapping(address => address) followers;
 
@@ -76,14 +82,10 @@ contract Mission is WorkflowStatusManager, IMission {
     // *:::::::::  -----------  ::::::::* //
     
 
-    constructor(uint _amount, address _ownerCV, address _factoryCV) {
+    constructor( address _ownerCV, uint _id) {
         transferOwnership(_ownerCV);
-        globalWadge += _amount;
-
-        ownerCV = _ownerCV;
         factoryMissionAddress = msg.sender;
-        factoryCVaddress = _factoryCV;
-        factoryCV = FactoryCV(factoryCVaddress);
+        cvId = _id;
     }
 
     // *:::::::::::: EMPLOYER ::::::::::::* //

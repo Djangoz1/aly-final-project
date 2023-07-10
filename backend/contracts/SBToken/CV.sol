@@ -156,16 +156,7 @@ contract CV is Ownable {
         _missionIds.increment();
     }
 
-    function buyMission(
-        address _factoryMission,
-        uint _amount
-    ) public onlyOwner {
-        IFactoryMission factoryMission = IFactoryMission(_factoryMission);
-        uint price = factoryMission.getPrice();
-        price.add(_amount);
-        factoryMission.createMission(price);
-    }
-
+ 
     function getMission(uint _idMission) public view returns (address) {
         require(isRegistred == true, "You must be registred");
         require(

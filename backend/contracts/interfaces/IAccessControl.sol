@@ -5,6 +5,8 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {IPubHub} from "../interfaces/IPubHub.sol";
 
 interface IAccessControl {
+    function hasRegistred(address _forCheck) external pure;
+
     function setPubHub(address _pubHub) external;
 
     function getPubHub() external view returns (address);
