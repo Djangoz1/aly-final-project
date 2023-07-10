@@ -48,20 +48,25 @@ const _testInitPub = async (accessControlAdress, datas) => {
     "AccessControl",
     accessControlAdress
   );
-  const pub = await accessControl.createPub(datas);
-  // const pubHub = await accessControl.getPubHub();
-  // ! finish verification
-  // !console.log("length", pubHub);
-  // const PubHub = await ethers.getContractAt("PubHub", pubHub);
-  // console.log("length", await PubHub.getLength());
+  let oldIndexers =  await accessControl.getPubIndexers(datas.publisher)
+  
 
-  return;
+  const newPub = await accessControl.createPub(datas);
+  await newPub.wait();
+  const cvAddr = await accessControl.getCVByAddress(newPub.from);
+  const cv = await ethers.getContractAt("CV", cvAddr);
 
-  // expect();
-  // accessControl.getPubIndexers(cv.target);
-  // console.log("cv", cv);
 
-  return pub;
+  const indexers = await accessControl.getPubIndexers(cvAddr)
+  expect(oldIndexers.length).to.be.equal(indexers.length -1)
+  const pubAddr = await accessControl.getPubById(parseInt(indexers[indexers.length - 1]))
+  const pub = await ethers.getContractAt("Pub", pubAddr);
+  expect(await pub.owner()).to.be.equal(cv.target)
+  expect(await pub.id()).to.be.equal(indexers[indexers.length - 1]);
+  // console.log(await pub.getMetadata())
+  
+  return pub
+  
 };
 
 const _testInitMission = async ({ cv, factoryMission }) => {

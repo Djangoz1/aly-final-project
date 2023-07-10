@@ -2,6 +2,7 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./FactoryCV.sol";
 
 import "../libraries/Milestone.sol";
@@ -16,6 +17,7 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {DataRecast} from "../libraries/DataRecast.sol";
 import {InteractionLogic} from "../libraries/InteractionLogic.sol";
 
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 
 
@@ -24,6 +26,8 @@ import {InteractionLogic} from "../libraries/InteractionLogic.sol";
 
 contract CV is Ownable {
     using Milestone for *;
+    using SafeMath for uint256;
+    using Counters for Counters.Counter;
 
     enum KycStatus {
         isKyc,
@@ -44,11 +48,12 @@ contract CV is Ownable {
 
     bool public isRegistred;
     bool isBanned;
-    uint missionsLength;
 
 
 
-    uint featuresLength;
+    Counters.Counter private _missionIds;
+
+    Counters.Counter private _featureIds;
 
     mapping(uint => address) public missionsList;
     mapping(uint => Milestone.Feature) public featuresList;
@@ -114,12 +119,12 @@ contract CV is Ownable {
 
 
     function incrementFeatures(Milestone.Feature memory _newFeature) external onlyOwner {
-        featuresList[featuresLength] = _newFeature;
-        featuresLength++;
+        featuresList[_featureIds.current()] = _newFeature;
+        _featureIds.increment();
     }
 
     function getFeaturesLength() external view returns (uint) {
-        return featuresLength;
+        return _featureIds.current();
     }
 
     function getFeature(
@@ -142,13 +147,13 @@ contract CV is Ownable {
 
     function setMission(address _missionAddress) external onlyFactoryMision{
         require(
-            missionsList[missionsLength] == address(0),
+            missionsList[_missionIds.current()] == address(0),
             "Mission already registred"
         );
         address _toFollow = InteractionLogic._followMission(_missionAddress, profile.followMissions);
         profile.followMissions.push(_toFollow);
-        missionsList[missionsLength] = _missionAddress;
-        missionsLength++;
+        missionsList[_missionIds.current()] = _missionAddress;
+        _missionIds.increment();
     }
 
     function buyMission(
@@ -157,7 +162,7 @@ contract CV is Ownable {
     ) public onlyOwner {
         IFactoryMission factoryMission = IFactoryMission(_factoryMission);
         uint price = factoryMission.getPrice();
-        price += _amount;
+        price.add(_amount);
         factoryMission.createMission(price);
     }
 
@@ -173,6 +178,6 @@ contract CV is Ownable {
     }
 
     function getMissionsLength() public view returns (uint) {
-        return missionsLength;
+        return _missionIds.current();
     }
 }

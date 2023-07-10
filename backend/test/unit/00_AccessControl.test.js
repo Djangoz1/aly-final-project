@@ -11,7 +11,7 @@ const {
 const { PUB_DATAS_EXEMPLE } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "AccessControl";
-
+const { decodePubMetadata } = require("../../helpers/decode");
 describe.only(`Contract ${CONTRACT_NAME} `, () => {
   let accessControl;
 
@@ -132,13 +132,11 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should  create Pub", async () => {
-        console.log(await factoryCV.getCVsLength());
-        // return;
-        console.log(cv.target);
         let datas = PUB_DATAS_EXEMPLE;
         datas.publisher = cv.target;
         const pub = await _testInitPub(accessControl.target, datas);
-        // console.log(pub);
+        const metadata = await pub.getMetadata();
+        console.log(metadata);
       });
     });
   });

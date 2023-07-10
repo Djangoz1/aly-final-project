@@ -66,6 +66,9 @@ library DataTypes {
         uint followers;
     }
 
+    string private constant PUB_DATA_TYPE = "PubData(string title, string content, string imgURI, address publisher, uint followers)";
+    
+
     struct MissionData {
         uint followersLength;
         string[] pubs;
