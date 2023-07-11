@@ -88,4 +88,23 @@ library DataRecast {
         );
         return metadata;
     }
+
+    function castProposalMetadata(
+        DataTypes.CreationProposalData memory _datas
+    ) internal pure returns (string memory) {
+        string memory metadata = string(
+            abi.encodePacked(
+                "title :{",
+                _datas.title,
+                "}",
+                "content :{",
+                _datas.content,
+                "}",
+                "imgURI :{",
+                _datas.imgURI,
+                "}"
+            )
+        );
+        return metadata;
+    }
 }

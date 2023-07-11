@@ -13,18 +13,18 @@ import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
 contract PubHub is Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _pubIds;
-    // /**
-    // * @dev storage indexer publications
-    // * @param key address is for cv publisher
-    // * @return array of index publications for each publisher
-    // */
+    /**
+     * @dev storage indexer publications
+     * @notice key address is for cv publisher
+     * @notice array of index publications for each publisher
+     */
     mapping(address => uint[]) indexerPub;
 
-    // /**
-    // * @dev storage all publications
-    // * @param key uint is for index publication
-    // * @return address publication
-    // */
+    /**
+     * @dev storage all publications
+     * @notice key uint is for index publication
+     * @notice address publication
+     */
     mapping(uint => address) pubs;
 
     IAccessControl accessControl;
@@ -37,9 +37,6 @@ contract PubHub is Ownable {
         _;
     }
 
-    // *::::::::: ----------- :::::::::* //
-    // *::::::::: CONSTRUCTOR :::::::::* //
-    // *::::::::: ----------- :::::::::* //
     constructor(address _accessControl) {
         accessControl = IAccessControl(_accessControl);
         accessControl.setPubHub(address(this));

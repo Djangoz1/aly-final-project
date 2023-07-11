@@ -130,4 +130,48 @@ library DataTypes {
         uint256 wadge;
         address assignedWorker;
     }
+
+    // *::::::::::::: ---------------- ::::::::::::: *//
+    // *::::::::::::: WORKER PROPOSALS ::::::::::::: *//
+    // *::::::::::::: ---------------- ::::::::::::: *//
+
+    /**
+     *    @param Propose when proposal is just proposed by worker
+     *    @param Validate when owner of feature validate proposal (means worker received wadge)
+     *    @param Refused when owner rejected the proposal
+     *    @param Litigation when litige send to Kleros court
+     */
+    enum WorkerProposalType {
+        Propose,
+        Validate,
+        Refused,
+        Litigation
+    }
+
+    /**
+     *   @notice featureId is referal feature of worker proposal
+     *   @notice metadata is concatenate string data of worker proposal (title, content, imgURI)
+     *   @notice closedAt is timestamp of Validate of Refused event
+     *   @notice createdAt is timestamp of deployment
+     */
+
+    struct WorkerProposalData {
+        uint featureId;
+        string metadata;
+        uint256 closedAt;
+        uint256 createdAt;
+    }
+
+    /**
+     * @notice title of worker proposal metadata
+     * @notice content of worker proposla metadata
+     * @notice imgURI? if owner want assign an image to this feature
+     */
+
+    struct CreationProposalData {
+        uint featureId;
+        string title;
+        string content;
+        string imgURI;
+    }
 }

@@ -23,6 +23,10 @@ interface IAccessControl {
 
     function getFactoryMission() external view returns (address);
 
+    function getWorkerProposalHub() external view returns (address);
+
+    function setWorkerProposalHub(address _workerProposalHub) external;
+
     function buyCV() external returns (address);
 
     function getCVByAddress(address _addr) external view returns (address);

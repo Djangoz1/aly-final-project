@@ -8,6 +8,8 @@ import {DataRecast} from "./libraries/DataRecast.sol";
 import {IAccessControl} from "./interfaces/IAccessControl.sol";
 import {IFactoryMission} from "./interfaces/IFactoryMission.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
+import {IFeature} from "./interfaces/IFeature.sol";
+import {IWorkerProposalHub} from "./interfaces/IWorkerProposalHub.sol";
 import {IPubHub} from "./interfaces/IPubHub.sol";
 import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
 import {ICV} from "./interfaces/ICV.sol";
@@ -20,6 +22,7 @@ contract AccessControl is Ownable {
     IFactoryCV public iFCV;
     IPubHub public iPH;
     IFeaturesHub public iFH;
+    IWorkerProposalHub public iWPH;
 
     DataTypes.AccessControlStatus public workflow;
 
@@ -102,6 +105,19 @@ contract AccessControl is Ownable {
 
     function getFeaturesHub() external view onlyInit returns (address) {
         return address(iFH);
+    }
+
+    function setWorkerProposalHub(
+        address _workerProposalHub
+    ) external onlyStart {
+        iWPH = IWorkerProposalHub(_workerProposalHub);
+        if (hasInit()) {
+            workflow = DataTypes.AccessControlStatus.Init;
+        }
+    }
+
+    function getWorkerProposalHub() external view onlyInit returns (address) {
+        return address(iWPH);
     }
 
     // *::::::::::::::: ----------- :::::::::::::::* //
@@ -200,7 +216,6 @@ contract AccessControl is Ownable {
     ) external payable onlyInit {
         require(msg.value == _data.wadge, "Missmatch value and wadge data");
         iFCV.checkRegistred(msg.sender);
-        ICV icv = ICV(iFCV.getCVByAddress(msg.sender));
         if (_data.assignedWorker != address(0)) {
             ICV cvWorker = ICV(_data.assignedWorker);
             iFCV.checkRegistred(cvWorker.owner());
@@ -208,7 +223,7 @@ contract AccessControl is Ownable {
         DataTypes.FeatureData memory _featureData = DataRecast.castFeatureData(
             _data
         );
-        iFH.createFeature(address(icv), _featureData);
+        iFH.createFeature(iFCV.getCVByAddress(msg.sender), _featureData);
     }
 
     function getFeatureIndexers(
@@ -222,5 +237,35 @@ contract AccessControl is Ownable {
 
     function getFeatureById(uint _id) external view onlyInit returns (address) {
         return iFH.getFeatureById(_id);
+    }
+
+    // *:::::::::::: ------------------------ ::::::::::::* //
+    // *:::::::::::: WORKER PROPOSAL BINDINGS ::::::::::::* //
+    // *:::::::::::: ------------------------ ::::::::::::* //
+
+    function createWorkerProposal(
+        DataTypes.CreationProposalData memory _metadata
+    ) external onlyInit {
+        iFCV.checkRegistred(msg.sender);
+        IFeature feature = IFeature(iFH.getFeatureById(_metadata.featureId));
+        address assignedWorker = feature.getDatas().assignedWorker;
+        if (assignedWorker != address(0)) {
+            require(
+                assignedWorker == msg.sender,
+                "Must be assigned for propose a work"
+            );
+        } else {
+            require(
+                feature.getDatas().isInviteOnly == false,
+                "Can't propose a work for a locked feature"
+            );
+        }
+
+        string memory metadata = DataRecast.castProposalMetadata(_metadata);
+        DataTypes.WorkerProposalData memory _datas;
+
+        _datas.metadata = metadata;
+        _datas.featureId = _metadata.featureId;
+        iWPH.postWorkerProposal(_datas, iFCV.getCVByAddress(msg.sender));
     }
 }

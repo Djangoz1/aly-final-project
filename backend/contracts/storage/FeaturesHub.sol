@@ -68,16 +68,12 @@ contract FeaturesHub is Ownable {
             _featuresIds.current(),
             _featureData
         );
-
         require(address(newFeature) != address(0), "Deployment feature failed");
         newFeature.transferOwnership(_for);
         require(newFeature.owner() == _for, "Missmatch ownership deployment");
-
         indexersList[newFeature.owner()].push(_featuresIds.current());
-
         featuresList[_featuresIds.current()] = address(newFeature);
         _featuresIds.increment();
-        // accessControl.hasRegistred(newFeature.owner());
     }
 
     function getFeatureById(
