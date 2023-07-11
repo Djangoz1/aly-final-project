@@ -27,13 +27,23 @@ contract FactoryMission is Ownable {
         _;
     }
 
-    // *::::::::: CONSTRUCTOR :::::::::* //
+    // *::::::::::::: ----------- ::::::::::::* //
+    // *::::::::::::: CONSTRUCTOR ::::::::::::* //
+    // *::::::::::::: ----------- ::::::::::::* //
+
     constructor(address _factoryCV, address _accessControl) payable {
         accessControl = IAccessControl(_accessControl);
         accessControl.setFactoryMission(address(this));
     }
 
-    // *::::::::::::: SETTER :::::::::::: //
+    function checkRegistred(uint _id) external view {
+        require(listMissions[_id] != address(0), "Mission not found");
+    }
+
+    // *::::::::::::: ------ ::::::::::::* //
+    // *::::::::::::: SETTER ::::::::::::* //
+    // *::::::::::::: ------ ::::::::::::* //
+
     function createMission(address _for) external onlyProxy {
         Mission newMission = new Mission(_for, _missionIds.current());
 
@@ -42,7 +52,9 @@ contract FactoryMission is Ownable {
         _missionIds.increment();
     }
 
-    // *::::::::::::: GETTER :::::::::::: //
+    // *::::::::::::: ------ ::::::::::::* //
+    // *::::::::::::: GETTER ::::::::::::* //
+    // *::::::::::::: ------ ::::::::::::* //
 
     /**
      * @param _for is cv address
@@ -56,12 +68,12 @@ contract FactoryMission is Ownable {
         return listIndexers[_for];
     }
 
-    function getMission(uint _id) public view onlyProxy returns (address) {
+    function getMission(uint _id) external view onlyProxy returns (address) {
         require(_id < _missionIds.current(), "Mission does not exist");
         return listMissions[_id];
     }
 
-    function getMissionIds() public view returns (uint256) {
+    function getMissionIds() external view returns (uint256) {
         return _missionIds.current();
     }
 }

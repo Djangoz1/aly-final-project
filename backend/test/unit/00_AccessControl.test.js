@@ -6,11 +6,15 @@ const {
   _testInitMission,
   _testInitFactoryMission,
   _testInitAccessControl,
+  _testInitFeature,
   _testInitFeaturesHub,
   _testInitPubHub,
   _testInitPub,
 } = require("../../helpers/test_init");
-const { PUB_DATAS_EXEMPLE } = require("../../helpers/test_utils");
+const {
+  PUB_DATAS_EXEMPLE,
+  FEATURE_DATAS_EXEMPLE,
+} = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "AccessControl";
 const { decodePubMetadata } = require("../../helpers/decode");
@@ -46,12 +50,12 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       const _fAddress = await accessControl.iFCV();
       expect(_fAddress).to.equal(factoryCV.target);
     });
-    
-    it('featuresHub deployment should set his address', async ()=>{
+
+    it("featuresHub deployment should set his address", async () => {
       let featuresHub = await _testInitFeaturesHub(accessControl.target);
       const _fAddress = await accessControl.iFH();
       expect(_fAddress).to.equal(featuresHub.target);
-    })
+    });
 
     it("factoryMission deployment should set his address", async () => {
       let factoryCV = await _testInitFactoryCV(accessControl.target);
@@ -79,7 +83,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       let factoryCV = await _testInitFactoryCV(accessControl.target);
       await _testInitFactoryMission(factoryCV.target, accessControl.target);
       await _testInitPubHub(accessControl.target);
-       await _testInitFeaturesHub(accessControl.target);
+      await _testInitFeaturesHub(accessControl.target);
       expect(parseInt(await accessControl.workflow())).to.equal(1);
     });
   });
@@ -92,7 +96,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     let factoryMission;
     let factoryCV;
     let pubHub;
-    let featuresHub
+    let featuresHub;
 
     beforeEach(async () => {
       factoryCV = await _testInitFactoryCV(accessControl.target);
@@ -131,11 +135,11 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       ).to.be.revertedWith("Value must be greater than price");
     });
 
-    // *::::::::::::: ---- :::::::::::::* //
-    // *::::::::::::: INIT :::::::::::::* //
-    // *::::::::::::: ---- :::::::::::::* //
+    // *::::::::::::: ------- :::::::::::::* //
+    // *::::::::::::: ELEMENT :::::::::::::* //
+    // *::::::::::::: ------- :::::::::::::* //
 
-    describe("Workflow : Init", () => {
+    describe("Element Deployment", () => {
       let cv;
 
       beforeEach(async () => {
@@ -146,16 +150,13 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         let datas = PUB_DATAS_EXEMPLE;
         datas.publisher = cv.target;
         await _testInitPub(accessControl.target, datas);
-        
-        
       });
       it("Should  deploy Mission", async () => {
-        let mission = await _testInitMission(accessControl.target, cv.target)
-        
-        console.log(mission);
+        await _testInitMission(accessControl.target, cv.target);
       });
-
-
+      it("Should  deploy feature", async () => {
+        let feature = await _testInitFeature(accessControl.target, cv.target);
+      });
     });
   });
 });

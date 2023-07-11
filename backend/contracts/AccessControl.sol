@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import {DataTypes} from "./libraries/DataTypes.sol";
+import {DataRecast} from "./libraries/DataRecast.sol";
 import {IAccessControl} from "./interfaces/IAccessControl.sol";
 import {IFactoryMission} from "./interfaces/IFactoryMission.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
@@ -99,6 +100,10 @@ contract AccessControl is Ownable {
         }
     }
 
+    function getFeaturesHub() external view onlyInit returns (address) {
+        return address(iFH);
+    }
+
     // *::::::::::::::: ----------- :::::::::::::::* //
     // *::::::::::::::: CV BINDINGS :::::::::::::::* //
     // *::::::::::::::: ----------- :::::::::::::::* //
@@ -179,5 +184,43 @@ contract AccessControl is Ownable {
         ICV icv = ICV(_cvAddr);
         iFCV.checkRegistred(icv.owner());
         return iFMI.getIndexers(_cvAddr);
+    }
+
+    function getMissionById(uint _id) external view returns (address) {
+        iFMI.checkRegistred(_id);
+        return iFMI.getMission(_id);
+    }
+
+    // *:::::::::::: ----------------- ::::::::::::* //
+    // *:::::::::::: FEATURES BINDINGS ::::::::::::* //
+    // *:::::::::::: ----------------- ::::::::::::* //
+
+    function postFeature(
+        DataTypes.CreationFeatureData memory _data
+    ) external payable onlyInit {
+        require(msg.value == _data.wadge, "Missmatch value and wadge data");
+        iFCV.checkRegistred(msg.sender);
+        ICV icv = ICV(iFCV.getCVByAddress(msg.sender));
+        if (_data.assignedWorker != address(0)) {
+            ICV cvWorker = ICV(_data.assignedWorker);
+            iFCV.checkRegistred(cvWorker.owner());
+        }
+        DataTypes.FeatureData memory _featureData = DataRecast.castFeatureData(
+            _data
+        );
+        iFH.createFeature(address(icv), _featureData);
+    }
+
+    function getFeatureIndexers(
+        address _cvAddr
+    ) external view onlyInit returns (uint256[] memory) {
+        ICV icv = ICV(_cvAddr);
+
+        iFCV.checkRegistred(icv.owner());
+        return iFH.getIndexersByAddress(_cvAddr);
+    }
+
+    function getFeatureById(uint _id) external view onlyInit returns (address) {
+        return iFH.getFeatureById(_id);
     }
 }

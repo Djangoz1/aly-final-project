@@ -2,6 +2,7 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Bindings} from "../libraries/Bindings.sol";
@@ -10,7 +11,8 @@ import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
 
 contract PubHub is Ownable {
-    uint length;
+    using Counters for Counters.Counter;
+    Counters.Counter private _pubIds;
     // /**
     // * @dev storage indexer publications
     // * @param key address is for cv publisher
@@ -43,8 +45,8 @@ contract PubHub is Ownable {
         accessControl.setPubHub(address(this));
     }
 
-    function getLength() external view returns (uint) {
-        return length;
+    function getFeaturesIds() external view returns (uint) {
+        return _pubIds.current();
     }
 
     /**
@@ -58,6 +60,7 @@ contract PubHub is Ownable {
     }
 
     function getPubById(uint _id) external view returns (address) {
+        require(_id < _pubIds.current(), "Id is out of range");
         require(pubs[_id] != address(0), "Publication not found");
         return pubs[_id];
     }
@@ -65,10 +68,10 @@ contract PubHub is Ownable {
     function postPub(
         DataTypes.PubData memory _datas
     ) external onlyProxy returns (address) {
-        address newPub = Bindings.deployPub(_datas, length);
-        indexerPub[_datas.publisher].push(length);
-        pubs[length] = newPub;
-        length++;
+        address newPub = Bindings.deployPub(_datas, _pubIds.current());
+        indexerPub[_datas.publisher].push(_pubIds.current());
+        pubs[_pubIds.current()] = newPub;
+        _pubIds.increment();
         return newPub;
     }
 }
