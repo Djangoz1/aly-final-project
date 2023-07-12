@@ -8,9 +8,10 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 
 interface IWorkerProposalHub {
     function postWorkerProposal(
-        DataTypes.WorkerProposalData memory _data,
-        address _forCV
-    ) external;
+        address _cv,
+        string calldata _tokenURI,
+        uint _featureId
+    ) external returns (uint);
 
     function getIndexer(address _forCV) external view returns (uint[] memory);
 

@@ -1,5 +1,7 @@
 const { ethers } = require("hardhat");
 const { expect, assert } = require("chai");
+const { createURIPost, createURIFeature } = require("../../utils/pinata");
+
 const {
   _testInitFactoryCV,
   _testInitCV,
@@ -8,6 +10,8 @@ const {
   _testInitAccessControl,
   _testInitFeature,
   _testInitFeaturesHub,
+  _testInitWorkerProposalHub,
+  _testInitWorkerProposal,
   _testInitPubHub,
   _testInitPub,
 } = require("../../helpers/test_init");
@@ -56,6 +60,11 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       const _fAddress = await accessControl.iFH();
       expect(_fAddress).to.equal(featuresHub.target);
     });
+    it("workerProposalHub deployment should set his address", async () => {
+      let workerProposalHub = await _testInitWorkerProposalHub(accessControl.target);
+      const _wphAddress = await accessControl.iWPH();
+      expect(_wphAddress).to.equal(workerProposalHub.target);
+    });
 
     it("factoryMission deployment should set his address", async () => {
       let factoryCV = await _testInitFactoryCV(accessControl.target);
@@ -84,6 +93,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       await _testInitFactoryMission(factoryCV.target, accessControl.target);
       await _testInitPubHub(accessControl.target);
       await _testInitFeaturesHub(accessControl.target);
+      await _testInitWorkerProposalHub(accessControl.target);
       expect(parseInt(await accessControl.workflow())).to.equal(1);
     });
   });
@@ -97,6 +107,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     let factoryCV;
     let pubHub;
     let featuresHub;
+    let workerProposalHub;
 
     beforeEach(async () => {
       factoryCV = await _testInitFactoryCV(accessControl.target);
@@ -106,6 +117,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       );
       featuresHub = await _testInitFeaturesHub(accessControl.target);
       pubHub = await _testInitPubHub(accessControl.target);
+      workerProposalHub = await _testInitWorkerProposalHub(accessControl.target);
     });
 
     it("Should deploy to Init workflow", async () => {
@@ -156,6 +168,10 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
       it("Should  deploy feature", async () => {
         let feature = await _testInitFeature(accessControl.target, cv.target);
+      });
+      it("Should deploy workerProposal", async () => {
+        let feature = await _testInitFeature(accessControl.target, cv.target);
+        let workerProposal = await _testInitWorkerProposal(accessControl.target, cv.target, 0); 
       });
     });
   });

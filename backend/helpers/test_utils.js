@@ -22,12 +22,22 @@ const FEATURE_DATAS_EXEMPLE = {
   imgURI: "https://picsum.photos/id/100/200",
   assignedWorker: ZERO_ADDRESS,
   devLanguage: "solidity",
-  wadge: 200,
+  wadge: 0.2,
 };
+
+
+const WORKER_PROPOSAL_DATAS_EXEMPLE = {
+    id: 0,
+    title: "Website creation",
+    description: "This is a part where content value stored. I can write everything I want to describe my work.",
+    // You can pass a link where the work stored
+    url:"https://github.com/Djangoz1/aly-final-project",
+}
 
 module.exports = {
   _testParseHex,
   ZERO_ADDRESS,
   PUB_DATAS_EXEMPLE,
+  WORKER_PROPOSAL_DATAS_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,
 };

@@ -9,7 +9,7 @@ import {IFactoryCV} from "../interfaces/IFactoryCV.sol";
 import {ICV} from "../interfaces/ICV.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {Pub} from "../Pub.sol";
-import {WorkerProposal} from "../WorkerProposal.sol";
+
 
 library Bindings {
     function _deployCV(
@@ -35,11 +35,4 @@ library Bindings {
         return address(pub);
     }
 
-    function deployWorkerProposal(
-        DataTypes.WorkerProposalData memory _datas,
-        uint _id
-    ) internal returns (address) {
-        WorkerProposal workerProposal = new WorkerProposal(_datas, _id);
-        return address(workerProposal);
-    }
 }

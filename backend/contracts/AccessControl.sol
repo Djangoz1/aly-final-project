@@ -47,6 +47,7 @@ contract AccessControl is Ownable {
             address(iFMI) != address(0) &&
             address(iFCV) != address(0) &&
             address(iFH) != address(0) &&
+            address(iWPH) != address(0) &&
             address(iPH) != address(0)
         ) {
             return true;
@@ -244,10 +245,11 @@ contract AccessControl is Ownable {
     // *:::::::::::: ------------------------ ::::::::::::* //
 
     function createWorkerProposal(
-        DataTypes.CreationProposalData memory _metadata
+        string calldata _tokenURI,
+        uint _featureID
     ) external onlyInit {
         iFCV.checkRegistred(msg.sender);
-        IFeature feature = IFeature(iFH.getFeatureById(_metadata.featureId));
+        IFeature feature = IFeature(iFH.getFeatureById(_featureID));
         address assignedWorker = feature.getDatas().assignedWorker;
         if (assignedWorker != address(0)) {
             require(
@@ -261,11 +263,10 @@ contract AccessControl is Ownable {
             );
         }
 
-        string memory metadata = DataRecast.castProposalMetadata(_metadata);
-        DataTypes.WorkerProposalData memory _datas;
-
-        _datas.metadata = metadata;
-        _datas.featureId = _metadata.featureId;
-        iWPH.postWorkerProposal(_datas, iFCV.getCVByAddress(msg.sender));
+        iWPH.postWorkerProposal(
+            iFCV.getCVByAddress(msg.sender),
+            _tokenURI,
+            _featureID
+        );
     }
 }
