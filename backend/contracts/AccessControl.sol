@@ -11,7 +11,7 @@ import {IMissionsHub} from "./interfaces/IMissionsHub.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
 
 import {IWorkerProposalHub} from "./interfaces/IWorkerProposalHub.sol";
-import {IPubHub} from "./interfaces/IPubHub.sol";
+import {IPubsHub} from "./interfaces/IPubsHub.sol";
 import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
 import {ICV} from "./interfaces/ICV.sol";
 
@@ -21,7 +21,7 @@ contract AccessControl is Ownable {
 
     IMissionsHub public iMH;
     IFactoryCV public iFCV;
-    IPubHub public iPH;
+    IPubsHub public iPH;
     IFeaturesHub public iFH;
     IWorkerProposalHub public iWPH;
 
@@ -66,7 +66,7 @@ contract AccessControl is Ownable {
     // *::::::::::::::: -------------- :::::::::::::::* //
 
     function setPubHub(address _pubHub) external onlyStart {
-        iPH = IPubHub(_pubHub);
+        iPH = IPubsHub(_pubHub);
         if (hasInit()) {
             workflow = DataTypes.AccessControlStatus.Init;
         }
@@ -152,33 +152,11 @@ contract AccessControl is Ownable {
     // *::::::::::::::: ------------ :::::::::::::::* //
 
     function createPub(
-        DataTypes.PubData memory _datas
-    ) external onlyInit returns (address) {
+        string calldata _tokenURI
+    ) external onlyInit returns (uint) {
         iFCV.checkRegistred(msg.sender);
-        ICV iCV = ICV(_datas.publisher);
-        require(
-            iCV.owner() == msg.sender,
-            "Must create a post with your own CV"
-        );
-        iFCV.checkRegistred(iCV.owner());
-        address newPub = iPH.postPub(_datas);
+        uint newPub = iPH.postPub(iFCV.getCVByAddress(msg.sender), _tokenURI);
         return newPub;
-    }
-
-    /**
-     * @notice This function can called only
-     */
-    function getPubIndexers(
-        address _addr
-    ) external view onlyInit returns (uint[] memory) {
-        ICV iCV = ICV(_addr);
-        iFCV.checkRegistred(iCV.owner());
-        uint[] memory indexer = iPH.getIndexerByAddr(_addr);
-        return indexer;
-    }
-
-    function getPubById(uint _id) external view onlyInit returns (address) {
-        return iPH.getPubById(_id);
     }
 
     // *:::::::::::: ----------------- ::::::::::::* //

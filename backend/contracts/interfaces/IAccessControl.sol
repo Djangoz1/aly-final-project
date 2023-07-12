@@ -2,7 +2,6 @@
 pragma solidity 0.8.20;
 
 import {DataTypes} from "../libraries/DataTypes.sol";
-import {IPubHub} from "../interfaces/IPubHub.sol";
 
 interface IAccessControl {
     function hasRegistred(address _forCheck) external pure;

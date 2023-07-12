@@ -7,12 +7,14 @@ const {
   FEATURE_DATAS_EXEMPLE,
   FEATURE_DATAS_URI_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
+  PUB_DATAS_URI_EXEMPLE,
 } = require("./test_utils");
 
 const {
   createURIFeature,
   createURIWorkerProposal,
   createURIMission,
+  createURIPub,
 } = require("../utils/pinata");
 
 const MissionsHub_NAME = "MissionsHub";
@@ -32,26 +34,6 @@ const _testInitAccessControl = async () => {
   await accessControl.waitForDeployment();
   return accessControl;
 };
-const _testInitPubHub = async (accessControl) => {
-  const pubHub = await ethers.deployContract("PubHub", [accessControl]);
-  await pubHub.waitForDeployment();
-  return pubHub;
-};
-const _testInitWorkerProposalHub = async (accessControl) => {
-  const workerProposalHub = await ethers.deployContract("WorkProposalHub", [
-    accessControl,
-  ]);
-  await workerProposalHub.waitForDeployment();
-  return workerProposalHub;
-};
-
-const _testInitFactoryCV = async (accessControl) => {
-  const factoryCV = await ethers.deployContract("FactoryCV", [accessControl]);
-
-  await factoryCV.waitForDeployment();
-
-  return factoryCV;
-};
 
 // *:::::::::::::: -- ::::::::::::::*//
 // *:::::::::::::: CV ::::::::::::::*//
@@ -62,7 +44,16 @@ const getCV = async (_cv) => {
   return cv;
 };
 
-const _testInitCV = async (accessControl, account, amount) => {
+const _testInitFactoryCV = async (accessControl) => {
+  const factoryCV = await ethers.deployContract("FactoryCV", [accessControl]);
+
+  await factoryCV.waitForDeployment();
+
+  return factoryCV;
+};
+
+const _testInitCV = async (_accessControl, account, amount) => {
+  const accessControl = await getProxy(_accessControl)
   const newCV = await accessControl.connect(account).buyCV({
     value: ethers.parseEther(`${amount}`),
   });
@@ -70,6 +61,7 @@ const _testInitCV = async (accessControl, account, amount) => {
     .connect(account)
     .getCVByAddress(account.address);
   const cv = await getCV(_cv);
+
   return cv;
 };
 
@@ -77,42 +69,52 @@ const _testInitCV = async (accessControl, account, amount) => {
 // *:::::::::::::: PUB ::::::::::::::*//
 // *:::::::::::::: --- ::::::::::::::*//
 
-const _testInitPub = async (accessControlAdress, datas) => {
-  const accessControl = await ethers.getContractAt(
+const _testInitPubHub = async (accessControl) => {
+  const pubHub = await ethers.deployContract("PubsHub", [accessControl]);
+  await pubHub.waitForDeployment();
+  return pubHub;
+};
+
+const _testInitPub = async (accessControlAdress, account, uriData) => {
+  if (!uriData) {
+    uriData = PUB_DATAS_URI_EXEMPLE;
+  }
+  const accessControl = await getContractAt(
     "AccessControl",
     accessControlAdress
   );
-  let oldIndexers = await accessControl.getPubIndexers(datas.publisher);
 
-  const newPub = await accessControl.createPub(datas);
-  await newPub.wait();
-  const cvAddr = await accessControl.getCVByAddress(newPub.from);
-  const cv = await ethers.getContractAt("CV", cvAddr);
 
-  const indexers = await accessControl.getPubIndexers(cvAddr);
-  expect(oldIndexers.length).to.be.equal(indexers.length - 1);
-  const pubAddr = await accessControl.getPubById(
-    parseInt(indexers[indexers.length - 1])
-  );
-  const pub = await ethers.getContractAt("Pub", pubAddr);
-  expect(await pub.owner()).to.be.equal(cv.target);
-  expect(await pub.id()).to.be.equal(indexers[indexers.length - 1]);
+  const _cv = await accessControl.getCVByAddress(account.address);
 
-  return pub;
-};
+  const pubsHub = await getContractAt("PubsHub", await accessControl.iPH());
+  const id = parseInt(await pubsHub.getTokensLength()) + 1;
+  uriData.id = id;
+  const json = await createURIPub(uriData);
+  const tokenURI = json.IpfsHash;
+  const beforeLength = parseInt(await pubsHub.balanceOf(_cv));
 
-const _testInitFeaturesHub = async (accessControlAdress) => {
-  const featuresHub = await ethers.deployContract("FeaturesHub", [
-    accessControlAdress,
-  ]);
-  return featuresHub;
+  const tx = await accessControl.connect(account).createPub(tokenURI);
+ 
+  await tx.wait();
+  expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
+  const afterLength = parseInt(await pubsHub.balanceOf(_cv));
+
+  expect(beforeLength).to.equal(afterLength - 1);
+
+  const _tokenURI = await pubsHub.tokenURI(parseInt(id));
+  expect(_tokenURI).to.be.equal(tokenURI);
+
+  const owner = await pubsHub.ownerOf(id);
+  expect(owner).to.be.equal(_cv);
+  return id;
 };
 
 // *:::::::::::::: ------- ::::::::::::::*//
 // *:::::::::::::: MISSION ::::::::::::::*//
 // *:::::::::::::: ------- ::::::::::::::*//
 
-const _testInitMission = async (_accessControl, _cv, _amount, uriData) => {
+const _testInitMission = async (_accessControl, account, _amount, uriData) => {
   if (!uriData) {
     uriData = FEATURE_DATAS_URI_EXEMPLE;
   }
@@ -121,6 +123,8 @@ const _testInitMission = async (_accessControl, _cv, _amount, uriData) => {
     "MissionsHub",
     await accessControl.iMH()
   );
+
+  const _cv = await accessControl.getCVByAddress(account.address);
 
   const id = parseInt(await missionsHub.getTokensLength()) + 1;
   uriData.id = id;
@@ -131,7 +135,9 @@ const _testInitMission = async (_accessControl, _cv, _amount, uriData) => {
 
   const beforeLength = parseInt(await missionsHub.balanceOf(_cv));
 
-  const tx = await accessControl.buyMission(tokenURI, { value: amount });
+  const tx = await accessControl
+    .connect(account)
+    .buyMission(tokenURI, { value: amount });
   tx.wait();
   expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
 
@@ -157,9 +163,16 @@ const _testInitMissionsHub = async (_accessControl) => {
 // *:::::::::::::: FEATURE ::::::::::::::* //
 // *:::::::::::::: ------- ::::::::::::::* //
 
+const _testInitFeaturesHub = async (accessControlAdress) => {
+  const featuresHub = await ethers.deployContract("FeaturesHub", [
+    accessControlAdress,
+  ]);
+  return featuresHub;
+};
+
 const _testInitFeature = async (
   _accessControl,
-  _cv,
+  account,
   _missionId,
   uriData,
   datas
@@ -170,7 +183,10 @@ const _testInitFeature = async (
   if (!uriData) {
     uriData = FEATURE_DATAS_URI_EXEMPLE;
   }
+
+  
   const accessControl = await getProxy(_accessControl);
+  const _cv = await accessControl.getCVByAddress(account.address);
   const amount = ethers.parseEther(`${datas.wadge}`);
   const featuresHub = await getContractAt(
     "FeaturesHub",
@@ -188,7 +204,7 @@ const _testInitFeature = async (
   datas.missionID = _missionId;
   const beforeLength = parseInt(await featuresHub.balanceOf(_cv));
 
-  const tx = await accessControl.postFeature(datas, {
+  const tx = await accessControl.connect(account).postFeature(datas, {
     value: amount,
   });
 
@@ -211,9 +227,17 @@ const _testInitFeature = async (
 // *:::::::::::::: WORKER PROPOSAL ::::::::::::::* //
 // *:::::::::::::: --------------- ::::::::::::::* //
 
+const _testInitWorkerProposalHub = async (accessControl) => {
+  const workerProposalHub = await ethers.deployContract("WorkProposalHub", [
+    accessControl,
+  ]);
+  await workerProposalHub.waitForDeployment();
+  return workerProposalHub;
+};
+
 const _testInitWorkerProposal = async (
   _accessControl,
-  _cv,
+  account,
   _featureID,
   _datas
 ) => {
@@ -223,6 +247,7 @@ const _testInitWorkerProposal = async (
     datas = _datas;
   }
   const accessControl = await getProxy(_accessControl);
+  const _cv = await accessControl.getCVByAddress(account.address);
   const workProposalHub = await getContractAt(
     "WorkProposalHub",
     await accessControl.iWPH()
@@ -235,7 +260,9 @@ const _testInitWorkerProposal = async (
 
   const beforeLength = parseInt(await workProposalHub.balanceOf(_cv));
 
-  const tx = await accessControl.createWorkerProposal(tokenURI, _featureID);
+  const tx = await accessControl
+    .connect(account)
+    .createWorkerProposal(tokenURI, _featureID);
   await tx.wait();
 
   const afterLength = parseInt(await workProposalHub.balanceOf(_cv));

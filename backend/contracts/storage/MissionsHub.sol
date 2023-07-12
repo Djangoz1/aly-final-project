@@ -15,9 +15,6 @@ contract MissionsHub is ERC721URIStorage {
 
     mapping(address => uint[]) indexers;
 
-    // Each mission can have a features
-    mapping(uint => uint[]) indexersFeatures;
-
     modifier onlyProxy() {
         require(
             msg.sender == address(accessControl),

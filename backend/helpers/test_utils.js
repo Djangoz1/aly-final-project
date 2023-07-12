@@ -7,13 +7,17 @@ const _testParseHex = (number) => {
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-const PUB_DATAS_EXEMPLE = {
+// *::::::::::::: ------------- :::::::::::::* //
+// *::::::::::::: WORK PROPOSAL :::::::::::::* //
+// *::::::::::::: ------------- :::::::::::::* //
+
+const PUB_DATAS_URI_EXEMPLE = {
+  id: 0,
   title: "Title of my post",
-  content:
+  description:
     "This is a part where content value stored. I can write everything I want to share at the community or missions community or private community.",
-  imgURI: "https://picsum.photos/id/100/200",
-  publisher: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  followers: 0,
+  image: "https://picsum.photos/id/100/200",
+  name: "Mission #",
 };
 
 // *::::::::::::: ------- :::::::::::::* //
@@ -45,7 +49,7 @@ const FEATURE_DATAS_EXEMPLE = {
   estimatedDays: 0,
   assignedWorker: ZERO_ADDRESS,
   isInviteOnly: true,
-  wadge: 0.2,
+  wadge: 0.002,
 };
 
 const FEATURE_DATAS_URI_EXEMPLE = {
@@ -57,6 +61,10 @@ const FEATURE_DATAS_URI_EXEMPLE = {
   name: "Feature #",
   devLanguage: "solidity",
 };
+
+// *::::::::::::: ------------- :::::::::::::* //
+// *::::::::::::: WORK PROPOSAL :::::::::::::* //
+// *::::::::::::: ------------- :::::::::::::* //
 
 const WORKER_PROPOSAL_DATAS_EXEMPLE = {
   id: 0,
@@ -70,7 +78,7 @@ const WORKER_PROPOSAL_DATAS_EXEMPLE = {
 module.exports = {
   _testParseHex,
   ZERO_ADDRESS,
-  PUB_DATAS_EXEMPLE,
+  PUB_DATAS_URI_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
   MISSION_DATAS_URI_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,

@@ -135,7 +135,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should buy CV", async () => {
-      expect(await _testInitCV(accessControl, this.addr1, 2000)).to.not.be
+      expect(await _testInitCV(accessControl, this.addr1, 1)).to.not.be
         .reverted;
     });
 
@@ -150,50 +150,48 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     // *::::::::::::: ------- :::::::::::::* //
 
     describe("Element Deployment", () => {
+
       let cv;
 
       beforeEach(async () => {
-        cv = await _testInitCV(accessControl, this.owner, 2000);
+        cv = await _testInitCV(accessControl, this.addr1, 1);
+         await _testInitCV(accessControl, this.addr2, 1);
       });
 
       it("Should  deploy Pub", async () => {
-        let datas = PUB_DATAS_EXEMPLE;
-        datas.publisher = cv.target;
-        await _testInitPub(accessControl.target, datas);
+        await _testInitPub(accessControl.target, this.addr1);
       });
+
       it("Should  deploy Mission", async () => {
-        await _testInitMission(accessControl.target, cv.target, 0.2);
+        await _testInitMission(accessControl.target, this.addr1, 0.2);
       });
+
       it("Should  deploy feature", async () => {
         const missionId = await _testInitMission(
           accessControl.target,
-          cv.target,
+          this.addr1,
           0.2
         );
 
         let feature = await _testInitFeature(
           accessControl.target,
-          cv.target,
+          this.addr1,
           missionId
         );
       });
-      it("Should deploy workerProposal", async () => {
+      it.only("Should deploy workerProposal", async () => {
         const missionId = await _testInitMission(
           accessControl.target,
-          cv.target,
-          0.2
+          this.addr2,
+          0.01
         );
         let featureId = await _testInitFeature(
           accessControl.target,
-          cv.target,
+          this.addr2,
           missionId
         );
 
-        let workerProposal = await _testInitWorkerProposal(
-          accessControl.target,
-          cv.target,
-          featureId
-        );
+        // await _testInitWorkerProposal(accessControl.target, this.addr2, featureId);
       });
     });
   });

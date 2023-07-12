@@ -2,24 +2,15 @@
 const { main: deployMain } = require("./01_deploy");
 
 const hre = require("hardhat");
-const { _testInitFeature } = require("../helpers/test_init");
+const { _testInitFeature, _testInitCV, _testInitMission, _testInitPub, _testInitWorkerProposal } = require("../helpers/test_init");
 const CONTRACT_NAME = "FactoryMission";
 
 async function main() {
   const mainDeploy = await deployMain();
 
-  const ADDR_FACTORY_CV = mainDeploy.factoryCV;
-  const ADDR_FACTORY_MISSION = mainDeploy.factoryMission;
-  [
-    this.owner,
-    this.addr1,
-    this.addr2,
-    this.addr3,
-    this.addr4,
-    this.addr5,
-    this.addr6,
-    this.addr7,
-  ] = await ethers.getSigners();
+
+  const _accessControl = mainDeploy["accessControl"]
+  
   const addresses = [
     this.owner,
     this.addr1,
@@ -29,54 +20,35 @@ async function main() {
     this.addr5,
     this.addr6,
     this.addr7,
-  ];
-  let factoryCV = await ethers.getContractAt("FactoryCV", ADDR_FACTORY_CV);
+  ] = await ethers.getSigners();
 
   for (let index = 0; index < addresses.length; index++) {
+    
     const user = addresses[index];
-    const tx = await factoryCV.connect(user).createCV(user.address);
+  
+    const cv = await _testInitCV(_accessControl, user, 0.2);
+    console.log("CV create on ", cv.target);
+    
 
-    await tx.wait();
-    const cvAddr = await factoryCV.getCV(user.address);
-    const cv = await ethers.getContractAt("CV", cvAddr);
+    const pub = await _testInitPub(_accessControl, user)
+    console.log("Pub create on id", pub)
+    
+    const mission = await _testInitMission(_accessControl, user, 1)
+    console.log("Mission create on id", mission)
+    
+    const feature = await _testInitFeature(_accessControl, user, mission)
+    console.log("Feature create on id", feature)
+    
+    const workerProposal = await _testInitWorkerProposal(_accessControl, user, feature)
+    console.log("WorkerProposal create on id", feature)
+
+    
 
     if (index === 0) {
       await cv.connect(user).setName("Ownie");
-      await cv.buyMission(ADDR_FACTORY_MISSION, 200);
-      const addrMission = await cv.getMission(0);
-      const mission = await ethers.getContractAt("Mission", addrMission);
-      await _testInitFeature({
-        mission,
-        values: {
-          wadge: 700,
-          description:
-            "__/title:Jeu de plateforme__/dev:unity__/domain:gaming__/desc:Refais moi le jeu de Peter Molineux",
-        },
-      });
-
-      await _testInitFeature({
-        mission,
-        values: {
-          wadge: 500,
-          description:
-            "__/title:NFT__/dev:solidity__/domain:web3__/desc:Créer un Pass NFT qui sera nécessaire pour les joueur pour jouer au jeu de plateforme",
-          isInvite: false,
-        },
-      });
-      await _testInitFeature({
-        mission,
-        values: {
-          wadge: 900,
-          description:
-            "__/title:Rewards System__/dev:solidity__/domain:web3__/desc:Créer un Reward System pour récompenser les joueurs qui ont gagné le jeu de plateforme",
-          isInvite: false,
-        },
-      });
-      console.log("Feature create on ", mission.target);
     } else {
       await cv.connect(user).setName(`Testor${index}`);
     }
-    console.log("CV create on ", cv.target);
   }
 }
 
