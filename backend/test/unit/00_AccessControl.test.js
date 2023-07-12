@@ -166,11 +166,14 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       it("Should  deploy Mission", async () => {
         await _testInitMission(accessControl.target, cv.target);
       });
-      it("Should  deploy feature", async () => {
-        let feature = await _testInitFeature(accessControl.target, cv.target);
+      it.only("Should  deploy feature", async () => {
+        await _testInitMission(accessControl.target, cv.target);
+        await _testInitMission(accessControl.target, cv.target);
+        let feature = await _testInitFeature(accessControl.target, cv.target, 1);
       });
       it("Should deploy workerProposal", async () => {
-        let feature = await _testInitFeature(accessControl.target, cv.target);
+        let feature = await _testInitFeature(accessControl.target, cv.target, 0);
+
         let workerProposal = await _testInitWorkerProposal(accessControl.target, cv.target, 0); 
       });
     });

@@ -104,12 +104,12 @@ library DataTypes {
      */
 
     struct FeatureData {
-        uint missionId;
-        string metadata;
+        uint256 missionID;
         uint256 startedAt;
         uint256 createdAt;
         uint256 wadge;
         uint16 estimatedDays;
+        string tokenURI;
         bool isInviteOnly;
         address assignedWorker;
     }

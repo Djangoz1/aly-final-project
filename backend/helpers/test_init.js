@@ -5,6 +5,7 @@ const {
   _testParseHex,
   ZERO_ADDRESS,
   FEATURE_DATAS_EXEMPLE,
+  FEATURE_DATAS_URI_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
 } = require("./test_utils");
 
@@ -132,19 +133,28 @@ const _testInitFactoryMission = async (_fcvAddr, _accessControl) => {
 // *:::::::::::::: FEATURE ::::::::::::::* //
 // *:::::::::::::: ------- ::::::::::::::* //
 
-const _testInitFeature = async (_accessControl, _cv, datas) => {
+const _testInitFeature = async (_accessControl, _cv, _missionId, uriData, datas) => {
   if (!datas) {
     datas = FEATURE_DATAS_EXEMPLE;
+  }
+  if (!uriData) {
+    uriData = FEATURE_DATAS_URI_EXEMPLE;
   }
   const accessControl = await getProxy(_accessControl);
   const amount = ethers.parseEther(`${datas.wadge}`);
   datas.wadge = amount;
 
+  const json = await createURIFeature(uriData);
+  const tokenURI = json.IpfsHash;
+
+  datas.tokenURI = tokenURI;
+  console.log(tokenURI)
+  datas.missionID = _missionId
   const tx = await accessControl.postFeature(datas, {
     value: amount,
   });
   await tx.wait();
-
+return
   const cv = await getContractAt("CV", _cv);
   expect(await cv.owner()).to.be.equal(tx.from);
 

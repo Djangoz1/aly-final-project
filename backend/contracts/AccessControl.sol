@@ -213,31 +213,25 @@ contract AccessControl is Ownable {
     // *:::::::::::: ----------------- ::::::::::::* //
 
     function postFeature(
-        DataTypes.CreationFeatureData memory _data
+        DataTypes.FeatureData memory _data
     ) external payable onlyInit {
-        require(msg.value == _data.wadge, "Missmatch value and wadge data");
+        require(msg.value > 0, "Must provide a value");
+        require(_data.missionID > 0, "Must provide a mission");
+        //! Faire un require sur le fait que la mission lui appartien bien
+        require(
+            bytes(_data.tokenURI).length > 0,
+            "Feature must have a metadata"
+        );
+        iFMI.checkRegistred(_data.missionID);
         iFCV.checkRegistred(msg.sender);
         if (_data.assignedWorker != address(0)) {
             ICV cvWorker = ICV(_data.assignedWorker);
             iFCV.checkRegistred(cvWorker.owner());
+            _data.isInviteOnly = true;
         }
-        DataTypes.FeatureData memory _featureData = DataRecast.castFeatureData(
-            _data
-        );
-        iFH.createFeature(iFCV.getCVByAddress(msg.sender), _featureData);
-    }
-
-    function getFeatureIndexers(
-        address _cvAddr
-    ) external view onlyInit returns (uint256[] memory) {
-        ICV icv = ICV(_cvAddr);
-
-        iFCV.checkRegistred(icv.owner());
-        return iFH.getIndexersByAddress(_cvAddr);
-    }
-
-    function getFeatureById(uint _id) external view onlyInit returns (address) {
-        return iFH.getFeatureById(_id);
+        _data.createdAt = block.timestamp;
+        _data.wadge = msg.value;
+        iFH.createFeature(iFCV.getCVByAddress(msg.sender), _data);
     }
 
     // *:::::::::::: ------------------------ ::::::::::::* //
@@ -249,17 +243,12 @@ contract AccessControl is Ownable {
         uint _featureID
     ) external onlyInit {
         iFCV.checkRegistred(msg.sender);
-        IFeature feature = IFeature(iFH.getFeatureById(_featureID));
-        address assignedWorker = feature.getDatas().assignedWorker;
-        if (assignedWorker != address(0)) {
+        DataTypes.FeatureData memory data = iFH.getDatas(_featureID);
+
+        if (data.assignedWorker != address(0)) {
             require(
-                assignedWorker == msg.sender,
+                data.assignedWorker == msg.sender,
                 "Must be assigned for propose a work"
-            );
-        } else {
-            require(
-                feature.getDatas().isInviteOnly == false,
-                "Can't propose a work for a locked feature"
             );
         }
 

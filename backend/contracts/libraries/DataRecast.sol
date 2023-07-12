@@ -47,17 +47,17 @@ library DataRecast {
         return metadata;
     }
 
-    function castFeatureData(
-        DataTypes.CreationFeatureData memory _data
-    ) internal pure returns (DataTypes.FeatureData memory) {
-        require(_data.wadge > 0, "You must provide a value");
-        DataTypes.FeatureData memory _featureData;
-        string memory metadata = DataRecast.castFeatureMetadata(_data);
-        _featureData.metadata = metadata;
-        _featureData.wadge = _data.wadge;
-        _featureData.assignedWorker = _data.assignedWorker;
-        return _featureData;
-    }
+    // function castFeatureData(
+    //     DataTypes.CreationFeatureData memory _data
+    // ) internal pure returns (DataTypes.FeatureData memory) {
+    //     require(_data.wadge > 0, "You must provide a value");
+    //     DataTypes.FeatureData memory _featureData;
+    //     string memory metadata = DataRecast.castFeatureMetadata(_data);
+    //     _featureData.metadata = metadata;
+    //     _featureData.wadge = _data.wadge;
+    //     _featureData.assignedWorker = _data.assignedWorker;
+    //     return _featureData;
+    // }
 
     function castPubMetadata(
         DataTypes.PubData memory _datas

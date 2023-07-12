@@ -13,7 +13,7 @@ contract WorkProposalHub is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
 
-    mapping(address => uint[]) indexerProposal;
+    mapping(address => uint[]) indexer;
 
     /// @notice id work proposal is linked to feature
     mapping(uint => uint) featuresIDs;
@@ -46,7 +46,7 @@ contract WorkProposalHub is ERC721URIStorage {
     ) external onlyProxy returns (uint) {
         _tokenIDs.increment();
         uint newProposalID = _tokenIDs.current();
-        indexerProposal[_cv].push(newProposalID);
+        indexer[_cv].push(newProposalID);
         _mint(_cv, newProposalID);
         _setTokenURI(newProposalID, _tokenURI);
         featuresIDs[newProposalID] = _featureID;
@@ -54,71 +54,11 @@ contract WorkProposalHub is ERC721URIStorage {
     }
 
     function getIndexer(address _cv) external view returns(uint[] memory){
-        require(indexerProposal[_cv].length > 0, "No work proposal found");
-        return indexerProposal[_cv];
+        require(indexer[_cv].length > 0, "No work proposal found");
+        return indexer[_cv];
     }
 
     function getFeatureOfWorkProposal(uint _idProposal) external view returns(uint){
         return featuresIDs[_idProposal];
     }
 }
-
-// pragma solidity 0.8.20;
-
-// import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/utils/Counters.sol";
-
-// import {DataTypes} from "../libraries/DataTypes.sol";
-// import {Bindings} from "../libraries/Bindings.sol";
-// import {IAccessControl} from "../interfaces/IAccessControl.sol";
-
-// contract WorkProposalHub {
-//     using Counters for Counters.Counter;
-//     Counters.Counter private _workerProposalIds;
-
-//     mapping(address => uint[]) indexerProposal;
-
-//     mapping(uint => address) proposals;
-
-//     IAccessControl accessControl;
-
-//     modifier onlyProxy() {
-//         require(
-//             msg.sender == address(accessControl),
-//             "Must call function with proxy bindings"
-//         );
-//         _;
-//     }
-
-//     // *::::::::: ----------- :::::::::* //
-//     // *::::::::: CONSTRUCTOR :::::::::* //
-//     // *::::::::: ----------- :::::::::* //
-//     constructor(address _accessControl) {
-//         accessControl = IAccessControl(_accessControl);
-//         accessControl.setWorkerProposalHub(address(this));
-//     }
-
-//     function postWorkerProposal(
-//         DataTypes.WorkerProposalData memory _data,
-//         address _forCV
-//     ) external onlyProxy {
-//         address newProposal = Bindings.deployWorkerProposal(
-//             _data,
-//             _workerProposalIds.current()
-//         );
-//         indexerProposal[_forCV].push(_workerProposalIds.current());
-//         proposals[_workerProposalIds.current()] = newProposal;
-//         _workerProposalIds.increment();
-//     }
-
-//     function getIndexer(
-//         address _forCV
-//     ) external view onlyProxy returns (uint[] memory) {
-//         return indexerProposal[_forCV];
-//     }
-
-//     function getProposal(uint _id) external view onlyProxy returns (address) {
-//         require(_id < _workerProposalIds.current(), "Id out of range");
-//         return proposals[_id];
-//     }
-// }

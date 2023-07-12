@@ -12,13 +12,10 @@ interface IFeaturesHub {
     // Ajoutez votre code ici
 
     function createFeature(
-        address _for,
-        DataTypes.FeatureData memory _featureData
-    ) external;
+        address _cv,
+        DataTypes.FeatureData memory _data
+    ) external  returns(uint);
 
-    function getFeatureById(uint _id) external view returns (address);
+    function getDatas(uint _id) external view returns(DataTypes.FeatureData memory _data);
 
-    function getIndexersByAddress(
-        address _for
-    ) external view returns (uint256[] memory);
 }

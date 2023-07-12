@@ -16,23 +16,32 @@ const PUB_DATAS_EXEMPLE = {
   followers: 0,
 };
 const FEATURE_DATAS_EXEMPLE = {
-  title: "Title of my feature",
-  content:
-    "This is a part where content value stored. I can write everything I want to describe my feature. Once a worker join this feature, I must follow instruction of this content. In the end, if a litigation arrived between owner(me) and worker, this content will be shared on Kleros Court",
-  imgURI: "https://picsum.photos/id/100/200",
+  missionID: 0,
+  tokenURI: "uritoken",
+  startedAt: 0,
+  createdAt: 0,
+  estimatedDays: 0,
   assignedWorker: ZERO_ADDRESS,
-  devLanguage: "solidity",
+  isInviteOnly: true,
   wadge: 0.2,
 };
-
+const FEATURE_DATAS_URI_EXEMPLE = {
+  title: "Title of my feature",
+  description:
+    "This is a part where content value stored. I can write everything I want to describe my feature. Once a worker join this feature, I must follow instruction of this content. In the end, if a litigation arrived between owner(me) and worker, this content will be shared on Kleros Court",
+  image: "https://picsum.photos/id/100/200",
+  name: "Feature #",
+  devLanguage: "solidity",
+};
 
 const WORKER_PROPOSAL_DATAS_EXEMPLE = {
-    id: 0,
-    title: "Website creation",
-    description: "This is a part where content value stored. I can write everything I want to describe my work.",
-    // You can pass a link where the work stored
-    url:"https://github.com/Djangoz1/aly-final-project",
-}
+  id: 0,
+  title: "Website creation",
+  description:
+    "This is a part where content value stored. I can write everything I want to describe my work.",
+  // You can pass a link where the work stored
+  url: "https://github.com/Djangoz1/aly-final-project",
+};
 
 module.exports = {
   _testParseHex,
@@ -40,4 +49,5 @@ module.exports = {
   PUB_DATAS_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,
+  FEATURE_DATAS_URI_EXEMPLE,
 };
