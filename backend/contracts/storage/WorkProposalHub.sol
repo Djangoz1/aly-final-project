@@ -33,11 +33,9 @@ contract WorkProposalHub is ERC721URIStorage {
         accessControl.setWorkerProposalHub(address(this));
     }
 
-
-    function getTokenLength () public view returns (uint){
+    function getTokensLength() public view returns (uint) {
         return _tokenIDs.current();
     }
-
 
     function postWorkerProposal(
         address _cv,
@@ -53,12 +51,14 @@ contract WorkProposalHub is ERC721URIStorage {
         return newProposalID;
     }
 
-    function getIndexer(address _cv) external view returns(uint[] memory){
+    function getIndexer(address _cv) external view returns (uint[] memory) {
         require(indexer[_cv].length > 0, "No work proposal found");
         return indexer[_cv];
     }
 
-    function getFeatureOfWorkProposal(uint _idProposal) external view returns(uint){
+    function getFeatureOfWorkProposal(
+        uint _idProposal
+    ) external view returns (uint) {
         return featuresIDs[_idProposal];
     }
 }

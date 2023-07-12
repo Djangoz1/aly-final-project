@@ -19,7 +19,12 @@ interface IAccessControl {
 
     function getFeaturesHub() external view returns (address);
 
+    // ! to remove
     function setFactoryMission(address _factoryMission) external;
+
+    // ! ^^^^ to remove
+
+    function setMissionsHub(address _missionsHub) external;
 
     function getFactoryMission() external view returns (address);
 

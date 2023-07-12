@@ -6,7 +6,7 @@ const {
   _testInitFactoryCV,
   _testInitCV,
   _testInitMission,
-  _testInitFactoryMission,
+  _testInitMissionsHub,
   _testInitAccessControl,
   _testInitFeature,
   _testInitFeaturesHub,
@@ -61,18 +61,17 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       expect(_fAddress).to.equal(featuresHub.target);
     });
     it("workerProposalHub deployment should set his address", async () => {
-      let workerProposalHub = await _testInitWorkerProposalHub(accessControl.target);
+      let workerProposalHub = await _testInitWorkerProposalHub(
+        accessControl.target
+      );
       const _wphAddress = await accessControl.iWPH();
       expect(_wphAddress).to.equal(workerProposalHub.target);
     });
 
     it("factoryMission deployment should set his address", async () => {
-      let factoryCV = await _testInitFactoryCV(accessControl.target);
-      let factoryMission = await _testInitFactoryMission(
-        factoryCV.target,
-        accessControl.target
-      );
-      const _fMAddress = await accessControl.iFMI();
+      // let factoryCV = await _testInitFactoryCV(accessControl.target);
+      let factoryMission = await _testInitMissionsHub(accessControl.target);
+      const _fMAddress = await accessControl.iMH();
       expect(_fMAddress).to.equal(factoryMission.target);
     });
 
@@ -89,8 +88,8 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should can use onlyInit function", async () => {
-      let factoryCV = await _testInitFactoryCV(accessControl.target);
-      await _testInitFactoryMission(factoryCV.target, accessControl.target);
+      await _testInitFactoryCV(accessControl.target);
+      await _testInitMissionsHub(accessControl.target);
       await _testInitPubHub(accessControl.target);
       await _testInitFeaturesHub(accessControl.target);
       await _testInitWorkerProposalHub(accessControl.target);
@@ -111,13 +110,12 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
     beforeEach(async () => {
       factoryCV = await _testInitFactoryCV(accessControl.target);
-      factoryMission = await _testInitFactoryMission(
-        factoryCV.target,
-        accessControl.target
-      );
+      factoryMission = await _testInitMissionsHub(accessControl.target);
       featuresHub = await _testInitFeaturesHub(accessControl.target);
       pubHub = await _testInitPubHub(accessControl.target);
-      workerProposalHub = await _testInitWorkerProposalHub(accessControl.target);
+      workerProposalHub = await _testInitWorkerProposalHub(
+        accessControl.target
+      );
     });
 
     it("Should deploy to Init workflow", async () => {
@@ -164,17 +162,38 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         await _testInitPub(accessControl.target, datas);
       });
       it("Should  deploy Mission", async () => {
-        await _testInitMission(accessControl.target, cv.target);
+        await _testInitMission(accessControl.target, cv.target, 0.2);
       });
-      it.only("Should  deploy feature", async () => {
-        await _testInitMission(accessControl.target, cv.target);
-        await _testInitMission(accessControl.target, cv.target);
-        let feature = await _testInitFeature(accessControl.target, cv.target, 1);
+      it("Should  deploy feature", async () => {
+        const missionId = await _testInitMission(
+          accessControl.target,
+          cv.target,
+          0.2
+        );
+
+        let feature = await _testInitFeature(
+          accessControl.target,
+          cv.target,
+          missionId
+        );
       });
       it("Should deploy workerProposal", async () => {
-        let feature = await _testInitFeature(accessControl.target, cv.target, 0);
+        const missionId = await _testInitMission(
+          accessControl.target,
+          cv.target,
+          0.2
+        );
+        let featureId = await _testInitFeature(
+          accessControl.target,
+          cv.target,
+          missionId
+        );
 
-        let workerProposal = await _testInitWorkerProposal(accessControl.target, cv.target, 0); 
+        let workerProposal = await _testInitWorkerProposal(
+          accessControl.target,
+          cv.target,
+          featureId
+        );
       });
     });
   });

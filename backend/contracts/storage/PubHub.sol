@@ -8,7 +8,6 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
-import {IFactoryMission} from "../interfaces/IFactoryMission.sol";
 
 contract PubHub is Ownable {
     using Counters for Counters.Counter;

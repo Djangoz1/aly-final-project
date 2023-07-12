@@ -8,10 +8,9 @@ const fs = require("fs");
 const createURIWorkerProposal = async ({ id, title, description, url }) => {
   const readableStreamForFile = fs.createReadStream("img/contract.png");
 
-
-  if(!id && !title && !description){
-    throw new Error("Missing value on creation worker proposal URI")
-    return
+  if (!id && !title && !description) {
+    throw new Error("Missing value on creation worker proposal URI");
+    return;
   }
   const options = {
     pinataMetadata: {
@@ -34,25 +33,24 @@ const createURIWorkerProposal = async ({ id, title, description, url }) => {
     };
 
     const json = await pinata.pinJSONToIPFS(body, options);
-    
+
     return json;
-} catch (err) {
+  } catch (err) {
     console.log("ERROR", err);
     return null;
-}
+  }
 };
 
 const createURIFeature = async ({ id, title, description, url }) => {
-    const readableStreamForFile = fs.createReadStream("img/contract.png");
-    
-    
-    if(!id && !title && !description){
-        throw new Error("Missing value on creation feature URI")
-        return
-    }
-    const options = {
-        pinataMetadata: {
-            name: `Work3 - Feature${id}`,
+  const readableStreamForFile = fs.createReadStream("img/contract.png");
+
+  if (!id && !title && !description) {
+    throw new Error("Missing value on creation feature URI");
+    return;
+  }
+  const options = {
+    pinataMetadata: {
+      name: `Work3 - Feature${id}`,
     },
     pinataOptions: {
       cidVersion: 0,
@@ -71,8 +69,6 @@ const createURIFeature = async ({ id, title, description, url }) => {
     };
 
     const json = await pinata.pinJSONToIPFS(body, options);
-    console.log("json", json )
-
     return json;
   } catch (err) {
     console.log("ERROR", err);
@@ -80,4 +76,43 @@ const createURIFeature = async ({ id, title, description, url }) => {
   }
 };
 
-module.exports = { createURIWorkerProposal, createURIFeature };
+const createURIMission = async ({ id, title, description, url }) => {
+  const readableStreamForFile = fs.createReadStream("img/contract.png");
+
+  if (!id && !title && !description) {
+    throw new Error("Missing value on creation feature URI");
+    return;
+  }
+  const options = {
+    pinataMetadata: {
+      name: `Work3 - Mission${id}`,
+    },
+    pinataOptions: {
+      cidVersion: 0,
+    },
+  };
+
+  try {
+    const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
+
+    const body = {
+      title: title,
+      description: description,
+      url: url,
+      image: result.IpfsHash,
+      name: "Feature #" + id,
+    };
+
+    const json = await pinata.pinJSONToIPFS(body, options);
+    return json;
+  } catch (err) {
+    console.log("ERROR", err);
+    return null;
+  }
+};
+
+module.exports = {
+  createURIWorkerProposal,
+  createURIFeature,
+  createURIMission,
+};

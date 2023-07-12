@@ -6,9 +6,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {DataTypes} from "./libraries/DataTypes.sol";
 import {DataRecast} from "./libraries/DataRecast.sol";
 import {IAccessControl} from "./interfaces/IAccessControl.sol";
-import {IFactoryMission} from "./interfaces/IFactoryMission.sol";
+
+import {IMissionsHub} from "./interfaces/IMissionsHub.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
-import {IFeature} from "./interfaces/IFeature.sol";
+
 import {IWorkerProposalHub} from "./interfaces/IWorkerProposalHub.sol";
 import {IPubHub} from "./interfaces/IPubHub.sol";
 import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
@@ -18,7 +19,7 @@ contract AccessControl is Ownable {
     uint cvPrice = 100;
     uint missionPrice = 200;
 
-    IFactoryMission public iFMI;
+    IMissionsHub public iMH;
     IFactoryCV public iFCV;
     IPubHub public iPH;
     IFeaturesHub public iFH;
@@ -44,7 +45,7 @@ contract AccessControl is Ownable {
 
     function hasInit() internal view returns (bool) {
         if (
-            address(iFMI) != address(0) &&
+            address(iMH) != address(0) &&
             address(iFCV) != address(0) &&
             address(iFH) != address(0) &&
             address(iWPH) != address(0) &&
@@ -86,15 +87,15 @@ contract AccessControl is Ownable {
         return address(iFCV);
     }
 
-    function setFactoryMission(address _factoryMission) external onlyStart {
-        iFMI = IFactoryMission(_factoryMission);
+    function setMissionsHub(address _missionsHub) external onlyStart {
+        iMH = IMissionsHub(_missionsHub);
         if (hasInit()) {
             workflow = DataTypes.AccessControlStatus.Init;
         }
     }
 
-    function getFactoryMission() external view onlyInit returns (address) {
-        return address(iFMI);
+    function getMissionsHub() external view onlyInit returns (address) {
+        return address(iMH);
     }
 
     function setFeaturesHub(address _featuresHub) external onlyStart {
@@ -184,28 +185,11 @@ contract AccessControl is Ownable {
     // *:::::::::::: MISSIONS BINDINGS ::::::::::::* //
     // *:::::::::::: ----------------- ::::::::::::* //
 
-    function buyMission() external payable {
+    function buyMission(string calldata _tokenURI) external payable {
         require(msg.value >= missionPrice, "Value out of price range !");
         iFCV.checkRegistred(msg.sender);
         address cv = iFCV.getCVByAddress(msg.sender);
-        iFMI.createMission(cv);
-    }
-
-    /**
-     * @param _cvAddr address of cv owner
-     * @return indexer of missions id for this cv
-     */
-    function getMissionsIndexers(
-        address _cvAddr
-    ) external view onlyInit returns (uint[] memory) {
-        ICV icv = ICV(_cvAddr);
-        iFCV.checkRegistred(icv.owner());
-        return iFMI.getIndexers(_cvAddr);
-    }
-
-    function getMissionById(uint _id) external view returns (address) {
-        iFMI.checkRegistred(_id);
-        return iFMI.getMission(_id);
+        iMH.createMission(cv, _tokenURI);
     }
 
     // *:::::::::::: ----------------- ::::::::::::* //
@@ -222,7 +206,7 @@ contract AccessControl is Ownable {
             bytes(_data.tokenURI).length > 0,
             "Feature must have a metadata"
         );
-        iFMI.checkRegistred(_data.missionID);
+        iMH.checkRegistred(_data.missionID);
         iFCV.checkRegistred(msg.sender);
         if (_data.assignedWorker != address(0)) {
             ICV cvWorker = ICV(_data.assignedWorker);

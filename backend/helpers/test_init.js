@@ -9,10 +9,13 @@ const {
   WORKER_PROPOSAL_DATAS_EXEMPLE,
 } = require("./test_utils");
 
-const {  createURIFeature, createURIWorkerProposal } = require("../utils/pinata");
+const {
+  createURIFeature,
+  createURIWorkerProposal,
+  createURIMission,
+} = require("../utils/pinata");
 
-
-const FactoryMission_NAME = "FactoryMission";
+const MissionsHub_NAME = "MissionsHub";
 
 const getContractAt = async (_contract, _address) => {
   const contract = await ethers.getContractAt(_contract, _address);
@@ -35,7 +38,9 @@ const _testInitPubHub = async (accessControl) => {
   return pubHub;
 };
 const _testInitWorkerProposalHub = async (accessControl) => {
-  const workerProposalHub = await ethers.deployContract("WorkProposalHub", [accessControl]);
+  const workerProposalHub = await ethers.deployContract("WorkProposalHub", [
+    accessControl,
+  ]);
   await workerProposalHub.waitForDeployment();
   return workerProposalHub;
 };
@@ -107,33 +112,58 @@ const _testInitFeaturesHub = async (accessControlAdress) => {
 // *:::::::::::::: MISSION ::::::::::::::*//
 // *:::::::::::::: ------- ::::::::::::::*//
 
-const _testInitMission = async (_accessControl, _cv) => {
-  const amount = ethers.parseEther("2");
+const _testInitMission = async (_accessControl, _cv, _amount, uriData) => {
+  if (!uriData) {
+    uriData = FEATURE_DATAS_URI_EXEMPLE;
+  }
   const accessControl = await getProxy(_accessControl);
-  const tx = await accessControl.buyMission({ value: amount });
-  tx.wait();
-  const indexer = await accessControl.getMissionsIndexers(_cv);
-  const missionAddr = await accessControl.getMissionById(
-    indexer[indexer.length - 1]
+  const missionsHub = await getContractAt(
+    "MissionsHub",
+    await accessControl.iMH()
   );
-  const mission = await getContractAt("Mission", missionAddr);
-  expect(await mission.owner()).to.be.equal(_cv);
-  return mission;
+
+  const id = parseInt(await missionsHub.getTokensLength()) + 1;
+  uriData.id = id;
+
+  const json = await createURIMission(uriData);
+  const tokenURI = json.IpfsHash;
+  const amount = ethers.parseEther(`${_amount}`);
+
+  const beforeLength = parseInt(await missionsHub.balanceOf(_cv));
+
+  const tx = await accessControl.buyMission(tokenURI, { value: amount });
+  tx.wait();
+  expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
+
+  const afterLength = parseInt(await missionsHub.balanceOf(_cv));
+  expect(beforeLength).to.equal(afterLength - 1);
+
+  const _tokenURI = await missionsHub.tokenURI(parseInt(id));
+  expect(_tokenURI).to.be.equal(tokenURI);
+
+  const owner = await missionsHub.ownerOf(id);
+  expect(owner).to.be.equal(_cv);
+  return id;
 };
 
-const _testInitFactoryMission = async (_fcvAddr, _accessControl) => {
-  const factoryMission = await ethers.deployContract(FactoryMission_NAME, [
-    _fcvAddr,
+const _testInitMissionsHub = async (_accessControl) => {
+  const missionsHub = await ethers.deployContract("MissionsHub", [
     _accessControl,
   ]);
-  return factoryMission;
+  return missionsHub;
 };
 
 // *:::::::::::::: ------- ::::::::::::::* //
 // *:::::::::::::: FEATURE ::::::::::::::* //
 // *:::::::::::::: ------- ::::::::::::::* //
 
-const _testInitFeature = async (_accessControl, _cv, _missionId, uriData, datas) => {
+const _testInitFeature = async (
+  _accessControl,
+  _cv,
+  _missionId,
+  uriData,
+  datas
+) => {
   if (!datas) {
     datas = FEATURE_DATAS_EXEMPLE;
   }
@@ -142,83 +172,85 @@ const _testInitFeature = async (_accessControl, _cv, _missionId, uriData, datas)
   }
   const accessControl = await getProxy(_accessControl);
   const amount = ethers.parseEther(`${datas.wadge}`);
-  datas.wadge = amount;
+  const featuresHub = await getContractAt(
+    "FeaturesHub",
+    await accessControl.iFH()
+  );
 
+  const id = parseInt(await featuresHub.getTokensLength()) + 1;
+  uriData.id = id;
+  datas.wadge = amount;
   const json = await createURIFeature(uriData);
   const tokenURI = json.IpfsHash;
+  expect(tokenURI).to.not.be.equal("");
 
   datas.tokenURI = tokenURI;
-  console.log(tokenURI)
-  datas.missionID = _missionId
+  datas.missionID = _missionId;
+  const beforeLength = parseInt(await featuresHub.balanceOf(_cv));
+
   const tx = await accessControl.postFeature(datas, {
     value: amount,
   });
+
+  expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
+
   await tx.wait();
-return
-  const cv = await getContractAt("CV", _cv);
-  expect(await cv.owner()).to.be.equal(tx.from);
+  const afterLength = parseInt(await featuresHub.balanceOf(_cv));
+  expect(beforeLength).to.equal(afterLength - 1);
 
-  const indexer = await accessControl.getFeatureIndexers(await cv.target);
-  const address = await accessControl.getFeatureById(
-    indexer[indexer.length - 1]
-  );
-  const _feature = await getContractAt("Feature", address);
-  expect(await _feature.owner()).to.be.equal(cv.target);
+  const _tokenURI = await featuresHub.tokenURI(parseInt(id));
+  expect(_tokenURI).to.not.be.equal("");
 
-  return _feature;
+  const owner = await featuresHub.ownerOf(id);
+  expect(owner).to.be.equal(_cv);
+
+  return id;
 };
-
 
 // *:::::::::::::: --------------- ::::::::::::::* //
 // *:::::::::::::: WORKER PROPOSAL ::::::::::::::* //
 // *:::::::::::::: --------------- ::::::::::::::* //
 
-
-const _testInitWorkerProposal = async (_accessControl, _cv, _featureID,  _datas) => {
+const _testInitWorkerProposal = async (
+  _accessControl,
+  _cv,
+  _featureID,
+  _datas
+) => {
   datas = WORKER_PROPOSAL_DATAS_EXEMPLE;
-  
+
   if (_datas) {
-    datas = _datas
+    datas = _datas;
   }
   const accessControl = await getProxy(_accessControl);
-  const workProposalHub = await getContractAt("WorkProposalHub", await accessControl.iWPH())
-  const targetID = parseInt(await workProposalHub.getTokenLength()) + 1
+  const workProposalHub = await getContractAt(
+    "WorkProposalHub",
+    await accessControl.iWPH()
+  );
+  const targetID = parseInt(await workProposalHub.getTokensLength()) + 1;
   datas.id = targetID;
 
-  
   const json = await createURIWorkerProposal(datas);
-  const tokenURI = json.IpfsHash
+  const tokenURI = json.IpfsHash;
 
-  const beforeLength = parseInt(await workProposalHub.balanceOf(_cv))
-  
+  const beforeLength = parseInt(await workProposalHub.balanceOf(_cv));
+
   const tx = await accessControl.createWorkerProposal(tokenURI, _featureID);
   await tx.wait();
 
-  const afterLength = parseInt(await workProposalHub.balanceOf(_cv))
+  const afterLength = parseInt(await workProposalHub.balanceOf(_cv));
   expect(beforeLength).to.equal(afterLength - 1);
-  
-  const id = parseInt(await workProposalHub.getTokenLength())
-  
-  
-  
 
+  const id = parseInt(await workProposalHub.getTokensLength());
 
-  const _tokenURI = await workProposalHub.tokenURI(parseInt(id))
-  expect(_tokenURI).to.not.be.equal('');
+  const _tokenURI = await workProposalHub.tokenURI(parseInt(id));
+  expect(_tokenURI).to.not.be.equal("");
 
-
-  const owner = await workProposalHub.ownerOf(id)
-  expect(owner).to.be.equal(_cv)
-
-  
+  const owner = await workProposalHub.ownerOf(id);
+  expect(owner).to.be.equal(_cv);
 
   return id;
-
-  
 };
-
-
-
 
 module.exports = {
   _testInitAccessControl,
@@ -229,7 +261,7 @@ module.exports = {
   _testInitCV,
   _testInitPub,
   _testInitPubHub,
-  _testInitFactoryMission,
+  _testInitMissionsHub,
   _testInitMission,
   _testInitFeature,
 };
