@@ -16,16 +16,10 @@ module.exports = {
       },
     },
   },
-   networks: {
-    hardhat: {
-      gas: 100000, // Spécifiez le gas limit souhaité ici
-    },
-  },
 
   // gasReporter: {
   //   currency: 'CHF',
   //   gasPrice: 21,
   //   enabled: true,
   // },
-  
 };

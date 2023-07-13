@@ -4,6 +4,7 @@ import { BtnToProfileCV } from "components/btn/BtnToProfileCV";
 import { ZERO_ADDRESS } from "constants/web3";
 import { useAuthState } from "context/auth";
 import { icfyCODER, icfyETHER } from "icones";
+import { ethers } from "ethers";
 import React from "react";
 
 export const StatFeatureFooter = ({ feature, submit, mission, link }) => {
@@ -23,7 +24,9 @@ export const StatFeatureFooter = ({ feature, submit, mission, link }) => {
         {feature?.assignedWorker !== ZERO_ADDRESS ? 1 : 0}
       </p>
       <Icon icon={icfyETHER} className="text-2xl text-black/70" />
-      <p className="text-black"> {parseInt(feature?.wadge)} ETH</p>
+      <p className="text-black">
+        {ethers.utils.formatEther(`${parseInt(feature?.wadge)}`)} ETH
+      </p>
 
       {cv &&
         submit &&

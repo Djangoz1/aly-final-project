@@ -11,8 +11,8 @@ export const CVName = ({ styles, address }) => {
     (async () => {
       const requestAddress = address || cv;
       try {
-        const _name = await _getterCV(requestAddress, "name");
-        setName(_name);
+        const profile = await _getterCV(requestAddress, "getProfile");
+        setName(profile.name);
       } catch (error) {
         return error;
       }

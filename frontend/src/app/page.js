@@ -12,8 +12,10 @@ import { Hero } from "sections/Hero";
 import { Missions } from "sections/Missions";
 import { Layout } from "sections/Layout";
 import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
+import {ADDRESSES} from "constants/web3"
 
 export default function Home() {
+
   const { address, isConnected } = useAccount();
   const { cv } = useAuthState();
   const dispatch = useAuthDispatch();
@@ -23,18 +25,21 @@ export default function Home() {
       doAuthCV(dispatch, address);
     }
   }, [isConnected]);
-  useEffect(() => {
-    if (cv) {
-      doAuthMission(dispatch, cv);
-    }
-  }, [cv]);
+  // useEffect(() => {
+  //   if (cv) {
+  //     doAuthMission(dispatch, cv);
+  //   }
+  // }, [cv]);
 
   return (
-    <Layout>
-      <>
-        <Hero />
-        <Missions />
-      </>
-    </Layout>
+    <>
+
+     <Layout>
+       <>
+         <Hero />
+         <Missions />
+       </>
+     </Layout>
+    </>
   );
 }

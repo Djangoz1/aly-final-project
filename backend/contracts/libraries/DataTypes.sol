@@ -109,6 +109,7 @@ library DataTypes {
         uint256 createdAt;
         uint256 wadge;
         uint16 estimatedDays;
+        FeatureType status;
         string tokenURI;
         bool isInviteOnly;
         address assignedWorker;

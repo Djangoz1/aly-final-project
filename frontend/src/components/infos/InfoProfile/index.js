@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
 import {
   icfyCODER,
@@ -18,10 +19,13 @@ export const InfoProfileCV = ({ infos }) => {
       <div className="flex items-end  ">
         <div className="flex flex-col ">
           <p className="text-black text-[23px] leading-none font-bold">
-            {infos?.name}
+            <CVName address={infos?.cvAddress} />
           </p>
           <p className="text-black leading-none text-[7px] text-black/70">
-            {infos?.cvAddress}
+            CV : {infos?.cvAddress}
+          </p>
+          <p className="text-black leading-none text-[7px] text-black/70">
+            Owner : {infos?.address}
           </p>
         </div>
 
@@ -36,7 +40,7 @@ export const InfoProfileCV = ({ infos }) => {
           </p>
           <Icon icon={icfyCODER} className="text-2xl text-black/70" />
           <p className="text-black text leading-none font-bold ml-3">
-            {infos?.featuresLength}
+            {infos?.features?.length}
           </p>
         </div>
       </div>

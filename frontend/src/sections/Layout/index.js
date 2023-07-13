@@ -20,11 +20,11 @@ export const Layout = ({ children }) => {
     }
   }, [address]);
 
-  useEffect(() => {
-    if (cv) {
-      doAuthMission(dispatch, cv);
-    }
-  }, [cv]);
+  // useEffect(() => {
+  //   if (cv) {
+  //     doAuthMission(dispatch, cv);
+  //   }
+  // }, [cv]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

@@ -150,12 +150,11 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     // *::::::::::::: ------- :::::::::::::* //
 
     describe("Element Deployment", () => {
-
       let cv;
 
       beforeEach(async () => {
         cv = await _testInitCV(accessControl, this.addr1, 1);
-         await _testInitCV(accessControl, this.addr2, 1);
+        await _testInitCV(accessControl, this.addr2, 1);
       });
 
       it("Should  deploy Pub", async () => {
@@ -179,7 +178,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           missionId
         );
       });
-      it.only("Should deploy workerProposal", async () => {
+      it("Should deploy workerProposal", async () => {
         const missionId = await _testInitMission(
           accessControl.target,
           this.addr2,

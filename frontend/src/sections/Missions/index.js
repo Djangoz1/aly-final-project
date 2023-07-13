@@ -18,31 +18,31 @@ import { Icon } from "@iconify/react";
 import { icfySEARCH, icfySEND } from "icones";
 
 export const Missions = () => {
-  const [ownersList, setOwnersList] = useState();
+  // const [ownersList, setOwnersList] = useState();
 
-  const { missions } = useAuthState();
+  // const { missions } = useAuthState();
 
-  const getAllOwnerCv = async () => {
-    const arr = [];
-    let addrOwner = [];
-    const addresses = await _getAllContractsMissionByFactory();
+  // const getAllOwnerCv = async () => {
+  //   const arr = [];
+  //   let addrOwner = [];
+  //   const addresses = await _getAllContractsMissionByFactory();
 
-    for (let index = 0; index < addresses.length; index++) {
-      const state = await _getStateOwnerMission(addresses[index]);
-      if (!addrOwner.includes(state?.cvAddress)) {
-        arr.push(state);
-        addrOwner.push(state?.cvAddress);
-      }
-    }
+  //   for (let index = 0; index < addresses.length; index++) {
+  //     const state = await _getStateOwnerMission(addresses[index]);
+  //     if (!addrOwner.includes(state?.cvAddress)) {
+  //       arr.push(state);
+  //       addrOwner.push(state?.cvAddress);
+  //     }
+  //   }
 
-    setOwnersList(arr);
-  };
+  //   setOwnersList(arr);
+  // };
 
-  useEffect(() => {
-    getAllOwnerCv();
-    if (missions) {
-    }
-  }, [missions]);
+  // useEffect(() => {
+  //   getAllOwnerCv();
+  //   if (missions) {
+  //   }
+  // }, [missions]);
 
   const handleClick = (cvAddress) => {
     router.push(`/profile/cv/${cvAddress}`);
@@ -63,7 +63,7 @@ export const Missions = () => {
         </div>
       </div>
 
-      <div className=" flex  flex-wrap w-full ">
+      {/* <div className=" flex  flex-wrap w-full ">
         {ownersList?.map((obj, index) => (
           <ListStatsFeature
             key={uuid()}
@@ -71,7 +71,7 @@ export const Missions = () => {
             link={true}
           />
         ))}
-      </div>
+      </div> */}
       {/* // </Link> */}
     </div>
   );

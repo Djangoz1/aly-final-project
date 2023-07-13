@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  _getStateFeature,
   _getStateFeatures,
   _getStateOwnerByCv,
 } from "utils/ui-tools/auth-tools";
@@ -9,14 +10,12 @@ import { _setterCV } from "utils/ui-tools/web3-tools";
 import { BtnJoinFeature } from "components/btn/BtnJoinFeature";
 
 // Récupérer l'address du CV et si cv a des missions alors le component s'affiche
-export const ListStatsFeature = ({ cvAddress, submit, link }) => {
+export const ListStatsFeature = ({ cvAddress, _ownerObj, submit, link }) => {
   const [ownerObj, setOwnerObj] = useState(null);
   const [featuresList, setFeaturesList] = useState(null);
 
   useEffect(() => {
-    if (!ownerObj) {
-      getOwnerObj();
-    }
+    if (!ownerObj) getOwnerObj();
   }, [cvAddress]);
 
   useEffect(() => {
@@ -26,38 +25,43 @@ export const ListStatsFeature = ({ cvAddress, submit, link }) => {
   }, [ownerObj]);
 
   const getOwnerObj = async () => {
-    let _ownerObj = await _getStateOwnerByCv(cvAddress);
-    setOwnerObj(_ownerObj);
+    if (_ownerObj) {
+      setOwnerObj(_ownerObj);
+    } else {
+      let object = await _getStateOwnerByCv(cvAddress);
+      setOwnerObj(object);
+    }
   };
 
   const getFeatures = async () => {
-    const arr = [];
-    for (let index = 0; index < ownerObj?.missions?.length; index++) {
-      const features = await _getStateFeatures(ownerObj?.missions[index]);
-      arr.push({ mission: ownerObj?.missions[index], feature: features });
+    const features = [];
+    for (let index = 0; index < ownerObj?.features?.length; index++) {
+      const feature = await _getStateFeature(
+        parseInt(ownerObj?.features[index])
+      );
+      features.push(feature);
     }
 
-    setFeaturesList(arr);
+    setFeaturesList({ mission: ownerObj, features });
   };
 
   return (
     <>
-      {featuresList?.map((features, index) =>
-        features?.feature?.map((elem) => (
-          <div className="mr-5 my-2" key={uuidv4()}>
-            <StatFeature
-              feature={elem}
-              mission={{
-                address: features?.mission,
-                owner: ownerObj?.name,
-                ownerAddress: cvAddress,
-              }}
-              submit={submit && getFeatures}
-              link={link}
-            />
-          </div>
-        ))
-      )}
+      {featuresList?.features?.map((elem, index) => (
+        <div className="mr-5 my-2" key={uuidv4()}>
+          <StatFeature
+            obj={featuresList}
+            feature={elem}
+            // mission={{
+            //   address: elem?.mission,
+            //   owner: ownerObj?.name,
+            //   ownerAddress: cvAddress,
+            // }}
+            submit={submit && getFeatures}
+            link={link}
+          />
+        </div>
+      ))}
     </>
   );
 };

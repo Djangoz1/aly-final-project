@@ -1,19 +1,23 @@
 import { recastDescription } from "utils/ux-tools";
-import { _getterFactoryMISSION, _setterMISSION } from "./web3-tools";
+import {
+  _getterFactoryMISSION,
+  _getterMissionsHub,
+  _setterMISSION,
+} from "./web3-tools";
 
 // *::::::::::::::: GET MISSION  :::::::::::::::*
 
-export const _getAllContractsMissionByFactory = async () => {
-  const length = parseInt(await _getterFactoryMISSION("getMissionsLength"));
+// export const _getAllContractsMissionByFactory = async () => {
+//   const length = parseInt(await _getterMissionsHub("getTokensLength"));
 
-  const missions = [];
-  for (let index = 0; index < length; index++) {
-    const mission = await _getterFactoryMISSION("getMission", [index]);
-    missions.push(mission);
-  }
+//   const missions = [];
+//   for (let index = 0; index < length; index++) {
+//     const mission = await _getterFactoryMISSION("getMission", [index]);
+//     missions.push(mission);
+//   }
 
-  return missions;
-};
+//   return missions;
+// };
 
 // *:::::::::::::::: Features ::::::::::::::::* //
 

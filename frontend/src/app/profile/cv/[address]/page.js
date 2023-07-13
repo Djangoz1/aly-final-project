@@ -1,9 +1,5 @@
 "use client";
 
-import { Header } from "sections/Layout/Header";
-import { ObjStatsOwner } from "components/inputs/inputsCV/owner/stats/obj";
-import { ZERO_ADDRESS } from "constants/web3";
-
 import { v4 as uuidv4 } from "uuid";
 
 import React, { useEffect, useState } from "react";
@@ -48,10 +44,14 @@ export default ({ params }) => {
     <Layout>
       <>
         <TabsStateCV setIsWorker={setIsWorker} isWorker={isWorker} />
-        <InfoProfileCV infos={ownerObj} />
-        {/* <ObjStatsOwner obj={ownerObj} /> */}
+        <InfoProfileCV address={cvRefAddress} infos={ownerObj} />
+
         <div className="flex flex-wrap mt-5">
-          <ListStatsFeature cvAddress={cvRefAddress} submit={handleSubmit} />
+          <ListStatsFeature
+            _ownerObj={ownerObj}
+            cvAddress={cvRefAddress}
+            submit={handleSubmit}
+          />
         </div>
       </>
     </Layout>

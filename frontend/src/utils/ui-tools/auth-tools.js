@@ -1,67 +1,49 @@
-import { _getterCV, _getterMISSION } from "./web3-tools";
+import {
+  _getterCV,
+  _getterFeaturesHub,
+  _getterMISSION,
+  _getterMissionsHub,
+} from "./web3-tools";
+
+import { ethers } from "ethers";
 
 // // *::::::::::::::: PROVIDER :::::::::::::::*
 
 // // *::::::::::::::: FactoryCV :::::::::::::::*
 
+// *::::::::::::::: -- :::::::::::::::*
 // *::::::::::::::: CV :::::::::::::::*
+// *::::::::::::::: -- :::::::::::::::*
 
 export const _getStateOwnerByCv = async (cvAddress) => {
   if (!cvAddress) return;
   const objectOwner = {
     cvAddress: cvAddress, //
     address: "", //
-    name: "", //
     missions: [], //
-    featuresLength: 0, //
+    features: [], //
     amountDispersed: 0,
   };
-
-  objectOwner.featuresLength = parseInt(
-    await _getterCV(cvAddress, "getFeaturesLength")
-  );
-
   objectOwner.address = await _getterCV(cvAddress, "owner");
-  objectOwner.name = await _getterCV(cvAddress, "name");
 
-  let missionsLength = parseInt(
-    await _getterCV(cvAddress, "getMissionsLength")
-  );
+  objectOwner.features = await _getterFeaturesHub("getIndexer", [cvAddress]);
 
-  for (let index = 0; index < missionsLength; index++) {
-    const missionAddr = await _getterCV(cvAddress, "getMission", [index]);
+  objectOwner.missions = await _getterMissionsHub("getIndexer", [cvAddress]);
 
-    objectOwner.missions.push(missionAddr);
-
-    let _featuresLength = await _getterMISSION(
-      missionAddr,
-      "getFeaturesLength"
+  for (let index = 0; index < objectOwner.features.length; index++) {
+    const id = parseInt(objectOwner.features[index]);
+    let datas = await _getterFeaturesHub("getDatas", [id]);
+    objectOwner.amountDispersed += ethers.utils.formatEther(
+      `${parseInt(datas?.wadge)}`
     );
-
-    if (_featuresLength > 0) {
-      for (let index = 0; index < _featuresLength; index++) {
-        const feature = await _getterMISSION(missionAddr, "getFeature", [
-          index,
-        ]);
-        objectOwner.amountDispersed += parseInt(feature.wadge);
-      }
-    }
   }
 
   return objectOwner;
 };
 
-export const _getStateFeatures = async (missionAddr) => {
-  const length = parseInt(
-    await _getterMISSION(missionAddr, "getFeaturesLength")
-  );
-  const arr = [];
-  for (let index = 0; index < length; index++) {
-    const feature = await _getterMISSION(missionAddr, "getFeature", [index]);
-    arr.push(feature);
-  }
-
-  return arr;
+export const _getStateFeature = async (id) => {
+  const datas = await _getterFeaturesHub("getDatas", [id]);
+  return datas;
 };
 
 export const _getStateOwnerMission = async (missionAddr) => {

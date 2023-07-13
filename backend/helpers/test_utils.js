@@ -46,20 +46,23 @@ const FEATURE_DATAS_EXEMPLE = {
   tokenURI: "uritoken",
   startedAt: 0,
   createdAt: 0,
-  estimatedDays: 0,
+  estimatedDays: 30,
   assignedWorker: ZERO_ADDRESS,
+  status: 0,
   isInviteOnly: true,
-  wadge: 0.002,
+  wadge: 0.02,
 };
 
 const FEATURE_DATAS_URI_EXEMPLE = {
   id: 0,
-  title: "Title of my feature",
+  title: "Dev blockchain",
   description:
     "This is a part where content value stored. I can write everything I want to describe my feature. Once a worker join this feature, I must follow instruction of this content. In the end, if a litigation arrived between owner(me) and worker, this content will be shared on Kleros Court",
   image: "https://picsum.photos/id/100/200",
   name: "Feature #",
+  url: "https://github.com/Djangoz1/aly-final-project",
   devLanguage: "solidity",
+  domain: "web3",
 };
 
 // *::::::::::::: ------------- :::::::::::::* //

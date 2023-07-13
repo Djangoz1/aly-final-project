@@ -1,28 +1,29 @@
 import { Icon } from "@iconify/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Timer } from "components/Timer";
+import { CVName } from "components/inputs/inputsCV/CVName";
 import { ENUMS_FEATURE_STATUS } from "constants/enums";
 import { calcTimestamp, parseTimestamp, selectDevDomain } from "helpers";
 import React from "react";
 import { recastDescription } from "utils/ux-tools";
 import { zeroAddress } from "viem";
 
-export const StatFeatureHeader = ({ feature, mission }) => {
+export const StatFeatureHeader = ({ obj, feature, metadata }) => {
   return (
     <div className="flex">
       <Icon
-        icon={
-          selectDevDomain(recastDescription(feature?.description)?.domain)?.icon
-        }
+        icon={selectDevDomain(metadata?.attributes?.[0]?.domain)?.icon}
         className={"text-primary text-[60px]"}
       />
       <div className="flex-col ml-3 flex justify-between">
-        <p className="font-black text-black">{mission?.owner}</p>
+        <p className="font-black text-black">
+          <CVName address={obj?.mission?.cvAddress} />
+        </p>
         <div>
           <p className=" text-xs">
             Oppened At :{" "}
             <span className="text-black">
-              {parseTimestamp(feature?.oppenedAt)}
+              {parseTimestamp(feature?.createdAt)}
             </span>
           </p>
           {feature?.assignedWorker !== zeroAddress && (
@@ -31,7 +32,7 @@ export const StatFeatureHeader = ({ feature, mission }) => {
               <span className="text-black">
                 <Timer
                   units={() =>
-                    calcTimestamp(feature?.oppenedAt, feature?.estimatedDays)
+                    calcTimestamp(feature?.startedAt, feature?.estimatedDays)
                   }
                 />
               </span>

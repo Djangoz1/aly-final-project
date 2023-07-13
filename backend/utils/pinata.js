@@ -41,7 +41,14 @@ const createURIWorkerProposal = async ({ id, title, description, url }) => {
   }
 };
 
-const createURIFeature = async ({ id, title, description, url }) => {
+const createURIFeature = async ({
+  id,
+  title,
+  description,
+  url,
+  devLanguage,
+  domain,
+}) => {
   const readableStreamForFile = fs.createReadStream("img/contract.png");
 
   if (!id && !title && !description) {
@@ -66,6 +73,7 @@ const createURIFeature = async ({ id, title, description, url }) => {
       url: url,
       image: result.IpfsHash,
       name: "Feature #" + id,
+      attributes: [{ id, devLanguage, domain }],
     };
 
     const json = await pinata.pinJSONToIPFS(body, options);

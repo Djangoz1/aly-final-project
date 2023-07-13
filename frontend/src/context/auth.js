@@ -2,7 +2,11 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import { _getterCV, _getterFactoryCV } from "utils/ui-tools/web3-tools";
+import {
+  _getterCV,
+  _getterFactoryCV,
+  _getterAccessControl,
+} from "utils/ui-tools/web3-tools";
 
 // Mise en place du reducer auth
 const reducer = (currentState, newState) => {
@@ -49,11 +53,14 @@ export const doAuthMissionId = async (dispatch, missions, missionId) => {
   }
 };
 
+// *:::::::::::: -- ::::::::::::* //
+// *:::::::::::: CV ::::::::::::* //
+// *:::::::::::: -- ::::::::::::* //
+
 export const doAuthCV = async (dispatch, address) => {
   dispatch({ status: "pending" });
-
-  let cv = await _getterFactoryCV("getCV", [address]);
-
+  let cv = await _getterAccessControl("getCVByAddress", [address]);
+  console.log("cv", cv);
   if (!cv?.error) {
     dispatch({ cv, status: "idle", error: null });
   } else {

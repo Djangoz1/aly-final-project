@@ -3,12 +3,16 @@ import {
   ABI_CV,
   ABI_FACTORY_CV,
   ABI_FACTORY_MISSION,
+  ABI_ACCESS_CONTROL,
   ABI_MISSION,
   ADDR_FACTORY_CV,
   ADDR_FACTORY_MISSION,
+  ABI_MISSIONS_HUB,
+  ABI_FEATURES_HUB,
 } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
+import { ADDRESSES } from "constants/web3";
 
 // ?----- viem client for events
 export const viemClient = createPublicClient({
@@ -48,15 +52,17 @@ export const _getterCONTRACT = async ({ functionName, args, addr, abi }) => {
   }
 };
 
-// *::::::::::::::: F & MISSION  :::::::::::::::*
+// *::::::::::::::: -----------  :::::::::::::::* //
+// *::::::::::::::: F & MISSION  :::::::::::::::* //
+// *::::::::::::::: -----------  :::::::::::::::* //
 
-export const _setterFactoryMISSION = async (funcName, args) => {
+export const _setterAccessControl = async (funcName, args) => {
   try {
     const hash = await _setterCONTRACT({
       funcName,
       args,
-      addr: ADDR_FACTORY_MISSION,
-      abi: ABI_FACTORY_MISSION,
+      addr: ADDRESSES["accessControl"],
+      abi: ABI_ACCESS_CONTROL,
     });
     return hash;
   } catch (error) {
@@ -64,12 +70,42 @@ export const _setterFactoryMISSION = async (funcName, args) => {
   }
 };
 
-export const _getterFactoryMISSION = async (funcName, args) => {
+export const _getterAccessControl = async (funcName, args) => {
   try {
     const res = await readContract({
-      address: ADDR_FACTORY_MISSION,
+      address: ADDRESSES["accessControl"],
       args: args,
-      abi: ABI_FACTORY_MISSION,
+      abi: ABI_ACCESS_CONTROL,
+      functionName: funcName,
+    });
+    return res;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+// *::::::::::::::: -----------  :::::::::::::::* //
+// *::::::::::::::: F & MISSION  :::::::::::::::* //
+// *::::::::::::::: -----------  :::::::::::::::* //
+export const _setterMissionHub = async (funcName, args) => {
+  try {
+    const hash = await _setterCONTRACT({
+      funcName,
+      args,
+      addr: ADDRESSES["MissionsHub"],
+      abi: ABI_MISSIONS_HUB,
+    });
+    return hash;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+export const _getterMissionsHub = async (funcName, args) => {
+  try {
+    const res = await readContract({
+      address: ADDRESSES["missionsHub"],
+      abi: ABI_MISSIONS_HUB,
+      args: args,
       functionName: funcName,
     });
     return res;
@@ -109,7 +145,41 @@ export const _getterMISSION = async (addr, funcName, args) => {
   }
 };
 
-// *::::::::::::::: F & CV  :::::::::::::::*
+// *::::::::::::::: ------------  :::::::::::::::* //
+// *::::::::::::::: FEATURES HUB  :::::::::::::::* //
+// *::::::::::::::: ------------  :::::::::::::::* //
+
+export const _setterFeaturesHub = async (funcName, args) => {
+  try {
+    const hash = await _setterCONTRACT({
+      funcName,
+      args,
+      addr: ADDRESSES["featuresHub"],
+      abi: ABI_FEATURES_HUB,
+    });
+    return hash;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+export const _getterFeaturesHub = async (funcName, args) => {
+  try {
+    const res = await readContract({
+      address: ADDRESSES["featuresHub"],
+      args: args,
+      abi: ABI_FEATURES_HUB,
+      functionName: funcName,
+    });
+    return res;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+// *::::::::::::::: ------  :::::::::::::::* //
+// *::::::::::::::: F & CV  :::::::::::::::* //
+// *::::::::::::::: ------  :::::::::::::::* //
 
 export const _setterFactoryCV = async (funcName, args) => {
   try {
@@ -128,7 +198,7 @@ export const _setterFactoryCV = async (funcName, args) => {
 export const _getterFactoryCV = async (funcName, args) => {
   try {
     const res = await readContract({
-      address: ADDR_FACTORY_CV,
+      address: ADDRESSES["factoryCV"],
       args: args,
       abi: ABI_FACTORY_CV,
       functionName: funcName,

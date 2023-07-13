@@ -1,14 +1,12 @@
 import { useAuthState } from "context/auth";
 // import { parseHex } from "helpers";
 import React, { useEffect, useState } from "react";
-// import { _getCVsLength } from "utils/ui-tools/auth-tools";
-import {
-  _getAllContractsMissionByFactory,
-  // _getMissionsLength,
-} from "utils/ui-tools/mission-tools";
+
+import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
 import {
   _getterFactoryCV,
   _getterFactoryMISSION,
+  _getterMissionsHub,
 } from "utils/ui-tools/web3-tools";
 
 export const HeroStats = ({ statistics }) => {
@@ -20,10 +18,11 @@ export const HeroStats = ({ statistics }) => {
   }, [factoryCv]);
 
   const getStats = async () => {
-    const _cvLength = parseInt(await _getterFactoryCV("getCVsLength"));
+    const _cvLength = parseInt(await _getterFactoryCV("getCvIds"));
     const _missionLength = parseInt(
-      await _getterFactoryMISSION("getMissionsLength")
+      await _getterMissionsHub("getTokensLength")
     );
+
     setCvLength(_cvLength);
     setMissionLength(_missionLength);
   };

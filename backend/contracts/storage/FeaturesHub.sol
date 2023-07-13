@@ -50,6 +50,11 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         address _cv,
         DataTypes.FeatureData memory _data
     ) external onlyProxy returns (uint) {
+        if (_data.assignedWorker == address(0)) {
+            _data.status = DataTypes.FeatureType.Waiting;
+        } else {
+            _data.status = DataTypes.FeatureType.Working;
+        }
         _tokenIDs.increment();
         uint newFeatureID = _tokenIDs.current();
         indexer[_cv].push(newFeatureID);
