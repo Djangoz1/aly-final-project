@@ -16,8 +16,8 @@ import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
 import {ICV} from "./interfaces/ICV.sol";
 
 contract AccessControl is Ownable {
-    uint cvPrice = 100;
-    uint missionPrice = 200;
+    uint public cvPrice = 0.01 ether;
+    uint public missionPrice = 0.05 ether;
 
     IMissionsHub public iMH;
     IFactoryCV public iFCV;
@@ -132,7 +132,7 @@ contract AccessControl is Ownable {
      * @return address target deployment cv
      */
     function buyCV() external payable onlyInit returns (address) {
-        require(msg.value > cvPrice, "Value must be greater than price");
+        require(msg.value > cvPrice, "Value must to be equal cv price");
         address newCV = iFCV.createCV(msg.sender);
         return newCV;
     }
@@ -164,7 +164,10 @@ contract AccessControl is Ownable {
     // *:::::::::::: ----------------- ::::::::::::* //
 
     function buyMission(string calldata _tokenURI) external payable {
-        require(msg.value >= missionPrice, "Value out of price range !");
+        require(
+            msg.value >= missionPrice,
+            "Value must to be equal mission price"
+        );
         iFCV.checkRegistred(msg.sender);
         address cv = iFCV.getCVByAddress(msg.sender);
         iMH.createMission(cv, _tokenURI);

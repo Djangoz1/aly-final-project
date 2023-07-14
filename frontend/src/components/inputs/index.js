@@ -12,30 +12,42 @@ export const InputNumber = ({ setter, value }) => {
   );
 };
 
-export const InputText = ({ value, setter, title, style }) => {
+export const InputText = ({ value, setter, title, target, style }) => {
+  const handleChange = (e) => {
+    if (!target) {
+      setter(e.target.value);
+    } else {
+      setter(target, e.target.value);
+    }
+  };
   return (
-    <div className={`join w-full `}>
-      <input
-        className={`input w-full input-bordered join-item input-${style?.input}`}
-        placeholder={title}
-        value={value}
-        onChange={(e) => setter(e.target.value)}
-      />
-      <button className={`btn join-item btn-${style?.btn}`}>+</button>
-    </div>
+    <input
+      className={`input w-full input-bordered join-item input-${
+        style?.input || "sm input-primary bg-black/10"
+      }`}
+      placeholder={title}
+      value={value}
+      onChange={(e) => handleChange(e)}
+    />
   );
 };
 
-export const InputTextArea = ({ value, setter, title }) => {
+export const InputTextArea = ({ value, setter, title, style, target }) => {
   const handleChange = (e) => {
-    setter(e.target.value);
+    if (!target) {
+      setter(e.target.value);
+    } else {
+      setter(target, e.target.value);
+    }
   };
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <textarea
         placeholder={title}
         value={value}
-        className="textarea    textarea-bordered  textarea-xs w-full max-w-xs"
+        className={`textarea w-full textarea-${
+          style || "sm textarea-primary bg-black/10"
+        }`}
         onChange={(e) => handleChange(e)}
       ></textarea>
     </div>

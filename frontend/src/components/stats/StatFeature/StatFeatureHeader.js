@@ -4,21 +4,27 @@ import { Timer } from "components/Timer";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { ENUMS_FEATURE_STATUS } from "constants/enums";
 import { calcTimestamp, parseTimestamp, selectDevDomain } from "helpers";
+import Link from "next/link";
 import React from "react";
 import { recastDescription } from "utils/ux-tools";
 import { zeroAddress } from "viem";
 
-export const StatFeatureHeader = ({ obj, feature, metadata }) => {
+export const StatFeatureHeader = ({ obj, feature }) => {
   return (
     <div className="flex">
       <Icon
-        icon={selectDevDomain(metadata?.attributes?.[0]?.domain)?.icon}
+        icon={selectDevDomain(feature?.metadata?.attributes?.[0]?.domain)?.icon}
         className={"text-primary text-[60px]"}
       />
+
       <div className="flex-col ml-3 flex justify-between">
-        <p className="font-black text-black">
-          <CVName address={obj?.mission?.cvAddress} />
-        </p>
+        <Link
+          href={`/profile/cv/${obj?.cvAddress}`}
+          className=" text-black hover:text-info"
+        >
+          <CVName address={obj?.cvAddress} />
+        </Link>
+        <p className="font-black text-black">{feature?.metadata?.title}</p>
         <div>
           <p className=" text-xs">
             Oppened At :{" "}

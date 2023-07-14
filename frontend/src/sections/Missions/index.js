@@ -7,7 +7,10 @@ import {
 
 import { v4 as uuid } from "uuid";
 
-import { _getAllContractsMissionByFactory } from "utils/ui-tools/mission-tools";
+import {
+  _getAllContractsMissionByFactory,
+  _getAllMissionsState,
+} from "utils/ui-tools/mission-tools";
 
 import { useAuthState } from "context/auth";
 // import { ObjStatsOwner } from "./obj";
@@ -18,35 +21,18 @@ import { Icon } from "@iconify/react";
 import { icfySEARCH, icfySEND } from "icones";
 
 export const Missions = () => {
-  // const [ownersList, setOwnersList] = useState();
+  const [ownersList, setOwnersList] = useState();
 
-  // const { missions } = useAuthState();
+  const { missions } = useAuthState();
 
-  // const getAllOwnerCv = async () => {
-  //   const arr = [];
-  //   let addrOwner = [];
-  //   const addresses = await _getAllContractsMissionByFactory();
-
-  //   for (let index = 0; index < addresses.length; index++) {
-  //     const state = await _getStateOwnerMission(addresses[index]);
-  //     if (!addrOwner.includes(state?.cvAddress)) {
-  //       arr.push(state);
-  //       addrOwner.push(state?.cvAddress);
-  //     }
-  //   }
-
-  //   setOwnersList(arr);
-  // };
-
-  // useEffect(() => {
-  //   getAllOwnerCv();
-  //   if (missions) {
-  //   }
-  // }, [missions]);
-
-  const handleClick = (cvAddress) => {
-    router.push(`/profile/cv/${cvAddress}`);
-  };
+  useEffect(() => {
+    if (!ownersList) {
+      (async () => {
+        const list = await _getAllMissionsState();
+        setOwnersList(list);
+      })();
+    }
+  }, [missions]);
 
   return (
     <div className="flex flex-col  mt-20   justify-center mx-auto">
@@ -63,7 +49,7 @@ export const Missions = () => {
         </div>
       </div>
 
-      {/* <div className=" flex  flex-wrap w-full ">
+      <div className=" flex  flex-wrap w-full ">
         {ownersList?.map((obj, index) => (
           <ListStatsFeature
             key={uuid()}
@@ -71,7 +57,7 @@ export const Missions = () => {
             link={true}
           />
         ))}
-      </div> */}
+      </div>
       {/* // </Link> */}
     </div>
   );

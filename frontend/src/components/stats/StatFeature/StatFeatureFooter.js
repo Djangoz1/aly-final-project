@@ -7,8 +7,9 @@ import { icfyCODER, icfyETHER } from "icones";
 import { ethers } from "ethers";
 import React from "react";
 
-export const StatFeatureFooter = ({ feature, submit, mission, link }) => {
+export const StatFeatureFooter = ({ feature, submit, obj, link }) => {
   const { cv } = useAuthState();
+
   return (
     <div className="flex items-center mt-4">
       <Icon
@@ -33,13 +34,13 @@ export const StatFeatureFooter = ({ feature, submit, mission, link }) => {
         feature?.assignedWorker === ZERO_ADDRESS &&
         !feature?.isInviteOnly && (
           <BtnJoinFeature
-            missionAddr={mission?.address}
-            featureId={parseInt(feature?.id)}
+            missionId={parseInt(feature?.missionID)}
+            featureId={feature?.id}
             getter={submit}
           />
         )}
 
-      {link && <BtnToProfileCV cvAddress={mission?.ownerAddress} />}
+      {link && <BtnToProfileCV cvAddress={obj?.cvAddress} />}
     </div>
   );
 };

@@ -1,49 +1,40 @@
 import { recastDescription } from "utils/ux-tools";
 import {
+  _getterAccessControl,
   _getterFactoryMISSION,
   _getterMissionsHub,
+  _setterAccessControl,
   _setterMISSION,
 } from "./web3-tools";
-
+import { _getStateOwnerByCv, _getStateOwnerMission } from "./auth-tools";
+import { createFileOnPinata } from "./pinata-tools";
+import { ethers } from "ethers";
 // *::::::::::::::: GET MISSION  :::::::::::::::*
 
-// export const _getAllContractsMissionByFactory = async () => {
-//   const length = parseInt(await _getterMissionsHub("getTokensLength"));
+export const _getAllMissionsState = async () => {
+  const length = parseInt(await _getterMissionsHub("getTokensLength"));
 
-//   const missions = [];
-//   for (let index = 0; index < length; index++) {
-//     const mission = await _getterFactoryMISSION("getMission", [index]);
-//     missions.push(mission);
-//   }
-
-//   return missions;
-// };
+  const arr = [];
+  for (let index = 0; index < length; index++) {
+    const owner = await _getterMissionsHub("ownerOf", [index]);
+    if (owner) {
+      const state = await _getStateOwnerByCv(owner);
+      arr.push(state);
+    }
+  }
+  return arr;
+};
 
 // *:::::::::::::::: Features ::::::::::::::::* //
 
-export const _setFeature = async (missionAddr, feature) => {
-  try {
-    let { estimatedDay, wadge, description, assignedWorker, inviteOnly } =
-      feature;
-    const _description =
-      "__/title:" +
-      description?.title +
-      "__/dev:" +
-      description?.dev +
-      "__/domain:" +
-      description.domain +
-      "__/desc:" +
-      description.desc;
-
-    await _setterMISSION(missionAddr, "setFeature", [
-      parseInt(estimatedDay),
-      parseInt(wadge),
-      _description,
-      assignedWorker,
-      inviteOnly,
-    ]);
-  } catch (error) {
-    console.error(error);
-    return error;
-  }
+export const _createMission = async (datas) => {
+  let value = await _getterAccessControl("missionPrice");
+  let dataURI = await createFileOnPinata(datas);
+  console.log("data", dataURI);
+  let tx = await _setterAccessControl(
+    "buyMission",
+    [dataURI],
+    `${parseInt(value)}`
+  );
+  console.log(tx);
 };

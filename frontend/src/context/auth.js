@@ -6,6 +6,7 @@ import {
   _getterCV,
   _getterFactoryCV,
   _getterAccessControl,
+  _getterMissionsHub,
 } from "utils/ui-tools/web3-tools";
 
 // Mise en place du reducer auth
@@ -31,16 +32,11 @@ const initialState = {
 export const doAuthMission = async (dispatch, address) => {
   dispatch({ status: "pending" });
   if (!address) return;
-  let missionsLength = parseInt(await _getterCV(address, "getMissionsLength"));
-  if (missionsLength > 0) {
-    let missions = [];
-    for (let index = 0; index < missionsLength; index++) {
-      const mission = await _getterCV(address, "getMission", [index]);
-      missions.push(mission);
-    }
+  try {
+    let missions = await _getterMissionsHub("getIndexer", [address]);
     dispatch({ missions, status: "idle", error: null });
-  } else {
-    dispatch({ status: "error", error: "Error : Get CV" });
+  } catch (error) {
+    dispatch({ status: "error", error: { mission: error } });
   }
 };
 

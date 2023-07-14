@@ -56,14 +56,17 @@ export const _getterCONTRACT = async ({ functionName, args, addr, abi }) => {
 // *::::::::::::::: F & MISSION  :::::::::::::::* //
 // *::::::::::::::: -----------  :::::::::::::::* //
 
-export const _setterAccessControl = async (funcName, args) => {
+export const _setterAccessControl = async (funcName, args, value) => {
   try {
-    const hash = await _setterCONTRACT({
-      funcName,
-      args,
-      addr: ADDRESSES["accessControl"],
+    const { request } = await prepareWriteContract({
+      address: ADDRESSES["accessControl"],
       abi: ABI_ACCESS_CONTROL,
+      functionName: funcName,
+      args: args,
+      value: value,
     });
+    const { hash } = await writeContract(request);
+
     return hash;
   } catch (error) {
     console.log("error", error);
@@ -101,17 +104,13 @@ export const _setterMissionHub = async (funcName, args) => {
 };
 
 export const _getterMissionsHub = async (funcName, args) => {
-  try {
-    const res = await readContract({
-      address: ADDRESSES["missionsHub"],
-      abi: ABI_MISSIONS_HUB,
-      args: args,
-      functionName: funcName,
-    });
-    return res;
-  } catch (error) {
-    console.log("error", error);
-  }
+  const res = await readContract({
+    address: ADDRESSES["missionsHub"],
+    abi: ABI_MISSIONS_HUB,
+    args: args,
+    functionName: funcName,
+  });
+  return res;
 };
 
 export const _setterMISSION = async (addr, funcName, args) => {

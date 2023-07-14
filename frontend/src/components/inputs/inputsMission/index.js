@@ -1,6 +1,6 @@
-import { InputNumber } from "components/inputs";
-import { ADDR_FACTORY_MISSION } from "constants/web3";
+import { InputText, InputTextArea } from "components/inputs";
 
+import { ethers } from "ethers";
 import {
   doAuthMission,
   doAuthMissionId,
@@ -9,31 +9,134 @@ import {
 } from "context/auth";
 
 import React, { useEffect, useState } from "react";
-import { _createContractMission } from "utils/ui-tools/mission-tools";
-import { _setterCV, _setterMISSION } from "utils/ui-tools/web3-tools";
+import {
+  _createContractMission,
+  _createMission,
+} from "utils/ui-tools/mission-tools";
+
+import {
+  _getterAccessControl,
+  _getterMissionsHub,
+  _setterCV,
+  _setterMISSION,
+} from "utils/ui-tools/web3-tools";
+import { AlertInfo } from "components/alert/AlertInfo";
 
 export const CreationMission = () => {
-  const { factoryMission, factoryCv, cv } = useAuthState();
-
-  let [amount, setAmount] = useState(0);
+  const { cv } = useAuthState();
   const dispatch = useAuthDispatch();
 
-  const handleCreateMission = async () => {
-    const value = 200;
-    await _setterCV(cv, "buyMission", [ADDR_FACTORY_MISSION, value]);
-    doAuthMission(dispatch, cv);
+  const [loading, setLoading] = useState(false);
+
+  let [amount, setAmount] = useState(0);
+  let [datas, setDatas] = useState({
+    title: "",
+    description: "",
+    reference: 0,
+    url: "",
+    image: "",
+  });
+
+  useEffect(() => {
+    (async () => {
+      // Récupération du prix de la mission
+      const _amount = parseInt(await _getterAccessControl("missionPrice"));
+      setAmount(ethers.utils.formatEther(`${_amount}`));
+    })();
+  }, []);
+
+  //  *::::::: ---------------- :::::::* //
+  //  *::::::: STATE MANAGEMENT :::::::* //
+  //  *::::::: ---------------- :::::::* //
+
+  const onChange = (variable, value) => {
+    setDatas({ ...datas, [variable]: value });
   };
+
+  // Récupération de l'input file
+  const handleFileInputChange = async (event) => {
+    const file = event.target.files[0];
+    onChange("image", file);
+  };
+
+  //  *::::::: ----------- :::::::* //
+  //  *::::::: TRANSACTION :::::::* //
+  //  *::::::: ----------- :::::::* //
+
+  const handleCreateMission = async () => {
+    setLoading(true);
+    await _createMission(datas);
+    doAuthMission(dispatch, cv);
+    setLoading(false);
+  };
+
   return (
     <div className="flex justify-between">
-      <div className="flex flex-col">
-        <label className="label ">Amount :</label>
-        <div className="flex">
-          <InputNumber value={amount} setter={setAmount} />
+      <div className="flex flex-col mx-auto w-[800px]">
+        <div className="flex flex-col">
+          <label className="label ">Title :</label>
+          <div className="flex">
+            <InputText
+              value={datas.title}
+              title={"Provide a title of your mission"}
+              target={"title"}
+              setter={onChange}
+            />
+          </div>
         </div>
-        <button className="btn btn-primary" onClick={handleCreateMission}>
-          Create a mission
-        </button>
+
+        <div className="flex flex-col">
+          <label className="label ">Link reference :</label>
+          <div className="flex">
+            <InputText
+              title={
+                "Provide a link to additional documentation of your mission"
+              }
+              value={datas.url}
+              setter={onChange}
+              target={"url"}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <label className="label ">Description :</label>
+          <div className="flex">
+            <InputTextArea
+              title={"Provide a description of your mission"}
+              value={datas.description}
+              target={"description"}
+              setter={onChange}
+            />
+          </div>
+        </div>
+        <div className="flex justify-evenly my-3">
+          <div className="flex flex-col">
+            <input type="file" onChange={handleFileInputChange} />
+
+            <button className="btn w-1/3 btn-xs">Add an image</button>
+          </div>
+          <button className="btn w-1/3 btn-xs">Add mission reference</button>
+        </div>
+        <div className="w-1/2 mx-auto flex items-center  mt-5 flex-col">
+          <button
+            className="btn btn-primary  w-full"
+            onClick={handleCreateMission}
+          >
+            Create a mission
+          </button>
+          <p className="text-black/40">Price : {amount} eth</p>
+        </div>
       </div>
+      {loading && (
+        <AlertInfo
+          message={
+            <>
+              <span className="loading loading-ring loading-lg mr-3 "></span>
+              Creation mission loading ...
+            </>
+          }
+        />
+      )}
     </div>
   );
 };

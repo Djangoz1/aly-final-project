@@ -1,3 +1,4 @@
+import { fetchJSONByCID } from "./pinata-tools";
 import {
   _getterCV,
   _getterFeaturesHub,
@@ -26,29 +27,23 @@ export const _getStateOwnerByCv = async (cvAddress) => {
   };
   objectOwner.address = await _getterCV(cvAddress, "owner");
 
-  objectOwner.features = await _getterFeaturesHub("getIndexer", [cvAddress]);
+  let featuresIndexer = await _getterFeaturesHub("getIndexer", [cvAddress]);
 
   objectOwner.missions = await _getterMissionsHub("getIndexer", [cvAddress]);
 
-  for (let index = 0; index < objectOwner.features.length; index++) {
-    const id = parseInt(objectOwner.features[index]);
-    let datas = await _getterFeaturesHub("getDatas", [id]);
+  for (let index = 0; index < featuresIndexer.length; index++) {
+    const id = parseInt(featuresIndexer[index]);
+    let featureDatas = await _getterFeaturesHub("getDatas", [id]);
     objectOwner.amountDispersed += ethers.utils.formatEther(
-      `${parseInt(datas?.wadge)}`
+      `${parseInt(featureDatas?.wadge)}`
     );
+    const metadata = await fetchJSONByCID(featureDatas?.tokenURI);
+
+    featureDatas.id = id;
+    featureDatas.metadata = metadata;
+
+    objectOwner.features.push(featureDatas);
   }
 
-  return objectOwner;
-};
-
-export const _getStateFeature = async (id) => {
-  const datas = await _getterFeaturesHub("getDatas", [id]);
-  return datas;
-};
-
-export const _getStateOwnerMission = async (missionAddr) => {
-  const owner = await _getterMISSION(missionAddr, "owner");
-
-  const objectOwner = await _getStateOwnerByCv(owner);
   return objectOwner;
 };
