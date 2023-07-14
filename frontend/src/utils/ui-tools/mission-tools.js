@@ -4,10 +4,15 @@ import {
   _getterFactoryMISSION,
   _getterMissionsHub,
   _setterAccessControl,
+  _setterFeaturesHub,
   _setterMISSION,
 } from "./web3-tools";
 import { _getStateOwnerByCv, _getStateOwnerMission } from "./auth-tools";
-import { createFileOnPinata } from "./pinata-tools";
+import {
+  createFeatureOnPinata,
+  createFileOnPinata,
+  createMissionOnPinata,
+} from "./pinata-tools";
 import { ethers } from "ethers";
 // *::::::::::::::: GET MISSION  :::::::::::::::*
 
@@ -29,12 +34,34 @@ export const _getAllMissionsState = async () => {
 
 export const _createMission = async (datas) => {
   let value = await _getterAccessControl("missionPrice");
-  let dataURI = await createFileOnPinata(datas);
-  console.log("data", dataURI);
+  let dataURI = await createMissionOnPinata(datas);
+
   let tx = await _setterAccessControl(
     "buyMission",
     [dataURI],
     `${parseInt(value)}`
   );
-  console.log(tx);
+};
+
+export const _createFeature = async (missionID, datas) => {
+  let value = datas.wadge;
+
+  let dataURI = await createFeatureOnPinata(datas.metadata);
+  let Data = {
+    missionID: missionID,
+    startedAt: 0,
+    createdAt: 0,
+    wadge: datas.wadge,
+    estimatedDays: datas.estimatedDays,
+    status: 0,
+    tokenURI: dataURI,
+    isInviteOnly: datas.isInviteOnly,
+    assignedWorker: datas.assignedWorker,
+  };
+
+  await _setterAccessControl(
+    "postFeature",
+    [Data],
+    ethers.utils.parseEther(`${value}`)
+  );
 };

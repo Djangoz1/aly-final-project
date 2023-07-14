@@ -10,7 +10,7 @@ import { ZERO_ADDRESS } from "constants/web3";
 import { _getAllCVs } from "utils/ui-tools/state-tools";
 import { _getterCV } from "utils/ui-tools/web3-tools";
 
-export const InputAssignedWorker = ({ features, setFeatures }) => {
+export const InputAssignedWorker = ({ datas, setDatas }) => {
   const [listNames, setListNames] = useState([]);
 
   const getNames = async (_name) => {
@@ -33,40 +33,38 @@ export const InputAssignedWorker = ({ features, setFeatures }) => {
   };
 
   const handleChange = async (_assignedWorker) => {
-    const _features = { ...features };
+    const _datas = { ...datas };
 
-    _features.assignedWorker = _assignedWorker;
+    _datas.assignedWorker = _assignedWorker;
     const stateNames = await getNames(_assignedWorker);
     if (stateNames.length === 1) {
-      _features.assignedWorker = stateNames[0].address;
+      _datas.assignedWorker = stateNames[0].address;
     }
-    setFeatures(_features);
+    setDatas(_datas);
   };
 
   const handleClick = async (_assignedWorker) => {
-    const _features = { ...features };
-    _features.assignedWorker = _assignedWorker;
-    setFeatures(_features);
+    const _datas = { ...datas };
+    _datas.assignedWorker = _assignedWorker;
+    setDatas(_datas);
   };
 
   return (
-    <div className="bg-base-100 w-[340px] mt-2 p-3">
-      <span className="flex text-white items-center mb-4">
+    <div className="bg-white w-[340px] rounded p-3">
+      <span className="flex text-black items-center mb-4">
         <Icon icon={"pepicons-pencil:cv"} />
         <p className="ml-3 uppercase mr-auto"> Worker</p>
 
-        <InputInviteOnly features={features} setFeatures={setFeatures} />
+        <InputInviteOnly datas={datas} setDatas={setDatas} />
       </span>
       <div className="flex flex-col w-full ">
-        <InputWadge features={features} setFeatures={setFeatures} />
+        <InputWadge datas={datas} setDatas={setDatas} />
 
         <InputText
           value={
-            features.assignedWorker !== ZERO_ADDRESS
-              ? features.assignedWorker
-              : ""
+            datas.assignedWorker !== ZERO_ADDRESS ? datas.assignedWorker : ""
           }
-          style={{ input: "xs input-xs", btn: "xs btn-xs" }}
+          style={{ input: "sm input-sm" }}
           setter={handleChange}
           title="Please input name or address cv"
         />

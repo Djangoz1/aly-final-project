@@ -42,10 +42,14 @@ export const doAuthMission = async (dispatch, address) => {
 
 export const doAuthMissionId = async (dispatch, missions, missionId) => {
   dispatch({ status: "pending" });
-  if (missions.length > missionId) {
-    dispatch({ missionId: missionId, status: "idle", error: null });
-  } else {
-    dispatch({ status: "error", error: "Error : Get CV" });
+  try {
+    if (missions.includes(missionId)) {
+      dispatch({ missionId: parseInt(missionId), status: "idle", error: null });
+    } else {
+      throw new Error("Mission not found");
+    }
+  } catch (error) {
+    dispatch({ status: "error", error: { mission: { error } } });
   }
 };
 

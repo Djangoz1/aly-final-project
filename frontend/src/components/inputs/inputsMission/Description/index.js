@@ -3,83 +3,143 @@ import { InputText, InputTextArea } from "../..";
 import { Icon } from "@iconify/react";
 import { ListDevDomains, ListDevLanguages } from "./list";
 import { InputAssignedWorker } from "../AssignedWorker";
-import { _setFeature } from "utils/ui-tools/mission-tools";
+import { _createFeature, _setFeature } from "utils/ui-tools/mission-tools";
 
 import { useAuthState } from "context/auth";
 import { _setterMISSION } from "utils/ui-tools/web3-tools";
+import { AlertInfo } from "components/alert/AlertInfo";
 
-export const InputDescription = ({ getter, features, setFeatures }) => {
+
+export const InputDescription = ({ getter, datas, setDatas }) => {
   const { missionId, missions } = useAuthState();
-  const mission = missions[missionId];
+  const [loading, setLoading] = useState(false)
 
-  // Change description
-  const handleChange = (_description) => {
-    const _features = { ...features };
-    _features.description.desc = _description;
-    setFeatures(_features);
+
+
+  // *:::::::::::: ---------------- ::::::::::::* //
+  // *:::::::::::: STATE MANAGEMENT ::::::::::::* //
+  // *:::::::::::: ---------------- ::::::::::::* //
+
+  // Change metadata
+  const handleChange = (_desc) => {
+    const _datas = { ...datas };
+    _datas.metadata.description = _desc;
+    setDatas(_datas);
   };
   // Change language
   const handleClick = (dev) => {
-    const _features = { ...features };
-    _features.description.dev = dev;
-    setFeatures(_features);
+    const _datas = { ...datas };
+    _datas.metadata.devLanguage = dev;
+    setDatas(_datas);
   };
   // Change domain
   const handleClickDomain = (domain) => {
-    const _features = { ...features };
-    _features.description.domain = domain;
-    setFeatures(_features);
+    const _datas = { ...datas };
+    _datas.metadata.domain = domain;
+    setDatas(_datas);
   };
 
   // Change title
   const handleChangeTitle = (title) => {
-    const _features = { ...features };
-    _features.description.title = title;
-    setFeatures(_features);
+    const _datas = { ...datas };
+    _datas.metadata.title = title;
+    setDatas(_datas);
   };
 
-  const handleSubmit = async (_features) => {
-    await _setFeature(mission, features);
-    getter();
+  // Change url
+  const handleChangeURL = (url) => {
+    const _datas = { ...datas };
+    _datas.metadata.url = url;
+    setDatas(_datas);
   };
+  
+  const handleFileInputChange = async (event) => {
+    const file = event.target.files[0];
+    const _datas = { ...datas };
+    _datas.metadata.image = file;
+    setDatas(_datas);
+
+  };
+
+
+  // *:::::::::::: ----------- ::::::::::::* //
+  // *:::::::::::: TRANSACTION ::::::::::::* //
+  // *:::::::::::: ----------- ::::::::::::* //
+
+
+  const handleSubmit = async (_datas) => {
+    setLoading(true)
+    await _createFeature(missionId, datas);
+    getter();
+    setLoading(false)
+  };
+  
+
+console.log(datas)
+
   return (
     <>
-      <div className="flex">
-        <div className="mr-4 flex flex-col">
+      <div className="flex flex-col">
+        <div className=" flex justify-between ">
           <ListDevLanguages
             setter={handleClick}
-            value={features.description.dev}
+            value={datas.metadata.devLanguage}
           />
-          <button
-            className="btn  btn-info  mt-auto btn-outlined"
-            onClick={() => handleSubmit(features)}
-          >
-            Ajouter Feature
-          </button>
+          <InputAssignedWorker datas={datas} setDatas={setDatas} />
         </div>
-        <div className="flex flex-col">
+        <div className="flex mt-4 ">
           <ListDevDomains
             setter={handleClickDomain}
-            value={features.description.domain}
+            value={datas.metadata.domain}
           />
-          <div className="bg-base-100 p-3 h-fit flex flex-col w-[340px]">
-            <span className="flex text-white items-center mb-4">
+          <div className="bg-white rounded p-3  h-fit flex flex-col w-full ml-4">
+            <span className="flex text-black items-center mb-4">
               <Icon icon={"icon-park-outline:text"} />
-              <p className="ml-3 uppercase"> Description</p>
+              <p className="ml-3 uppercase"> metadata</p>
             </span>
-            <InputText
-              title={"Title"}
-              value={features.description.title}
-              style={{ input: "xs w-full", btn: "xs" }}
-              setter={handleChangeTitle}
+            <input
+              type="file"
+              className="border border-primary text-black flex p-3 w-fit items-center  rounded"
+              onChange={handleFileInputChange}
             />
+            <div className="flex ">
 
-            <div className="mt-2">
-              <InputTextArea setter={handleChange} title="Description" />
+              <InputText
+                title={"Title"}
+                value={datas.metadata.title}
+                style={{ input: "sm w-full bg-neutral-200 border border-primary mr-3" }}
+                setter={handleChangeTitle}
+                />
+              <InputText
+                title={"URL"}
+                value={datas.metadata.url}
+                style={{ input: "sm w-full bg-neutral-200 border border-primary" }}
+                setter={handleChangeURL}
+                />
+            </div>
+
+            <div className="mt-2 ">
+              <InputTextArea sty setter={handleChange} title="Description" />
             </div>
           </div>
-          <InputAssignedWorker features={features} setFeatures={setFeatures} />
         </div>
+        <button
+          className="btn  btn-info w-fit   mt-5 ml-auto btn-outlined"
+          onClick={() => handleSubmit(datas)}
+        >
+          Ajouter Feature
+        </button>
+
+        {loading && (
+        <AlertInfo
+          message={
+            <>
+              <span className="loading loading-ring loading-lg mr-3 "></span>
+              Creation feature loading ...
+            </>
+          }
+        />
+      )}
       </div>
     </>
   );

@@ -71,7 +71,7 @@ export const CreationMission = () => {
   };
 
   return (
-    <div className="flex justify-between">
+    <div className="flex  justify-between">
       <div className="flex flex-col mx-auto w-[800px]">
         <div className="flex flex-col">
           <label className="label ">Title :</label>
@@ -109,13 +109,17 @@ export const CreationMission = () => {
             />
           </div>
         </div>
-        <div className="flex justify-evenly my-3">
+        <div className="flex justify-evenly items-center my-3">
           <div className="flex flex-col">
-            <input type="file" onChange={handleFileInputChange} />
-
-            <button className="btn w-1/3 btn-xs">Add an image</button>
+            <input
+              type="file"
+              className="border border-primary text-black flex items-center p-3 rounded"
+              onChange={handleFileInputChange}
+            />
           </div>
-          <button className="btn w-1/3 btn-xs">Add mission reference</button>
+          <button className="btn btn-outline btn-primary w-1/3 btn-xs">
+            Add mission reference
+          </button>
         </div>
         <div className="w-1/2 mx-auto flex items-center  mt-5 flex-col">
           <button
@@ -149,7 +153,7 @@ export const ListMission = () => {
   };
 
   return (
-    <div className="tabs w-fit tabs-boxed">
+    <div className="tabs w-fit  tabs-boxed">
       <a
         onClick={() => handleClick(null)}
         className={`tab tab-sm tab-success tab-lifted ${
@@ -161,12 +165,12 @@ export const ListMission = () => {
       {missions.map((mission, index) => (
         <a
           key={mission}
-          onClick={() => handleClick(index)}
+          onClick={() => handleClick(mission)}
           className={`tab tab-sm tab-lifted ${
-            index === missionId && "tab-active"
+            parseInt(mission) === missionId && "tab-active"
           }`}
         >
-          Mission #{index}
+          Mission #{parseInt(mission)}
         </a>
       ))}
     </div>

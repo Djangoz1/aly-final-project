@@ -33,17 +33,22 @@ export const _getStateOwnerByCv = async (cvAddress) => {
 
   for (let index = 0; index < featuresIndexer.length; index++) {
     const id = parseInt(featuresIndexer[index]);
-    let featureDatas = await _getterFeaturesHub("getDatas", [id]);
+    let featureDatas = await _getStateFeature(id);
     objectOwner.amountDispersed += ethers.utils.formatEther(
       `${parseInt(featureDatas?.wadge)}`
     );
-    const metadata = await fetchJSONByCID(featureDatas?.tokenURI);
-
-    featureDatas.id = id;
-    featureDatas.metadata = metadata;
 
     objectOwner.features.push(featureDatas);
   }
 
   return objectOwner;
+};
+
+export const _getStateFeature = async (id) => {
+  let featureDatas = await _getterFeaturesHub("getDatas", [id]);
+  const metadata = await fetchJSONByCID(featureDatas?.tokenURI);
+
+  featureDatas.id = id;
+  featureDatas.metadata = metadata;
+  return featureDatas;
 };

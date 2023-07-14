@@ -41,16 +41,16 @@ export const InputTextArea = ({ value, setter, title, style, target }) => {
     }
   };
   return (
-    <div className="relative w-full">
+
       <textarea
         placeholder={title}
         value={value}
-        className={`textarea w-full textarea-${
+        className={`textarea w-full h-full textarea-${
           style || "sm textarea-primary bg-black/10"
         }`}
         onChange={(e) => handleChange(e)}
       ></textarea>
-    </div>
+
   );
 };
 

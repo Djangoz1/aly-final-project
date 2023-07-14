@@ -5,8 +5,8 @@ import { useState } from "react";
 
 export const ListDevLanguages = ({ setter, value }) => {
   return (
-    <div className="flex flex-wrap p-3  shadow bg-base-100 justify-between w-[240px] ">
-      <h5 className="w-full text-white items-center flex">
+    <div className="flex flex-wrap p-3  shadow bg-white justify-between w-2/3 border rounded border-primary ">
+      <h5 className="w-full text-black items-center flex">
         <Icon icon={icfyCODE} />
         <span className="ml-3 "> DEV</span>
       </h5>
@@ -15,7 +15,7 @@ export const ListDevLanguages = ({ setter, value }) => {
           key={language?.icon}
           className={`flex flex-col btn w-[100px] my-2 items-center
               justify-center text-white  ${
-                value === language?.name ? "btn-primary" : null
+                value === language?.name ? "btn-primary" : "bg-neutral-700"
               }`}
           onClick={() => setter(language.name)}
         >
@@ -33,8 +33,8 @@ export const ListDevDomains = ({ setter, value }) => {
     setter(value);
   };
   return (
-    <div className="flex flex-wrap p-3 h-fit shadow bg-base-100 justify-between w-[340px] ">
-      <h5 className="w-full text-white items-center flex">
+    <div className="flex flex-wrap p-3 h-fit shadow bg-white rounded justify-between w-[340px] ">
+      <h5 className="w-full text-black items-center flex">
         <Icon icon={"carbon:task"} />
         <span className="ml-3 "> DOMAIN</span>
       </h5>
@@ -44,7 +44,7 @@ export const ListDevDomains = ({ setter, value }) => {
           key={domain?.icon}
           className={`flex flex-col btn p-0 w-[100px] my-2 items-center
               justify-center text-white  ${
-                value === domain?.name ? "btn-primary" : null
+                value === domain?.name ? "btn-primary" : "bg-neutral-600"
               }`}
           onClick={() => handleClick(domain.name)}
         >
