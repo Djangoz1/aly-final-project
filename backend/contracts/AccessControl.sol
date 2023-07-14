@@ -182,7 +182,10 @@ contract AccessControl is Ownable {
     ) external payable onlyInit {
         require(msg.value > 0, "Must provide a value");
         require(_data.missionID > 0, "Must provide a mission");
-        //! Faire un require sur le fait que la mission lui appartien bien
+        require(
+            iMH.ownerOf(_data.missionID) == msg.sender,
+            "Not the owner of mission"
+        );
         require(
             bytes(_data.tokenURI).length > 0,
             "Feature must have a metadata"

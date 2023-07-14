@@ -10,5 +10,11 @@ interface IMissionsHub {
         string calldata _tokenURI
     ) external returns (uint);
 
+    function setFeatureMission(
+        address _cv,
+        uint _missionID,
+        uint _featureID
+    ) external;
+
     function checkRegistred(uint _id) external view;
 }

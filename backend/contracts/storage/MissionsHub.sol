@@ -15,10 +15,23 @@ contract MissionsHub is ERC721URIStorage {
 
     mapping(address => uint[]) indexers;
 
+    /**
+     * @notice each mission return featuresIndexer
+     */
+    mapping(uint => uint[]) featuresIndexer;
+
     modifier onlyProxy() {
         require(
             msg.sender == address(accessControl),
             "Must call function with proxy bindings"
+        );
+        _;
+    }
+
+    modifier onlyFeaturesHub() {
+        require(
+            msg.sender == accessControl.getFeaturesHub(),
+            "Only featuresHub can call this function"
         );
         _;
     }
@@ -53,6 +66,15 @@ contract MissionsHub is ERC721URIStorage {
         return newProposalID;
     }
 
+    function setFeatureMission(
+        address _cv,
+        uint _missionID,
+        uint _featureID
+    ) external onlyFeaturesHub {
+        require(ownerOf(_missionID) == _cv, "Not the owner of mission");
+        featuresIndexer[_missionID].push(_featureID);
+    }
+
     // *::::::::::::: ------ ::::::::::::* //
     // *::::::::::::: GETTER ::::::::::::* //
     // *::::::::::::: ------ ::::::::::::* //
@@ -69,5 +91,11 @@ contract MissionsHub is ERC721URIStorage {
 
     function getTokensLength() external view returns (uint256) {
         return _tokenIDs.current();
+    }
+
+    function getFeaturesIndexer(
+        uint _missionID
+    ) external view returns (uint[] memory) {
+        return featuresIndexer[_missionID];
     }
 }

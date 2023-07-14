@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {IMissionsHub} from "../interfaces/IMissionsHub.sol";
 
 contract FeaturesHub is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -50,6 +51,7 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         address _cv,
         DataTypes.FeatureData memory _data
     ) external onlyProxy returns (uint) {
+        IMissionsHub missionHub = IMissionsHub(accessControl.getMissionsHub());
         if (_data.assignedWorker == address(0)) {
             _data.status = DataTypes.FeatureType.Waiting;
         } else {
@@ -61,6 +63,7 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         _mint(_cv, newFeatureID);
         _setTokenURI(newFeatureID, _data.tokenURI);
         featuresData[newFeatureID] = _data;
+        missionHub.setFeatureMission(_cv, _data.missionID, newFeatureID);
         return newFeatureID;
     }
 
