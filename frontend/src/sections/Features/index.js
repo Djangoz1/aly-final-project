@@ -1,7 +1,7 @@
-import { FeatureAmount } from "components/Feature/FeatureAmount";
-import { FeatureInfo } from "components/Feature/FeatureInfo";
-import { FeatureTiming } from "components/Feature/FeatureTiming";
-import { FeatureWorker } from "components/Feature/FeatureWorker";
+import { FeatureAmount } from "components/Mission/MissionAmount";
+import { FeatureInfo } from "components/Mission/MissionTextInfo";
+import { FeatureTiming } from "components/Feature/MissionDataInfo";
+import { FeatureWorker } from "components/Mission/MissionGithub";
 
 import { ChatMission } from "components/inputs/inputsMission/ChatMission";
 import { InputDescription } from "components/inputs/inputsMission/Description";
@@ -18,6 +18,7 @@ import {
 import { _getFeatures, _setFeature } from "utils/ui-tools/mission-tools";
 import { _getterMissionsHub } from "utils/ui-tools/web3-tools";
 import { StatFeature } from "components/stats/StatFeature";
+import { MissionInfo } from "components/Mission";
 
 export const CreationFeatures = () => {
   const { missions, missionId } = useAuthState();
@@ -41,7 +42,11 @@ export const CreationFeatures = () => {
     }
   };
 
-  console.log(features);
+  useEffect(() => {
+    if (cv) {
+      getFeatures();
+    }
+  }, [missions, missionId]);
   useEffect(() => {
     if (cv) {
       getFeatures();
@@ -49,7 +54,8 @@ export const CreationFeatures = () => {
   }, [missions, missionId]);
 
   return (
-    <div>
+    <div className="mt-4">
+      <MissionInfo missionId={missionId} />
       <div className="my-5 flex flex-wrap   w-fit">
         {features?.map((feature, index) => (
           <StatFeature obj={ownerObj} feature={feature} key={uuidv4()} />

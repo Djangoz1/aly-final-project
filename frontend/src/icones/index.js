@@ -4,7 +4,9 @@ export const icfyINSTA = "skill-icons:instagram";
 export const icfyFB = "devicon:facebook";
 export const icfyTWITTER = "skill-icons:twitter";
 export const icfyLINKEDIN = "devicon:linkedin";
+export const icfyGITHUB = "line-md:github-loop";
 
+export const icfyINFO = "mdi:information-outline";
 export const icfyCV = "pepicons-pop:cv";
 export const icfyETHER = "mdi:ethereum";
 export const icfyCOIN = "ph:coins-light";

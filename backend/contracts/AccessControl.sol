@@ -183,7 +183,7 @@ contract AccessControl is Ownable {
         require(msg.value > 0, "Must provide a value");
         require(_data.missionID > 0, "Must provide a mission");
         require(
-            iMH.ownerOf(_data.missionID) == msg.sender,
+            iMH.ownerOf(_data.missionID) == iFCV.getCVByAddress(msg.sender),
             "Not the owner of mission"
         );
         require(

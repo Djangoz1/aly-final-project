@@ -17,4 +17,6 @@ interface IMissionsHub {
     ) external;
 
     function checkRegistred(uint _id) external view;
+
+    function ownerOf(uint256 tokenId) external view returns (address);
 }

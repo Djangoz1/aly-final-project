@@ -20,8 +20,9 @@ export const _getAllMissionsState = async () => {
   const length = parseInt(await _getterMissionsHub("getTokensLength"));
 
   const arr = [];
-  for (let index = 0; index < length; index++) {
+  for (let index = 1; index <= length; index++) {
     const owner = await _getterMissionsHub("ownerOf", [index]);
+
     if (owner) {
       const state = await _getStateOwnerByCv(owner);
       arr.push(state);

@@ -75,7 +75,7 @@ export const InputDescription = ({ getter, datas, setDatas }) => {
   };
   
 
-console.log(datas)
+
 
   return (
     <>

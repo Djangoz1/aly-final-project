@@ -26,7 +26,6 @@ const initialState = {
   error: null,
 };
 
-// Fonction appelé au moment du onClick
 
 // *::::::::::::::: MANAGE STATE  :::::::::::::::*
 export const doAuthMission = async (dispatch, address) => {
@@ -49,7 +48,7 @@ export const doAuthMissionId = async (dispatch, missions, missionId) => {
       throw new Error("Mission not found");
     }
   } catch (error) {
-    dispatch({ status: "error", error: { mission: { error } } });
+    dispatch({ status: "error", missionId: null, error: { mission: { error } } });
   }
 };
 

@@ -21,18 +21,19 @@ import { Icon } from "@iconify/react";
 import { icfySEARCH, icfySEND } from "icones";
 
 export const Missions = () => {
-  const [ownersList, setOwnersList] = useState();
+  const [ownersList, setOwnersList] = useState([]);
 
   const { missions } = useAuthState();
 
   useEffect(() => {
-    if (!ownersList) {
+    if (ownersList.length === 0) {
       (async () => {
         const list = await _getAllMissionsState();
+
         setOwnersList(list);
       })();
     }
-  }, [missions]);
+  }, []);
 
   return (
     <div className="flex flex-col  mt-20   justify-center mx-auto">
