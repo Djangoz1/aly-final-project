@@ -98,7 +98,6 @@ export const _setterAccessControl = async (funcName, args, value) => {
       value: value,
     });
     const { hash } = await writeContract(request);
-
     return hash;
   } catch (error) {
     console.log("error", error);

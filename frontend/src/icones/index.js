@@ -6,6 +6,7 @@ export const icfyTWITTER = "skill-icons:twitter";
 export const icfyLINKEDIN = "devicon:linkedin";
 export const icfyGITHUB = "line-md:github-loop";
 
+export const icfyIMG = "line-md:image-twotone";
 export const icfyHEART = "line-md:heart-filled";
 export const icfyINFO = "mdi:information-outline";
 export const icfyCV = "pepicons-pop:cv";
