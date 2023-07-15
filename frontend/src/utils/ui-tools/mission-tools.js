@@ -1,7 +1,7 @@
-import { recastDescription } from "utils/ux-tools";
 import {
   _getterAccessControl,
   _getterFactoryMISSION,
+  _getterFeaturesHub,
   _getterMissionsHub,
   _setterAccessControl,
   _setterFeaturesHub,
@@ -12,9 +12,13 @@ import {
   createFeatureOnPinata,
   createFileOnPinata,
   createMissionOnPinata,
+  fetchJSONByCID,
 } from "./pinata-tools";
 import { ethers } from "ethers";
-// *::::::::::::::: GET MISSION  :::::::::::::::*
+
+// *::::::::::::::: ------  :::::::::::::::* //
+// *::::::::::::::: GETTER  :::::::::::::::* //
+// *::::::::::::::: ------  :::::::::::::::* //
 
 export const _getAllMissionsState = async () => {
   const length = parseInt(await _getterMissionsHub("getTokensLength"));
@@ -31,7 +35,26 @@ export const _getAllMissionsState = async () => {
   return arr;
 };
 
-// *:::::::::::::::: Features ::::::::::::::::* //
+export const _getMissionInfoState = async (missionId) => {
+  const tokenURI = await _getterMissionsHub("tokenURI", [missionId]);
+  const _metadata = await fetchJSONByCID(tokenURI);
+  _metadata.features = await _getterMissionsHub("getFeaturesIndexer", [
+    missionId,
+  ]);
+  let amount = 0;
+  for (let index = 0; index < _metadata.features.length; index++) {
+    const featureId = _metadata.features[index];
+    const featureData = await _getterFeaturesHub("getDatas", [featureId]);
+    amount += parseInt(featureData.wadge);
+  }
+  _metadata.owner = await _getterMissionsHub("ownerOf", [missionId]);
+  _metadata.totalAmount = ethers.utils.formatEther(amount.toString());
+  return _metadata;
+};
+
+// *::::::::::::::: ------  :::::::::::::::* //
+// *::::::::::::::: SETTER  :::::::::::::::* //
+// *::::::::::::::: ------  :::::::::::::::* //
 
 export const _createMission = async (datas) => {
   let value = await _getterAccessControl("missionPrice");

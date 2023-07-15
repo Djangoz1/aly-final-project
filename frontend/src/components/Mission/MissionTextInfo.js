@@ -1,8 +1,4 @@
-import { Icon } from "@iconify/react";
-import { ENUMS_FEATURE_STATUS, ENUMS_FEATURE_TYPE } from "constants/enums";
-import { selectDevDomain, selectLanguage } from "helpers";
 import React from "react";
-import { recastDescription } from "utils/ux-tools";
 
 export const MissionTextInfo = ({ metadata }) => {
   return (

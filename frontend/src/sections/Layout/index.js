@@ -1,3 +1,4 @@
+"use client";
 import { Footer } from "sections/Layout/Footer";
 import { Header } from "sections/Layout/Header";
 import {

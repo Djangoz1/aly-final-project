@@ -1,9 +1,3 @@
-import { FeatureAmount } from "components/Mission/MissionAmount";
-import { FeatureInfo } from "components/Mission/MissionTextInfo";
-import { FeatureTiming } from "components/Feature/MissionDataInfo";
-import { FeatureWorker } from "components/Mission/MissionGithub";
-
-import { ChatMission } from "components/inputs/inputsMission/ChatMission";
 import { InputDescription } from "components/inputs/inputsMission/Description";
 import { ZERO_ADDRESS } from "constants/web3";
 import { useAuthState } from "context/auth";
@@ -95,19 +89,7 @@ export const CreationFeature = ({ getter }) => {
         <div className="flex flex-col">
           <InputDescription getter={getter} datas={datas} setDatas={setDatas} />
         </div>
-        {/* <ChatMission features={datas} /> */}
       </div>
     </>
-  );
-};
-
-export const FeatureDescription = ({ feature }) => {
-  return (
-    <div className="stats shadow">
-      <FeatureInfo feature={feature} />
-      <FeatureAmount feature={feature} />
-      <FeatureWorker feature={feature} />
-      <FeatureTiming feature={feature} />
-    </div>
   );
 };

@@ -1,36 +1,22 @@
-import { FeatureAmount, MissionAmount } from "components/Mission/MissionAmount";
+import { MissionAmount } from "components/Mission/MissionAmount";
 import { MissionTextInfo } from "components/Mission/MissionTextInfo";
-import {
-  FeatureTiming,
-  MissionDataInfo,
-} from "components/Feature/MissionDataInfo";
-import { FeatureWorker, MissionGithub } from "components/Mission/MissionGithub";
-import { ethers } from "ethers";
+import { MissionDataInfo } from "components/Feature/MissionDataInfo";
+import { MissionGithub } from "components/Mission/MissionGithub";
+
 import React, { useEffect, useState } from "react";
-import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
+
 import {
   _getterFeaturesHub,
   _getterMissionsHub,
 } from "utils/ui-tools/web3-tools";
+import { _getMissionInfoState } from "utils/ui-tools/mission-tools";
 
 export const MissionInfo = ({ missionId }) => {
   const [metadata, setMetadata] = useState(null);
 
   useEffect(() => {
     (async () => {
-      const tokenURI = await _getterMissionsHub("tokenURI", [missionId]);
-      const _metadata = await fetchJSONByCID(tokenURI);
-      _metadata.features = await _getterMissionsHub("getFeaturesIndexer", [
-        missionId,
-      ]);
-      let amount = 0;
-      for (let index = 0; index < _metadata.features.length; index++) {
-        const featureId = _metadata.features[index];
-        const featureData = await _getterFeaturesHub("getDatas", [featureId]);
-        amount += parseInt(featureData.wadge);
-      }
-      _metadata.owner = await _getterMissionsHub("ownerOf", [missionId]);
-      _metadata.totalAmount = ethers.utils.formatEther(amount.toString());
+      const _metadata = await _getMissionInfoState(missionId);
       setMetadata(_metadata);
     })();
   }, [missionId]);

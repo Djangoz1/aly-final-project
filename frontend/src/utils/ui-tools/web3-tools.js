@@ -2,13 +2,10 @@ import { prepareWriteContract, writeContract, readContract } from "@wagmi/core";
 import {
   ABI_CV,
   ABI_FACTORY_CV,
-  ABI_FACTORY_MISSION,
   ABI_ACCESS_CONTROL,
-  ABI_MISSION,
-  ADDR_FACTORY_CV,
-  ADDR_FACTORY_MISSION,
   ABI_MISSIONS_HUB,
   ABI_FEATURES_HUB,
+  ABI_PUBS_HUB,
 } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
@@ -52,9 +49,44 @@ export const _getterCONTRACT = async ({ functionName, args, addr, abi }) => {
   }
 };
 
-// *::::::::::::::: -----------  :::::::::::::::* //
-// *::::::::::::::: F & MISSION  :::::::::::::::* //
-// *::::::::::::::: -----------  :::::::::::::::* //
+// *::::::::::::::: ---------------  :::::::::::::::* //
+// *::::::::::::::: PUBLICATION HUB  :::::::::::::::* //
+// *::::::::::::::: ---------------  :::::::::::::::* //
+
+export const _setterPubsHub = async (funcName, args, value) => {
+  try {
+    const { request } = await prepareWriteContract({
+      address: ADDRESSES["pubsHub"],
+      abi: ABI_PUBS_HUB,
+      functionName: funcName,
+      args: args,
+      value: value,
+    });
+    const { hash } = await writeContract(request);
+
+    return hash;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+export const _getterPubsHub = async (funcName, args) => {
+  try {
+    const res = await readContract({
+      address: ADDRESSES["pubsHub"],
+      abi: ABI_PUBS_HUB,
+      args: args,
+      functionName: funcName,
+    });
+    return res;
+  } catch (error) {
+    console.log("error", { error });
+  }
+};
+
+// *::::::::::::::: --------------  :::::::::::::::* //
+// *::::::::::::::: ACCESS CONTROL  :::::::::::::::* //
+// *::::::::::::::: --------------  :::::::::::::::* //
 
 export const _setterAccessControl = async (funcName, args, value) => {
   try {
@@ -87,8 +119,9 @@ export const _getterAccessControl = async (funcName, args) => {
   }
 };
 // *::::::::::::::: -----------  :::::::::::::::* //
-// *::::::::::::::: F & MISSION  :::::::::::::::* //
+// *::::::::::::::: MISSION HUB  :::::::::::::::* //
 // *::::::::::::::: -----------  :::::::::::::::* //
+
 export const _setterMissionHub = async (funcName, args) => {
   try {
     const hash = await _setterCONTRACT({
@@ -111,37 +144,6 @@ export const _getterMissionsHub = async (funcName, args) => {
     functionName: funcName,
   });
   return res;
-};
-
-export const _setterMISSION = async (addr, funcName, args) => {
-  try {
-    const { request } = await prepareWriteContract({
-      address: addr,
-
-      abi: ABI_MISSION,
-      functionName: funcName,
-      args: args,
-    });
-    const { hash } = await writeContract(request);
-
-    return hash;
-  } catch (error) {
-    console.log("error", error);
-  }
-};
-
-export const _getterMISSION = async (addr, funcName, args) => {
-  try {
-    const res = await readContract({
-      address: addr,
-      args: args,
-      abi: ABI_MISSION,
-      functionName: funcName,
-    });
-    return res;
-  } catch (error) {
-    console.log("error", error);
-  }
 };
 
 // *::::::::::::::: ------------  :::::::::::::::* //

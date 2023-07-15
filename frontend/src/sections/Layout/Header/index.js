@@ -22,6 +22,7 @@ export const Header = ({ setter, isOpen }) => {
   const routes = [
     { name: "Home", path: "/" },
     { name: "Profile", path: cv ? `/profile/cv/${cv}` : "/" },
+    { name: "Community", path: `/community` },
     { name: "How it works", path: "/" },
     { name: "FAQ", path: "/" },
   ];

@@ -1,13 +1,7 @@
 "use client";
 
-import { Header } from "sections/Layout/Header";
-import {
-  doAuthCV,
-  doAuthMission,
-  useAuthDispatch,
-  useAuthState,
-} from "context/auth";
-import { useAccount } from "wagmi";
+import { useAuthState } from "context/auth";
+
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { CreationMission, ListMission } from "components/inputs/inputsMission";
 
