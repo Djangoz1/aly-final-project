@@ -30,6 +30,15 @@ contract LaunchpadHub is Ownable {
         accessControl.setLaunchpadHub(address(this));
     }
 
+    function getTokensLength() external view returns (uint) {
+        return _tokenIDs.current();
+    }
+
+    function getLaunchpad(uint _id) external view returns (address) {
+        require(_id <= _tokenIDs.current(), "ID out of range");
+        return indexer[_id];
+    }
+
     function deployLaunchpad(
         address _owner,
         DataTypes.LaunchpadData memory _datas

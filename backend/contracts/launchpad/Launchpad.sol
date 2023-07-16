@@ -27,6 +27,11 @@ contract Launchpad is Ownable {
     IAccessControl accessControl;
     LaunchpadHub launchpadHub;
 
+    modifier onlyStatus(DataTypes.LaunchpadStatus _status) {
+        require(status == _status, "Wrong status step expected");
+        _;
+    }
+
     constructor(
         address _accessControl,
         uint256 _id,
@@ -40,17 +45,28 @@ contract Launchpad is Ownable {
         launchpadHub = LaunchpadHub(msg.sender);
         _id = id;
         datas = _datas;
-        for (uint8 i = 0; i <= _datas.numberOfTier; i++) {
-            DataTypes.TierData memory _tierData;
-            _tierData.minTierCap = _datas.minCap.div(_datas.numberOfTier);
-            if (i == _datas.numberOfTier) {
-                uint256 modulus = _datas.minCap.sub(_datas.maxCap);
-                _tierData.maxTierCap = _tierData.minTierCap.add(modulus);
-            } else {
-                _tierData.maxTierCap = _tierData.minTierCap;
-            }
-            tierDetails[i] = _tierData;
-        }
+        // for (uint8 i = 0; i <= _datas.numberOfTier; i++) {
+        //     DataTypes.TierData memory _tierData;
+        //     _tierData.minTierCap = _datas.minCap.div(_datas.numberOfTier);
+        //     if (i == _datas.numberOfTier) {
+        //         uint256 modulus = _datas.minCap.sub(_datas.maxCap);
+        //         _tierData.maxTierCap = _tierData.minTierCap.add(modulus);
+        //     } else {
+        //         _tierData.maxTierCap = _tierData.minTierCap;
+        //     }
+        //     tierDetails[i] = _tierData;
+        // }
+    }
+
+    function getDatas() external view returns (DataTypes.LaunchpadData memory) {
+        return datas;
+    }
+
+    function getTierData(
+        uint _id
+    ) external view returns (DataTypes.TierData memory) {
+        require(datas.numberOfTier > _id, "ID tier out of range");
+        return tierDetails[_id];
     }
 
     // *::::::::: ---------------- :::::::::* //
@@ -97,10 +113,10 @@ contract Launchpad is Ownable {
             totalMaxCap.add(_maxTierCaps[i]);
         }
         require(
-            totalMinCap < totalMaxCap,
+            totalMinCap <= totalMaxCap,
             "Mismatch min and max capitalization"
         );
-        for (uint8 i = 0; i <= _tierIDs; i++) {
+        for (uint8 i = 0; i < _tierIDs; i++) {
             DataTypes.TierData memory _tierData;
             _tierData.maxTierCap = _maxTierCaps[i];
             _tierData.minTierCap = _minTierCaps[i];
@@ -109,13 +125,18 @@ contract Launchpad is Ownable {
         datas.numberOfTier = _tierIDs;
         datas.minCap = totalMinCap;
         datas.maxCap = totalMaxCap;
+        status = DataTypes.LaunchpadStatus.Init;
     }
 
     // *::::::::: ------------- :::::::::* //
     // *::::::::: USER BINDINGS :::::::::* //
     // *::::::::: ------------- :::::::::* //
 
-    function buyTokens() external payable {
+    function buyTokens()
+        external
+        payable
+        onlyStatus(DataTypes.LaunchpadStatus.Init)
+    {
         require(datas.saleStart <= block.timestamp, "Sale not started yet");
         require(datas.saleEnd >= block.timestamp, "Sale ended");
         require(msg.value > 0, "Value must be more than 0");

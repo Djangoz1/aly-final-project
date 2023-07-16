@@ -246,11 +246,14 @@ contract AccessControl is Ownable {
     // *:::::::::::: LAUNCHPAD BINDINGS ::::::::::::* //
     // *:::::::::::: ------------------ ::::::::::::* //
 
+    /**
+     * @notice launchpad owned by address and not by cv address
+     */
     function createLaunchpad(
         DataTypes.LaunchpadData memory _datas
     ) external payable onlyInit {
         require(msg.value == launchpadPrice, "Invalid value for launchpad");
         iFCV.checkRegistred(msg.sender);
-        iLH.deployLaunchpad(_datas);
+        iLH.deployLaunchpad(msg.sender, _datas);
     }
 }

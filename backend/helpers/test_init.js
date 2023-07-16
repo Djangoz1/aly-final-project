@@ -8,6 +8,7 @@ const {
   FEATURE_DATAS_URI_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
   PUB_DATAS_URI_EXEMPLE,
+  LAUNCHPAD_DATAS_EXEMPLE,
 } = require("./test_utils");
 
 const {
@@ -53,7 +54,7 @@ const _testInitFactoryCV = async (accessControl) => {
 };
 
 const _testInitCV = async (_accessControl, account, amount) => {
-  const accessControl = await getProxy(_accessControl)
+  const accessControl = await getProxy(_accessControl);
   const newCV = await accessControl.connect(account).buyCV({
     value: ethers.parseEther(`${amount}`),
   });
@@ -84,7 +85,6 @@ const _testInitPub = async (accessControlAdress, account, uriData) => {
     accessControlAdress
   );
 
-
   const _cv = await accessControl.getCVByAddress(account.address);
 
   const pubsHub = await getContractAt("PubsHub", await accessControl.iPH());
@@ -95,7 +95,7 @@ const _testInitPub = async (accessControlAdress, account, uriData) => {
   const beforeLength = parseInt(await pubsHub.balanceOf(_cv));
 
   const tx = await accessControl.connect(account).createPub(tokenURI);
- 
+
   await tx.wait();
   expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
   const afterLength = parseInt(await pubsHub.balanceOf(_cv));
@@ -184,7 +184,6 @@ const _testInitFeature = async (
     uriData = FEATURE_DATAS_URI_EXEMPLE;
   }
 
-  
   const accessControl = await getProxy(_accessControl);
   const _cv = await accessControl.getCVByAddress(account.address);
   const amount = ethers.parseEther(`${datas.wadge}`);
@@ -279,6 +278,74 @@ const _testInitWorkerProposal = async (
   return id;
 };
 
+// *:::::::::::::: --------- ::::::::::::::* //
+// *:::::::::::::: LAUNCHPAD ::::::::::::::* //
+// *:::::::::::::: --------- ::::::::::::::* //
+
+const _testInitLaunchpadHub = async (accessControl) => {
+  const launchpadHub = await ethers.deployContract("LaunchpadHub", [
+    accessControl,
+  ]);
+  await launchpadHub.waitForDeployment();
+  return launchpadHub;
+};
+
+const _testInitLaunchpad = async (_accessControl, account, amount, datas) => {
+  if (!datas) {
+    datas = LAUNCHPAD_DATAS_EXEMPLE;
+    const currentDate = new Date();
+    const futureDate = new Date(
+      currentDate.getTime() + 10 * 24 * 60 * 60 * 1000
+    );
+    datas.saleEnd = futureDate.getTime();
+  }
+
+  const accessControl = await getProxy(_accessControl);
+  const launchpadHub = await getContractAt(
+    "LaunchpadHub",
+    await accessControl.iLH()
+  );
+
+  const beforeLength = parseInt(await launchpadHub.getTokensLength());
+  if (!amount) {
+    amount = parseInt(await accessControl.launchpadPrice());
+  }
+
+  const tx = await accessControl
+    .connect(account)
+    .createLaunchpad(datas, { value: `${amount}` });
+
+  expect(tx.from).to.be.equal(account.address);
+  const id = parseInt(await launchpadHub.getTokensLength());
+  expect(beforeLength).to.be.equal(id - 1);
+  const launchpadAddr = await launchpadHub.getLaunchpad(id);
+  const launchpad = await getContractAt("Launchpad", launchpadAddr);
+  
+  
+  expect(await launchpad.owner()).to.be.equal(account.address);
+
+  const _tierDataMaxCap =  [200000000, 100000000, 300000000 ];
+  const _tierDataMinCap = [15000000, 10000000, 20000000 ];
+  
+  await launchpad.connect(account).updateTiers(3, _tierDataMaxCap, _tierDataMinCap )
+  const launchpadDatas = await launchpad.getDatas();
+  expect(await launchpadDatas.numberOfTier).to.be.equal(3);
+  let tierData = await launchpad.getTierData(0)
+
+  expect(parseInt(tierData.minTierCap)).to.be.equal(_tierDataMinCap[0])
+  expect(parseInt(tierData.maxTierCap)).to.be.equal(_tierDataMaxCap[0])
+  tierData = await launchpad.getTierData(1)
+  expect(parseInt(tierData.minTierCap)).to.be.equal(_tierDataMinCap[1])
+  expect(parseInt(tierData.maxTierCap)).to.be.equal(_tierDataMaxCap[1])
+  tierData = await launchpad.getTierData(2)
+  expect(parseInt(tierData.minTierCap)).to.be.equal(_tierDataMinCap[2])
+  expect(parseInt(tierData.maxTierCap)).to.be.equal(_tierDataMaxCap[2])
+
+
+  await expect(launchpad.getTierData(3)).to.be.revertedWith("ID tier out of range");
+  
+};
+
 module.exports = {
   _testInitAccessControl,
   _testInitFeaturesHub,
@@ -291,4 +358,6 @@ module.exports = {
   _testInitMissionsHub,
   _testInitMission,
   _testInitFeature,
+  _testInitLaunchpad,
+  _testInitLaunchpadHub,
 };

@@ -8,5 +8,8 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 
 interface ILaunchpadHub {
-    function deployLaunchpad(DataTypes.LaunchpadData memory _datas) external;
+    function deployLaunchpad(
+        address _owner,
+        DataTypes.LaunchpadData memory _datas
+    ) external;
 }

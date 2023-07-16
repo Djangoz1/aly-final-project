@@ -187,7 +187,7 @@ library DataTypes {
 
     enum LaunchpadStatus {
         Waiting,
-        Started,
+        Init,
         Paused
     }
 

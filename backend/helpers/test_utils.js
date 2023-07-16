@@ -78,6 +78,23 @@ const WORKER_PROPOSAL_DATAS_EXEMPLE = {
   url: "https://github.com/Djangoz1/aly-final-project",
 };
 
+// *::::::::::::: --------- :::::::::::::* //
+// *::::::::::::: LAUNCHPAD :::::::::::::* //
+// *::::::::::::: --------- :::::::::::::* //
+
+const LAUNCHPAD_DATAS_EXEMPLE = {
+  tokenAddress: ZERO_ADDRESS,
+  name: "Launchpad 1",
+  pubURI: "qsdqsqsdsqsqsq",
+  numberOfTier: 3,
+  maxCap: 1000000000,
+  minCap: 10000000,
+  saleStart: new Date().getTime(),
+  saleEnd: new Date().getTime() + 1,
+  totalUser: 0,
+  communityVote: false,
+};
+
 module.exports = {
   _testParseHex,
   ZERO_ADDRESS,
@@ -86,4 +103,5 @@ module.exports = {
   MISSION_DATAS_URI_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,
   FEATURE_DATAS_URI_EXEMPLE,
+  LAUNCHPAD_DATAS_EXEMPLE,
 };
