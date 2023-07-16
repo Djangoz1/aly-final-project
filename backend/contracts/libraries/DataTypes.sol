@@ -15,19 +15,6 @@ library DataTypes {
     }
 
     /**
-     *    @param Social when publisher post on global access
-     *    @param Work when publisher post on followers mission access
-     *    @param Feed when publisher post on paid access
-     *    @param Private when publisher post for a whitelisted address
-     */
-    enum PubType {
-        Social,
-        Work,
-        Feed,
-        Private
-    }
-
-    /**
      *    @dev string name, string imgURI, address[] posts, uint followers, address[] followAccounts, address[] followMissions
      *    @param name
      *    @param content
@@ -47,6 +34,23 @@ library DataTypes {
         address[] posts;
     }
 
+    // *::::::::::::: ----------- :::::::::::::* //
+    // *::::::::::::: PUBLICATION :::::::::::::* //
+    // *::::::::::::: ----------- :::::::::::::* //
+
+    /**
+     *    @param Social when publisher post on global access
+     *    @param Work when publisher post on followers mission access
+     *    @param Feed when publisher post on paid access
+     *    @param Private when publisher post for a whitelisted address
+     */
+    enum PubType {
+        Social,
+        Work,
+        Feed,
+        Private
+    }
+
     /**
      *    @dev string title, string content, address publisher, uint followers
      *    @param title
@@ -63,8 +67,9 @@ library DataTypes {
         uint followers;
     }
 
-    string private constant PUB_DATA_TYPE =
-        "PubData(string title, string content, string imgURI, address publisher, uint followers)";
+    // *::::::::::::: ------- :::::::::::::* //
+    // *::::::::::::: MISSION :::::::::::::* //
+    // *::::::::::::: ------- :::::::::::::* //
 
     struct MissionData {
         uint followersLength;
@@ -174,5 +179,44 @@ library DataTypes {
         string title;
         string content;
         string imgURI;
+    }
+
+    // *::::::::::::: --------- :::::::::::::* //
+    // *::::::::::::: LAUNCHPAD :::::::::::::* //
+    // *::::::::::::: --------- :::::::::::::* //
+
+    enum LaunchpadStatus {
+        Waiting,
+        Started,
+        Paused
+    }
+
+    struct LaunchpadData {
+        address tokenAddress;
+        string name;
+        string pubURI;
+        uint8 numberOfTier;
+        uint256 maxCap;
+        uint256 minCap;
+        uint256 saleStart;
+        uint256 saleEnd;
+        uint256 totalUser;
+        bool communityVote;
+    }
+
+    struct TierData {
+        uint256 maxTierCap;
+        uint256 minTierCap;
+        uint256 amountRaised;
+        uint256 users;
+    }
+
+    /**
+     * @notice tierLength must be equal to investedAmountLenght
+     * @notice investedAmount[id] | id = tier[id]
+     */
+    struct InvestorData {
+        uint8[] tier;
+        uint256[] investedAmount;
     }
 }

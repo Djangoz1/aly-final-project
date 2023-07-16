@@ -10,6 +10,7 @@ import {IAccessControl} from "./interfaces/IAccessControl.sol";
 import {IMissionsHub} from "./interfaces/IMissionsHub.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
 
+import {ILaunchpadHub} from "./interfaces/ILaunchpadHub.sol";
 import {IWorkerProposalHub} from "./interfaces/IWorkerProposalHub.sol";
 import {IPubsHub} from "./interfaces/IPubsHub.sol";
 import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
@@ -18,12 +19,14 @@ import {ICV} from "./interfaces/ICV.sol";
 contract AccessControl is Ownable {
     uint public cvPrice = 0.01 ether;
     uint public missionPrice = 0.05 ether;
+    uint public launchpadPrice = 0.4 ether;
 
     IMissionsHub public iMH;
     IFactoryCV public iFCV;
     IPubsHub public iPH;
     IFeaturesHub public iFH;
     IWorkerProposalHub public iWPH;
+    ILaunchpadHub public iLH;
 
     DataTypes.AccessControlStatus public workflow;
 
@@ -49,6 +52,7 @@ contract AccessControl is Ownable {
             address(iFCV) != address(0) &&
             address(iFH) != address(0) &&
             address(iWPH) != address(0) &&
+            address(iLH) != address(0) &&
             address(iPH) != address(0)
         ) {
             return true;
@@ -120,6 +124,17 @@ contract AccessControl is Ownable {
 
     function getWorkerProposalHub() external view onlyInit returns (address) {
         return address(iWPH);
+    }
+
+    function setLaunchpadHub(address _launchpadHub) external onlyStart {
+        iLH = ILaunchpadHub(_launchpadHub);
+        if (hasInit()) {
+            workflow = DataTypes.AccessControlStatus.Init;
+        }
+    }
+
+    function getLaunchpadHub() external view onlyInit returns (address) {
+        return address(iLH);
     }
 
     // *::::::::::::::: ----------- :::::::::::::::* //
@@ -225,5 +240,17 @@ contract AccessControl is Ownable {
             _tokenURI,
             _featureID
         );
+    }
+
+    // *:::::::::::: ------------------ ::::::::::::* //
+    // *:::::::::::: LAUNCHPAD BINDINGS ::::::::::::* //
+    // *:::::::::::: ------------------ ::::::::::::* //
+
+    function createLaunchpad(
+        DataTypes.LaunchpadData memory _datas
+    ) external payable onlyInit {
+        require(msg.value == launchpadPrice, "Invalid value for launchpad");
+        iFCV.checkRegistred(msg.sender);
+        iLH.deployLaunchpad(_datas);
     }
 }

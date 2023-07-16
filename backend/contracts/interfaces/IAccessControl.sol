@@ -26,6 +26,10 @@ interface IAccessControl {
 
     function setWorkerProposalHub(address _workerProposalHub) external;
 
+    function setLaunchpadHub(address _launchpadHub) external;
+
+    function getLaunchpadHub() external view returns (address);
+
     function buyCV() external returns (address);
 
     function getCVByAddress(address _addr) external view returns (address);
