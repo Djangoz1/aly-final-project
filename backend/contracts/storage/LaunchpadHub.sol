@@ -7,11 +7,16 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {Launchpad} from "../launchpad/Launchpad.sol";
+import {ICollectLaunchpadInvestor} from "../interfaces/ICollectLaunchpadInvestor.sol";
+import {LaunchpadCohort} from "../cohort/LaunchpadCohort.sol";
 
 contract LaunchpadHub is Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
     IAccessControl accessControl;
+    LaunchpadCohort launchpadCohort;
+
+    ICollectLaunchpadInvestor cLaunchpadInvestor;
 
     uint8 public maxTiers = 5;
 
@@ -25,9 +30,21 @@ contract LaunchpadHub is Ownable {
         _;
     }
 
-    constructor(address _accessControl) {
-        accessControl = IAccessControl(_accessControl);
+    constructor(address _launchpadCohort) {
+        launchpadCohort = LaunchpadCohort(_launchpadCohort);
+        accessControl = IAccessControl(launchpadCohort.getAccessControl());
         accessControl.setLaunchpadHub(address(this));
+        launchpadCohort.setLaunchpadHub(address(this));
+    }
+
+    function setLaunchpadInvestor(
+        address _launchpadInvestor
+    ) external onlyOwner {
+        require(
+            _launchpadInvestor != address(0),
+            "Must assign a launchpad investor address"
+        );
+        cLaunchpadInvestor = ICollectLaunchpadInvestor(_launchpadInvestor);
     }
 
     function getTokensLength() external view returns (uint) {
@@ -41,18 +58,12 @@ contract LaunchpadHub is Ownable {
 
     function deployLaunchpad(
         address _owner,
-        DataTypes.LaunchpadData memory _datas
+        DataTypes.LaunchpadData memory _datas,
+        DataTypes.TierData[] memory _tierDatas
     ) external onlyProxy {
-        require(bytes(_datas.name).length > 0, "Need to specify name");
         require(
             bytes(_datas.pubURI).length > 0,
             "Must create pub with information about your project"
-        );
-        require(
-            _datas.maxCap > 0 &&
-                _datas.maxCap > _datas.minCap &&
-                _datas.minCap > 0,
-            "Mismatch capitalization datas"
         );
         require(
             _datas.saleStart > block.timestamp &&
@@ -62,9 +73,11 @@ contract LaunchpadHub is Ownable {
         require(_datas.numberOfTier <= maxTiers, "Too many tier numbers");
         _tokenIDs.increment();
         Launchpad newLaunchpad = new Launchpad(
-            address(accessControl),
+            address(launchpadCohort),
+            _owner,
             _tokenIDs.current(),
-            _datas
+            _datas,
+            _tierDatas
         );
         newLaunchpad.transferOwnership(_owner);
         indexer[_tokenIDs.current()] = address(newLaunchpad);

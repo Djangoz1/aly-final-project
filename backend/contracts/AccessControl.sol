@@ -10,11 +10,14 @@ import {IAccessControl} from "./interfaces/IAccessControl.sol";
 import {IMissionsHub} from "./interfaces/IMissionsHub.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
 
+import {ILaunchpadCohort} from "./interfaces/ILaunchpadCohort.sol";
 import {ILaunchpadHub} from "./interfaces/ILaunchpadHub.sol";
 import {IWorkerProposalHub} from "./interfaces/IWorkerProposalHub.sol";
 import {IPubsHub} from "./interfaces/IPubsHub.sol";
 import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
 import {ICV} from "./interfaces/ICV.sol";
+
+// import {IERC20Token} from "./interfaces/IERC20Token.sol";
 
 contract AccessControl is Ownable {
     uint public cvPrice = 0.01 ether;
@@ -26,7 +29,9 @@ contract AccessControl is Ownable {
     IPubsHub public iPH;
     IFeaturesHub public iFH;
     IWorkerProposalHub public iWPH;
+    ILaunchpadCohort public iLC;
     ILaunchpadHub public iLH;
+    // IERC20Hub public iERC20H;
 
     DataTypes.AccessControlStatus public workflow;
 
@@ -53,6 +58,7 @@ contract AccessControl is Ownable {
             address(iFH) != address(0) &&
             address(iWPH) != address(0) &&
             address(iLH) != address(0) &&
+            address(iLC) != address(0) &&
             address(iPH) != address(0)
         ) {
             return true;
@@ -76,7 +82,7 @@ contract AccessControl is Ownable {
         }
     }
 
-    function getPubHub() external view onlyInit returns (address) {
+    function getPubHub() external view returns (address) {
         return address(iPH);
     }
 
@@ -87,7 +93,7 @@ contract AccessControl is Ownable {
         }
     }
 
-    function getFactoryCV() external view onlyInit returns (address) {
+    function getFactoryCV() external view returns (address) {
         return address(iFCV);
     }
 
@@ -98,7 +104,7 @@ contract AccessControl is Ownable {
         }
     }
 
-    function getMissionsHub() external view onlyInit returns (address) {
+    function getMissionsHub() external view returns (address) {
         return address(iMH);
     }
 
@@ -109,7 +115,7 @@ contract AccessControl is Ownable {
         }
     }
 
-    function getFeaturesHub() external view onlyInit returns (address) {
+    function getFeaturesHub() external view returns (address) {
         return address(iFH);
     }
 
@@ -122,19 +128,28 @@ contract AccessControl is Ownable {
         }
     }
 
-    function getWorkerProposalHub() external view onlyInit returns (address) {
+    function getWorkerProposalHub() external view returns (address) {
         return address(iWPH);
     }
 
+    function setLaunchpadCohort(address _launchpadCohort) external onlyStart {
+        require(_launchpadCohort != address(0), "Must set a valid address");
+        iLC = ILaunchpadCohort(_launchpadCohort);
+        if (hasInit()) {
+            workflow = DataTypes.AccessControlStatus.Init;
+        }
+    }
+
     function setLaunchpadHub(address _launchpadHub) external onlyStart {
+        require(_launchpadHub != address(0), "Must set a valid address");
         iLH = ILaunchpadHub(_launchpadHub);
         if (hasInit()) {
             workflow = DataTypes.AccessControlStatus.Init;
         }
     }
 
-    function getLaunchpadHub() external view onlyInit returns (address) {
-        return address(iLH);
+    function getLaunchpadCohort() external view returns (address) {
+        return address(iLC);
     }
 
     // *::::::::::::::: ----------- :::::::::::::::* //
@@ -250,10 +265,11 @@ contract AccessControl is Ownable {
      * @notice launchpad owned by address and not by cv address
      */
     function createLaunchpad(
-        DataTypes.LaunchpadData memory _datas
+        DataTypes.LaunchpadData memory _datas,
+        DataTypes.TierData[] memory _tiersDatas
     ) external payable onlyInit {
         require(msg.value == launchpadPrice, "Invalid value for launchpad");
         iFCV.checkRegistred(msg.sender);
-        iLH.deployLaunchpad(msg.sender, _datas);
+        iLH.deployLaunchpad(msg.sender, _datas, _tiersDatas);
     }
 }

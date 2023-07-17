@@ -2,6 +2,12 @@
 pragma solidity 0.8.20;
 
 library DataTypes {
+    enum DeploymentStatus {
+        Pending,
+        Done,
+        Migrate
+    }
+
     /**
      *    @param Initialization during initialization process
      *    @param Init when all addresses are stored
@@ -193,21 +199,23 @@ library DataTypes {
 
     struct LaunchpadData {
         address tokenAddress;
-        string name;
         string pubURI;
         uint8 numberOfTier;
         uint256 maxCap;
         uint256 minCap;
+        uint256 minInvest;
+        uint256 maxInvest;
         uint256 saleStart;
         uint256 saleEnd;
+        uint256 lockedTime;
         uint256 totalUser;
-        bool communityVote;
     }
 
     struct TierData {
         uint256 maxTierCap;
         uint256 minTierCap;
         uint256 amountRaised;
+        uint256 tokenPrice;
         uint256 users;
     }
 
@@ -217,6 +225,7 @@ library DataTypes {
      */
     struct InvestorData {
         uint8[] tier;
-        uint256[] investedAmount;
+        uint256 investedAmount;
+        uint256 lockedTokens;
     }
 }

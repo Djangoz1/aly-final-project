@@ -84,15 +84,24 @@ const WORKER_PROPOSAL_DATAS_EXEMPLE = {
 
 const LAUNCHPAD_DATAS_EXEMPLE = {
   tokenAddress: ZERO_ADDRESS,
-  name: "Launchpad 1",
   pubURI: "qsdqsqsdsqsqsq",
   numberOfTier: 3,
   maxCap: 1000000000,
   minCap: 10000000,
+  minInvest: 300,
+  maxInvest: 400,
   saleStart: new Date().getTime(),
   saleEnd: new Date().getTime() + 1,
+  lockedTime: 100000,
   totalUser: 0,
-  communityVote: false,
+};
+
+const TIER_DATAS_EXEMPLE = {
+  maxTierCap: 10000000,
+  minTierCap: 1000000,
+  amountRaised: 0,
+  tokenPrice: ethers.parseEther("0.0001"),
+  users: 0,
 };
 
 module.exports = {
@@ -103,5 +112,6 @@ module.exports = {
   MISSION_DATAS_URI_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,
   FEATURE_DATAS_URI_EXEMPLE,
+  TIER_DATAS_EXEMPLE,
   LAUNCHPAD_DATAS_EXEMPLE,
 };

@@ -4,25 +4,39 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "hardhat/console.sol";
+
+// import "@openzeppelin/contracts/security/Pausable.sol";
+// import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {LaunchpadCohort} from "../cohort/LaunchpadCohort.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {CollectLaunchpadInvestor} from "../collect/CollectLaunchpadInvestor.sol";
+import {CollectLaunchpadDatas} from "../collect/CollectLaunchpadDatas.sol";
 import {LaunchpadHub} from "../storage/LaunchpadHub.sol";
 
 contract Launchpad is Ownable {
+    // contract Launchpad is Ownable, Pausable {
+    LaunchpadCohort launchpadCohort;
+    CollectLaunchpadDatas cLD;
+    CollectLaunchpadInvestor cLI;
+
     using Counters for Counters.Counter;
     Counters.Counter private _tierID;
-
     using SafeMath for uint256;
+    using DataTypes for DataTypes.LaunchpadData;
+    using DataTypes for DataTypes.TierData;
 
     uint256 public id;
 
-    DataTypes.LaunchpadData datas;
+    bool private _royaltiesTaken;
+
+    IERC20 private iERC20;
 
     DataTypes.LaunchpadStatus status;
-
-    mapping(uint256 => DataTypes.TierData) tierDetails;
-    mapping(address => DataTypes.InvestorData) investorDetails;
 
     IAccessControl accessControl;
     LaunchpadHub launchpadHub;
@@ -32,100 +46,166 @@ contract Launchpad is Ownable {
         _;
     }
 
-    constructor(
-        address _accessControl,
-        uint256 _id,
-        DataTypes.LaunchpadData memory _datas
-    ) {
-        accessControl = IAccessControl(_accessControl);
+    modifier onlyProcess() {
         require(
-            accessControl.getLaunchpadHub() == msg.sender,
-            "Must deploy with launchpad"
+            block.timestamp > cLD.getLaunchpadData(id).saleStart,
+            "Sale not started"
         );
+        require(
+            block.timestamp < cLD.getLaunchpadData(id).saleStart,
+            "Sale already ended"
+        );
+        _;
+    }
+
+    constructor(
+        address _launchpadCohort,
+        address _owner,
+        uint256 _id,
+        DataTypes.LaunchpadData memory _datas,
+        DataTypes.TierData[] memory _tierDatas
+    ) {
+        launchpadCohort = LaunchpadCohort(_launchpadCohort);
+        cLD = CollectLaunchpadDatas(launchpadCohort.getAddrCollectDatas());
+        cLI = CollectLaunchpadInvestor(
+            launchpadCohort.getAddrCollectInvestor()
+        );
+        accessControl = IAccessControl(launchpadCohort.getAccessControl());
+        require(
+            _datas.tokenAddress != address(0),
+            "Must assign a token address"
+        );
+
+        require(
+            launchpadCohort.getAddrLaunchpadHub() == msg.sender,
+            "Must deploy with launchpad cohort"
+        );
+        iERC20 = IERC20(_datas.tokenAddress);
+        require(iERC20.balanceOf(_owner) > 0, "You must have funds to provide");
         launchpadHub = LaunchpadHub(msg.sender);
         _id = id;
-        datas = _datas;
-        // for (uint8 i = 0; i <= _datas.numberOfTier; i++) {
-        //     DataTypes.TierData memory _tierData;
-        //     _tierData.minTierCap = _datas.minCap.div(_datas.numberOfTier);
-        //     if (i == _datas.numberOfTier) {
-        //         uint256 modulus = _datas.minCap.sub(_datas.maxCap);
-        //         _tierData.maxTierCap = _tierData.minTierCap.add(modulus);
-        //     } else {
-        //         _tierData.maxTierCap = _tierData.minTierCap;
-        //     }
-        //     tierDetails[i] = _tierData;
-        // }
-    }
+        require(_tierDatas.length > 0, "Must have at least one tier");
+        uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
+        uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
+        uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
+        for (uint256 index = 0; index < _tierDatas.length; index++) {
+            DataTypes.TierData memory _tierData = _tierDatas[index];
+            _maxTierCaps[index] = _tierData.maxTierCap;
+            _minTierCaps[index] = _tierData.minTierCap;
+            _tokenPrice[index] = _tierData.tokenPrice;
+        }
 
-    function getDatas() external view returns (DataTypes.LaunchpadData memory) {
-        return datas;
-    }
-
-    function getTierData(
-        uint _id
-    ) external view returns (DataTypes.TierData memory) {
-        require(datas.numberOfTier > _id, "ID tier out of range");
-        return tierDetails[_id];
+        cLD.setLaunchpadData(id, _owner, _datas);
+        cLD._setTiers(
+            _tierDatas.length,
+            _owner,
+            id,
+            _maxTierCaps,
+            _minTierCaps,
+            _tokenPrice
+        );
     }
 
     // *::::::::: ---------------- :::::::::* //
     // *::::::::: STATE MANAGEMENT :::::::::* //
     // *::::::::: ---------------- :::::::::* //
 
-    function updateStartTime(uint256 _saleStart) external onlyOwner {
-        require(datas.saleStart > block.timestamp, "Sale already started");
-        datas.saleStart = _saleStart;
-    }
+    // function pause() external onlyOwner {
+    //     _pause();
+    // }
 
-    function updateEndTime(uint256 _saleEnd) external onlyOwner {
-        require(
-            _saleEnd > block.timestamp && datas.saleStart < _saleEnd,
-            "Sale end can't be less than start time"
-        );
-        datas.saleEnd = _saleEnd;
-    }
+    // function unpause() external onlyOwner {
+    //     _unpause();
+    // }
 
-    function updateTiers(
-        uint8 _tierIDs,
-        uint256[] memory _maxTierCaps,
-        uint256[] memory _minTierCaps
-    ) external onlyOwner {
+    /**
+     * @notice must be call after ERC20.approve(address(this) amount)
+     * @param _amount must be equal of the allowance of contract for sender address
+     * @notice protocol take 1% royalties
+     */
+    function lockTokens(uint _amount) external onlyOwner {
         require(
-            _tierIDs <= launchpadHub.maxTiers(),
-            "Number of tiers out of range"
+            iERC20.balanceOf(msg.sender) >= _amount,
+            "Didn't have enough tokens"
         );
-        require(datas.saleStart > block.timestamp, "Sale already started");
         require(
-            _tierIDs == _maxTierCaps.length && _tierIDs == _minTierCaps.length,
-            "Mismatch datas tier"
+            iERC20.allowance(msg.sender, address(this)) == _amount,
+            "Mismatch allowance amount"
         );
-        uint256 totalMinCap;
-        uint256 totalMaxCap;
-        for (uint8 i = 0; i < _tierIDs; i++) {
-            require(
-                _maxTierCaps[i] >= _minTierCaps[i] &&
-                    _maxTierCaps[i] > 0 &&
-                    _minTierCaps[i] > 0,
-                "Mismatch data capitalization"
-            );
-            totalMinCap.add(_minTierCaps[i]);
-            totalMaxCap.add(_maxTierCaps[i]);
-        }
-        require(
-            totalMinCap <= totalMaxCap,
-            "Mismatch min and max capitalization"
+        uint royalties = _amount.div(100);
+        bool success = iERC20.transferFrom(
+            msg.sender,
+            address(this),
+            royalties
         );
-        for (uint8 i = 0; i < _tierIDs; i++) {
-            DataTypes.TierData memory _tierData;
-            _tierData.maxTierCap = _maxTierCaps[i];
-            _tierData.minTierCap = _minTierCaps[i];
-            tierDetails[i] = _tierData;
-        }
-        datas.numberOfTier = _tierIDs;
-        datas.minCap = totalMinCap;
-        datas.maxCap = totalMaxCap;
+        require(success, "Royalties can't be transferred");
         status = DataTypes.LaunchpadStatus.Init;
+    }
+
+    function getDatas() external view returns (DataTypes.LaunchpadData memory) {
+        return cLD.getLaunchpadData(id);
+    }
+
+    function getTierDatas(
+        uint _tierID
+    ) external view returns (DataTypes.TierData memory) {
+        DataTypes.LaunchpadData memory _lData = cLD.getLaunchpadData(id);
+        require(_lData.numberOfTier > _tierID, "ID tier out of range");
+        return cLD.getTierData(id, _tierID);
+    }
+
+    function setTimer(uint _saleEnd, uint _saleStart) external onlyOwner {
+        cLD._setStartTime(id, _saleStart);
+        cLD._setEndTime(id, _saleEnd);
+    }
+
+    function getTokenSupply() external view returns (uint) {
+        uint amount = iERC20.allowance(owner(), address(this));
+        require(
+            iERC20.balanceOf(owner()) >= amount,
+            "Mismatch allowance and owner funds"
+        );
+        return amount;
+    }
+
+    function setTierID() external onlyOwner {
+        _setTierID();
+    }
+
+    function _setTierID() private onlyProcess {
+        uint tierID_ = _tierID.current().add(1);
+        DataTypes.TierData memory _tierData = cLD.getTierData(
+            id,
+            _tierID.current()
+        );
+        require(
+            _tierData.minTierCap <= _tierData.amountRaised,
+            "Must have minimum cap to set tier ID"
+        );
+        require(
+            cLD.getLaunchpadData(id).numberOfTier >= tierID_,
+            "Tier ID out of range"
+        );
+        _tierID.increment();
+    }
+
+    /**
+     * @notice collectLaunchpadDatas documentation
+     */
+    function setTiers(
+        uint8 _tierIDs,
+        uint256[] calldata _maxTierCaps,
+        uint256[] calldata _minTierCaps,
+        uint256[] calldata _amountPerToken
+    ) external onlyOwner {
+        cLD._setTiers(
+            _tierIDs,
+            msg.sender,
+            id,
+            _maxTierCaps,
+            _minTierCaps,
+            _amountPerToken
+        );
     }
 
     // *::::::::: ------------- :::::::::* //
@@ -136,69 +216,31 @@ contract Launchpad is Ownable {
         external
         payable
         onlyStatus(DataTypes.LaunchpadStatus.Init)
+        onlyProcess
     {
-        require(datas.saleStart <= block.timestamp, "Sale not started yet");
-        require(datas.saleEnd >= block.timestamp, "Sale ended");
+        // whenNotPaused
+
         require(msg.value > 0, "Value must be more than 0");
         accessControl.hasRegistred(msg.sender);
 
-        if (
-            tierDetails[_tierID.current()].maxTierCap ==
-            tierDetails[_tierID.current()].amountRaised
-        ) {
-            require(
-                _tierID.current() <= datas.numberOfTier,
-                "Fundrising has already obtained his objectif"
-            );
-            _tierID.increment();
+        bool allowed = cLD._checkTierBalance(id, _tierID.current());
+        if (!allowed) {
+            _setTierID();
         }
-        require(
-            investorDetails[msg.sender].tier.length ==
-                investorDetails[msg.sender].investedAmount.length,
-            "Mismatch investors details data"
+        cLD._checkAmount(id, msg.sender, _tierID.current(), msg.value);
+        bool success = cLI._investOnLaunchpad(
+            id,
+            _tierID.current(),
+            msg.sender,
+            msg.value
         );
-        require(
-            tierDetails[_tierID.current()].maxTierCap <=
-                tierDetails[_tierID.current()].amountRaised.add(msg.value),
-            "Value out of range for this tier"
-        );
-        if (
-            investorDetails[msg.sender].tier.length == 0 &&
-            investorDetails[msg.sender].investedAmount.length == 0
-        ) {
-            investorDetails[msg.sender].tier.push(uint8(_tierID.current()));
-            investorDetails[msg.sender].investedAmount.push(msg.value);
-            tierDetails[_tierID.current()].users.add(1);
-            datas.totalUser.add(1);
-        } else {
-            bool alreadyInvested = false;
+        require(success, "Error on invest on launchpad");
 
-            for (
-                uint256 index = 0;
-                index < investorDetails[msg.sender].tier.length;
-                index++
-            ) {
-                if (
-                    investorDetails[msg.sender].tier[index] == _tierID.current()
-                ) {
-                    investorDetails[msg.sender].investedAmount[index].add(
-                        msg.value
-                    );
-                    alreadyInvested = true;
-                }
-            }
-            if (!alreadyInvested) {
-                investorDetails[msg.sender].investedAmount.push(msg.value);
-                tierDetails[_tierID.current()].users.add(1);
-            }
-        }
-        tierDetails[_tierID.current()].amountRaised.add(msg.value);
-        if (
-            tierDetails[_tierID.current()].maxTierCap ==
-            tierDetails[_tierID.current()].amountRaised &&
-            _tierID.current() < datas.numberOfTier
-        ) {
-            _tierID.increment();
+        cLD._addAmountRaised(id, _tierID.current(), msg.value);
+
+        allowed = cLD._checkTierBalance(id, _tierID.current());
+        if (!allowed) {
+            _setTierID();
         }
     }
 }

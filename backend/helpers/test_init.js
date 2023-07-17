@@ -9,6 +9,7 @@ const {
   WORKER_PROPOSAL_DATAS_EXEMPLE,
   PUB_DATAS_URI_EXEMPLE,
   LAUNCHPAD_DATAS_EXEMPLE,
+  TIER_DATAS_EXEMPLE,
 } = require("./test_utils");
 
 const {
@@ -131,13 +132,12 @@ const _testInitMission = async (_accessControl, account, _amount, uriData) => {
 
   const json = await createURIMission(uriData);
   const tokenURI = json.IpfsHash;
-  const amount = ethers.parseEther(`${_amount}`);
 
   const beforeLength = parseInt(await missionsHub.balanceOf(_cv));
 
   const tx = await accessControl
     .connect(account)
-    .buyMission(tokenURI, { value: amount });
+    .buyMission(tokenURI, { value: `${_amount}` });
   tx.wait();
   expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
 
@@ -282,25 +282,76 @@ const _testInitWorkerProposal = async (
 // *:::::::::::::: LAUNCHPAD ::::::::::::::* //
 // *:::::::::::::: --------- ::::::::::::::* //
 
-const _testInitLaunchpadHub = async (accessControl) => {
-  const launchpadHub = await ethers.deployContract("LaunchpadHub", [
+const _testInitLaunchpadContracts = async (accessControl, address) => {
+  const cohort = await ethers.deployContract("LaunchpadCohort", [
     accessControl,
   ]);
-  await launchpadHub.waitForDeployment();
-  return launchpadHub;
+  await cohort.waitForDeployment();
+  expect(await cohort.owner()).to.be.equal(address);
+  expect(await cohort.getAccessControl()).to.be.equal(accessControl);
+
+  const hub = await ethers.deployContract("LaunchpadHub", [cohort.target]);
+  await hub.waitForDeployment();
+  expect(await hub.owner()).to.be.equal(address);
+  expect(await cohort.getAccessControl()).to.be.equal(accessControl);
+
+  const datas = await ethers.deployContract("CollectLaunchpadDatas", [
+    cohort.target,
+  ]);
+  await datas.waitForDeployment();
+  expect(await datas.owner()).to.be.equal(address);
+
+  const investors = await ethers.deployContract("CollectLaunchpadInvestor", [
+    cohort.target,
+  ]);
+  await investors.waitForDeployment();
+  expect(await investors.owner()).to.be.equal(address);
+
+  await expect(
+    ethers.deployContract("CollectLaunchpadInvestor", [cohort.target])
+  ).to.be.revertedWith("Deployment already done");
+  return { investors, datas, cohort, hub };
 };
 
-const _testInitLaunchpad = async (_accessControl, account, amount, datas) => {
+const _testInitLaunchpad = async (
+  _accessControl,
+  account,
+  _token,
+  amount,
+  datas,
+  tierDatas
+) => {
+  const accessControl = await getProxy(_accessControl);
+  let token;
   if (!datas) {
     datas = LAUNCHPAD_DATAS_EXEMPLE;
     const currentDate = new Date();
     const futureDate = new Date(
+      currentDate.getTime() + 20 * 24 * 60 * 60 * 1000
+    );
+    const startDate = new Date(
       currentDate.getTime() + 10 * 24 * 60 * 60 * 1000
     );
     datas.saleEnd = futureDate.getTime();
+    datas.saleStart = startDate.getTime();
+
+    const pubID = await _testInitPub(_accessControl, account);
+
+    const pubsHub = await getContractAt("PubsHub", await accessControl.iPH());
+    const pubURI = await pubsHub.tokenURI(pubID);
+    datas.pubURI = pubURI;
+    token = await _testInitToken(account, "Django", "DJN", 10000000);
+
+    datas.tokenAddress = token.target;
+    tierDatas = [TIER_DATAS_EXEMPLE];
+  }
+  if (_token) {
+    token = _token;
+    datas.tokenAddress = _token.target;
   }
 
-  const accessControl = await getProxy(_accessControl);
+  tierDatas = [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE];
+
   const launchpadHub = await getContractAt(
     "LaunchpadHub",
     await accessControl.iLH()
@@ -313,37 +364,66 @@ const _testInitLaunchpad = async (_accessControl, account, amount, datas) => {
 
   const tx = await accessControl
     .connect(account)
-    .createLaunchpad(datas, { value: `${amount}` });
-
+    .createLaunchpad(datas, tierDatas, { value: `${amount}` });
+  tx.wait();
   expect(tx.from).to.be.equal(account.address);
   const id = parseInt(await launchpadHub.getTokensLength());
   expect(beforeLength).to.be.equal(id - 1);
+
   const launchpadAddr = await launchpadHub.getLaunchpad(id);
   const launchpad = await getContractAt("Launchpad", launchpadAddr);
-  
-  
   expect(await launchpad.owner()).to.be.equal(account.address);
 
-  const _tierDataMaxCap =  [200000000, 100000000, 300000000 ];
-  const _tierDataMinCap = [15000000, 10000000, 20000000 ];
-  
-  await launchpad.connect(account).updateTiers(3, _tierDataMaxCap, _tierDataMinCap )
-  const launchpadDatas = await launchpad.getDatas();
-  expect(await launchpadDatas.numberOfTier).to.be.equal(3);
-  let tierData = await launchpad.getTierData(0)
+  let lDatas = await launchpad.getDatas();
 
-  expect(parseInt(tierData.minTierCap)).to.be.equal(_tierDataMinCap[0])
-  expect(parseInt(tierData.maxTierCap)).to.be.equal(_tierDataMaxCap[0])
-  tierData = await launchpad.getTierData(1)
-  expect(parseInt(tierData.minTierCap)).to.be.equal(_tierDataMinCap[1])
-  expect(parseInt(tierData.maxTierCap)).to.be.equal(_tierDataMaxCap[1])
-  tierData = await launchpad.getTierData(2)
-  expect(parseInt(tierData.minTierCap)).to.be.equal(_tierDataMinCap[2])
-  expect(parseInt(tierData.maxTierCap)).to.be.equal(_tierDataMaxCap[2])
+  expect(lDatas.tokenAddress).to.be.equal(datas.tokenAddress);
+  expect(lDatas.pubURI).to.be.equal(datas.pubURI);
+  let maxTierCap = 0;
+  let minTierCap = 0;
+  let _tDatas = [];
+  for (let index = 0; index < tierDatas.length; index++) {
+    const element = tierDatas[index];
+    let tierData = await launchpad.getTierDatas(index);
+    _tDatas.push(tierData);
+    expect(parseInt(tierData.maxTierCap)).to.be.equal(element.maxTierCap);
+    expect(parseInt(tierData.minTierCap)).to.be.equal(element.minTierCap);
+    maxTierCap += parseInt(tierData.maxTierCap);
+    minTierCap += parseInt(tierData.minTierCap);
+  }
 
+  expect(lDatas.minCap).to.be.equal(minTierCap);
+  expect(lDatas.maxCap).to.be.equal(maxTierCap);
+  expect(lDatas.minInvest).to.be.equal(datas.minInvest);
+  expect(lDatas.maxInvest).to.be.equal(datas.maxInvest);
+  expect(lDatas.saleStart).to.be.equal(datas.saleStart);
+  expect(lDatas.saleEnd).to.be.equal(datas.saleEnd);
+  expect(lDatas.lockedTime).to.be.equal(datas.lockedTime);
+  expect(lDatas.totalUser).to.be.equal(0);
+  expect(lDatas.numberOfTier).to.be.equal(tierDatas.length);
+  await expect(launchpad.getTierDatas(tierDatas.length)).to.be.revertedWith(
+    "ID tier out of range"
+  );
 
-  await expect(launchpad.getTierData(3)).to.be.revertedWith("ID tier out of range");
-  
+  return launchpad;
+};
+
+// *:::::::::::::: ----- ::::::::::::::* //
+// *:::::::::::::: TOKEN ::::::::::::::* //
+// *:::::::::::::: ----- ::::::::::::::* //
+
+const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
+  const token = await ethers.deployContract("ERC20Token", [
+    _name,
+    _symbol,
+    _totalSupply,
+  ]);
+
+  expect(token.runner.address).to.equal(account.address);
+  expect(await token.name()).to.equal(_name);
+  expect(await token.totalSupply()).to.equal(_totalSupply);
+  expect(await token.symbol()).to.equal(_symbol);
+  expect(await token.balanceOf(account.address)).to.equal(_totalSupply);
+  return token;
 };
 
 module.exports = {
@@ -358,6 +438,7 @@ module.exports = {
   _testInitMissionsHub,
   _testInitMission,
   _testInitFeature,
+  _testInitToken,
   _testInitLaunchpad,
-  _testInitLaunchpadHub,
+  _testInitLaunchpadContracts,
 };

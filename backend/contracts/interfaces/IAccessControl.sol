@@ -28,7 +28,9 @@ interface IAccessControl {
 
     function setLaunchpadHub(address _launchpadHub) external;
 
-    function getLaunchpadHub() external view returns (address);
+    function setLaunchpadCohort(address _launchpadCohort) external;
+
+    function getLaunchpadCohort() external view returns (address);
 
     function buyCV() external returns (address);
 

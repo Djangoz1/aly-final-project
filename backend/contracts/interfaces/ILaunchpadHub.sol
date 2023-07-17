@@ -10,6 +10,9 @@ import {IAccessControl} from "../interfaces/IAccessControl.sol";
 interface ILaunchpadHub {
     function deployLaunchpad(
         address _owner,
-        DataTypes.LaunchpadData memory _datas
+        DataTypes.LaunchpadData memory _datas,
+        DataTypes.TierData[] memory _tierDatas
     ) external;
+
+    function setLaunchpadInvestor(address _launchpadInvestor) external;
 }

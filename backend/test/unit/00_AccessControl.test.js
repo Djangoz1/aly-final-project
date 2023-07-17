@@ -1,6 +1,5 @@
 const { ethers } = require("hardhat");
 const { expect, assert } = require("chai");
-const { createURIPost, createURIFeature } = require("../../utils/pinata");
 
 const {
   _testInitFactoryCV,
@@ -14,8 +13,8 @@ const {
   _testInitWorkerProposal,
   _testInitPubHub,
   _testInitPub,
-  _testInitLaunchpadHub,
   _testInitLaunchpad,
+  _testInitLaunchpadContracts,
 } = require("../../helpers/test_init");
 const {
   PUB_DATAS_EXEMPLE,
@@ -24,7 +23,7 @@ const {
 
 const CONTRACT_NAME = "AccessControl";
 
-describe.only(`Contract ${CONTRACT_NAME} `, () => {
+describe(`Contract ${CONTRACT_NAME} `, () => {
   let accessControl;
 
   beforeEach(async () => {
@@ -83,10 +82,11 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       expect(pubHubAddr).to.equal(pubHub.target);
     });
 
-    it("launchpadHub deployment should set his address", async () => {
-      let launchpadHub = await _testInitLaunchpadHub(accessControl.target);
-      const launchpadHubAddr = await accessControl.iLH();
-      expect(launchpadHubAddr).to.equal(launchpadHub.target);
+    it("launchpad contracts deployment should set his address", async () => {
+      await _testInitLaunchpadContracts(
+        accessControl.target,
+        this.owner.address
+      );
     });
 
     it("Should not use onlyInit function", async () => {
@@ -101,7 +101,11 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       await _testInitPubHub(accessControl.target);
       await _testInitFeaturesHub(accessControl.target);
       await _testInitWorkerProposalHub(accessControl.target);
-      await _testInitLaunchpadHub(accessControl.target);
+      await _testInitLaunchpadContracts(
+        accessControl.target,
+        this.owner.address
+      );
+
       expect(parseInt(await accessControl.workflow())).to.equal(1);
     });
   });
@@ -116,7 +120,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     let pubHub;
     let featuresHub;
     let workerProposalHub;
-    let launchpadHub;
+    let launchpadContracts;
     beforeEach(async () => {
       factoryCV = await _testInitFactoryCV(accessControl.target);
       factoryMission = await _testInitMissionsHub(accessControl.target);
@@ -125,7 +129,10 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       workerProposalHub = await _testInitWorkerProposalHub(
         accessControl.target
       );
-      launchpadHub = await _testInitLaunchpadHub(accessControl.target);
+      launchpadContracts = await _testInitLaunchpadContracts(
+        accessControl.target,
+        this.owner.address
+      );
     });
 
     it("Should deploy to Init workflow", async () => {
@@ -164,6 +171,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
       beforeEach(async () => {
         cv = await _testInitCV(accessControl, this.addr1, 1);
+        await _testInitCV(accessControl, this.owner, 1);
         await _testInitCV(accessControl, this.addr2, 1);
       });
 
@@ -185,17 +193,19 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         await _testInitFeature(accessControl.target, this.addr1, missionId);
       });
       it("Should deploy workerProposal", async () => {
+        let price = parseInt(await accessControl.missionPrice());
+
         const missionId = await _testInitMission(
           accessControl.target,
           this.addr2,
-          0.01
+          price
         );
         await _testInitFeature(accessControl.target, this.addr2, missionId);
       });
-      it.only("Should deploy launchpad", async () => {
+      it("Should deploy launchpad", async () => {
         const launchpad = await _testInitLaunchpad(
           accessControl.target,
-          this.addr2
+          this.owner
         );
       });
     });
