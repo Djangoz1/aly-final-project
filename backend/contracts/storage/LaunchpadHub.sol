@@ -6,17 +6,16 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
-import {Launchpad} from "../launchpad/Launchpad.sol";
-import {ICollectLaunchpadInvestor} from "../interfaces/ICollectLaunchpadInvestor.sol";
-import {LaunchpadCohort} from "../cohort/LaunchpadCohort.sol";
+import "../launchpad/Launchpad.sol";
+// import {ICollectLaunchpadInvestor} from "../interfaces/ICollectLaunchpadInvestor.sol";
+import {ILaunchpadCohort} from "../interfaces/ILaunchpadCohort.sol";
 
 contract LaunchpadHub is Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
-    IAccessControl accessControl;
-    LaunchpadCohort launchpadCohort;
-
-    ICollectLaunchpadInvestor cLaunchpadInvestor;
+    address addrAControl;
+    address addrLCohort;
+    address addrLInvestor;
 
     uint8 public maxTiers = 5;
 
@@ -24,17 +23,20 @@ contract LaunchpadHub is Ownable {
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(accessControl),
+            msg.sender == addrAControl,
             "Must call function with proxy bindings"
         );
         _;
     }
 
-    constructor(address _launchpadCohort) {
-        launchpadCohort = LaunchpadCohort(_launchpadCohort);
-        accessControl = IAccessControl(launchpadCohort.getAccessControl());
-        accessControl.setLaunchpadHub(address(this));
-        launchpadCohort.setLaunchpadHub(address(this));
+    constructor(address _addrLCohort) {
+        require(_addrLCohort != address(0), "Must have address");
+        addrLCohort = _addrLCohort;
+        ILaunchpadCohort iLC = ILaunchpadCohort(_addrLCohort);
+        addrAControl = iLC.getAccessControl();
+        IAccessControl iAC = IAccessControl(addrAControl);
+        iAC.setLaunchpadHub(address(this));
+        iLC.setLaunchpadHub(address(this));
     }
 
     function setLaunchpadInvestor(
@@ -44,7 +46,7 @@ contract LaunchpadHub is Ownable {
             _launchpadInvestor != address(0),
             "Must assign a launchpad investor address"
         );
-        cLaunchpadInvestor = ICollectLaunchpadInvestor(_launchpadInvestor);
+        addrLInvestor = _launchpadInvestor;
     }
 
     function getTokensLength() external view returns (uint) {
@@ -53,6 +55,7 @@ contract LaunchpadHub is Ownable {
 
     function getLaunchpad(uint _id) external view returns (address) {
         require(_id <= _tokenIDs.current(), "ID out of range");
+        require(indexer[_id] != address(0), "Launchpad not found");
         return indexer[_id];
     }
 
@@ -73,7 +76,7 @@ contract LaunchpadHub is Ownable {
         require(_datas.numberOfTier <= maxTiers, "Too many tier numbers");
         _tokenIDs.increment();
         Launchpad newLaunchpad = new Launchpad(
-            address(launchpadCohort),
+            addrLCohort,
             _owner,
             _tokenIDs.current(),
             _datas,

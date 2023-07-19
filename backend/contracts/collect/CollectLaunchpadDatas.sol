@@ -17,7 +17,7 @@ import {LaunchpadHub} from "../storage/LaunchpadHub.sol";
 contract CollectLaunchpadDatas is Ownable {
     using SafeMath for uint256;
     LaunchpadCohort launchpadCohort;
-    CollectLaunchpadInvestor cLI;
+    CollectLaunchpadInvestor public cLI;
     LaunchpadHub iLH;
     using Counters for Counters.Counter;
     Counters.Counter private _tierIDs;
@@ -41,6 +41,12 @@ contract CollectLaunchpadDatas is Ownable {
             launchpadCohort.getAddrCollectInvestor()
         );
         iLH = LaunchpadHub(launchpadCohort.getAddrLaunchpadHub());
+    }
+
+    function setCollectInvestor(address _address) external {
+        require(_address != address(0), "Couldn't set 0 address");
+        require(address(cLI) == address(0), "Address already init");
+        cLI = CollectLaunchpadInvestor(_address);
     }
 
     function getLaunchpadData(
@@ -117,15 +123,21 @@ contract CollectLaunchpadDatas is Ownable {
         uint _tierID,
         uint _amount
     ) external {
-        tierDetails[_launchpadID][uint8(_tierID)].amountRaised.add(_amount);
+        tierDetails[_launchpadID][_tierID].amountRaised = tierDetails[
+            _launchpadID
+        ][_tierID].amountRaised.add(_amount);
     }
 
     function _incrementLaunchpadUser(uint _launchpadID) external {
-        launchpadDatas[_launchpadID].totalUser.add(1);
+        launchpadDatas[_launchpadID].totalUser = launchpadDatas[_launchpadID]
+            .totalUser
+            .add(1);
     }
 
     function _incrementTierUser(uint _launchpadID, uint _tierID) external {
-        tierDetails[_launchpadID][uint8(_tierID)].users.add(1);
+        tierDetails[_launchpadID][_tierID].users = tierDetails[_launchpadID][
+            _tierID
+        ].users.add(1);
     }
 
     /**
@@ -188,7 +200,7 @@ contract CollectLaunchpadDatas is Ownable {
 
             // fixed bug stack too large
             uint id_ = _id;
-            tierDetails[id_][uint8(i)] = _tierData;
+            tierDetails[id_][i] = _tierData;
         }
 
         launchpadDatas[_id].numberOfTier = uint8(_tierLength);
@@ -197,33 +209,40 @@ contract CollectLaunchpadDatas is Ownable {
         launchpadDatas[_id].maxCap = totalMaxCap;
     }
 
+    /**
+     * @notice check if amount raised on tier is still on range
+     * @notice value must be < maxTierCap && > minInvest  && balance of sender < maxInvest
+     * @param _launchpadID id of invested launchpad
+     * @param _from sender of value
+     * @param _tierID is ID of current ID
+     * @param _value is msg.value of sender
+     */
     function _checkAmount(
         uint _launchpadID,
         address _from,
         uint _tierID,
-        uint _amount
+        uint _value
     ) external view returns (bool) {
         require(
             _tierID < launchpadDatas[_launchpadID].numberOfTier,
             "Tier out of range"
         );
-        uint256 _balance = tierDetails[_launchpadID][uint8(_tierID)]
-            .amountRaised;
+        uint256 _balance = tierDetails[_launchpadID][_tierID].amountRaised;
 
         require(
-            tierDetails[_launchpadID][uint8(_tierID)].maxTierCap <=
-                _balance.add(_amount),
+            tierDetails[_launchpadID][_tierID].maxTierCap <=
+                _balance.add(_value),
             "Value out of range for this tier"
         );
         require(
-            launchpadDatas[_launchpadID].minInvest < _amount,
+            launchpadDatas[_launchpadID].minInvest < _value,
             "Mismatches value and minimum investment"
         );
         uint256 _balanceOf = cLI
             .getInvestorData(_launchpadID, _from)
             .investedAmount;
         require(
-            _balanceOf.add(_amount) <= launchpadDatas[_launchpadID].maxInvest,
+            _balanceOf.add(_value) <= launchpadDatas[_launchpadID].maxInvest,
             "Maximum investments out of range"
         );
         return true;
@@ -234,9 +253,11 @@ contract CollectLaunchpadDatas is Ownable {
         uint _tierID
     ) external returns (bool) {
         if (
-            tierDetails[_launchpadID][uint8(_tierID)].maxTierCap ==
-            tierDetails[_launchpadID][uint8(_tierID)].amountRaised
-        ) {} else {
+            tierDetails[_launchpadID][_tierID].maxTierCap ==
+            tierDetails[_launchpadID][_tierID].amountRaised
+        ) {
+            return false;
+        } else {
             return true;
         }
     }

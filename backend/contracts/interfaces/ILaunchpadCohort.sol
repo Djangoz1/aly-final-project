@@ -15,4 +15,6 @@ interface ILaunchpadCohort {
     function getAddrCollectDatas() external view returns (address);
 
     function getAddrLaunchpadHub() external view returns (address);
+
+    function setLaunchpadHub(address _LH) external;
 }

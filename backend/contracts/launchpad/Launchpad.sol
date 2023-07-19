@@ -5,10 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
+// import "@openzeppelin/contracts/security/Pausable.sol";
 import "hardhat/console.sol";
 
-// import "@openzeppelin/contracts/security/Pausable.sol";
 // import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {LaunchpadCohort} from "../cohort/LaunchpadCohort.sol";
 
@@ -19,7 +18,6 @@ import {CollectLaunchpadDatas} from "../collect/CollectLaunchpadDatas.sol";
 import {LaunchpadHub} from "../storage/LaunchpadHub.sol";
 
 contract Launchpad is Ownable {
-    // contract Launchpad is Ownable, Pausable {
     LaunchpadCohort launchpadCohort;
     CollectLaunchpadDatas cLD;
     CollectLaunchpadInvestor cLI;
@@ -47,17 +45,28 @@ contract Launchpad is Ownable {
     }
 
     modifier onlyProcess() {
+        // ! Decoment after test
+
+        // require(
+        //     block.timestamp > cLD.getLaunchpadData(id).saleStart,
+        //     "Sale not started"
+        // );
+        // ! @@@@@@
+
         require(
-            block.timestamp > cLD.getLaunchpadData(id).saleStart,
-            "Sale not started"
-        );
-        require(
-            block.timestamp < cLD.getLaunchpadData(id).saleStart,
+            block.timestamp < cLD.getLaunchpadData(id).saleEnd,
             "Sale already ended"
         );
         _;
     }
 
+    /**
+     * @param _launchpadCohort is address of contract where store every contract module
+     * @param _owner is msg.sender of deployer launchpad
+     * @param _id is launchpadID.current
+     * @param _datas is datas set by deployer
+     * @param _tierDatas is tier datas set by deployer
+     */
     constructor(
         address _launchpadCohort,
         address _owner,
@@ -66,6 +75,7 @@ contract Launchpad is Ownable {
         DataTypes.TierData[] memory _tierDatas
     ) {
         launchpadCohort = LaunchpadCohort(_launchpadCohort);
+        launchpadHub = LaunchpadHub(msg.sender);
         cLD = CollectLaunchpadDatas(launchpadCohort.getAddrCollectDatas());
         cLI = CollectLaunchpadInvestor(
             launchpadCohort.getAddrCollectInvestor()
@@ -82,9 +92,8 @@ contract Launchpad is Ownable {
         );
         iERC20 = IERC20(_datas.tokenAddress);
         require(iERC20.balanceOf(_owner) > 0, "You must have funds to provide");
-        launchpadHub = LaunchpadHub(msg.sender);
-        _id = id;
         require(_tierDatas.length > 0, "Must have at least one tier");
+        id = _id;
         uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
         uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
         uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
@@ -104,6 +113,33 @@ contract Launchpad is Ownable {
             _minTierCaps,
             _tokenPrice
         );
+    }
+
+    /**
+     * @notice check if contract have allowance to transfered that amount
+     * check if owner have enough funds
+     * if not, the protocol paused automatically this contract
+     * @param _tokens is number of token that sender buy
+     */
+    function transferIfAllow(uint _tokens) external returns (bool) {
+        IERC20 token = IERC20(cLD.getLaunchpadData(id).tokenAddress);
+        uint valueAllowed = token.allowance(owner(), address(this));
+        require(valueAllowed > 0, "Our funds is empty");
+        require(
+            valueAllowed >= _tokens,
+            "We didn't have enough funds available"
+        );
+        if (token.balanceOf(owner()) <= valueAllowed) {
+            // _pause();
+            require(
+                token.balanceOf(owner()) >= valueAllowed,
+                "Mismatch balance of owner and allowance !"
+            );
+        } else {
+            bool success = token.transferFrom(owner(), address(this), _tokens);
+            require(success, "Error transfer token");
+            return true;
+        }
     }
 
     // *::::::::: ---------------- :::::::::* //
@@ -135,7 +171,7 @@ contract Launchpad is Ownable {
         uint royalties = _amount.div(100);
         bool success = iERC20.transferFrom(
             msg.sender,
-            address(this),
+            address(owner()),
             royalties
         );
         require(success, "Royalties can't be transferred");
@@ -191,6 +227,10 @@ contract Launchpad is Ownable {
 
     /**
      * @notice collectLaunchpadDatas documentation
+     * @param _tierIDs is length of tier set
+     * @param _maxTierCaps is an array of max tier caps value for each tier. Length must be equal at _tierIDs
+     * @param _minTierCaps is an array of min tier caps value for each tier. Length must be equal at _tierIDs
+     * @param _amountPerToken is an array of amount per token for each tier. Length must be equal at _tierIDs
      */
     function setTiers(
         uint8 _tierIDs,
@@ -220,15 +260,20 @@ contract Launchpad is Ownable {
     {
         // whenNotPaused
 
-        require(msg.value > 0, "Value must be more than 0");
         accessControl.hasRegistred(msg.sender);
-
-        bool allowed = cLD._checkTierBalance(id, _tierID.current());
-        if (!allowed) {
+        require(msg.value > 0, "Value must be more than 0");
+        bool inRange = cLD._checkTierBalance(id, _tierID.current());
+        if (!inRange) {
             _setTierID();
         }
-        cLD._checkAmount(id, msg.sender, _tierID.current(), msg.value);
-        bool success = cLI._investOnLaunchpad(
+        bool success = cLD._checkAmount(
+            id,
+            msg.sender,
+            _tierID.current(),
+            msg.value
+        );
+        require(success, "Error on _checkAmount");
+        success = cLI._investOnLaunchpad(
             id,
             _tierID.current(),
             msg.sender,
@@ -238,8 +283,8 @@ contract Launchpad is Ownable {
 
         cLD._addAmountRaised(id, _tierID.current(), msg.value);
 
-        allowed = cLD._checkTierBalance(id, _tierID.current());
-        if (!allowed) {
+        inRange = cLD._checkTierBalance(id, _tierID.current());
+        if (!inRange) {
             _setTierID();
         }
     }

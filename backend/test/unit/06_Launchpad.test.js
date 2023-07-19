@@ -20,6 +20,7 @@ const {
 const {
   PUB_DATAS_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,
+  LAUNCHPAD_DATAS_EXEMPLE,
 } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "Launchpad";
@@ -65,24 +66,60 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         accessControl.target,
         this.owner
       );
-      
     });
-    it("Should init launchpad ", async () => {
-      let token = await _testInitToken(this.owner, "Django", "DJN", 10000000);
-      datas = LAUNCHPAD_DATAS_EXEMPLE
-      
+    it.only("Should init launchpad ", async () => {
+      let token = await _testInitToken(this.owner, "Django", "DJN", 2000000000);
+      datas = LAUNCHPAD_DATAS_EXEMPLE;
+
+      const currentDate = new Date();
+      const futureDate = new Date(
+        currentDate.getTime() + 20 * 24 * 60 * 60 * 1000
+      );
+      const amount = parseInt(await accessControl.launchpadPrice());
+      const startDate = new Date(currentDate.getTime());
+      datas.saleEnd = futureDate.getTime();
+      datas.saleStart = startDate.getTime();
       const launchpad = await _testInitLaunchpad(
         accessControl.target,
         this.owner,
         token,
+        amount,
         datas
       );
 
-      await   token.approve(launchpad.target, 20000);
-        console.log(await token.allowance(this.owner.address, launchpad.target))
-        await launchpad.lockTokens(20000)
+      const tier = await launchpad.getTierDatas(0);
+      const tokenPrice = tier.tokenPrice;
+      const value = ethers.parseEther("0.1");
 
-        // await launchpad.buyTokens({value: ethers.parseEther("2")})
+      // console.log(tokenPrice);
+      // console.log(value);
+      // console.log(value / tokenPrice);
+
+      // await token.approve(lInvestors.target, 100000000);
+
+      await token.approve(launchpad.target, 100000000);
+      // console.log(await token.allowance(this.owner.address, launchpad.target));
+      await launchpad.lockTokens(100000000);
+      const investorData = await lInvestors.getInvestorData(
+        0,
+        this.owner.address
+      );
+      // console.log(investorData.investedAmount);
+      // console.log(await lDatas.cLI());
+      console.log("id", await launchpad.id());
+      // console.log(await lHub.getLaunchpad(await launchpad.id()));
+      await launchpad.buyTokens({ value: ethers.parseEther("1") });
+      await launchpad.buyTokens({ value: ethers.parseEther("1") });
+      console.log(
+        await lInvestors.getInvestorData(
+          await launchpad.id(),
+          this.owner.address
+        )
+      );
+      const _tierdata = await launchpad.getTierDatas(0);
+
+      console.log(_tierdata);
+      console.log(await token.balanceOf(launchpad.target));
     });
   });
 });

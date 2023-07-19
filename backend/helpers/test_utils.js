@@ -89,7 +89,7 @@ const LAUNCHPAD_DATAS_EXEMPLE = {
   maxCap: 1000000000,
   minCap: 10000000,
   minInvest: 300,
-  maxInvest: 400,
+  maxInvest: ethers.parseEther("3"),
   saleStart: new Date().getTime(),
   saleEnd: new Date().getTime() + 1,
   lockedTime: 100000,
@@ -100,7 +100,7 @@ const TIER_DATAS_EXEMPLE = {
   maxTierCap: 10000000,
   minTierCap: 1000000,
   amountRaised: 0,
-  tokenPrice: ethers.parseEther("0.0001"),
+  tokenPrice: ethers.parseEther("0.1"),
   users: 0,
 };
 
