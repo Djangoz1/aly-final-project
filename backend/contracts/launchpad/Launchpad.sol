@@ -156,26 +156,30 @@ contract Launchpad is Ownable {
 
     /**
      * @notice must be call after ERC20.approve(address(this) amount)
-     * @param _amount must be equal of the allowance of contract for sender address
      * @notice protocol take 1% royalties
+     * @param _tokens must be equal of the allowance of contract for sender address
      */
-    function lockTokens(uint _amount) external onlyOwner {
+    function lockTokens(uint _tokens) external onlyOwner {
         require(
-            iERC20.balanceOf(msg.sender) >= _amount,
+            iERC20.balanceOf(msg.sender) >= _tokens,
             "Didn't have enough tokens"
         );
         require(
-            iERC20.allowance(msg.sender, address(this)) == _amount,
+            iERC20.allowance(msg.sender, address(this)) == _tokens,
             "Mismatch allowance amount"
         );
-        uint royalties = _amount.div(100);
+        uint royalties = _tokens.div(100);
         bool success = iERC20.transferFrom(
             msg.sender,
-            address(owner()),
+            address(launchpadCohort.owner()),
             royalties
         );
         require(success, "Royalties can't be transferred");
         status = DataTypes.LaunchpadStatus.Init;
+    }
+
+    function getCurrentTierID() external view returns (uint) {
+        return _tierID.current();
     }
 
     function getDatas() external view returns (DataTypes.LaunchpadData memory) {

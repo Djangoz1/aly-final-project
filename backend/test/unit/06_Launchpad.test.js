@@ -21,6 +21,7 @@ const {
   PUB_DATAS_EXEMPLE,
   FEATURE_DATAS_EXEMPLE,
   LAUNCHPAD_DATAS_EXEMPLE,
+  TIER_DATAS_EXEMPLE,
 } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "Launchpad";
@@ -28,9 +29,9 @@ const CONTRACT_NAME = "Launchpad";
 describe.only(`Contract ${CONTRACT_NAME} `, () => {
   let accessControl;
   let lHub;
-  let lInvestors;
-  let lCohort;
-  let lDatas;
+  let cLI;
+  let LC;
+  let cLD;
 
   beforeEach(async () => {
     [
@@ -54,21 +55,30 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       this.owner.address
     );
     await _testInitCV(accessControl.target, this.owner, 0.5);
+    await _testInitCV(accessControl.target, this.addr1, 0.5);
+    await _testInitCV(accessControl.target, this.addr2, 0.5);
     lHub = contracts.hub;
-    lInvestors = contracts.investors;
-    lCohort = contracts.cohort;
-    lDatas = contracts.datas;
+    cLI = contracts.investors;
+    LC = contracts.cohort;
+    cLD = contracts.datas;
   });
 
   describe("Init : Launchpad", () => {
-    it("Should create launchpad", async () => {
-      const launchpad = await _testInitLaunchpad(
-        accessControl.target,
-        this.owner
-      );
-    });
-    it.only("Should init launchpad ", async () => {
-      let token = await _testInitToken(this.owner, "Django", "DJN", 2000000000);
+    let token;
+    let owner;
+    let datas;
+    let launchpad;
+    let _lDatas;
+    let _tDatas;
+
+    beforeEach(async () => {
+      owner = await this.addr1;
+      const supply = 2000000000;
+      token = await _testInitToken(this.owner, "Django", "DJN", supply);
+      await token.transfer(owner.address, supply);
+      expect(await token.balanceOf(this.owner.address)).to.be.equal(0);
+      expect(await token.balanceOf(owner.address)).to.be.equal(supply);
+
       datas = LAUNCHPAD_DATAS_EXEMPLE;
 
       const currentDate = new Date();
@@ -79,47 +89,134 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       const startDate = new Date(currentDate.getTime());
       datas.saleEnd = futureDate.getTime();
       datas.saleStart = startDate.getTime();
-      const launchpad = await _testInitLaunchpad(
+      _tDatas = [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE];
+
+      launchpad = await _testInitLaunchpad(
         accessControl.target,
-        this.owner,
+        owner,
         token,
         amount,
-        datas
+        datas,
+        _tDatas
       );
+      _lDatas = await launchpad.getDatas();
+    });
 
-      const tier = await launchpad.getTierDatas(0);
-      const tokenPrice = tier.tokenPrice;
-      const value = ethers.parseEther("0.1");
+    it("Should  have good owner  ", async () => {
+      expect(await launchpad.owner()).to.be.equal(owner.address);
+    });
 
-      // console.log(tokenPrice);
-      // console.log(value);
-      // console.log(value / tokenPrice);
+    it("Should  have true date datas  ", async () => {
+      expect(_lDatas.saleStart).to.be.equal(datas.saleStart);
+      expect(_lDatas.saleEnd).to.be.equal(datas.saleEnd);
+    });
 
-      // await token.approve(lInvestors.target, 100000000);
+    it("Should  have true pubURI", async () => {
+      expect(_lDatas.pubURI).to.be.equal(datas.pubURI);
+    });
 
-      await token.approve(launchpad.target, 100000000);
-      // console.log(await token.allowance(this.owner.address, launchpad.target));
-      await launchpad.lockTokens(100000000);
-      const investorData = await lInvestors.getInvestorData(
-        0,
-        this.owner.address
-      );
-      // console.log(investorData.investedAmount);
-      // console.log(await lDatas.cLI());
-      console.log("id", await launchpad.id());
-      // console.log(await lHub.getLaunchpad(await launchpad.id()));
-      await launchpad.buyTokens({ value: ethers.parseEther("1") });
-      await launchpad.buyTokens({ value: ethers.parseEther("1") });
-      console.log(
-        await lInvestors.getInvestorData(
+    it("Should  have true capitalization", async () => {
+      let _maxCap = 0;
+      let _minCap = 0;
+      for (let index = 0; index < _tDatas.length; index++) {
+        const element = _tDatas[index];
+        _maxCap += element.maxTierCap;
+        _minCap += element.minTierCap;
+      }
+      expect(_lDatas.maxCap).to.be.equal(_maxCap);
+      expect(_lDatas.minCap).to.be.equal(_minCap);
+    });
+
+    it("Should  have true invest datas", async () => {
+      expect(_lDatas.minInvest).to.be.equal(datas.minInvest);
+      expect(_lDatas.maxInvest).to.be.equal(datas.maxInvest);
+    });
+
+    it("Should  have true lockedTime", async () => {
+      expect(_lDatas.lockedTime).to.be.equal(datas.lockedTime);
+    });
+
+    it("Should  have 0 total user", async () => {
+      expect(_lDatas.totalUser).to.be.equal(0);
+    });
+
+    it("Should  have true number of tier", async () => {
+      expect(_lDatas.numberOfTier).to.be.equal(_tDatas.length);
+    });
+
+    it("Should  have true token address", async () => {
+      expect(_lDatas.tokenAddress).to.be.equal(token.target);
+    });
+    it("Should  can lock token", async () => {
+      const tokens = 100000000;
+      expect(await token.balanceOf(this.owner.address)).to.be.equal(0);
+      await token.connect(owner).approve(launchpad.target, tokens);
+      expect(
+        await token.connect(owner).allowance(owner.address, launchpad.target)
+      ).to.be.equal(tokens);
+      await launchpad.connect(owner).lockTokens(tokens);
+      const royalties = tokens / 100;
+      const afterRoyalties = tokens - royalties;
+      expect(
+        await token.allowance(owner.address, launchpad.target)
+      ).to.be.equal(afterRoyalties);
+      expect(await token.balanceOf(LC.owner())).to.be.equal(royalties);
+    });
+
+    describe("Launchpad : Buy test", () => {
+      const txValue = ethers.parseEther("1");
+      beforeEach(async () => {
+        const tokens = 100000000;
+        await token.connect(owner).approve(launchpad.target, tokens);
+        await launchpad.connect(owner).lockTokens(tokens);
+      });
+      it("Should  can buy token", async () => {
+        await launchpad.connect(this.addr2).buyTokens({ value: txValue });
+        let investorData = await cLI.getInvestorData(
           await launchpad.id(),
-          this.owner.address
-        )
-      );
-      const _tierdata = await launchpad.getTierDatas(0);
+          this.addr2
+        );
+        const tierData = await launchpad.getTierDatas(
+          await launchpad.getCurrentTierID()
+        );
 
-      console.log(_tierdata);
-      console.log(await token.balanceOf(launchpad.target));
+        expect(investorData.tier.length).to.be.equal(1);
+        expect(investorData.tier[0]).to.be.equal(
+          await launchpad.getCurrentTierID()
+        );
+        let expectedTokens = txValue / tierData.tokenPrice;
+        expect(investorData.investedAmount).to.be.equal(txValue);
+        expect(investorData.lockedTokens).to.be.equal(expectedTokens);
+        await launchpad.connect(this.addr2).buyTokens({ value: txValue });
+        investorData = await cLI.getInvestorData(
+          await launchpad.id(),
+          this.addr2
+        );
+        expectedTokens = investorData.investedAmount / tierData.tokenPrice;
+        expect(investorData.tier.length).to.be.equal(1);
+        expect(investorData.investedAmount).to.be.equal(ethers.parseEther("2"));
+        expect(investorData.lockedTokens).to.be.equal(expectedTokens);
+      });
+      it("Should  have true datas after buying", async () => {
+        await launchpad.connect(this.addr2).buyTokens({ value: txValue });
+
+        let datas = await launchpad.getDatas();
+        let tierData = await launchpad.getTierDatas(
+          await launchpad.getCurrentTierID()
+        );
+
+        expect(datas.totalUser).to.be.equal(1);
+        expect(tierData.users).to.be.equal(1);
+        expect(tierData.amountRaised).to.be.equal(txValue);
+
+        await launchpad.connect(this.addr2).buyTokens({ value: txValue });
+        tierData = await launchpad.getTierDatas(
+          await launchpad.getCurrentTierID()
+        );
+        expect(datas.totalUser).to.be.equal(1);
+        expect(tierData.users).to.be.equal(1);
+        expect(tierData.amountRaised).to.be.equal(ethers.parseEther("2"));
+      });
     });
   });
 });
