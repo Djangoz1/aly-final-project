@@ -26,7 +26,7 @@ const {
 
 const CONTRACT_NAME = "Launchpad";
 
-describe.only(`Contract ${CONTRACT_NAME} `, () => {
+describe(`Contract ${CONTRACT_NAME} `, () => {
   let accessControl;
   let lHub;
   let cLI;
@@ -176,6 +176,9 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           await launchpad.id(),
           this.addr2
         );
+        expect(await token.balanceOf(launchpad.target)).to.be.equal(
+          investorData.lockedTokens
+        );
         const tierData = await launchpad.getTierDatas(
           await launchpad.getCurrentTierID()
         );
@@ -191,6 +194,9 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         investorData = await cLI.getInvestorData(
           await launchpad.id(),
           this.addr2
+        );
+        expect(await token.balanceOf(launchpad.target)).to.be.equal(
+          investorData.lockedTokens
         );
         expectedTokens = investorData.investedAmount / tierData.tokenPrice;
         expect(investorData.tier.length).to.be.equal(1);

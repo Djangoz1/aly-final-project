@@ -9,7 +9,8 @@ const {
   _testInitPubHub,
   _testInitWorkerProposalHub,
   _testInitAccessControl,
-  _testInitFeaturesHub
+  _testInitFeaturesHub, 
+  _testInitLaunchpadContracts
 } = require("../helpers/test_init");
 const CONTRACT_NAME = "FactoryCV";
 
@@ -32,7 +33,13 @@ async function main() {
   
   const pubsHub = await _testInitPubHub(accessControl.target)
   console.log(`pubsHub deployed to ${pubsHub.target}`);
-
+  
+  const launchpadContracts = await _testInitLaunchpadContracts(accessControl.target);
+  const {cohort, datas, investors, hub} = launchpadContracts
+  console.log(`launchpadCohort deployed to ${cohort.target}`);
+  console.log(`collectLaunchpadDatas deployed to ${datas.target}`);
+  console.log(`collectLaunchpadInvestors deployed to ${investors.target}`);
+  console.log(`launchpadHub deployed to ${hub.target}`);
   const jsonContent = {
     "accessControl": accessControl.target,
     "factoryCV": factoryCV.target,
@@ -40,6 +47,10 @@ async function main() {
     "pubsHub": pubsHub.target,
     "featuresHub": featuresHub.target,
     "workerProposalHub": featuresHub.target,
+    "collectLaunchpadInvestors" : investors.target,
+    "collectLaunchpadDatas" : datas.target,
+    "launchpadHub" : hub.target,
+    "launchpadCohort" : cohort.target,
   };
   const jsonString = JSON.stringify(jsonContent, null, 2);
   await writeFileAsync("addresses.json", jsonString);

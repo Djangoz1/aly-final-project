@@ -125,6 +125,7 @@ const _testInitMission = async (_accessControl, account, _amount, uriData) => {
     await accessControl.iMH()
   );
 
+  const amount = await accessControl.missionPrice()
   const _cv = await accessControl.getCVByAddress(account.address);
 
   const id = parseInt(await missionsHub.getTokensLength()) + 1;
@@ -133,11 +134,12 @@ const _testInitMission = async (_accessControl, account, _amount, uriData) => {
   const json = await createURIMission(uriData);
   const tokenURI = json.IpfsHash;
 
+
   const beforeLength = parseInt(await missionsHub.balanceOf(_cv));
 
   const tx = await accessControl
     .connect(account)
-    .buyMission(tokenURI, { value: `${_amount}` });
+    .buyMission(tokenURI, { value: `${amount}` });
   tx.wait();
   expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
 
@@ -287,30 +289,38 @@ const _testInitLaunchpadContracts = async (accessControl, address) => {
     accessControl,
   ]);
   await cohort.waitForDeployment();
-  expect(await cohort.owner()).to.be.equal(address);
   expect(await cohort.getAccessControl()).to.be.equal(accessControl);
-
+  
   const hub = await ethers.deployContract("LaunchpadHub", [cohort.target]);
   await hub.waitForDeployment();
-  expect(await hub.owner()).to.be.equal(address);
   expect(await cohort.getAccessControl()).to.be.equal(accessControl);
-
+  
   const datas = await ethers.deployContract("CollectLaunchpadDatas", [
     cohort.target,
   ]);
   await datas.waitForDeployment();
-  expect(await datas.owner()).to.be.equal(address);
-
+  
   const investors = await ethers.deployContract("CollectLaunchpadInvestor", [
     cohort.target,
   ]);
   await investors.waitForDeployment();
-  expect(await investors.owner()).to.be.equal(address);
-
+  
   await expect(
     ethers.deployContract("CollectLaunchpadInvestor", [cohort.target])
-  ).to.be.revertedWith("Deployment already done");
-  return { investors, datas, cohort, hub };
+    ).to.be.revertedWith("Deployment already done");
+    
+    expect(await datas.owner()).to.be.equal(await investors.owner());
+    expect(await investors.owner()).to.be.equal(await hub.owner());
+    expect(await hub.owner()).to.be.equal(await cohort.owner());
+    expect(await cohort.owner()).to.be.equal(await datas.owner());
+    if (address) {
+      
+      expect(await datas.owner()).to.be.equal(address);
+      expect(await investors.owner()).to.be.equal(address);
+      expect(await hub.owner()).to.be.equal(address);
+      expect(await cohort.owner()).to.be.equal(address);
+    }
+    return { investors, datas, cohort, hub };
 };
 
 const _testInitLaunchpad = async (
