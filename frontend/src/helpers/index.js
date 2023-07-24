@@ -17,6 +17,43 @@ export const parseTimestamp = (_timestamp) => {
   return formattedDate;
 };
 
+export const parseTimestamp1 = (_timestamp) => {
+  let timestamp;
+
+  timestamp = parseInt(_timestamp);
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  // const hours = date.getHours();
+  // const minutes = date.getMinutes();
+  // const seconds = date.getSeconds();
+
+  const formattedDate = `${day}/${month}/${year}`;
+
+  return formattedDate;
+};
+
+export const calcTimeRemaining = (timestamp) => {
+  const now = new Date().getTime();
+
+  const difference = timestamp - now;
+
+  if (difference > 0) {
+    const oneMinute = 60 * 1000;
+    const oneHour = oneMinute * 60;
+    const oneDay = oneHour * 24;
+
+    const days = Math.floor(difference / oneDay);
+    const hours = Math.floor((difference % oneDay) / oneHour);
+    const minutes = Math.floor((difference % oneHour) / oneMinute);
+
+    return { days, hours, minutes };
+  } else {
+    return { days: 0, hours: 0, minutes: 0 };
+  }
+};
+
 export const calcTimestamp = (_timestamp, _dayValue) => {
   const oppenedAt = parseInt(_timestamp) * 1000;
   const duration = _dayValue * 24 * 60 * 60 * 1000;

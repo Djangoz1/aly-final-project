@@ -80,6 +80,7 @@ export const createPubOnPinata = async (datas) => {
       description: datas.description,
       attributes: attributes,
     };
+    console.log("jsoonb", jsonData);
 
     const formData = new FormData();
     formData.append("pinataMetadata", JSON.stringify(pinataMetadata));

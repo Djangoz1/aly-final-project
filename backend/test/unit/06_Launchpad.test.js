@@ -72,6 +72,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     let _tDatas;
 
     beforeEach(async () => {
+      //  Transfer token to addr2 for testing allowance
       owner = await this.addr1;
       const supply = 2000000000;
       token = await _testInitToken(this.owner, "Django", "DJN", supply);

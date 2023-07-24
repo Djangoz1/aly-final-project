@@ -6,6 +6,8 @@ import {
   ABI_MISSIONS_HUB,
   ABI_FEATURES_HUB,
   ABI_PUBS_HUB,
+  ABI_LAUNCHPAD_HUB,
+  ABI_LAUNCHPAD,
 } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
@@ -232,6 +234,38 @@ export const _getterCV = async (addr, funcName, args) => {
       address: addr,
       args: args,
       abi: ABI_CV,
+      functionName: funcName,
+    });
+    return res;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+// *::::::::::::::: -------------------  :::::::::::::::* //
+// *::::::::::::::: LAUNCHPAD CONTRACTS  :::::::::::::::* //
+// *::::::::::::::: -------------------  :::::::::::::::* //
+
+export const _getterLaunchpadHub = async (funcName, args) => {
+  try {
+    const res = await readContract({
+      address: ADDRESSES["launchpadHub"],
+      args: args,
+      abi: ABI_LAUNCHPAD_HUB,
+      functionName: funcName,
+    });
+    return res;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+export const _getterLaunchpad = async (addr, funcName, args) => {
+  try {
+    const res = await readContract({
+      address: addr,
+      args: args,
+      abi: ABI_LAUNCHPAD,
       functionName: funcName,
     });
     return res;

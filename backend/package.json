@@ -1,7 +1,8 @@
 {
   "scripts": {
     "deploy": "hardhat run scripts/01_deploy.js --network localhost",
-    "fuzzing": "hardhat run scripts/02_fuzzing.js --network localhost"
+    "fuzzing": "hardhat run scripts/02_fuzzing.js --network localhost",
+    "token": "hardhat run scripts/03_token.js --network localhost"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

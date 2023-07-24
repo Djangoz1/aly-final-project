@@ -1,12 +1,26 @@
 import React, { useState } from "react";
 
-export const InputNumber = ({ setter, value }) => {
+export const InputNumber = ({ setter, value, target, title, style }) => {
+  const handleChange = (e) => {
+    if (e.target.value < 0) {
+      return;
+    }
+    if (!target) {
+      setter(e.target.value);
+    } else {
+      setter(target, e.target.value);
+    }
+  };
   return (
     <>
       <input
-        className="input input-bordered flex items-center join-item"
-        onChange={(e) => setter(e.target.value)}
+        className={`input input-bordered input-primary flex items-center bg-black/10 input-${
+          style || "sm"
+        }`}
+        onChange={handleChange}
         type="number"
+        value={value > 0 ? value : 0}
+        placeholder={title}
       />
     </>
   );
@@ -22,8 +36,8 @@ export const InputText = ({ value, setter, title, target, style }) => {
   };
   return (
     <input
-      className={`input w-full input-bordered join-item input-${
-        style?.input || "sm input-primary bg-black/10"
+      className={`input input-primary bg-black/10 w-full input-bordered join-item input-${
+        style || "sm"
       }`}
       placeholder={title}
       value={value}
@@ -41,16 +55,14 @@ export const InputTextArea = ({ value, setter, title, style, target }) => {
     }
   };
   return (
-
-      <textarea
-        placeholder={title}
-        value={value}
-        className={`textarea w-full h-full textarea-${
-          style || "sm textarea-primary bg-black/10"
-        }`}
-        onChange={(e) => handleChange(e)}
-      ></textarea>
-
+    <textarea
+      placeholder={title}
+      value={value}
+      className={`textarea w-full h-full textarea-${
+        style || "sm textarea-primary bg-black/10"
+      }`}
+      onChange={(e) => handleChange(e)}
+    ></textarea>
   );
 };
 

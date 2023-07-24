@@ -47,3 +47,23 @@ export const heroEntreprise = {
 };
 
 export const stateCV = [heroWorker, heroEntreprise];
+
+export const linkCommunityPub = {
+  tab: "Publications",
+  title: "Lorem",
+  subtitle: "Lorem",
+  description:
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit, nesciunt id laborum eos exercitationem soluta possimus fuga sequi quas iure odio neque eligendi dolor minus!",
+  button: "Lorem",
+};
+
+export const linkCommunityLaunchpad = {
+  tab: "Launchpad",
+  title: "Lorem",
+  subtitle: "Lorem",
+  description:
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit, nesciunt id laborum eos exercitationem soluta possimus fuga sequi quas iure odio neque eligendi dolor minus!",
+  button: "Lorem",
+};
+
+export const sectionCommunity = [linkCommunityPub, linkCommunityLaunchpad];

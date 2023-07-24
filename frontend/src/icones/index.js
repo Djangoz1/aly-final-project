@@ -11,6 +11,7 @@ export const icfyHEART = "line-md:heart-filled";
 export const icfyINFO = "mdi:information-outline";
 export const icfyCV = "pepicons-pop:cv";
 export const icfyETHER = "mdi:ethereum";
+export const icfyETH = "iconoir:ethereum-rotate-out";
 export const icfyCOIN = "ph:coins-light";
 export const icfyCODE = "ant-design:code-outlined";
 
