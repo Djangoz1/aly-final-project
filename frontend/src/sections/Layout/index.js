@@ -39,8 +39,9 @@ export const Layout = ({ children }) => {
       }`}
     >
       <Header setter={toggleSidebar} isOpen={sidebarOpen} />
-
-      {children}
+      <div className="  flex flex-col  box-border  justify-center">
+        {children}
+      </div>
       {/* <div className="h-full   z-100 flex-auto relative px-5 py-2 bg-gray-100 my-5 rounded-2xl shadow-lg border border-black/5 w-[90%] mx-auto "> */}
       {/* </div> */}
 

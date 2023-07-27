@@ -22,11 +22,11 @@ export const Workflow = ({ steps }) => {
 
   return (
     <div className="flex relative  w-full flex-col ">
-      <h4 className="text-black text-2xl font-black">Workflow</h4>
-      <ul className="steps  w-full  steps-horizontal">
+      <h4 className="text-white text-2xl ml-[5vw] font-black">Workflow</h4>
+      <ul className="steps   w-full  steps-horizontal">
         {steps.map((step, index) => (
           <li
-            className={`step text-black  ${
+            className={`step  text-white  ${
               workerStatus?.[index] ? "step-primary" : null
             }`}
             key={step}

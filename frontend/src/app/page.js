@@ -12,10 +12,10 @@ import { Hero } from "sections/Hero";
 import { Missions } from "sections/Missions";
 import { Layout } from "sections/Layout";
 import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
-import {ADDRESSES} from "constants/web3"
+import { ADDRESSES } from "constants/web3";
+import { HeroLaunchpad } from "sections/Hero/HeroLaunchpad";
 
 export default function Home() {
-
   const { address, isConnected } = useAccount();
   const { cv } = useAuthState();
   const dispatch = useAuthDispatch();
@@ -33,13 +33,13 @@ export default function Home() {
 
   return (
     <>
-
-     <Layout>
-       <>
-         <Hero />
-         <Missions />
-       </>
-     </Layout>
+      <Layout>
+        <>
+          <HeroLaunchpad />
+          <Hero />
+          <Missions />
+        </>
+      </Layout>
     </>
   );
 }
