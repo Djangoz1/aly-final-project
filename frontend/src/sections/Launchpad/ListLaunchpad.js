@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import { LaunchpadCard } from "components/Launchpad/LaunchpadCard";
 import React, { useEffect, useState } from "react";
 import { _getterLaunchpadHub } from "utils/ui-tools/web3-tools";
+import { Icon } from "@iconify/react";
+import { icfySEARCH } from "icones";
 
 export const ListLaunchpad = () => {
   const [list, setList] = useState([]);
@@ -21,10 +23,11 @@ export const ListLaunchpad = () => {
   }, []);
   return (
     <div>
-      ListLaunchpad
-      <div className="flex justify-evenly">
+      <div className="flex flex-wrap justify-evenly">
         {list.map((el) => (
-          <LaunchpadCard address={el} key={uuidv4()} />
+          <div className="mb-3 mx-1" key={uuidv4()}>
+            <LaunchpadCard address={el} />
+          </div>
         ))}
       </div>
     </div>

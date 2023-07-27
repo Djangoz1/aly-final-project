@@ -47,7 +47,7 @@ export const LaunchpadAllowance = ({ datas, setter }) => {
         </div>
         <div className="flex flex-col">
           <label className="text-primary">Locked time</label>
-          {console.log("fffdsfzfszfezfzefezfezf", datas.lockedTime)}
+
           <InputNumber
             setter={setter}
             target={"lockedTime"}
@@ -59,6 +59,16 @@ export const LaunchpadAllowance = ({ datas, setter }) => {
       </div>
       <div className="flex mb-5">
         <div className="flex flex-col">
+          <label className="text-primary">Token allowance</label>
+          <InputNumber
+            setter={setter}
+            target={"allowance"}
+            value={datas.allowance}
+            title={"Token allowance"}
+            style={"xs"}
+          />
+        </div>
+        <div className="flex mx-5 flex-col">
           <label className="text-primary">Minimum Invest</label>
           <InputNumber
             setter={setter}
@@ -68,7 +78,7 @@ export const LaunchpadAllowance = ({ datas, setter }) => {
             style={"xs"}
           />
         </div>
-        <div className="flex ml-5 flex-col">
+        <div className="flex flex-col">
           <label className="text-primary">Maximum Invest</label>
           <InputNumber
             setter={setter}

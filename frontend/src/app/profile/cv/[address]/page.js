@@ -19,7 +19,7 @@ import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { StatFeature } from "components/stats/StatFeature";
 import { Layout } from "sections/Layout";
 import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
-import { TabsStateCV } from "components/tabs/TabsStateCV";
+
 import { InfoProfileCV } from "components/infos/InfoProfile";
 
 export default ({ params }) => {
@@ -43,7 +43,6 @@ export default ({ params }) => {
   return (
     <Layout>
       <>
-        <TabsStateCV setIsWorker={setIsWorker} isWorker={isWorker} />
         <InfoProfileCV address={cvRefAddress} infos={ownerObj} />
 
         <div className="flex flex-wrap mt-5">

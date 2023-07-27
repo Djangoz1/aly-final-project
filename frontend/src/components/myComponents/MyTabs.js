@@ -6,8 +6,8 @@ export const MyTabs = ({ arr, setter, value }) => {
       {arr.map((status, index) => (
         <button
           key={index}
-          className={`tab tab-bordered text-black ${
-            status.tab === value.tab ? "border-primary  " : "  "
+          className={`tab tab-bordered  ${
+            status.tab === value.tab ? "border-primary text-white " : "  "
           }`}
           onClick={() => setter(status)}
         >

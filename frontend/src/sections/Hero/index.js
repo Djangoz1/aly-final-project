@@ -6,45 +6,36 @@ import { Workflow } from "components/Workflow";
 import { HeroStats } from "components/stats/HeroStats";
 
 import Link from "next/link";
-import { TabsStateCV } from "components/tabs/TabsStateCV";
+
+import { MyTabs } from "components/myComponents/MyTabs";
+import { Rocket } from "spline/Rocket";
 
 export const Hero = () => {
-  const [isWorker, setIsWorker] = useState(false);
   const heroStatus = [heroEntreprise, heroWorker];
-
+  const [isTabs, setIsTabs] = useState(heroStatus[0]);
+  console.log(isTabs);
   return (
     <div className="flex flex-col   justify-center mx-auto">
-      <TabsStateCV setIsWorker={setIsWorker} isWorker={isWorker} />
+      <MyTabs arr={heroStatus} setter={setIsTabs} value={isTabs} />
+
       <div className="flex justify-between mb-5">
         <div className="w-[35vw] ">
           <div className="flex flex-col mb-5">
-            <h4 className="text-black text-2xl font-black">
-              {isWorker ? heroWorker.title : heroEntreprise.title}
-            </h4>
-            <h4 className="text-black text-2xl font-black">
-              {isWorker ? heroWorker.subtitle : heroEntreprise.subtitle}
+            <h4 className="text-white text-2xl font-black">{isTabs?.title}</h4>
+            <h4 className="text-white/80 text-2xl font-black">
+              {isTabs?.subtitle}
             </h4>
           </div>
-          <p>
-            {isWorker ? heroWorker.description : heroEntreprise.description}
-          </p>
+          <p>{isTabs.description}</p>
           <div className="join mt-4">
             <div className="btn btn-primary">
               <Link href={"profile/mission"}>Create a Mission</Link>
             </div>
           </div>
         </div>
-        <HeroStats
-          statistics={
-            isWorker ? heroWorker.statistic : heroEntreprise.statistic
-          }
-        />
+        <HeroStats statistics={isTabs?.statistic} />
       </div>
-      <Workflow
-        isWorker={isWorker}
-        workerSteps={heroWorker?.steps}
-        entrepriseSteps={heroEntreprise?.steps}
-      />
+      <Workflow steps={isTabs?.steps} />
     </div>
   );
 };

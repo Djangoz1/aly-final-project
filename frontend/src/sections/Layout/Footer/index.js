@@ -6,7 +6,7 @@ import React from "react";
 export const Footer = () => {
   const icons = [icfyFB, icfyINSTA, icfyLINKEDIN, icfyTWITTER];
   return (
-    <div className="w-full bg-white">
+    <div className="w-full mt-auto ">
       <div className="border border-x-0 border-top-black/50 box-border pt-4 w-[90%] mx-auto h-[10vh] flex items-start  mt-auto">
         <div className="flex">
           {icons.map((icon) => (

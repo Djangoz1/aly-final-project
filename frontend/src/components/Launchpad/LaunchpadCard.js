@@ -6,29 +6,20 @@ import { calcTimeRemaining } from "helpers";
 import React, { useEffect, useState } from "react";
 import { calcTierAverage } from "utils/ui-tools/launchpad-tools";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
-import { _getterFactoryCV, _getterLaunchpad } from "utils/ui-tools/web3-tools";
+import {
+  _getterAccessControl,
+  _getterFactoryCV,
+  _getterLaunchpad,
+} from "utils/ui-tools/web3-tools";
+import { getLaunchpadDatas } from "utils/ui-tools/launchpad-tools";
+import Link from "next/link";
 
 export const LaunchpadCard = ({ address }) => {
   const [isDatas, setIsDatas] = useState(null);
   const getDatas = async () => {
-    const datas = await _getterLaunchpad(address, "getDatas");
-    let amountRaised = 0;
-
-    for (let index = 0; index < datas?.numberOfTier; index++) {
-      const element = await _getterLaunchpad(address, "getTierDatas", [index]);
-      amountRaised += parseInt(element?.amountRaised);
-    }
-    const currentTier = await _getterLaunchpad(address, "getCurrentTierID");
-    const tier = await _getterLaunchpad(address, "getTierDatas", [currentTier]);
-    datas.tokenPrice = tier.tokenPrice;
-    let owner = await _getterLaunchpad(address, "owner");
-    datas.owner = await _getterFactoryCV("getCVByAddress", [owner]);
-    datas.metadata = await fetchJSONByCID(datas.pubURI);
-    datas.currentTier = parseInt(currentTier) + 1;
-    datas.amountRaised = amountRaised;
+    const datas = await getLaunchpadDatas(address);
     setIsDatas(datas);
   };
-  console.log(isDatas);
   useEffect(() => {
     if (address && !isDatas) getDatas();
   }, [address]);
@@ -45,7 +36,7 @@ export const LaunchpadCard = ({ address }) => {
     }
   };
   return (
-    <div className="bg-white shadow relative min-h-[20vh] flex flex-col border-box rounded w-1/3 p-3">
+    <div className="bg-white shadow z-0 relative min-h-[20vh] flex flex-col border-box rounded min-w-[450px] w-full p-3">
       <div className="badge badge-warning badge-outline badge-sm absolute right-2 ">
         {isStart()}
       </div>
@@ -60,11 +51,13 @@ export const LaunchpadCard = ({ address }) => {
           <CVName address={isDatas?.owner} />
         </span>
       </div>
+
       <MyProgressbar
         title={"Sale progress"}
         value={isDatas?.amountRaised}
         endedValue={parseInt(isDatas?.maxCap)}
       />
+
       <div className="flex justify-evenly my-5">
         <p className="border border-primary text-xs rounded flex items-center px-2 py-1">
           Softcap :{" "}
@@ -79,6 +72,18 @@ export const LaunchpadCard = ({ address }) => {
             {parseInt(isDatas?.maxCap)} ETH
           </span>
         </p>
+      </div>
+      <div className=" text-xs  flex justify-evenly mb-2 items-center  flex">
+        <div className="flex flex-col items-center">
+          <span className="badge badge-primary">{isDatas?.token?.name}</span>
+          <p>Token Name</p>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="badge badge-secondary">
+            {isDatas?.token?.symbol}
+          </span>
+          <p>Token Symbol</p>
+        </div>
       </div>
       <div className="flex flex-col">
         <div className="flex items-center justify-between">
@@ -107,6 +112,18 @@ export const LaunchpadCard = ({ address }) => {
             {parseInt(isDatas?.tokenPrice)} ETH
           </span>
         </div>
+        <div className="flex items-center justify-between">
+          <label className="text-xs">Total supply </label>
+          <span className="text-black text-sm">
+            {parseInt(isDatas?.token?.totalSupply)}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <label className="text-xs">Launchpad supply</label>
+          <span className="text-black text-sm">
+            {parseInt(isDatas?.token?.allowance) || 0}
+          </span>
+        </div>
         <div className="flex justify-between my-2">
           <div className="flex flex-col items-center justify-center">
             <label className="text-xs">Presale start</label>
@@ -124,10 +141,18 @@ export const LaunchpadCard = ({ address }) => {
           </div>
         </div>
       </div>
-      <button className="btn btn-primary btn-xs w-1/2 my-3 mx-auto">
+      <Link
+        href={`/profile/launchpad/${address}`}
+        className="btn btn-primary btn-xs w-1/2 my-3 mx-auto"
+      >
         View details
-      </button>
-      <p className="text-[8px] hover:text-info hover:underline">{address}</p>
+      </Link>
+      <Link
+        href={`/profile/launchpad/${address}`}
+        className="text-[8px] hover:text-info hover:underline"
+      >
+        {address}
+      </Link>
     </div>
   );
 };

@@ -17,8 +17,10 @@ export const LaunchpadMetadata = ({ datas, setter }) => {
         </div>
         <div className="flex flex-col">
           <label className="text-primary">Image</label>
+
           <input
             type="file"
+            className="file-input file-input-bordered file-input-primary file-input-xs w-full max-w-xs"
             onChange={(e) => setter("image", e.target.files[0])}
           />
         </div>

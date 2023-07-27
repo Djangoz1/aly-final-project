@@ -11,7 +11,7 @@ export const MyProgressbar = ({ value, endedValue, title }) => {
       <p className="text-black text-xs">
         {title}({calcPercent()}%){" "}
       </p>
-      <div className="border border-primary shadow  h-[5vh] w-full p-1 rounded">
+      <div className="border border-primary shadow  h-[3vh] mt-1 w-full p-1 rounded">
         <div
           className="bg-primary rounded-l-full h-full"
           style={{ width: `${calcPercent()}%` }}

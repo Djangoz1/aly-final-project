@@ -21,8 +21,6 @@ export const Publications = () => {
   const { cv } = useAuthState();
   const [pubs, setPubs] = useState([]);
 
-  const [loading, setLoading] = useState(false);
-  const [forceModal, setForceModal] = useState(false);
   const getAllPubs = async () => {
     const pubs = await _getAllPubsState();
     console.log(pubs);
@@ -34,83 +32,9 @@ export const Publications = () => {
       getAllPubs();
     }
   }, [pubs]);
-  const [datas, setDatas] = useState({
-    title: "",
-    description: "",
-    image: "",
-  });
 
-  const handleChange = (target, value) => {
-    setDatas({ ...datas, [target]: value });
-  };
-
-  const handleChangeImage = (e) => {
-    setDatas({ ...datas, image: e.target.files[0] });
-  };
-
-  const handleSubmit = async (e) => {
-    setLoading(true);
-    const tokenURI = await createPubOnPinata(datas);
-    await _setterAccessControl("createPub", [tokenURI]);
-    setLoading(false);
-    getAllPubs();
-    setForceModal(true);
-  };
   return (
     <>
-      <div className="w-[200px] ml-auto  my-5">
-        <MyModal
-          force={forceModal}
-          btn={"+"}
-          modal={
-            <div className="flex flex-col  h-full">
-              <PubProfile address={cv} />
-              <div className="mt-5 mb-3">
-                <InputText
-                  value={datas.title}
-                  setter={handleChange}
-                  target={"title"}
-                  title={"Title ..."}
-                />
-              </div>
-
-              <InputTextArea
-                value={datas.description}
-                setter={handleChange}
-                target={"description"}
-                title={"What's new ?"}
-              />
-              <div className="flex items-center mt-5">
-                <input type="file" onChange={handleChangeImage} />
-                {/* <Icon
-                      icon={icfyIMG}
-                      // onClick={handleChangeImage}
-                      className="text-[40px] cursor-pointer text-info mr-5"
-                    /> */}
-
-                <Icon
-                  icon={icfyMISSION}
-                  className="text-[40px] text-info mr-5 cursor-pointer"
-                />
-                <div
-                  className="btn btn-info px-5 btn-sm ml-auto"
-                  onClick={handleSubmit}
-                >
-                  {!loading ? (
-                    <Icon
-                      icon={icfySEND}
-                      className="text-[20px] text-white ml-auto cursor-pointer"
-                    />
-                  ) : (
-                    <span className="loading loading-dots loading-md text-white" />
-                  )}
-                </div>
-              </div>
-            </div>
-          }
-        />
-      </div>
-
       {pubs?.map((pub) => (
         <div
           key={uuidv4()}

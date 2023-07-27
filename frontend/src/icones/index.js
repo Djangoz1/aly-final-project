@@ -6,6 +6,7 @@ export const icfyTWITTER = "skill-icons:twitter";
 export const icfyLINKEDIN = "devicon:linkedin";
 export const icfyGITHUB = "line-md:github-loop";
 
+export const icfyRETURN = "ph:key-return-duotone";
 export const icfyIMG = "line-md:image-twotone";
 export const icfyHEART = "line-md:heart-filled";
 export const icfyINFO = "mdi:information-outline";
@@ -14,6 +15,9 @@ export const icfyETHER = "mdi:ethereum";
 export const icfyETH = "iconoir:ethereum-rotate-out";
 export const icfyCOIN = "ph:coins-light";
 export const icfyCODE = "ant-design:code-outlined";
+export const icfySTAR = "line-md:star-twotone";
+export const icfyTIME = "svg-spinners:clock";
+export const icfyURL = "line-md:external-link";
 
 export const icfyCODER = "iconoir:developer";
 export const icfyMISSION = "line-md:document-code";

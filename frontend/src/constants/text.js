@@ -52,6 +52,7 @@ export const linkCommunityPub = {
   tab: "Publications",
   title: "Lorem",
   subtitle: "Lorem",
+  link: "/community",
   description:
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit, nesciunt id laborum eos exercitationem soluta possimus fuga sequi quas iure odio neque eligendi dolor minus!",
   button: "Lorem",
@@ -60,6 +61,7 @@ export const linkCommunityPub = {
 export const linkCommunityLaunchpad = {
   tab: "Launchpad",
   title: "Lorem",
+  link: "/community/launchpad",
   subtitle: "Lorem",
   description:
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit, nesciunt id laborum eos exercitationem soluta possimus fuga sequi quas iure odio neque eligendi dolor minus!",

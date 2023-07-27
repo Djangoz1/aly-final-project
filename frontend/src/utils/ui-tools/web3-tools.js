@@ -8,6 +8,7 @@ import {
   ABI_PUBS_HUB,
   ABI_LAUNCHPAD_HUB,
   ABI_LAUNCHPAD,
+  ABI_ERC20,
 } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
@@ -102,7 +103,7 @@ export const _setterAccessControl = async (funcName, args, value) => {
     const { hash } = await writeContract(request);
     return hash;
   } catch (error) {
-    console.log("error", error);
+    return { error };
   }
 };
 
@@ -269,6 +270,40 @@ export const _getterLaunchpad = async (addr, funcName, args) => {
       functionName: funcName,
     });
     return res;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+// *::::::::::::::: -----  :::::::::::::::* //
+// *::::::::::::::: ERC20  :::::::::::::::* //
+// *::::::::::::::: -----  :::::::::::::::* //
+
+export const _getterERC20 = async (addr, funcName, args) => {
+  try {
+    const res = await readContract({
+      address: addr,
+      args: args,
+      abi: ABI_ERC20,
+      functionName: funcName,
+    });
+    return res;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+export const _setterERC20 = async (addr, funcName, args) => {
+  try {
+    const { request } = await prepareWriteContract({
+      address: addr,
+      functionName: funcName,
+      abi: ABI_ERC20,
+      args: args,
+    });
+    const { hash } = await writeContract(request);
+
+    return hash;
   } catch (error) {
     console.log("error", error);
   }
