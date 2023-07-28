@@ -8,7 +8,7 @@ export const MyProgressbar = ({ value, endedValue, title }) => {
   };
   return (
     <div className="flex flex-col items-center">
-      <p className="text-black text-xs">
+      <p className="text-white/60 text-xs">
         {title}({calcPercent()}%){" "}
       </p>
       <div className="border border-primary shadow  h-[3vh] mt-1 w-full p-1 rounded">

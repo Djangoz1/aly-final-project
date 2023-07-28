@@ -8,9 +8,11 @@ export const MissionAmount = ({ metadata }) => {
       <div className="stat-figure text-secondary">
         <Icon icon="mdi:ethereum" className=" w-12 h-12" />
       </div>
-      <div className="stat-title">Amount</div>
-      <div className="stat-value text-secondary">{metadata?.totalAmount}</div>
-      <div className="stat-desc text-secondary">ETH</div>
+      <div className="stat-title text-xs">Amount</div>
+      <div className="stat-value text-secondary text-lg my-auto">
+        {metadata?.totalAmount}
+      </div>
+      <div className="stat-desc mt-auto">ETH</div>
     </div>
   );
 };

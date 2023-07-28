@@ -37,7 +37,7 @@ export const InputText = ({ value, setter, title, target, style }) => {
   return (
     <input
       className={`input input-primary bg-black/10 w-full input-bordered join-item input-${
-        style || "sm"
+        style || "xs"
       }`}
       placeholder={title}
       value={value}

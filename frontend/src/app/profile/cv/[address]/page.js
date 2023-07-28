@@ -21,6 +21,7 @@ import { Layout } from "sections/Layout";
 import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
 
 import { InfoProfileCV } from "components/infos/InfoProfile";
+import { MySection } from "components/myComponents/MySection";
 
 export default ({ params }) => {
   const cvRefAddress = params.address;
@@ -39,20 +40,22 @@ export default ({ params }) => {
   const handleSubmit = async (_missionAddr, _idFeature) => {
     await _setterCV(cv, "beAssignedWorker", [_missionAddr, _idFeature]);
   };
-  const [isWorker, setIsWorker] = useState(false);
+
   return (
     <Layout>
-      <>
-        <InfoProfileCV address={cvRefAddress} infos={ownerObj} />
+      <MySection styles={"flex-col"}>
+        <div className="flex flex-col w-full">
+          <InfoProfileCV address={cvRefAddress} infos={ownerObj} />
 
-        <div className="flex flex-wrap mt-5">
-          <ListStatsFeature
-            _ownerObj={ownerObj}
-            cvAddress={cvRefAddress}
-            submit={handleSubmit}
-          />
+          <div className="flex flex-wrap mt-5">
+            <ListStatsFeature
+              _ownerObj={ownerObj}
+              cvAddress={cvRefAddress}
+              submit={handleSubmit}
+            />
+          </div>
         </div>
-      </>
+      </MySection>
     </Layout>
   );
 };

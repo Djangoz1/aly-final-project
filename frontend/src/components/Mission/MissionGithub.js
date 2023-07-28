@@ -15,17 +15,17 @@ export const MissionGithub = ({ metadata }) => {
   // const { isDone, isInviteOnly, assignedWorker } = feature;
   return (
     <div className="stat">
-      <div className="stat-title">Owner</div>
+      <div className="stat-title text-xs">Owner</div>
 
       <div className={`stat-figure`}>
         <Icon icon={icfyGITHUB} className="text-[42px] text-secondary" />
       </div>
 
-      <div className="stat-title text-[34px] text-secondary">
+      <div className="stat-value text-lg text-secondary my-auto">
         <CVName address={metadata?.owner} />
       </div>
 
-      <div className={`stat-desc truncate w-[180px] hover:text-info`}>
+      <div className={`stat-desc truncate mt-auto w-[180px] hover:text-info`}>
         <a href={metadata?.url}>
           {metadata?.url === "" ? "No link provided" : metadata?.url}
         </a>

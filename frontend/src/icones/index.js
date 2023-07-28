@@ -1,10 +1,16 @@
 import React from "react";
 
+export const icfyHANDSHAKE = "ic:round-handshake";
+
 export const icfyINSTA = "skill-icons:instagram";
 export const icfyFB = "devicon:facebook";
 export const icfyTWITTER = "skill-icons:twitter";
 export const icfyLINKEDIN = "devicon:linkedin";
 export const icfyGITHUB = "line-md:github-loop";
+
+export const icfyHOME = "line-md:home-twotone";
+export const icfyMAIL = "line-md:email-twotone";
+export const icfyROCKET = "bi:rocket-takeoff";
 
 export const icfyRETURN = "ph:key-return-duotone";
 export const icfyIMG = "line-md:image-twotone";
@@ -22,7 +28,7 @@ export const icfyURL = "line-md:external-link";
 export const icfyCODER = "iconoir:developer";
 export const icfyMISSION = "line-md:document-code";
 export const icfySETTINGS = "solar:settings-bold";
-export const icfyHAMBURGER = "mdi:hamburger-open";
+export const icfyHAMBURGER = "line-md:menu-fold-left";
 
 export const icfyGAMING = "pepicons-print:controller-circle-filled";
 export const icfyAI = "vscode-icons:file-type-ai2";

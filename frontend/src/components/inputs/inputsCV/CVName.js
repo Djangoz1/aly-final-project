@@ -1,4 +1,5 @@
 import { useAuthState } from "context/auth";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import { _getterCV } from "utils/ui-tools/web3-tools";
@@ -19,5 +20,9 @@ export const CVName = ({ styles, address }) => {
     })();
   }, [cv, address]);
 
-  return <span className={styles}>{name}</span>;
+  return (
+    <Link href={`/profile/cv/${address || cv}`} className={styles}>
+      {name}
+    </Link>
+  );
 };

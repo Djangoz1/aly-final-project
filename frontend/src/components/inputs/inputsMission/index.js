@@ -113,7 +113,7 @@ export const CreationMission = () => {
           <div className="flex flex-col">
             <input
               type="file"
-              className="border border-primary text-black flex items-center p-3 rounded"
+              className="file-input file-input-bordered file-input-xs file-input-primary w-full max-w-xs"
               onChange={handleFileInputChange}
             />
           </div>

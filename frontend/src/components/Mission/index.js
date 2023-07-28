@@ -24,8 +24,8 @@ export const MissionInfo = ({ missionId }) => {
   return (
     <div className="stats shadow w-full">
       <MissionTextInfo metadata={metadata} />
-      <MissionDataInfo metadata={metadata} />
       <MissionGithub metadata={metadata} />
+      <MissionDataInfo metadata={metadata} />
       <MissionAmount metadata={metadata} />
     </div>
   );

@@ -13,15 +13,17 @@ export const MyModal = ({ force, styles, btn, modal }) => {
   return (
     <>
       <button
-        className={`btn w-full ${
-          styles?.btn ? styles?.btn : "btn-primary cursor-pointer btn-xs"
+        className={`btn  ${
+          styles?.btn
+            ? styles?.btn
+            : " w-full btn-primary cursor-pointer btn-xs"
         }`}
         onClick={handleClick}
       >
         {btn}
       </button>
       {isOpen && (
-        <div className="fixed h-screeen w-screen  top-0 left-0">
+        <div className="fixed h-screeen w-screen  z-50 top-0 left-0">
           <div
             className=" bg-black/40 top-0 left-0 h-screen w-screen"
             onClick={handleClick}

@@ -2,7 +2,7 @@ import React from "react";
 
 export const MyTabs = ({ arr, setter, value }) => {
   return (
-    <div className="tabs mb-5 flex   w-full justify-start">
+    <div className="tabs  flex   w-full justify-start">
       {arr.map((status, index) => (
         <button
           key={index}

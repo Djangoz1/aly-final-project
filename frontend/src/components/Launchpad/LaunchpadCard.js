@@ -13,6 +13,7 @@ import {
 } from "utils/ui-tools/web3-tools";
 import { getLaunchpadDatas } from "utils/ui-tools/launchpad-tools";
 import Link from "next/link";
+import { MyCard } from "components/myComponents/MyCard";
 
 export const LaunchpadCard = ({ address }) => {
   const [isDatas, setIsDatas] = useState(null);
@@ -36,17 +37,21 @@ export const LaunchpadCard = ({ address }) => {
     }
   };
   return (
-    <div className="bg-white shadow z-0 relative min-h-[20vh] flex flex-col border-box rounded min-w-[450px] w-full p-3">
+    <MyCard styles={"min-h-[20vh] flex  flex-col"}>
+      {/* <div className="bg-white shadow z-0 relative min-h-[20vh] flex flex-col border-box rounded min-w-[450px] w-full p-3"> */}
       <div className="badge badge-warning badge-outline badge-sm absolute right-2 ">
         {isStart()}
       </div>
       <div className="flex flex-col items-center mb-5">
-        <div className="rounded-2xl w-[60px] shadow overflow-hidden border border-black/20">
+        <div className="rounded-full h-[60px] w-[60px] shadow overflow-hidden border border-black/20">
           <ImagePin CID={isDatas?.metadata?.image} />
         </div>
-        <h5 className="text-center text-black font-black">
+        <Link
+          href={`/profile/launchpad/${address}`}
+          className="text-center text-white font-black"
+        >
           {isDatas?.metadata?.title}
-        </h5>
+        </Link>
         <span>
           <CVName address={isDatas?.owner} />
         </span>
@@ -61,14 +66,14 @@ export const LaunchpadCard = ({ address }) => {
       <div className="flex justify-evenly my-5">
         <p className="border border-primary text-xs rounded flex items-center px-2 py-1">
           Softcap :{" "}
-          <span className="font-bold text-lg text-black ml-1">
+          <span className="font-bold  text-white ml-1">
             {parseInt(isDatas?.minCap)} ETH
           </span>
         </p>
 
         <p className="border border-primary text-xs rounded flex items-center px-2 py-1">
           Maxcap :{" "}
-          <span className="font-bold text-lg text-black ml-1">
+          <span className="font-bold  text-white ml-1">
             {parseInt(isDatas?.maxCap)} ETH
           </span>
         </p>
@@ -85,42 +90,42 @@ export const LaunchpadCard = ({ address }) => {
           <p>Token Symbol</p>
         </div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col my-5">
         <div className="flex items-center justify-between">
           <label className="text-xs">Number of Round</label>
-          <span className="text-black text-sm">{isDatas?.numberOfTier}</span>
+          <span className="text-white text-sm">{isDatas?.numberOfTier}</span>
         </div>
         <div className="flex items-center justify-between">
           <label className="text-xs">Current Round</label>
-          <span className="text-black text-sm">{isDatas?.currentTier}</span>
+          <span className="text-white text-sm">{isDatas?.currentTier}</span>
         </div>
         <div className="flex items-center justify-between">
           <label className="text-xs">Min - Max Contribution</label>
-          <span className="text-black text-sm">
+          <span className="text-white text-sm">
             {parseInt(isDatas?.minInvest)} ~ {parseInt(isDatas?.maxInvest)} ETH{" "}
           </span>
         </div>
         <div className="flex items-center justify-between">
           <label className="text-xs">Lockup Time</label>
-          <span className="text-black text-sm">
+          <span className="text-white text-sm">
             {parseInt(isDatas?.lockedTime)} Day(s)
           </span>
         </div>
         <div className="flex items-center justify-between">
           <label className="text-xs">Current token price</label>
-          <span className="text-black text-sm">
+          <span className="text-white text-sm">
             {parseInt(isDatas?.tokenPrice)} ETH
           </span>
         </div>
         <div className="flex items-center justify-between">
           <label className="text-xs">Total supply </label>
-          <span className="text-black text-sm">
+          <span className="text-white text-sm">
             {parseInt(isDatas?.token?.totalSupply)}
           </span>
         </div>
         <div className="flex items-center justify-between">
           <label className="text-xs">Launchpad supply</label>
-          <span className="text-black text-sm">
+          <span className="text-white text-sm">
             {parseInt(isDatas?.token?.allowance) || 0}
           </span>
         </div>
@@ -153,6 +158,7 @@ export const LaunchpadCard = ({ address }) => {
       >
         {address}
       </Link>
-    </div>
+      {/* </div> */}
+    </MyCard>
   );
 };

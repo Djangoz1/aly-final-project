@@ -18,28 +18,28 @@ export const InfoProfileCV = ({ infos }) => {
       <Icon icon={icfyCV} className="text-[60px] text-primary" />
       <div className="flex items-end  ">
         <div className="flex flex-col ">
-          <p className="text-black text-[23px] leading-none font-bold">
+          <p className="text-white text-[23px] leading-none font-bold">
             <CVName address={infos?.cvAddress} />
           </p>
-          <p className="text-black leading-none text-[7px] text-black/70">
+          <p className="text-white leading-none text-[7px] text-white/70">
             CV : {infos?.cvAddress}
           </p>
-          <p className="text-black leading-none text-[7px] text-black/70">
+          <p className="text-white leading-none text-[7px] text-white/70">
             Owner : {infos?.address}
           </p>
         </div>
 
         <div className="flex items-end mx-10">
-          <Icon icon={icfyCOIN} className="text-2xl text-black/70" />
-          <p className="text-black  leading-none ml-3 mr-10 font-bold">
+          <Icon icon={icfyCOIN} className="text-2xl text-white/70" />
+          <p className="text-white  leading-none ml-3 mr-10 font-bold">
             {infos?.amountDispersed}
           </p>
-          <Icon icon={icfyMISSION} className="text-2xl text-black/70" />
-          <p className="text-black  leading-none ml-3 mr-10 font-bold">
+          <Icon icon={icfyMISSION} className="text-2xl text-white/70" />
+          <p className="text-white  leading-none ml-3 mr-10 font-bold">
             {infos?.missions?.length}
           </p>
-          <Icon icon={icfyCODER} className="text-2xl text-black/70" />
-          <p className="text-black text leading-none font-bold ml-3">
+          <Icon icon={icfyCODER} className="text-2xl text-white/70" />
+          <p className="text-white text leading-none font-bold ml-3">
             {infos?.features?.length}
           </p>
         </div>

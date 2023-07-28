@@ -101,7 +101,7 @@ export const CreationLaunchpad = () => {
 
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full ">
         <div className="flex mb-5 items-center">
           <div className="flex flex-col w-1/2">
             <label className="text-primary">Token address</label>

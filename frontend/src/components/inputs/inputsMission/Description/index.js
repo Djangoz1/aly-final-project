@@ -9,12 +9,9 @@ import { useAuthState } from "context/auth";
 import { _setterMISSION } from "utils/ui-tools/web3-tools";
 import { AlertInfo } from "components/alert/AlertInfo";
 
-
 export const InputDescription = ({ getter, datas, setDatas }) => {
   const { missionId, missions } = useAuthState();
-  const [loading, setLoading] = useState(false)
-
-
+  const [loading, setLoading] = useState(false);
 
   // *:::::::::::: ---------------- ::::::::::::* //
   // *:::::::::::: STATE MANAGEMENT ::::::::::::* //
@@ -52,30 +49,24 @@ export const InputDescription = ({ getter, datas, setDatas }) => {
     _datas.metadata.url = url;
     setDatas(_datas);
   };
-  
+
   const handleFileInputChange = async (event) => {
     const file = event.target.files[0];
     const _datas = { ...datas };
     _datas.metadata.image = file;
     setDatas(_datas);
-
   };
-
 
   // *:::::::::::: ----------- ::::::::::::* //
   // *:::::::::::: TRANSACTION ::::::::::::* //
   // *:::::::::::: ----------- ::::::::::::* //
 
-
   const handleSubmit = async (_datas) => {
-    setLoading(true)
+    setLoading(true);
     await _createFeature(missionId, datas);
     getter();
-    setLoading(false)
+    setLoading(false);
   };
-  
-
-
 
   return (
     <>
@@ -99,23 +90,27 @@ export const InputDescription = ({ getter, datas, setDatas }) => {
             </span>
             <input
               type="file"
-              className="border border-primary text-black flex p-3 w-fit items-center  rounded"
+              className="file-input file-input-bordered file-input-primary file-input-xs w-full max-w-xs"
               onChange={handleFileInputChange}
             />
             <div className="flex ">
-
               <InputText
                 title={"Title"}
                 value={datas.metadata.title}
-                style={{ input: "sm w-full bg-neutral-200 border border-primary mr-3" }}
+                style={{
+                  input:
+                    "xs input-xs w-full bg-neutral-200 border border-primary mr-3",
+                }}
                 setter={handleChangeTitle}
-                />
+              />
               <InputText
                 title={"URL"}
                 value={datas.metadata.url}
-                style={{ input: "sm w-full bg-neutral-200 border border-primary" }}
+                style={{
+                  input: "sm w-full bg-neutral-200 border border-primary",
+                }}
                 setter={handleChangeURL}
-                />
+              />
             </div>
 
             <div className="mt-2 ">
@@ -131,15 +126,15 @@ export const InputDescription = ({ getter, datas, setDatas }) => {
         </button>
 
         {loading && (
-        <AlertInfo
-          message={
-            <>
-              <span className="loading loading-ring loading-lg mr-3 "></span>
-              Creation feature loading ...
-            </>
-          }
-        />
-      )}
+          <AlertInfo
+            message={
+              <>
+                <span className="loading loading-ring loading-lg mr-3 "></span>
+                Creation feature loading ...
+              </>
+            }
+          />
+        )}
       </div>
     </>
   );

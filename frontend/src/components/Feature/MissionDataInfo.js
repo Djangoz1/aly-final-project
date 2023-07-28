@@ -11,13 +11,13 @@ export const MissionDataInfo = ({ metadata }) => {
         <Icon icon={icfyINFO} className="text-[42px] text-secondary" />
       </div>
 
-      <div className=" stat-title  flex flex-col">Information</div>
-      <div className="stat-value flex flex-col ">
-        <span className="text-lg ">{metadata?.name}</span>
-        <span className="text-lg ">
-          Tasks number : {metadata?.features?.length}
-        </span>
+      <div className=" stat-title text-xs  flex flex-col">Information</div>
+      <div className="stat-value text-lg text-secondary my-auto">
+        {metadata?.name}
       </div>
+      <span className="stat-desc mt-auto text-sm  ">
+        Tasks number : {metadata?.features?.length}
+      </span>
     </div>
   );
 };
