@@ -20,22 +20,22 @@ export const StatFeatureHeader = ({ obj, feature }) => {
       <div className="flex-col ml-3 flex justify-between">
         <Link
           href={`/profile/cv/${obj?.cvAddress}`}
-          className=" text-black hover:text-info"
+          className=" text-white hover:text-info"
         >
           <CVName address={obj?.cvAddress} />
         </Link>
-        <p className="font-black text-black">{feature?.metadata?.title}</p>
+        <p className="font-black text-white">{feature?.metadata?.title}</p>
         <div>
           <p className=" text-xs">
             Oppened At :{" "}
-            <span className="text-black">
+            <span className="text-white">
               {parseTimestamp(feature?.createdAt)}
             </span>
           </p>
           {feature?.assignedWorker !== zeroAddress && (
             <p className="text-xs ">
               Temps restants :{" "}
-              <span className="text-black">
+              <span className="text-white">
                 <Timer
                   units={() =>
                     calcTimestamp(feature?.startedAt, feature?.estimatedDays)
@@ -46,7 +46,7 @@ export const StatFeatureHeader = ({ obj, feature }) => {
           )}
         </div>
       </div>
-      <p className="ml-auto badge badge-success">
+      <p className="ml-auto badge badge-outline badge-success">
         {ENUMS_FEATURE_STATUS[feature?.status]}
       </p>
     </div>

@@ -10,10 +10,10 @@ export const BtnJoinFeature = ({ missionAddr, featureId, getter }) => {
   };
   return (
     <button
-      className="btn btn-xs btn-success btn-outline ml-auto"
+      className="btn btn-xs btn-success join-item btn-outline ml-auto"
       onClick={handleSubmit}
     >
-      Join Feature
+      Work
     </button>
   );
 };

@@ -21,24 +21,13 @@ export const StatFeatureFooter = ({ feature, submit, obj, link }) => {
         }
       `}
       />
-      <p className="ml-1 mr-3 text-black">
+      <p className="ml-1 mr-3 text-white">
         {feature?.assignedWorker !== ZERO_ADDRESS ? 1 : 0}
       </p>
-      <Icon icon={icfyETHER} className="text-2xl text-black/70" />
-      <p className="text-black">
+      <Icon icon={icfyETHER} className="text-2xl text-white/70" />
+      <p className="text-white">
         {ethers.utils.formatEther(`${parseInt(feature?.wadge)}`)} ETH
       </p>
-
-      {cv &&
-        submit &&
-        feature?.assignedWorker === ZERO_ADDRESS &&
-        !feature?.isInviteOnly && (
-          <BtnJoinFeature
-            missionId={parseInt(feature?.missionID)}
-            featureId={feature?.id}
-            getter={submit}
-          />
-        )}
 
       {link && <BtnToProfileCV cvAddress={obj?.cvAddress} />}
     </div>
