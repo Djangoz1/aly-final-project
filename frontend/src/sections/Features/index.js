@@ -13,6 +13,7 @@ import { _getFeatures, _setFeature } from "utils/ui-tools/mission-tools";
 import { _getterMissionsHub } from "utils/ui-tools/web3-tools";
 import { StatFeature } from "components/stats/StatFeature";
 import { MissionInfo } from "components/Mission";
+import { MyModal } from "components/modal/MyModal";
 
 export const CreationFeatures = () => {
   const { missions, missionId } = useAuthState();
@@ -48,21 +49,21 @@ export const CreationFeatures = () => {
   }, [missions, missionId]);
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 flex flex-col">
       <MissionInfo missionId={missionId} />
-      <div className="my-5 flex flex-wrap   w-fit">
+
+      <div className="divider text-primary mt-[5vh]">Features</div>
+
+      <div className="mb-5 flex flex-wrap   w-fit">
         {features?.map((feature, index) => (
           <StatFeature obj={ownerObj} feature={feature} key={uuidv4()} />
         ))}
       </div>
-      <details className="collapse bg-primary border border-primary">
-        <summary className="collapse-title text-xl font-medium">
-          Click to open/close
-        </summary>
-        <div className="collapse-content">
-          <CreationFeature getter={getFeatures} />
-        </div>
-      </details>
+      <MyModal
+        btn={"Create"}
+        styles={{ btn: "w-fit btn-primary btn-sm ml-auto" }}
+        modal={<CreationFeature getter={getFeatures} />}
+      />
     </div>
   );
 };

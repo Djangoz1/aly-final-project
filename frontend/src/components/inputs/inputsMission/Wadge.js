@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import { useAccount, useBalance } from "wagmi";
 
-
-
 export const InputWadge = ({ datas, setDatas }) => {
-  const {address}= useAccount()
+  const { address } = useAccount();
   const { data, isError, isLoading } = useBalance({
     address: address,
   });
@@ -31,26 +29,25 @@ export const InputWadge = ({ datas, setDatas }) => {
     setDatas(_datas);
   };
 
-  // ! TO DELETE : REMPLACER PAR LA BALANCE UNE FOIS QUE TOUTE LA PARTIE MONNAIE EST RÉGLER
-  
   const [balance, setBalance] = useState(0);
-  
+
   useEffect(() => {
-    if(address){
-      console.log()
-      setBalance(data.formatted)
+    if (address) {
+      setBalance(data.formatted);
     }
-  }, [address])
+  }, [address]);
   // (()=>{
-    
+
   // },[])
   return (
-    <div className="text-black flex flex-col ">
-      <span className="countdown font-mono text-sm ">
-        Your balance :{" "}
-        {balance}
-        ETH
-      </span>
+    <div className="text-white flex flex-col ">
+      <p className="text-white/50  font-mono flex items-center  text-xs ">
+        Your balance :
+        <span className="text-white ml-3 ">
+          {Math.floor(balance)}
+          ETH
+        </span>
+      </p>
       <p className="text-[10px] text-success w-full mt-1 mb-3">
         Payable amount will be sent only when the mission is finished
       </p>

@@ -8,6 +8,7 @@ import { _createFeature, _setFeature } from "utils/ui-tools/mission-tools";
 import { useAuthState } from "context/auth";
 import { _setterMISSION } from "utils/ui-tools/web3-tools";
 import { AlertInfo } from "components/alert/AlertInfo";
+import { MyCard } from "components/myComponents/MyCard";
 
 export const InputDescription = ({ getter, datas, setDatas }) => {
   const { missionId, missions } = useAuthState();
@@ -83,43 +84,37 @@ export const InputDescription = ({ getter, datas, setDatas }) => {
             setter={handleClickDomain}
             value={datas.metadata.domain}
           />
-          <div className="bg-white rounded p-3  h-fit flex flex-col w-full ml-4">
-            <span className="flex text-black items-center mb-4">
-              <Icon icon={"icon-park-outline:text"} />
-              <p className="ml-3 uppercase"> metadata</p>
-            </span>
-            <input
-              type="file"
-              className="file-input file-input-bordered file-input-primary file-input-xs w-full max-w-xs"
-              onChange={handleFileInputChange}
-            />
-            <div className="flex ">
+          <MyCard styles=" w-full flex flex-col h-full  ml-4">
+            <p className=" uppercase flex text-white items-center mb-3">
+              <Icon icon={"icon-park-outline:text"} className="mr-4" /> metadata
+            </p>
+
+            <div className="flex items-center my-4">
               <InputText
                 title={"Title"}
                 value={datas.metadata.title}
-                style={{
-                  input:
-                    "xs input-xs w-full bg-neutral-200 border border-primary mr-3",
-                }}
                 setter={handleChangeTitle}
               />
+              <div className="mx-3" />
               <InputText
                 title={"URL"}
                 value={datas.metadata.url}
-                style={{
-                  input: "sm w-full bg-neutral-200 border border-primary",
-                }}
                 setter={handleChangeURL}
               />
             </div>
 
-            <div className="mt-2 ">
-              <InputTextArea sty setter={handleChange} title="Description" />
+            <div className="my-2 ">
+              <InputTextArea setter={handleChange} title="Description" />
             </div>
-          </div>
+            <input
+              type="file"
+              className="file-input mt-auto file-input-bordered file-input-primary file-input-xs w-full max-w-xs"
+              onChange={handleFileInputChange}
+            />
+          </MyCard>
         </div>
         <button
-          className="btn  btn-info w-fit   mt-5 ml-auto btn-outlined"
+          className="btn btn-xs btn-info w-fit   mt-5 ml-auto btn-outline"
           onClick={() => handleSubmit(datas)}
         >
           Ajouter Feature

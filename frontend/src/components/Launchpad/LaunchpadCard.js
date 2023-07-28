@@ -137,7 +137,7 @@ export const LaunchpadCard = ({ address }) => {
               units={() => calcTimeRemaining(parseInt(isDatas?.saleStart))}
             />
           </div>
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col ml-3 items-center justify-center">
             <label className="text-xs">Presale end</label>
 
             <Timer

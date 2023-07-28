@@ -9,6 +9,7 @@ import { InputWadge } from "./Wadge";
 import { ZERO_ADDRESS } from "constants/web3";
 import { _getAllCVs } from "utils/ui-tools/state-tools";
 import { _getterCV } from "utils/ui-tools/web3-tools";
+import { MyCard } from "components/myComponents/MyCard";
 
 export const InputAssignedWorker = ({ datas, setDatas }) => {
   const [listNames, setListNames] = useState([]);
@@ -50,8 +51,8 @@ export const InputAssignedWorker = ({ datas, setDatas }) => {
   };
 
   return (
-    <div className="bg-white w-[340px] rounded p-3">
-      <span className="flex text-black items-center mb-4">
+    <MyCard styles=" w-[360px] flex h-full flex-col ml-4">
+      <span className="flex text-white items-center mb-4">
         <Icon icon={"pepicons-pencil:cv"} />
         <p className="ml-3 uppercase mr-auto"> Worker</p>
 
@@ -64,7 +65,6 @@ export const InputAssignedWorker = ({ datas, setDatas }) => {
           value={
             datas.assignedWorker !== ZERO_ADDRESS ? datas.assignedWorker : ""
           }
-          style={{ input: "sm input-sm" }}
           setter={handleChange}
           title="Please input name or address cv"
         />
@@ -98,6 +98,6 @@ export const InputAssignedWorker = ({ datas, setDatas }) => {
           )}
         </div>
       </div>
-    </div>
+    </MyCard>
   );
 };

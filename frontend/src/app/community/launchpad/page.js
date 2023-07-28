@@ -2,12 +2,14 @@
 import { MyTabs } from "components/myComponents/MyTabs";
 import { sectionCommunity } from "constants/text";
 import React, { useState } from "react";
-import { Launchpad } from "sections/Launchpad";
+
 import { Layout } from "sections/Layout";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { icfySEARCH } from "icones";
 import { MySection } from "components/myComponents/MySection";
+import Link from "next/link";
+import { ListLaunchpad } from "sections/Launchpad/ListLaunchpad";
 
 const LaunchpadPage = () => {
   const [isTabs, setIsTabs] = useState(sectionCommunity[1]);
@@ -33,8 +35,15 @@ const LaunchpadPage = () => {
             />
           </div>
         </div>
-
-        <Launchpad />
+        <div className="flex flex-col w-full">
+          <Link
+            href={"/community/launchpad/create"}
+            className="btn-xs w-1/6 items-center ml-auto mb-5 btn btn-primary"
+          >
+            Create
+          </Link>
+          <ListLaunchpad />
+        </div>
       </MySection>
     </Layout>
   );

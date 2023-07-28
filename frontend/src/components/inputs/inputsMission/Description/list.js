@@ -1,30 +1,35 @@
 import { Icon } from "@iconify/react";
+import { MyCard } from "components/myComponents/MyCard";
 import { DEV_DOMAIN, DEV_LANGUAGES } from "constants/languages";
 import { icfyCODE } from "icones";
 import { useState } from "react";
 
 export const ListDevLanguages = ({ setter, value }) => {
   return (
-    <div className="flex flex-wrap p-3  shadow bg-white justify-between w-2/3 border rounded border-primary ">
-      <h5 className="w-full text-black items-center flex">
+    <MyCard styles={"flex flex-wrap justify-between w-full"}>
+      <h5 className="w-full text-white items-center flex">
         <Icon icon={icfyCODE} />
         <span className="ml-3 "> DEV</span>
       </h5>
       {DEV_LANGUAGES.map((language, index) => (
         <li
           key={language?.icon}
-          className={`flex flex-col btn w-[100px] my-2 items-center
+          className={`flex flex-col btn  w-[100px] my-2 items-center  btn-primary
               justify-center text-white  ${
-                value === language?.name ? "btn-primary" : "bg-neutral-700"
+                value !== language?.name && "btn-outline"
               }`}
           onClick={() => setter(language.name)}
         >
-          <Icon icon={language?.icon} style={{ color: language?.color }} />
+          <Icon
+            icon={language?.icon}
+            className="text-xl"
+            style={{ color: language?.color }}
+          />
 
-          <a className="text-xs">{language?.name}</a>
+          <a className="text-[10px]">{language?.name}</a>
         </li>
       ))}
-    </div>
+    </MyCard>
   );
 };
 
@@ -33,8 +38,8 @@ export const ListDevDomains = ({ setter, value }) => {
     setter(value);
   };
   return (
-    <div className="flex flex-wrap p-3 h-fit shadow bg-white rounded justify-between w-[340px] ">
-      <h5 className="w-full text-black items-center flex">
+    <MyCard styles={"flex flex-wrap justify-between w-[340px]"}>
+      <h5 className="w-full text-white items-center flex">
         <Icon icon={"carbon:task"} />
         <span className="ml-3 "> DOMAIN</span>
       </h5>
@@ -42,17 +47,21 @@ export const ListDevDomains = ({ setter, value }) => {
       {DEV_DOMAIN.map((domain, index) => (
         <li
           key={domain?.icon}
-          className={`flex flex-col btn p-0 w-[100px] my-2 items-center
+          className={`flex flex-col btn  w-[100px] my-2 items-center  btn-primary
               justify-center text-white  ${
-                value === domain?.name ? "btn-primary" : "bg-neutral-600"
+                value !== domain?.name && "btn-outline"
               }`}
           onClick={() => handleClick(domain.name)}
         >
-          <Icon icon={domain?.icon} style={{ color: domain?.color }} />
+          <Icon
+            icon={domain?.icon}
+            className="text-xl"
+            style={{ color: domain?.color }}
+          />
 
-          <p className="text-xs">{domain?.name}</p>
+          <p className="text-[10px]">{domain?.name}</p>
         </li>
       ))}
-    </div>
+    </MyCard>
   );
 };
