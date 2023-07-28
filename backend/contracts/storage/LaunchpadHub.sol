@@ -13,17 +13,17 @@ import {ILaunchpadCohort} from "../interfaces/ILaunchpadCohort.sol";
 contract LaunchpadHub is Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
-    address addrAControl;
-    address addrLCohort;
-    address addrLInvestor;
+
+    address private addrLCohort;
 
     uint8 public maxTiers = 5;
 
-    mapping(uint => address) indexer;
+    mapping(uint => address) private launchpads;
+    mapping(address => uint[]) private indexer;
 
     modifier onlyProxy() {
         require(
-            msg.sender == addrAControl,
+            msg.sender == ILaunchpadCohort(addrLCohort).getAccessControl(),
             "Must call function with proxy bindings"
         );
         _;
@@ -32,37 +32,33 @@ contract LaunchpadHub is Ownable {
     constructor(address _addrLCohort) {
         require(_addrLCohort != address(0), "Must have address");
         addrLCohort = _addrLCohort;
-        ILaunchpadCohort iLC = ILaunchpadCohort(_addrLCohort);
-        addrAControl = iLC.getAccessControl();
-        IAccessControl iAC = IAccessControl(addrAControl);
+
+        IAccessControl iAC = accessControl();
         iAC.setLaunchpadHub(address(this));
-        iLC.setLaunchpadHub(address(this));
     }
 
-    function setLaunchpadInvestor(
-        address _launchpadInvestor
-    ) external onlyOwner {
-        require(
-            _launchpadInvestor != address(0),
-            "Must assign a launchpad investor address"
-        );
-        addrLInvestor = _launchpadInvestor;
+    function accessControl() private view returns (IAccessControl) {
+        return IAccessControl(ILaunchpadCohort(addrLCohort).getAccessControl());
     }
 
     function getTokensLength() external view returns (uint) {
         return _tokenIDs.current();
     }
 
+    function ownerOf(address _cv) external view returns (uint[] memory) {
+        return indexer[_cv];
+    }
+
     function getLaunchpad(uint _id) external view returns (address) {
         require(_id <= _tokenIDs.current(), "ID out of range");
-        require(indexer[_id] != address(0), "Launchpad not found");
-        return indexer[_id];
+        require(launchpads[_id] != address(0), "Launchpad not found");
+        return launchpads[_id];
     }
 
     function deployLaunchpad(
         address _owner,
-        DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tierDatas
+        DataTypes.LaunchpadData calldata _datas,
+        DataTypes.TierData[] calldata _tierDatas
     ) external onlyProxy {
         require(
             bytes(_datas.pubURI).length > 0,
@@ -82,7 +78,11 @@ contract LaunchpadHub is Ownable {
             _datas,
             _tierDatas
         );
+        IAccessControl iAC = accessControl();
+        address cv = iAC.getCVByAddress(_owner);
+        indexer[cv].push(_tokenIDs.current());
+
         newLaunchpad.transferOwnership(_owner);
-        indexer[_tokenIDs.current()] = address(newLaunchpad);
+        launchpads[_tokenIDs.current()] = address(newLaunchpad);
     }
 }

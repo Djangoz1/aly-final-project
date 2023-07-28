@@ -143,6 +143,8 @@ contract AccessControl is Ownable {
     function setLaunchpadHub(address _launchpadHub) external onlyStart {
         require(_launchpadHub != address(0), "Must set a valid address");
         iLH = ILaunchpadHub(_launchpadHub);
+        iLC.setLaunchpadHub(_launchpadHub);
+
         if (hasInit()) {
             workflow = DataTypes.AccessControlStatus.Init;
         }

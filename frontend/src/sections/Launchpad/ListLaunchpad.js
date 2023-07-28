@@ -10,8 +10,7 @@ export const ListLaunchpad = () => {
     const arr = [];
 
     for (let index = 1; index <= length; index++) {
-      const element = await _getterLaunchpadHub("getLaunchpad", [index]);
-      arr.push(element);
+      arr.push(index);
     }
     setList(arr);
   };
@@ -24,7 +23,7 @@ export const ListLaunchpad = () => {
       <div className="flex flex-wrap justify-evenly">
         {list.map((el) => (
           <div className="mb-3 mx-1" key={uuidv4()}>
-            <LaunchpadCard address={el} />
+            <LaunchpadCard id={el} />
           </div>
         ))}
       </div>

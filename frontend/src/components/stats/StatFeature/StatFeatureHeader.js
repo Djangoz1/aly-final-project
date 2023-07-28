@@ -6,7 +6,6 @@ import { ENUMS_FEATURE_STATUS } from "constants/enums";
 import { calcTimestamp, parseTimestamp, selectDevDomain } from "helpers";
 import Link from "next/link";
 import React from "react";
-import { recastDescription } from "utils/ux-tools";
 import { zeroAddress } from "viem";
 
 export const StatFeatureHeader = ({ obj, feature }) => {

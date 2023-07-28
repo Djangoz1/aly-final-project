@@ -15,7 +15,7 @@ export const StatFeatureHidden = ({ feature }) => {
           Mission #{parseInt(feature?.missionID)}
         </span>
       </div>
-      <div className="flex flex-col mb-5">
+      <div className="flex flex-col my-5">
         <p className="text-xs">Description :</p>
         <p className="text-sm text-justify text-white max-w-[350px]">
           {feature?.metadata?.description}

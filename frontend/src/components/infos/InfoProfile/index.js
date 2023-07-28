@@ -1,49 +1,21 @@
-import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
 import { ModalSetCV } from "components/modal/ModalSetCV";
-import {
-  icfyCODER,
-  icfyCOIN,
-  icfyCV,
-  icfyETHER,
-  icfyMISSION,
-  icfySETTINGS,
-} from "icones";
+import { MyStat } from "components/myComponents/MyStat";
+import { profileStats } from "constants/stats";
+import { v4 as uuidv4 } from "uuid";
 import React from "react";
 
 // Pour le owner mettre en params le resultat de _getStateOwnerByCv(cvAddress)
 export const InfoProfileCV = ({ infos }) => {
-  return (
-    <div className="flex border border-x-0 border-t-0 pb-4 border-black/20">
-      <Icon icon={icfyCV} className="text-[60px] text-primary" />
-      <div className="flex items-end  ">
-        <div className="flex flex-col ">
-          <p className="text-white text-[23px] leading-none font-bold">
-            <CVName address={infos?.cvAddress} />
-          </p>
-          <p className="text-white leading-none text-[7px] text-white/70">
-            CV : {infos?.cvAddress}
-          </p>
-          <p className="text-white leading-none text-[7px] text-white/70">
-            Owner : {infos?.address}
-          </p>
-        </div>
+  const stats = profileStats(infos);
 
-        <div className="flex items-end mx-10">
-          <Icon icon={icfyCOIN} className="text-2xl text-white/70" />
-          <p className="text-white  leading-none ml-3 mr-10 font-bold">
-            {infos?.amountDispersed}
-          </p>
-          <Icon icon={icfyMISSION} className="text-2xl text-white/70" />
-          <p className="text-white  leading-none ml-3 mr-10 font-bold">
-            {infos?.missions?.length}
-          </p>
-          <Icon icon={icfyCODER} className="text-2xl text-white/70" />
-          <p className="text-white text leading-none font-bold ml-3">
-            {infos?.features?.length}
-          </p>
-        </div>
+  return (
+    <div className="flex pb-4 justify-between items-center">
+      <div className="stats w-full">
+        {stats?.map((elem) => (
+          <MyStat values={elem.values} key={uuidv4()} />
+        ))}
       </div>
+
       <ModalSetCV />
     </div>
   );

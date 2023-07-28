@@ -19,10 +19,10 @@ export const ModalSetCV = () => {
   return (
     <>
       {/* You can open the modal using ID.showModal() method */}
-      <div className="btn btn-ghost absolute top-3 right-3">
+      <div className="btn btn-ghost ">
         <Icon
           icon={icfySETTINGS}
-          className="text-[30px] text-black"
+          className="text-[30px] text-white"
           onClick={() => window.my_modal_4.showModal()}
         />
       </div>

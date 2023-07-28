@@ -2,6 +2,7 @@ import { fetchJSONByCID } from "./pinata-tools";
 import {
   _getterCV,
   _getterFeaturesHub,
+  _getterLaunchpadHub,
   _getterMISSION,
   _getterMissionsHub,
 } from "./web3-tools";
@@ -23,6 +24,7 @@ export const _getStateOwnerByCv = async (cvAddress) => {
     address: "", //
     missions: [], //
     features: [], //
+    launchpads: [],
     amountDispersed: 0,
   };
   objectOwner.address = await _getterCV(cvAddress, "owner");
@@ -30,14 +32,13 @@ export const _getStateOwnerByCv = async (cvAddress) => {
   let featuresIndexer = await _getterFeaturesHub("getIndexer", [cvAddress]);
 
   objectOwner.missions = await _getterMissionsHub("getIndexer", [cvAddress]);
+  objectOwner.launchpads = await _getterLaunchpadHub("ownerOf", [cvAddress]);
 
   for (let index = 0; index < featuresIndexer.length; index++) {
     const id = parseInt(featuresIndexer[index]);
     let featureDatas = await _getStateFeature(id);
-    objectOwner.amountDispersed += ethers.utils.formatEther(
-      `${parseInt(featureDatas?.wadge)}`
-    );
-
+    let number = ethers.utils.formatEther(`${parseInt(featureDatas?.wadge)}`);
+    objectOwner.amountDispersed += parseFloat(number);
     objectOwner.features.push(featureDatas);
   }
 

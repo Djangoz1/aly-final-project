@@ -10,20 +10,24 @@ import {
   _getterAccessControl,
   _getterFactoryCV,
   _getterLaunchpad,
+  _getterLaunchpadHub,
 } from "utils/ui-tools/web3-tools";
 import { getLaunchpadDatas } from "utils/ui-tools/launchpad-tools";
 import Link from "next/link";
 import { MyCard } from "components/myComponents/MyCard";
 
-export const LaunchpadCard = ({ address }) => {
+export const LaunchpadCard = ({ id }) => {
   const [isDatas, setIsDatas] = useState(null);
+  const [address, setAddress] = useState(null);
   const getDatas = async () => {
-    const datas = await getLaunchpadDatas(address);
+    const _address = await _getterLaunchpadHub("getLaunchpad", [id]);
+    setAddress(_address);
+    const datas = await getLaunchpadDatas(_address);
     setIsDatas(datas);
   };
   useEffect(() => {
-    if (address && !isDatas) getDatas();
-  }, [address]);
+    if (id && !isDatas) getDatas();
+  }, [id]);
 
   const isStart = () => {
     const start = calcTimeRemaining(parseInt(isDatas?.saleStart));
