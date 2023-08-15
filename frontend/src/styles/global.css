@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap");
+
 body {
   width: 100vw;
   overflow-x: hidden;
@@ -17,6 +19,10 @@ body {
 
 .text-shadow {
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.font-prim {
+  font-family: "Playfair Display", serif;
 }
 
 .page {
@@ -60,6 +66,16 @@ body {
     linear-gradient(225deg, #000000 25%, transparent 25%) -10px 0/ 20px 20px,
     linear-gradient(315deg, #00000055 25%, transparent 25%) 0px 0/ 20px 20px,
     linear-gradient(45deg, #000000 25%, #e5e5f7 25%) 0px 0/ 20px 20px;
+}
+
+.hide-scrollbar {
+  /* Pour les navigateurs basés sur Webkit (Chrome, Safari, etc.) */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 .main {

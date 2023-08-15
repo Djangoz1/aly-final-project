@@ -5,6 +5,7 @@ import {
   _getterLaunchpadHub,
   _getterMISSION,
   _getterMissionsHub,
+  _getterPubsHub,
 } from "./web3-tools";
 
 import { ethers } from "ethers";
@@ -24,13 +25,14 @@ export const _getStateOwnerByCv = async (cvAddress) => {
     address: "", //
     missions: [], //
     features: [], //
+    pubs: [],
     launchpads: [],
     amountDispersed: 0,
   };
   objectOwner.address = await _getterCV(cvAddress, "owner");
 
   let featuresIndexer = await _getterFeaturesHub("getIndexer", [cvAddress]);
-
+  objectOwner.pubs = await _getterPubsHub("getIndexer", [cvAddress]);
   objectOwner.missions = await _getterMissionsHub("getIndexer", [cvAddress]);
   objectOwner.launchpads = await _getterLaunchpadHub("ownerOf", [cvAddress]);
 

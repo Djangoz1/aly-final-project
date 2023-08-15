@@ -1,85 +1,75 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { heroEntreprise, heroWorker, stateCV } from "constants/text";
-
-import { Workflow } from "components/Workflow";
-
-import Link from "next/link";
-
-import { MyTabs } from "components/myComponents/MyTabs";
-import { Scene } from "spline/Scene";
+import { Icon } from "@iconify/react";
+import { MyCard } from "components/myComponents/MyCard";
 import { MyBottomSection, MySection } from "components/myComponents/MySection";
-import { brainstorming } from "constants/spline";
-import {
-  _getterFactoryCV,
-  _getterMissionsHub,
-} from "utils/ui-tools/web3-tools";
+import { rocket } from "constants/spline";
+import { icfySEARCH } from "icones";
+import React from "react";
 import { LinearGradient } from "react-text-gradients";
+import { Rocket, Scene } from "spline/Scene";
+import { inputStyle } from "styles/style";
 
 export const Hero = () => {
-  const heroStatus = [heroEntreprise, heroWorker];
-  const [isTabs, setIsTabs] = useState(heroStatus[0]);
-  console.log(isTabs);
-  const [cvLength, setCvLength] = useState(null);
-  const [missionLength, setMissionLength] = useState(null);
-  useEffect(() => {
-    getStats();
-  }, []);
-
   const stats = [
-    { title: "Jobs Proposition", value: missionLength },
-    { title: "Jobs completed", value: "100" },
-    { title: "Enterprises", value: cvLength },
-    { title: "Total paid", value: "1000 USDT" },
+    { title: "Launchpad created", value: "100" },
+    { title: "Amount raised", value: "100k" },
+    { title: "Investors", value: "10k" },
   ];
-  const getStats = async () => {
-    if (!cvLength) {
-      const _cvLength = parseInt(await _getterFactoryCV("getCvIds"));
-      setCvLength(_cvLength);
-    }
-    if (!missionLength) {
-      const _missionLength = parseInt(
-        await _getterMissionsHub("getTokensLength")
-      );
-
-      setMissionLength(_missionLength);
-    }
-  };
   return (
-    <div className="flex flex-col">
-      <MySection>
-        <div className="flex flex-col ">
-          <MyTabs arr={heroStatus} setter={setIsTabs} value={isTabs} />
+    <div className="flex  flex-col">
+      <MySection styles={"flex flex-col h-screen mt-10"}>
+        <div className="flex">
+          <div className="w-1/2 pr-10">
+            <h6 className="text-white  font-prim font-bold text-[35px]">
+              Propel your skills through blockchain technology <br /> & build a
+              new labor market
+            </h6>
+            <p>Work on your decentralization.</p>
+          </div>
+          <img src="/hero.avif" className="w-1/2 py-5" />
+        </div>
+        <MyCard styles={"w-full mt-12 mx-auto flex flex-col"}>
+          <div class="relative flex items-center  w-full">
+            <span class="absolute">
+              <Icon icon={icfySEARCH} className="text-2xl ml-2" />
+            </span>
 
-          <div className="flex justify-between items-center mb-5">
-            <div className="w-[35vw]  mr-auto ">
-              <div className="flex flex-col mb-5">
-                <h4 className="text-white text-2xl font-black">
-                  <LinearGradient gradient={["to left", "red , cyan"]}>
-                    {isTabs?.title}
-                  </LinearGradient>
-                </h4>
-                <h4 className="text-white/80 text-2xl font-black">
-                  <LinearGradient gradient={["to right", "red , cyan"]}>
-                    {isTabs?.subtitle}
-                  </LinearGradient>
-                </h4>
-              </div>
-              <p>{isTabs.description}</p>
-              <div className="join mt-4">
-                <div className="btn btn-primary">
-                  <Link href={"profile/mission"}>Create a Mission</Link>
-                </div>
-              </div>
+            <input
+              type="text"
+              placeholder="Write a language technology"
+              className={`block w-full text-xs py-3  text-gray-700  placeholder-white-400/70   pl-11 pr-5 rtl:pr-11 rtl:pl-5 rounded-full ${inputStyle}`}
+            />
+          </div>
+          <div className="flex justify-evenly text-white mt-4">
+            <div className="btn btn-secondary btn-outline rounded-full btn-xs">
+              Trouver un freelance
             </div>
-            <div>
-              <Scene url={brainstorming} />
+            ou
+            <div className="btn btn-primary rounded-full  btn-xs">
+              Trouver un projet
             </div>
           </div>
-          <Workflow steps={isTabs?.steps} />
-        </div>
+        </MyCard>
       </MySection>
-      <MyBottomSection stats={stats} />
     </div>
   );
 };
+// {/* <MySection styles={" items-center"}>
+//   <div className="flex flex-col">
+//     <h2 className="font-black text-[50px]">
+//       <LinearGradient gradient={["to left", "red , cyan"]}>
+//         Launchpad
+//       </LinearGradient>
+//     </h2>
+//     <p className="text-justify w-2/3">
+//       stands for Hue, Saturation, and Lightness. The values are based on a
+//       position from the center of a color wheel. The value for Hue is from
+//       0 to 360, representing the degrees on a color wheel. Saturation is
+//       the distance from the center of the color wheel. The L stands for
+//       Lightness, which represents the preceived liminance of the color.
+//     </p>
+//   </div>
+//   <div className="w-fit ml-auto">
+//     <Scene url={rocket} />
+//   </div>
+// </MySection>
+// <MyBottomSection stats={stats} /> */}

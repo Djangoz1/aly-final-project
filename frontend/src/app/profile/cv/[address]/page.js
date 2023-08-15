@@ -24,6 +24,7 @@ import { ListStatsFeature } from "components/stats/lists/ListStatsFeature";
 import { InfoProfileCV } from "components/infos/InfoProfile";
 import { MySection } from "components/myComponents/MySection";
 import { LaunchpadCard } from "components/Launchpad/LaunchpadCard";
+import { Pub } from "components/Pub";
 
 export default ({ params }) => {
   const cvRefAddress = params.address;
@@ -36,8 +37,6 @@ export default ({ params }) => {
       (async () => {
         let _ownerObj = await _getStateOwnerByCv(cvRefAddress);
         setOwnerObj(_ownerObj);
-
-        console.log("fsfgsf", _ownerObj?.launchpads);
       })();
     }
   }, [cvRefAddress]);
@@ -45,24 +44,54 @@ export default ({ params }) => {
     await _setterCV(cv, "beAssignedWorker", [_missionAddr, _idFeature]);
   };
 
+  const [isView, setIsView] = useState("missions");
   return (
     <Layout>
       <MySection styles={"flex-col"}>
         <div className="flex flex-col w-full">
           <InfoProfileCV address={cvRefAddress} infos={ownerObj} />
-          <div className="divider my-5 text-primary">Missions</div>
-          <div className="flex flex-wrap mt-5">
-            <ListStatsFeature
-              _ownerObj={ownerObj}
-              cvAddress={cvRefAddress}
-              submit={handleSubmit}
-            />
+          <div className="divider my-5 text-primary">
+            <button
+              className={`btn btn-xs btn-primary ${
+                isView !== "missions" && "btn-outline"
+              }`}
+              onClick={() => setIsView("missions")}
+            >
+              Missions
+            </button>
+            <button
+              className={`btn btn-xs btn-primary ${
+                isView !== "launchpads" && "btn-outline"
+              }`}
+              onClick={() => setIsView("launchpads")}
+            >
+              Launchpads
+            </button>
+            <button
+              className={`btn btn-xs btn-primary ${
+                isView !== "publications" && "btn-outline"
+              }`}
+              onClick={() => setIsView("publications")}
+            >
+              Publications
+            </button>
           </div>
-          <div className="divider my-5 text-primary">Launchpad</div>
-          <div className="flex">
-            {ownerObj?.launchpads?.map((id) => (
-              <LaunchpadCard id={parseInt(id)} key={uuidv4()} />
-            ))}
+          <div className="flex flex-wrap mt-5">
+            {isView === "missions" && (
+              <ListStatsFeature
+                _ownerObj={ownerObj}
+                cvAddress={cvRefAddress}
+                submit={handleSubmit}
+              />
+            )}
+            {isView === "launchpads" &&
+              ownerObj?.launchpads?.map((id) => (
+                <LaunchpadCard id={parseInt(id)} key={uuidv4()} />
+              ))}
+            {isView === "publications" &&
+              ownerObj?.pubs?.map((id) => (
+                <Pub id={parseInt(id)} key={uuidv4()} />
+              ))}
           </div>
         </div>
       </MySection>

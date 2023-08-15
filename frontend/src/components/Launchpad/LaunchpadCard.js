@@ -46,7 +46,8 @@ export const LaunchpadCard = ({ id }) => {
       <div className="badge badge-warning badge-outline badge-sm absolute right-2 ">
         {isStart()}
       </div>
-      <div className="flex flex-col items-center mb-5">
+
+      <div className="flex flex-col  items-center mb-5">
         <div className="rounded-full h-[60px] w-[60px] shadow overflow-hidden border border-black/20">
           <ImagePin CID={isDatas?.metadata?.image} />
         </div>

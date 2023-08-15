@@ -9,14 +9,15 @@ export const InfoProfileCV = ({ infos }) => {
   const stats = profileStats(infos);
 
   return (
-    <div className="flex pb-4 justify-between items-center">
-      <div className="stats w-full">
-        {stats?.map((elem) => (
-          <MyStat values={elem.values} key={uuidv4()} />
-        ))}
-      </div>
-
+    <>
       <ModalSetCV />
-    </div>
+      <div className="flex pb-4 justify-between items-center">
+        <div className="stats w-full">
+          {stats?.map((elem) => (
+            <MyStat values={elem.values} key={uuidv4()} />
+          ))}
+        </div>
+      </div>
+    </>
   );
 };

@@ -71,7 +71,9 @@ export const Drawer = ({ setter, isOpen }) => {
           {links?.map((el) => (
             <Link
               href={el?.path}
-              className="btn border border-black/50 shadow flex justify-between"
+              className={`btn border mx-auto border-black/50 shadow flex justify-between ${
+                isOpen ? "w-full" : "w-fit"
+              }`}
             >
               <Icon
                 icon={el?.icon}

@@ -21,21 +21,16 @@ const LaunchpadPage = ({ params }) => {
     if (launchAddr && !isDatas) getDatas();
   }, [launchAddr]);
   return (
-    <Layout>
+    <Layout banniere={<ImagePin CID={isDatas?.metadata?.image} />}>
       <MySection>
-        <div className="relative w-full">
-          <div className="h-[30vh] overflow-hidden w-full absolute">
-            <div className="h-[60vh] absolute z-0 w-full ">
-              <ImagePin CID={isDatas?.metadata?.image} />
-            </div>
-          </div>
-          <div className="flex justify-evenly flex-wrap mt-[10vh]">
-            <div className="flex flex-col">
+        <div className="relative   mb-auto w-full">
+          <div className="flex flex-col  ">
+            <div className="flex">
               <LaunchpadStats datas={isDatas} />
-              <LaunchpadDescription datas={isDatas} />
-            </div>
-            <div className="flex flex-col">
               <LaunchpadIdentity datas={isDatas} />
+            </div>
+            <div className="flex">
+              <LaunchpadDescription datas={isDatas} />
               <LaunchpadHistory datas={isDatas} />
             </div>
           </div>

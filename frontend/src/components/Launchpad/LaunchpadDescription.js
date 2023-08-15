@@ -3,9 +3,10 @@ import React from "react";
 
 export const LaunchpadDescription = ({ datas }) => {
   return (
-    <MyCard styles={"mt-3 min-h-[40vh]"}>
-      <h6 className="text-white  font-bold">Launchpad Description</h6>
+    <div>
+      <div className="divider text-primary">Description</div>
+
       <p className="text-white">{datas?.metadata?.description}</p>
-    </MyCard>
+    </div>
   );
 };

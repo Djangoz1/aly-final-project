@@ -8,10 +8,10 @@ export const Logo = () => {
   return (
     <Link
       href={"/"}
-      className="text-white text-shadow  text-2xl font-black flex items-center"
+      className="text-white text-shadow  text-2xl font-bold flex items-center"
     >
       <LogoIc />
-      <LinearGradient gradient={["to left", "red , cyan"]}>
+      <LinearGradient gradient={["to left", "white , gray"]}>
         Wwwork3
       </LinearGradient>
     </Link>
@@ -22,7 +22,7 @@ export const LogoIc = ({ styles }) => {
   return (
     <Icon
       icon={icfyHANDSHAKE}
-      className={`text-secondary rotate-90 text-[30px]  ${styles || "mr-1"}`}
+      className={`text-white rotate-90 text-[30px]  ${styles || "mr-1"}`}
     />
   );
 };

@@ -1,5 +1,7 @@
 import { InputText, InputTextArea } from "components/inputs";
 
+import { v4 as uuidv4 } from "uuid";
+
 import { ethers } from "ethers";
 import {
   doAuthMission,
@@ -21,6 +23,9 @@ import {
   _setterMISSION,
 } from "utils/ui-tools/web3-tools";
 import { AlertInfo } from "components/alert/AlertInfo";
+import { corporateStats, missionType, prototypeStats } from "constants/stats";
+import { Icon } from "@iconify/react";
+import { icfyINFO } from "icones";
 
 export const CreationMission = () => {
   const { cv } = useAuthState();
@@ -70,45 +75,57 @@ export const CreationMission = () => {
     setLoading(false);
   };
 
+  const inputs = [missionType, prototypeStats, corporateStats];
+
   return (
     <div className="flex  justify-between">
       <div className="flex flex-col mx-auto w-[800px]">
-        <div className="flex flex-col">
-          <label className="label ">Title :</label>
-          <div className="flex">
-            <InputText
-              value={datas.title}
-              title={"Provide a title of your mission"}
-              target={"title"}
-              setter={onChange}
-            />
+        {inputs?.map((stats) => (
+          <div className="flex flex-col mb-4 w-full" key={uuidv4()}>
+            <h5 className="font-bold text-white">{stats.title}</h5>
+            <div className="flex flex-wrap justify-between w-full">
+              {stats.values?.map((el) => (
+                <div
+                  className="border flex items-center text-white w-[49%] text-xs p-3 rounded border-slate-800/60 hover:border-white mb-3"
+                  key={uuidv4()}
+                >
+                  {el} <Icon icon={icfyINFO} className="text-info ml-3" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
 
         <div className="flex flex-col">
-          <label className="label ">Link reference :</label>
+          <h5 className="font-bold text-white">Do you have actual website ?</h5>
           <div className="flex">
             <InputText
-              title={
-                "Provide a link to additional documentation of your mission"
-              }
+              title={"https://link-of-your-website.com"}
               value={datas.url}
               setter={onChange}
               target={"url"}
             />
           </div>
         </div>
+
         <div className="flex flex-col">
-          <label className="label ">Description :</label>
-          <div className="flex">
-            <InputTextArea
-              title={"Provide a description of your mission"}
-              value={datas.description}
-              target={"description"}
+          <h5 className="font-bold text-white">Description of your project</h5>
+          <div className="flex mb-3">
+            <InputText
+              value={datas.title}
+              title={"Name of your project"}
+              target={"title"}
               setter={onChange}
             />
           </div>
+          <InputTextArea
+            title={"Description of your project"}
+            value={datas.description}
+            target={"description"}
+            setter={onChange}
+          />
         </div>
+
         <div className="flex justify-evenly items-center my-3">
           <div className="flex flex-col">
             <input

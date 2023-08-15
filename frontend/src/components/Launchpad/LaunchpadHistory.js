@@ -17,7 +17,7 @@ export const LaunchpadHistory = () => {
     { user: "Django", amount: 0.1, date: "20/01/2023" },
   ];
   return (
-    <MyCard styles={"mt-3"}>
+    <MyCard styles={"mt-3 w-fit"}>
       <h6 className=" font-bold text-white">Historic</h6>
       <div className="overflow-x-auto">
         <table className="table">

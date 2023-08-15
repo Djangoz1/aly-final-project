@@ -1,13 +1,50 @@
+import { Timer } from "components/Timer";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { calcTimeRemaining } from "helpers";
 import {
+  icfyCHAT,
   icfyCODER,
   icfyCOIN,
   icfyCV,
+  icfyETH,
   icfyETHER,
   icfyGITHUB,
   icfyINFO,
   icfyMISSION,
+  icfyROCKET,
+  icfySTAR,
+  icfyTIME,
 } from "icones";
+
+export const missionType = {
+  title: "What kind of mission do you need ?",
+  values: [
+    "Landing page",
+    "Mobile App",
+    "Bot",
+    "E-commerce",
+    "Blogs or forum",
+    "Algorithm",
+    "Portfolio or personal",
+    "DApp",
+    "Educational ressources",
+    "Smart contract",
+    "Game",
+    "Other",
+  ],
+};
+
+export const prototypeStats = {
+  title: "Do you need a clickable prototype ?",
+  values: ["Yes, I want to test the prototype", "No, I don't need a prototype"],
+};
+export const corporateStats = {
+  title: "Do you have a corporate style ?",
+  values: [
+    "Yes, I have a corporate style",
+    "No, I don't have a corporate style",
+  ],
+};
 
 export const missionStats = (metadata) => {
   return [
@@ -81,7 +118,7 @@ export const profileStats = (infos) => {
         value: infos?.missions?.length,
 
         icon: icfyMISSION,
-        desc: "Number mission created",
+        desc: "Mission(s) created",
       },
     },
     {
@@ -90,7 +127,111 @@ export const profileStats = (infos) => {
         value: infos?.features?.length,
 
         icon: icfyCODER,
-        desc: "Number features worked",
+        desc: "Feature(s) worked",
+      },
+    },
+    {
+      values: {
+        title: "Launchpads",
+        value: infos?.launchpads?.length,
+
+        icon: icfyROCKET,
+        desc: "Launchpad(s) created",
+      },
+    },
+    {
+      values: {
+        title: "Publications",
+        value: infos?.pubs?.length,
+
+        icon: icfyCHAT,
+        desc: "Publish number",
+      },
+    },
+  ];
+};
+
+export const launchpadStats = (datas) => {
+  return [
+    {
+      values: {
+        title: "Capitalization",
+        value: (
+          <>
+            {datas?.amountRaised} <span className="ml-1 text-[9px] ">ETH</span>
+          </>
+        ),
+        icon: icfyETH,
+        desc: (
+          <>
+            Min ~ Max :{" "}
+            <span className="text-white">
+              {parseInt(datas?.minCap)} ~ {parseInt(datas?.maxCap)} ETH
+            </span>
+          </>
+        ),
+      },
+    },
+    {
+      values: {
+        title: (
+          <>
+            Token :<span className="text-white"> {datas?.token?.name} </span>
+          </>
+        ),
+        value: (
+          <>
+            1{" "}
+            <span className="ml-1 text-[9px]">
+              = {parseInt(datas?.tokenPrice)} ETH
+            </span>
+          </>
+        ),
+        icText: datas?.token.symbol,
+        desc: (
+          <div className=" w-[70px] truncate">
+            <span className=" truncate">{datas?.tokenAddress}</span>
+          </div>
+        ),
+      },
+    },
+    {
+      values: {
+        title: "Round",
+        value: (
+          <>
+            1 <span className="ml-1 text-[9px]">/ {datas?.numberOfTier}</span>
+          </>
+        ),
+        icon: icfySTAR,
+        desc: (
+          <>
+            Total user :{" "}
+            <span className="text-white">{parseInt(datas?.totalUser)}</span>
+          </>
+        ),
+      },
+    },
+    {
+      values: {
+        title: "Timing",
+        value: (
+          <div className="flex text-xs flex-col">
+            <div className="flex items-center">
+              <span className="text-[9px] text-white mr-3">Start </span>
+              <Timer
+                units={() => calcTimeRemaining(parseInt(datas?.saleStart))}
+              />
+            </div>
+            <div className="flex  items-center">
+              <span className="text-[9px] text-white mr-auto">End </span>
+              <Timer
+                units={() => calcTimeRemaining(parseInt(datas?.saleEnd))}
+              />
+            </div>
+          </div>
+        ),
+        icon: icfyTIME,
       },
     },
   ];

@@ -36,7 +36,7 @@ export const InputText = ({ value, setter, title, target, style }) => {
   };
   return (
     <input
-      className={`input input-primary bg-black/10 w-full input-bordered join-item input-${
+      className={`input input-ghost border border-white/30 w-full input-bordered join-item input-${
         style || "xs"
       }`}
       placeholder={title}
@@ -58,8 +58,8 @@ export const InputTextArea = ({ value, setter, title, style, target }) => {
     <textarea
       placeholder={title}
       value={value}
-      className={`textarea w-full h-full textarea-${
-        style || "sm textarea-primary bg-black/10"
+      className={`textarea  w-full h-full textarea-${
+        style || "sm textarea-ghost border-white/30"
       }`}
       onChange={(e) => handleChange(e)}
     ></textarea>

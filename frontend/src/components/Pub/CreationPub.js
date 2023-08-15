@@ -35,6 +35,7 @@ export const CreationPub = () => {
   };
   return (
     <MyModal
+      styles={{ modal: "h-fit" }}
       force={forceModal}
       btn={"Create"}
       modal={

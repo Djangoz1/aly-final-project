@@ -11,6 +11,7 @@ export const icfyGITHUB = "line-md:github-loop";
 export const icfyHOME = "line-md:home-twotone";
 export const icfyMAIL = "line-md:email-twotone";
 export const icfyROCKET = "bi:rocket-takeoff";
+export const icfyCHAT = "fluent:calendar-chat-20-regular";
 
 export const icfyRETURN = "ph:key-return-duotone";
 export const icfyIMG = "line-md:image-twotone";
