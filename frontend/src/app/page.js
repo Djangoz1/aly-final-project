@@ -1,4 +1,5 @@
 "use client";
+import JobDescriptionComponent from '../services/JobDescriptionComponent';
 import { Header } from "sections/Layout/Header";
 import {
   doAuthCV,
