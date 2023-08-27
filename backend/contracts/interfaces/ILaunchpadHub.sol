@@ -8,11 +8,12 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 
 interface ILaunchpadHub {
-    function deployLaunchpad(
+    function mint(
         address _owner,
-        DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tierDatas
-    ) external;
+        DataTypes.LaunchpadData calldata _datas,
+        DataTypes.TierData[] calldata _tierDatas,
+        string memory _pubURI
+    ) external returns (uint);
 
     function getTokensLength() external view returns (uint);
 

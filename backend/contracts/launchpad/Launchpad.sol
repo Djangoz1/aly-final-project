@@ -29,6 +29,7 @@ contract Launchpad is Ownable {
     using DataTypes for DataTypes.TierData;
 
     uint256 public id;
+    uint256 public pubID;
 
     bool private _royaltiesTaken;
 
@@ -72,7 +73,8 @@ contract Launchpad is Ownable {
         address _owner,
         uint256 _id,
         DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tierDatas
+        DataTypes.TierData[] memory _tierDatas,
+        string memory _pubURI
     ) {
         launchpadCohort = LaunchpadCohort(_launchpadCohort);
         launchpadHub = LaunchpadHub(msg.sender);
@@ -81,38 +83,40 @@ contract Launchpad is Ownable {
             launchpadCohort.getAddrCollectInvestor()
         );
         accessControl = IAccessControl(launchpadCohort.getAccessControl());
-        require(
-            _datas.tokenAddress != address(0),
-            "Must assign a token address"
-        );
 
         require(
             launchpadCohort.getAddrLaunchpadHub() == msg.sender,
             "Must deploy with launchpad cohort"
         );
-        iERC20 = IERC20(_datas.tokenAddress);
-        require(iERC20.balanceOf(_owner) > 0, "You must have funds to provide");
-        require(_tierDatas.length > 0, "Must have at least one tier");
-        id = _id;
+_datas.maxCap = 0;
+_datas.minCap = 0;
         uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
         uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
         uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
+        require(_tierDatas.length > 0, "Must have at least one tier");
         for (uint256 index = 0; index < _tierDatas.length; index++) {
             DataTypes.TierData memory _tierData = _tierDatas[index];
             _maxTierCaps[index] = _tierData.maxTierCap;
             _minTierCaps[index] = _tierData.minTierCap;
             _tokenPrice[index] = _tierData.tokenPrice;
+            _datas.maxCap = _datas.maxCap.add(_tierData.maxTierCap);
+            _datas.minCap = _datas.minCap.add(_tierData.minTierCap);
         }
-
-        cLD.setLaunchpadData(id, _owner, _datas);
+        
+        _datas.numberOfTier = uint8(_tierDatas.length);
+        cLD.setLaunchpadData(_id, _owner, _datas);
         cLD._setTiers(
             _tierDatas.length,
             _owner,
-            id,
+            _id,
             _maxTierCaps,
             _minTierCaps,
             _tokenPrice
         );
+        id = _id;
+        pubID = accessControl.createPub(_pubURI, _owner);
+
+        iERC20 = IERC20(_datas.tokenAddress);
     }
 
     /**
@@ -160,10 +164,7 @@ contract Launchpad is Ownable {
      * @param _tokens must be equal of the allowance of contract for sender address
      */
     function lockTokens(uint _tokens) external onlyOwner {
-        require(
-            iERC20.balanceOf(msg.sender) >= _tokens,
-            "Didn't have enough tokens"
-        );
+        require(iERC20.balanceOf(msg.sender) >= _tokens, "No enough funds");
         require(
             iERC20.allowance(msg.sender, address(this)) == _tokens,
             "Mismatch allowance amount"

@@ -6,31 +6,36 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
-import {Bindings} from "../libraries/Bindings.sol";
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {AddressHub} from "../storage/AddressHub.sol";
+import {ICVHub} from "../interfaces/ICVHub.sol";
 
 contract WorkProposalHub is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
 
-    mapping(address => uint[]) indexer;
+    /**
+     * @dev storage indexer work proposal for each CV
+     * @notice key uint is for CV ID
+     * @notice return array of ID work proposal for each CV
+     */
+    mapping(uint => uint[]) indexer;
 
     /// @notice id work proposal is linked to feature
     mapping(uint => uint) featuresIDs;
 
-    IAccessControl accessControl;
+    AddressHub addressHub;
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(accessControl),
+            msg.sender == address(addressHub.accessControl()),
             "Must call function with proxy bindings"
         );
         _;
     }
 
-    constructor(address _accessControl) ERC721("WorkProposal", "WP") {
-        accessControl = IAccessControl(_accessControl);
-        accessControl.setWorkerProposalHub(address(this));
+    constructor(address _addressHub) ERC721("WorkProposal", "WP") {
+        addressHub = AddressHub(_addressHub);
+        addressHub.setWorkerProposalHub(address(this));
     }
 
     function getTokensLength() public view returns (uint) {
@@ -38,22 +43,23 @@ contract WorkProposalHub is ERC721URIStorage {
     }
 
     function postWorkerProposal(
-        address _cv,
+        address _owner,
         string calldata _tokenURI,
         uint _featureID
     ) external onlyProxy returns (uint) {
+        ICVHub iCVH = ICVHub(addressHub.cvHub());
         _tokenIDs.increment();
         uint newProposalID = _tokenIDs.current();
-        indexer[_cv].push(newProposalID);
-        _mint(_cv, newProposalID);
+        indexer[iCVH.getCV(_owner)].push(newProposalID);
+        _mint(_owner, newProposalID);
         _setTokenURI(newProposalID, _tokenURI);
         featuresIDs[newProposalID] = _featureID;
         return newProposalID;
     }
 
-    function getIndexer(address _cv) external view returns (uint[] memory) {
-        require(indexer[_cv].length > 0, "No work proposal found");
-        return indexer[_cv];
+    function getIndexer(uint _cvID) external view returns (uint[] memory) {
+        require(indexer[_cvID].length > 0, "No work proposal found");
+        return indexer[_cvID];
     }
 
     function getFeatureOfWorkProposal(

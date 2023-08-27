@@ -1,28 +1,36 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {AddressHub} from "../storage/AddressHub.sol";
+import {ICVHub} from "../interfaces/ICVHub.sol";
+import {DataTypes} from "../libraries/DataTypes.sol";
 
 contract MissionsHub is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
 
-    IAccessControl accessControl;
-
-    mapping(address => uint[]) indexers;
+    AddressHub addrHub;
 
     /**
-     * @notice each mission return featuresIndexer
+     * @notice cv ID return array of ID missions
      */
-    mapping(uint => uint[]) featuresIndexer;
+    mapping(uint => uint[]) indexers;
 
+    /**
+     * @notice mission ID return data mission
+     */
+    mapping(uint => DataTypes.MissionData) datas;
+
+    modifier onlyOwnerOf(uint _missionID, address _owner) {
+        require(ownerOf(_missionID) == _owner, "Not the owner");
+        _;
+    }
     modifier onlyProxy() {
         require(
-            msg.sender == address(accessControl),
+            msg.sender == address(addrHub.accessControl()),
             "Must call function with proxy bindings"
         );
         _;
@@ -30,8 +38,8 @@ contract MissionsHub is ERC721URIStorage {
 
     modifier onlyFeaturesHub() {
         require(
-            msg.sender == accessControl.getFeaturesHub(),
-            "Only featuresHub can call this function"
+            msg.sender == addrHub.featuresHub(),
+            "Must call function with featuresHub bindings"
         );
         _;
     }
@@ -40,9 +48,9 @@ contract MissionsHub is ERC721URIStorage {
     // *::::::::::::: CONSTRUCTOR ::::::::::::* //
     // *::::::::::::: ----------- ::::::::::::* //
 
-    constructor(address _accessControl) ERC721("Mission", "WM") {
-        accessControl = IAccessControl(_accessControl);
-        accessControl.setMissionsHub(address(this));
+    constructor(address _addressHub) ERC721("Mission", "WM") {
+        addrHub = AddressHub(_addressHub);
+        addrHub.setMissionsHub(address(this));
     }
 
     function checkRegistred(uint _id) external view {
@@ -54,25 +62,42 @@ contract MissionsHub is ERC721URIStorage {
     // *::::::::::::: SETTER ::::::::::::* //
     // *::::::::::::: ------ ::::::::::::* //
 
-    function createMission(
-        address _cv,
+    function mint(
+        address _for,
         string calldata _tokenURI
     ) external onlyProxy returns (uint) {
+        ICVHub iCVH = ICVHub(addrHub.cvHub());
         _tokenIDs.increment();
-        uint newProposalID = _tokenIDs.current();
-        indexers[_cv].push(newProposalID);
-        _mint(_cv, newProposalID);
-        _setTokenURI(newProposalID, _tokenURI);
-        return newProposalID;
+        uint newMissionID = _tokenIDs.current();
+        DataTypes.MissionData memory newMission;
+        newMission.id = newMissionID;
+        indexers[iCVH.getCV(_for)].push(newMissionID);
+        datas[newMissionID] = newMission;
+        _mint(_for, newMissionID);
+        _setTokenURI(newMissionID, _tokenURI);
+        return newMissionID;
     }
 
-    function setFeatureMission(
-        address _cv,
+    function addFeature(
+        address _owner,
         uint _missionID,
         uint _featureID
-    ) external onlyFeaturesHub {
-        require(ownerOf(_missionID) == _cv, "Not the owner of mission");
-        featuresIndexer[_missionID].push(_featureID);
+    ) external onlyFeaturesHub onlyOwnerOf(_missionID, _owner) {
+        require(
+            datas[_missionID].status == DataTypes.MissionStatus.Process,
+            "Mission closed"
+        );
+        datas[_missionID].features.push(_featureID);
+    }
+
+    function closeMission(
+        uint _missionID
+    ) external onlyOwnerOf(_missionID, msg.sender) {
+        require(
+            datas[_missionID].status == DataTypes.MissionStatus.Process,
+            "Wrong status"
+        );
+        datas[_missionID].status = DataTypes.MissionStatus.Close;
     }
 
     // *::::::::::::: ------ ::::::::::::* //
@@ -80,22 +105,29 @@ contract MissionsHub is ERC721URIStorage {
     // *::::::::::::: ------ ::::::::::::* //
 
     /**
-     * @param _cv is cv address
+     * @param _cvID is cv ID
      * @return [] of missionIds
      */
 
-    function getIndexer(address _cv) external view returns (uint[] memory) {
-        require(indexers[_cv].length > 0, "No missions index found");
-        return indexers[_cv];
+    function getIndexer(uint _cvID) external view returns (uint[] memory) {
+        require(indexers[_cvID].length > 0, "No missions index found");
+        return indexers[_cvID];
+    }
+
+    function getData(
+        uint _missionID
+    ) external view returns (DataTypes.MissionData memory) {
+        require(_missionID <= _tokenIDs.current(), "ID mission out of range");
+        return datas[_missionID];
     }
 
     function getTokensLength() external view returns (uint256) {
         return _tokenIDs.current();
     }
 
-    function getFeaturesIndexer(
-        uint _missionID
-    ) external view returns (uint[] memory) {
-        return featuresIndexer[_missionID];
-    }
+    // function getFeaturesIndexer(
+    //     uint _missionID
+    // ) external view returns (uint[] memory) {
+    //     return featuresIndexer[_missionID];
+    // }
 }

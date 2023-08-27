@@ -4,13 +4,14 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {AddressHub} from "../storage/AddressHub.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 
 contract LaunchpadCohort is Ownable {
-    address accessControl;
-    address launchpadInvestor;
-    address launchpadDatas;
-    address launchpadHub;
+    address public addressHub;
+    address public launchpadInvestor;
+    address public launchpadDatas;
+    address public launchpadHub;
 
     DataTypes.DeploymentStatus deploymentStatus;
 
@@ -22,11 +23,10 @@ contract LaunchpadCohort is Ownable {
         _;
     }
 
-    constructor(address _accessControl) {
-        IAccessControl AccessControl = IAccessControl(_accessControl);
-        AccessControl.setLaunchpadCohort(address(this));
-        // require(AccessControl.getLaunchpadCohort() == address(this));
-        accessControl = address(AccessControl);
+    constructor(address _addressHub) {
+        AddressHub addrHub = AddressHub(_addressHub);
+        addrHub.setLaunchpadCohort(address(this));
+        addressHub = _addressHub;
     }
 
     function setMigrate() external onlyOwner {
@@ -35,7 +35,7 @@ contract LaunchpadCohort is Ownable {
 
     function hasInit() internal {
         if (
-            accessControl != address(0) &&
+            addressHub != address(0) &&
             launchpadDatas != address(0) &&
             launchpadInvestor != address(0) &&
             launchpadHub != address(0)
@@ -45,7 +45,8 @@ contract LaunchpadCohort is Ownable {
     }
 
     function getAccessControl() external view returns (address) {
-        return accessControl;
+        AddressHub addressHub = AddressHub(addressHub);
+        return addressHub.accessControl();
     }
 
     // *::::::::::: -------- :::::::::::* //

@@ -1,16 +1,14 @@
 const { ethers } = require("hardhat");
 const { expect, assert } = require("chai");
-const {
-  _testInitFactoryCV,
-  _testInitCV,
-  _testInitFactoryMission,
-} = require("../../helpers/test_init");
+const { _testInitAll, getContractAt } = require("../../helpers/test_init");
+const { ZERO_ADDRESS } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "CV";
 
 describe(`Contract ${CONTRACT_NAME} `, () => {
-  let cv;
+  let addressHub;
   let factoryMission;
+  let contract;
   beforeEach(async () => {
     [
       this.owner,
@@ -23,76 +21,191 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       this.addr7,
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
 
-    let factoryCV = await _testInitFactoryCV();
-    factoryMission = await _testInitFactoryMission(factoryCV.target);
-    cv = await _testInitCV({ factoryCV, owner: this.addr1.address });
+    let contracts = await _testInitAll();
+    addressHub = await contracts.addressHub;
+    accessControl = await contracts.accessControl;
+    contract = await contracts.cvHub;
+    factoryMission = await contracts.missionsHub;
   });
 
   // *:::::::: INITIALISATION ::::::::* //
 
-  describe("Initialization", () => {
-    it("Should deploy smart contract properly", async () => {
-      expect(cv.target).to.not.equal(0x0);
-      expect(cv.target).to.not.equal("");
-      expect(cv.target).to.not.equal(null);
-      expect(cv.target).to.not.equal(undefined);
+  describe("Initialization CV Hub", () => {
+    it("Should have a collecter", async () => {
+      expect(await contract.getCollectFollowCv()).to.be.not.equal(ZERO_ADDRESS);
     });
 
-    it("Should NOT get mission", async () => {
-      let length = await cv.getMissionsLength();
-      expect(length).to.equal(0);
+    it("Should have 0 token", async () => {
+      expect(await contract.getTokensLength()).to.be.equal(0);
     });
 
-    it("Should get the good owner", async () => {
-      expect(await cv.owner()).to.equal(this.addr1.address);
+    it("Should create a CV", async () => {
+      await accessControl.createCV("tokenURI");
+      expect(await contract.getTokensLength()).to.be.equal(1);
+      expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
+      expect(await contract.getCV(this.owner.address)).to.be.equal(1);
+      expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
     });
 
-    it("Should set name", async () => {
-      await cv.connect(this.addr1).setName("Django");
-      const profile = await cv.getProfile();
-      const name = profile.name;
-      expect(name).to.equal("Django");
+    describe("NOT WORKS", () => {
+      it("Should NOT mint CV", async () => {
+        await expect(
+          contract.mint(this.owner.address, "tokenURI")
+        ).to.be.revertedWith("Must call function with proxy bindings");
+      });
+      it("Should NOT mint CV twice", async () => {
+        await accessControl.createCV("tokenURI");
+        await expect(accessControl.createCV("tokenURI")).to.be.revertedWith(
+          "CV already exist"
+        );
+      });
+    });
+  });
+
+  describe("Follow CV", () => {
+    let collecter;
+
+    beforeEach(async () => {
+      collecter = await getContractAt(
+        "CollectFollowCv",
+        await contract.getCollectFollowCv()
+      );
+      await accessControl.createCV("tokenURI");
+      await accessControl.connect(this.addr1).createCV("tokenURI");
+    });
+    describe("WORKS", () => {
+      it("Should have a collecter", async () => {
+        expect(await contract.getCollectFollowCv()).to.be.equal(
+          collecter.target
+        );
+      });
+      it("Should isFollow return true", async () => {
+        await contract.followCV(2);
+        let isFollow = await collecter.isFollow(1, 2);
+        expect(isFollow).to.be.equal(true);
+      });
+      it("Should update length followers", async () => {
+        let length = await collecter.getFollowerLength(2);
+        expect(length).to.be.equal(0);
+        await contract.followCV(2);
+        length = await collecter.getFollowerLength(2);
+
+        expect(length).to.be.equal(1);
+      });
+      it("Should update length followed", async () => {
+        let length = await collecter.getFollowedLength(1);
+        expect(length).to.be.equal(0);
+        await contract.followCV(2);
+        length = await collecter.getFollowedLength(1);
+
+        expect(length).to.be.equal(1);
+      });
+
+      it("Should get cv follower", async () => {
+        await contract.followCV(2);
+        let follower = await collecter.getFollower(2, 0);
+        expect(follower).to.be.equal(1);
+      });
+
+      it("Should get cv followed", async () => {
+        await contract.followCV(2);
+        let follower = await collecter.getFollowed(1, 0);
+        expect(follower).to.be.equal(2);
+      });
     });
 
-    it("Should buy mission", async () => {
-      await cv.connect(this.addr1).buyMission(factoryMission.target, 2000);
-      let length = await cv.getMissionsLength();
-      const missionAddr = await cv.getMission(parseInt(length) - 1);
-      const profile = await cv.getProfile();
-      expect(profile.followMissions[0]).to.equal(missionAddr);
+    describe("NOT WORKS", () => {
+      it("Should NOT follow CV twice", async () => {
+        await contract.followCV(2);
+        await expect(contract.followCV(2)).to.be.revertedWith(
+          "Already followed"
+        );
+      });
+      it("Should NOT follow CV if sender haven't CV", async () => {
+        await expect(
+          contract.connect(this.addr3).followCV(2)
+        ).to.be.revertedWith("CV not exist");
+      });
+      it("Should NOT follow CV wich not exist", async () => {
+        await expect(contract.followCV(3)).to.be.revertedWith(
+          "ERC721: invalid token ID"
+        );
+      });
+      it("Should NOT follow own cv", async () => {
+        await expect(contract.followCV(1)).to.be.revertedWith(
+          "Can't follow yourself"
+        );
+      });
     });
-    it("Should NOT followed mission twice", async () => {
-      await cv.connect(this.addr1).buyMission(factoryMission.target, 2000);
-      let length = await cv.getMissionsLength();
-      const missionAddr = await cv.getMission(parseInt(length) - 1);
-      await expect(
-        cv.connect(this.addr1).followMission(missionAddr)
-      ).to.be.revertedWith("Already followed");
+  });
+
+  describe("Unfollow CV", () => {
+    let collecter;
+
+    beforeEach(async () => {
+      collecter = await getContractAt(
+        "CollectFollowCv",
+        await contract.getCollectFollowCv()
+      );
+      await accessControl.createCV("tokenURI");
+      await accessControl.connect(this.addr1).createCV("tokenURI");
+      await contract.followCV(2);
+    });
+    describe("WORKS", () => {
+      it("Should unfollow CV", async () => {
+        await contract.unfollowCV(2);
+        let isFollow = await collecter.isFollow(1, 2);
+        expect(isFollow).to.be.equal(false);
+      });
+
+      it("Should update length followers", async () => {
+        let length = await collecter.getFollowerLength(2);
+        expect(length).to.be.equal(1);
+        await contract.unfollowCV(2);
+        length = await collecter.getFollowerLength(2);
+
+        expect(length).to.be.equal(0);
+      });
+      it("Should update length followed", async () => {
+        let length = await collecter.getFollowedLength(1);
+        expect(length).to.be.equal(1);
+        await contract.unfollowCV(2);
+        length = await collecter.getFollowedLength(1);
+
+        expect(length).to.be.equal(0);
+      });
     });
 
-    it("Should not buy mission", async () => {
-      await expect(
-        cv.connect(this.addr2).buyMission(factoryMission.target, 2000)
-      ).to.be.revertedWith("Ownable: caller is not the owner");
-    });
+    describe("NOT WORKS", () => {
+      it("Should NOT unfollow CV with no proxy bindings", async () => {
+        await expect(
+          collecter.unfollow(this.owner.address, 2)
+        ).to.be.revertedWith("Must call function with hub bindings");
+      });
+      it("Should NOT unfollow CV twice", async () => {
+        await contract.unfollowCV(2);
+        await expect(contract.unfollowCV(2)).to.be.revertedWith("Not followed");
+      });
+      it("Should NOT unfollow CV if sender haven't CV", async () => {
+        await expect(
+          contract.connect(this.addr3).unfollowCV(2)
+        ).to.be.revertedWith("CV not exist");
+      });
+      it("Should NOT unfollow CV wich not exist", async () => {
+        await expect(contract.unfollowCV(3)).to.be.revertedWith(
+          "ERC721: invalid token ID"
+        );
+      });
+      it("Should NOT unfollow own cv", async () => {
+        await expect(contract.unfollowCV(1)).to.be.revertedWith(
+          "Can't unfollow yourself"
+        );
+      });
 
-    // it("Should set a mission", async () => {
-    //   let transaction = await cv.setMission(
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test"
-    //   );
-    //   transaction.wait();
-    //   let length = await cv.getMissionLength();
-    //   expect(length).to.equal(1);
-    // });
+      it("Shoud NOT unfollow CV if not followed", async () => {
+        await accessControl.connect(this.addr2).createCV("tokenURI");
+        await expect(contract.unfollowCV(3)).to.be.revertedWith("Not followed");
+      });
+    });
   });
 });

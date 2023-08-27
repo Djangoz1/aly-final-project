@@ -4,15 +4,17 @@ pragma solidity 0.8.20;
 import {DataTypes} from "../libraries/DataTypes.sol";
 
 interface IAccessControl {
+    function initWorkflow() external;
+
     function hasRegistred(address _forCheck) external pure;
 
     function setPubHub(address _pubHub) external;
 
     function getPubHub() external view returns (address);
 
-    function setFactoryCV(address _factoryCV) external;
+    function setCVHub(address _CVHub) external;
 
-    function getFactoryCV() external view returns (address);
+    function getCVHub() external view returns (address);
 
     function setFeaturesHub(address _featuresHub) external;
 
@@ -34,7 +36,12 @@ interface IAccessControl {
 
     function buyCV() external returns (address);
 
-    function getCVByAddress(address _addr) external view returns (address);
+    function createPub(string calldata _tokenURI) external returns (uint);
+
+    function createPub(
+        string calldata _tokenURI,
+        address _sender
+    ) external returns (uint);
 
     function getPubIndexers(
         address _addr

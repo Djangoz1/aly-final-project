@@ -84,7 +84,6 @@ const WORKER_PROPOSAL_DATAS_EXEMPLE = {
 
 const LAUNCHPAD_DATAS_EXEMPLE = {
   tokenAddress: ZERO_ADDRESS,
-  pubURI: "qsdqsqsdsqsqsq",
   numberOfTier: 3,
   maxCap: 1000000000,
   minCap: 10000000,

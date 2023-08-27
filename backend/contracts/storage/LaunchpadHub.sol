@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {IAddressHub} from "../interfaces/IAddressHub.sol";
+import {ICVHub} from "../interfaces/ICVHub.sol";
 import "../launchpad/Launchpad.sol";
 // import {ICollectLaunchpadInvestor} from "../interfaces/ICollectLaunchpadInvestor.sol";
 import {ILaunchpadCohort} from "../interfaces/ILaunchpadCohort.sol";
@@ -15,11 +17,23 @@ contract LaunchpadHub is Ownable {
     Counters.Counter private _tokenIDs;
 
     address private addrLCohort;
+    address private addrAccessControl;
 
     uint8 public maxTiers = 5;
 
+    /**
+     * @dev This is the mapping of the launchpads address to the token ID
+     * @dev uint param is for token ID
+     * @dev return address is for launchpad address
+     */
+
     mapping(uint => address) private launchpads;
-    mapping(address => uint[]) private indexer;
+    /**
+     * @dev This is the mapping of the launchpads for cv ID
+     * @dev uint param is for CV ID
+     * @dev return uint[] for launchpad IDs
+     */
+    mapping(uint => uint[]) private indexer;
 
     modifier onlyProxy() {
         require(
@@ -32,9 +46,9 @@ contract LaunchpadHub is Ownable {
     constructor(address _addrLCohort) {
         require(_addrLCohort != address(0), "Must have address");
         addrLCohort = _addrLCohort;
-
-        IAccessControl iAC = accessControl();
-        iAC.setLaunchpadHub(address(this));
+        ILaunchpadCohort iLC = ILaunchpadCohort(_addrLCohort);
+        addrAccessControl = iLC.getAccessControl();
+        iLC.setLaunchpadHub(address(this));
     }
 
     function accessControl() private view returns (IAccessControl) {
@@ -45,8 +59,8 @@ contract LaunchpadHub is Ownable {
         return _tokenIDs.current();
     }
 
-    function ownerOf(address _cv) external view returns (uint[] memory) {
-        return indexer[_cv];
+    function getLaunchpads(uint _cvID) external view returns (uint[] memory) {
+        return indexer[_cvID];
     }
 
     function getLaunchpad(uint _id) external view returns (address) {
@@ -55,34 +69,34 @@ contract LaunchpadHub is Ownable {
         return launchpads[_id];
     }
 
-    function deployLaunchpad(
+    function mint(
         address _owner,
         DataTypes.LaunchpadData calldata _datas,
-        DataTypes.TierData[] calldata _tierDatas
-    ) external onlyProxy {
-        require(
-            bytes(_datas.pubURI).length > 0,
-            "Must create pub with information about your project"
-        );
-        require(
-            _datas.saleStart > block.timestamp &&
-                _datas.saleStart < _datas.saleEnd,
-            "Mismatch timestamp date datas"
-        );
-        require(_datas.numberOfTier <= maxTiers, "Too many tier numbers");
+        DataTypes.TierData[] calldata _tierDatas,
+        string memory _pubURI
+    ) external onlyProxy returns(uint) {
+        require(bytes(_pubURI).length > 0, "Must have pub URI");
+        
+        // require(_datas.tokenAddress != address(0), "Must have token address");
         _tokenIDs.increment();
+
         Launchpad newLaunchpad = new Launchpad(
             addrLCohort,
             _owner,
             _tokenIDs.current(),
             _datas,
-            _tierDatas
+            _tierDatas,
+            _pubURI
         );
-        IAccessControl iAC = accessControl();
-        address cv = iAC.getCVByAddress(_owner);
-        indexer[cv].push(_tokenIDs.current());
+        ILaunchpadCohort iLC = ILaunchpadCohort(addrLCohort);
+        IAddressHub iAH = IAddressHub(iLC.addressHub());
+
+        ICVHub iCVH = ICVHub(iAH.cvHub());
+        uint cvID = iCVH.getCV(_owner);
+        indexer[cvID].push(_tokenIDs.current());
 
         newLaunchpad.transferOwnership(_owner);
         launchpads[_tokenIDs.current()] = address(newLaunchpad);
+        return _tokenIDs.current();
     }
 }

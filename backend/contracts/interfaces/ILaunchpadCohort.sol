@@ -2,6 +2,12 @@
 pragma solidity 0.8.20;
 
 interface ILaunchpadCohort {
+    function accessControl() external view returns (address);
+
+    function addressHub() external view returns (address);
+
+    function launchpadHub() external view returns (address);
+
     function getAccessControl() external view returns (address);
 
     function deployLaunchpadHub() external;

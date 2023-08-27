@@ -14,11 +14,25 @@ library DataTypes {
      *    @param Paused when the protocol is paused
      */
 
+    enum InitStatus {
+        Initialization,
+        Init,
+        Paused
+    }
+
+    // ! TO DELETE
+    /**
+     *    @param Initialization during initialization process
+     *    @param Init when all addresses are stored
+     *    @param Paused when the protocol is paused
+     */
+
     enum AccessControlStatus {
         Initialization,
         Init,
         Paused
     }
+    // !
 
     /**
      *    @dev string name, string imgURI, address[] posts, uint followers, address[] followAccounts, address[] followMissions
@@ -40,6 +54,16 @@ library DataTypes {
         address[] posts;
     }
 
+    /**
+     *    @param cvID for followed cv ID
+     *    @param indexedAt for index on indexers[cvID]
+     */
+
+    struct FollowData {
+        uint cvID;
+        uint indexedAt;
+    }
+
     // *::::::::::::: ----------- :::::::::::::* //
     // *::::::::::::: PUBLICATION :::::::::::::* //
     // *::::::::::::: ----------- :::::::::::::* //
@@ -58,48 +82,61 @@ library DataTypes {
     }
 
     /**
-     *    @dev string title, string content, address publisher, uint followers
-     *    @param title
-     *    @param content
-     *    @param imgURI
-     *    @param publisher
-     *    @param followers
+     *    @param id
+     *    @param pubID
      */
-    struct PubData {
-        string title;
-        string content;
-        string imgURI;
-        address publisher;
-        uint followers;
+    struct LikeData {
+        uint id;
+        uint pubID;
+        uint indexedAt;
+        
     }
 
     // *::::::::::::: ------- :::::::::::::* //
     // *::::::::::::: MISSION :::::::::::::* //
     // *::::::::::::: ------- :::::::::::::* //
 
+    enum MissionStatus {
+        Process,
+        Close,
+        Contest
+    }
+
     struct MissionData {
-        uint followersLength;
-        string[] pubs;
-        // mapping(address=>uint) followers;
+        uint id;
+        MissionStatus status;
+        uint[] features;
     }
 
     // *::::::::::::: -------- ::::::::::::: *//
     // *::::::::::::: FEATURES ::::::::::::: *//
     // *::::::::::::: -------- ::::::::::::: *//
+    /**
+     *    @param missionID is mission ID of feature
+     *    @param workerAcceptJob is true when worker accept assignation job
+     *    @param enterpriseAcceptWorker when feature have a commit but owner refused it and worker accept to rework on it
+     */
+
+    struct FeatureInteractionData {
+        uint[] workerDemand;
+        uint missionID;
+        uint signedWorker;
+        bool workerAcceptJob;
+        bool workerContest;
+        bool ownerContest;
+    }
 
     /**
-     *    @param Waiting when feature didn't have assign worker
-     *    @param Working when owner assign a worker
-     *    @param Validated when owner accept the commit of worker. This one mean worker received wadge
+     *    @param Process when feature didn't have assign worker
      *    @param Improve when feature have a commit but owner refused it and worker accept to rework on it
-     *    @param Litigation when litige between worker and owner
+     *    @param Validated when owner accept the commit of worker. This one mean worker received wadge
+     *    @param Contest when litige between worker and owner
      */
-    enum FeatureType {
-        Waiting,
-        Working,
-        Validated,
+    enum FeatureStatus {
+        Process,
         Improve,
-        Litigation
+        Validated,
+        Contest
     }
 
     /**
@@ -115,15 +152,15 @@ library DataTypes {
      */
 
     struct FeatureData {
+        uint id;
         uint256 missionID;
         uint256 startedAt;
-        uint256 createdAt;
         uint256 wadge;
         uint16 estimatedDays;
-        FeatureType status;
+        FeatureStatus status;
         string tokenURI;
         bool isInviteOnly;
-        address assignedWorker;
+        uint cvWorker;
     }
 
     /**
@@ -199,7 +236,6 @@ library DataTypes {
 
     struct LaunchpadData {
         address tokenAddress;
-        string pubURI;
         uint8 numberOfTier;
         uint256 maxCap;
         uint256 minCap;

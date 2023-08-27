@@ -177,14 +177,7 @@ contract CollectLaunchpadDatas is Ownable {
             totalMinCap = totalMinCap.add(_minTierCaps[i]);
             totalMaxCap = totalMaxCap.add(_maxTierCaps[i]);
         }
-        require(
-            totalMinCap <= totalMaxCap,
-            "Mismatch min and max capitalization"
-        );
-        require(
-            totalMinCap > 0 && totalMaxCap > 0,
-            "Capitalization need values"
-        );
+       
 
         for (uint256 i = 0; i < _tierLength; i++) {
             DataTypes.TierData memory _tierData;
@@ -203,10 +196,7 @@ contract CollectLaunchpadDatas is Ownable {
             tierDetails[id_][i] = _tierData;
         }
 
-        launchpadDatas[_id].numberOfTier = uint8(_tierLength);
-        launchpadDatas[_id].minCap = totalMinCap;
-
-        launchpadDatas[_id].maxCap = totalMaxCap;
+        
     }
 
     /**

@@ -10,8 +10,8 @@ interface IPubsHub {
 
     function getIndexer(address _cv) external view returns (uint[] memory);
 
-    function postPub(
-        address _cv,
+    function mint(
+        uint _cvID,
         string calldata _tokenURI
     ) external returns (uint);
 }

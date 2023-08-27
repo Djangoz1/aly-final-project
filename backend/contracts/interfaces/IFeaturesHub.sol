@@ -11,11 +11,25 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 interface IFeaturesHub {
     // Ajoutez votre code ici
 
-    function createFeature(
-        address _cv,
+    function getAddressHub() external view returns (address);
+
+    function mint(
+        address _owner,
+        uint _missionID,
+        uint _wadge,
+        uint16 _estimatedDays,
+        bool _isInviteOnly,
+        string memory _tokenURI
+    ) external returns (uint);
+
+    function getData(
+        uint _id
+    ) external view returns (DataTypes.FeatureData memory _data);
+
+    function setFeature(
+        uint _featureID,
         DataTypes.FeatureData memory _data
-    ) external  returns(uint);
+    ) external returns (bool);
 
-    function getDatas(uint _id) external view returns(DataTypes.FeatureData memory _data);
-
+    function ownerOf(uint256 tokenId) external view returns (address owner);
 }

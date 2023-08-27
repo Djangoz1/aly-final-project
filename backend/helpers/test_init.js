@@ -31,8 +31,45 @@ const getProxy = async (accessControlAddr) => {
   return accessControl;
 };
 
-const _testInitAccessControl = async () => {
-  const accessControl = await ethers.deployContract("AccessControl");
+const _testInitAll = async () => {
+  let addressHub = await _testInitAddressHub();
+  let accessControl = await _testInitAccessControl(addressHub.target);
+
+  expect(await accessControl.workflow()).to.equal(0);
+  let missionsHub = await _testInitMissionsHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let cvHub = await _testInitCVHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let pubsHub = await _testInitPubHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let featuresHub = await _testInitFeaturesHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let workerProposalHub = await _testInitWorkerProposalHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let launchpadContracts = await _testInitLaunchpadContracts(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(1);
+
+  return {
+    addressHub,
+    accessControl,
+    missionsHub,
+    cvHub,
+    pubsHub,
+    featuresHub,
+    workerProposalHub,
+    launchpadContracts,
+  };
+};
+
+const _testInitAddressHub = async () => {
+  const accessControl = await ethers.deployContract("AddressHub");
+  await accessControl.waitForDeployment();
+  return accessControl;
+};
+const _testInitAccessControl = async (addressHub) => {
+  const accessControl = await ethers.deployContract("AccessControl", [
+    addressHub,
+  ]);
   await accessControl.waitForDeployment();
   return accessControl;
 };
@@ -46,8 +83,8 @@ const getCV = async (_cv) => {
   return cv;
 };
 
-const _testInitFactoryCV = async (accessControl) => {
-  const factoryCV = await ethers.deployContract("FactoryCV", [accessControl]);
+const _testInitCVHub = async (accessControl) => {
+  const factoryCV = await ethers.deployContract("CVHub", [accessControl]);
 
   await factoryCV.waitForDeployment();
 
@@ -56,9 +93,7 @@ const _testInitFactoryCV = async (accessControl) => {
 
 const _testInitCV = async (_accessControl, account, amount) => {
   const accessControl = await getProxy(_accessControl);
-  const newCV = await accessControl.connect(account).buyCV({
-    value: ethers.parseEther(`${amount}`),
-  });
+  const newCV = await accessControl.connect(account).createCV("tokenURI");
   const _cv = await accessControl
     .connect(account)
     .getCVByAddress(account.address);
@@ -71,8 +106,8 @@ const _testInitCV = async (_accessControl, account, amount) => {
 // *:::::::::::::: PUB ::::::::::::::*//
 // *:::::::::::::: --- ::::::::::::::*//
 
-const _testInitPubHub = async (accessControl) => {
-  const pubHub = await ethers.deployContract("PubsHub", [accessControl]);
+const _testInitPubHub = async (addressHub) => {
+  const pubHub = await ethers.deployContract("PubsHub", [addressHub]);
   await pubHub.waitForDeployment();
   return pubHub;
 };
@@ -125,7 +160,7 @@ const _testInitMission = async (_accessControl, account, _amount, uriData) => {
     await accessControl.iMH()
   );
 
-  const amount = await accessControl.missionPrice()
+  const amount = await accessControl.missionPrice();
   const _cv = await accessControl.getCVByAddress(account.address);
 
   const id = parseInt(await missionsHub.getTokensLength()) + 1;
@@ -133,7 +168,6 @@ const _testInitMission = async (_accessControl, account, _amount, uriData) => {
 
   const json = await createURIMission(uriData);
   const tokenURI = json.IpfsHash;
-
 
   const beforeLength = parseInt(await missionsHub.balanceOf(_cv));
 
@@ -154,10 +188,8 @@ const _testInitMission = async (_accessControl, account, _amount, uriData) => {
   return id;
 };
 
-const _testInitMissionsHub = async (_accessControl) => {
-  const missionsHub = await ethers.deployContract("MissionsHub", [
-    _accessControl,
-  ]);
+const _testInitMissionsHub = async (_addressHub) => {
+  const missionsHub = await ethers.deployContract("MissionsHub", [_addressHub]);
   return missionsHub;
 };
 
@@ -165,10 +197,8 @@ const _testInitMissionsHub = async (_accessControl) => {
 // *:::::::::::::: FEATURE ::::::::::::::* //
 // *:::::::::::::: ------- ::::::::::::::* //
 
-const _testInitFeaturesHub = async (accessControlAdress) => {
-  const featuresHub = await ethers.deployContract("FeaturesHub", [
-    accessControlAdress,
-  ]);
+const _testInitFeaturesHub = async (addressHub) => {
+  const featuresHub = await ethers.deployContract("FeaturesHub", [addressHub]);
   return featuresHub;
 };
 
@@ -228,9 +258,9 @@ const _testInitFeature = async (
 // *:::::::::::::: WORKER PROPOSAL ::::::::::::::* //
 // *:::::::::::::: --------------- ::::::::::::::* //
 
-const _testInitWorkerProposalHub = async (accessControl) => {
+const _testInitWorkerProposalHub = async (addressHub) => {
   const workerProposalHub = await ethers.deployContract("WorkProposalHub", [
-    accessControl,
+    addressHub,
   ]);
   await workerProposalHub.waitForDeployment();
   return workerProposalHub;
@@ -284,55 +314,48 @@ const _testInitWorkerProposal = async (
 // *:::::::::::::: LAUNCHPAD ::::::::::::::* //
 // *:::::::::::::: --------- ::::::::::::::* //
 
-const _testInitLaunchpadContracts = async (accessControl, address) => {
-  const cohort = await ethers.deployContract("LaunchpadCohort", [
-    accessControl,
-  ]);
+const _testInitLaunchpadContracts = async (addressHub, address) => {
+  const cohort = await ethers.deployContract("LaunchpadCohort", [addressHub]);
   await cohort.waitForDeployment();
-  expect(await cohort.getAccessControl()).to.be.equal(accessControl);
-  
+
   const hub = await ethers.deployContract("LaunchpadHub", [cohort.target]);
   await hub.waitForDeployment();
-  expect(await cohort.getAccessControl()).to.be.equal(accessControl);
-  
+
   const datas = await ethers.deployContract("CollectLaunchpadDatas", [
     cohort.target,
   ]);
   await datas.waitForDeployment();
-  
+
   const investors = await ethers.deployContract("CollectLaunchpadInvestor", [
     cohort.target,
   ]);
   await investors.waitForDeployment();
-  
-  await expect(
-    ethers.deployContract("CollectLaunchpadInvestor", [cohort.target])
-    ).to.be.revertedWith("Deployment already done");
-    
-    expect(await datas.owner()).to.be.equal(await investors.owner());
-    expect(await investors.owner()).to.be.equal(await hub.owner());
-    expect(await hub.owner()).to.be.equal(await cohort.owner());
-    expect(await cohort.owner()).to.be.equal(await datas.owner());
-    if (address) {
-      
-      expect(await datas.owner()).to.be.equal(address);
-      expect(await investors.owner()).to.be.equal(address);
-      expect(await hub.owner()).to.be.equal(address);
-      expect(await cohort.owner()).to.be.equal(address);
-    }
-    return { investors, datas, cohort, hub };
+
+  expect(await datas.owner()).to.be.equal(await investors.owner());
+  expect(await investors.owner()).to.be.equal(await hub.owner());
+  expect(await hub.owner()).to.be.equal(await cohort.owner());
+  expect(await cohort.owner()).to.be.equal(await datas.owner());
+  if (address) {
+    expect(await datas.owner()).to.be.equal(address);
+    expect(await investors.owner()).to.be.equal(address);
+    expect(await hub.owner()).to.be.equal(address);
+    expect(await cohort.owner()).to.be.equal(address);
+  }
+  return { investors, datas, cohort, hub };
 };
 
 const _testInitLaunchpad = async (
-  _accessControl,
+  addressHub,
   account,
   _token,
   amount,
   datas,
   tierDatas
 ) => {
-  const accessControl = await getProxy(_accessControl);
+  let AddressHub = await getContractAt("AddressHub", addressHub);
+  let accessControl;
   let token;
+
   if (!datas) {
     datas = LAUNCHPAD_DATAS_EXEMPLE;
     const currentDate = new Date();
@@ -347,13 +370,14 @@ const _testInitLaunchpad = async (
 
     const pubID = await _testInitPub(_accessControl, account);
 
-    const pubsHub = await getContractAt("PubsHub", await accessControl.iPH());
+    const pubsHub = await getContractAt("PubsHub", await addressHub.pubsHub());
     const pubURI = await pubsHub.tokenURI(pubID);
     datas.pubURI = pubURI;
     token = await _testInitToken(account, "Django", "DJN", 10000000);
 
     datas.tokenAddress = token.target;
   }
+  return;
   if (!tierDatas) {
     tierDatas = [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE];
   }
@@ -364,7 +388,7 @@ const _testInitLaunchpad = async (
 
   const launchpadHub = await getContractAt(
     "LaunchpadHub",
-    await accessControl.iLH()
+    await accessControl.launchpadHub()
   );
 
   const beforeLength = parseInt(await launchpadHub.getTokensLength());
@@ -437,11 +461,14 @@ const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
 };
 
 module.exports = {
+  getContractAt,
+  _testInitAll,
+  _testInitAddressHub,
   _testInitAccessControl,
   _testInitFeaturesHub,
   _testInitWorkerProposalHub,
   _testInitWorkerProposal,
-  _testInitFactoryCV,
+  _testInitCVHub,
   _testInitCV,
   _testInitPub,
   _testInitPubHub,

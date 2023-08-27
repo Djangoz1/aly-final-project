@@ -2,156 +2,56 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 import {DataTypes} from "./libraries/DataTypes.sol";
-import {DataRecast} from "./libraries/DataRecast.sol";
+
 import {IAccessControl} from "./interfaces/IAccessControl.sol";
 
 import {IMissionsHub} from "./interfaces/IMissionsHub.sol";
 import {IFeaturesHub} from "./interfaces/IFeaturesHub.sol";
 
+import {AddressHub} from "./storage/AddressHub.sol";
 import {ILaunchpadCohort} from "./interfaces/ILaunchpadCohort.sol";
 import {ILaunchpadHub} from "./interfaces/ILaunchpadHub.sol";
 import {IWorkerProposalHub} from "./interfaces/IWorkerProposalHub.sol";
 import {IPubsHub} from "./interfaces/IPubsHub.sol";
-import {IFactoryCV} from "./interfaces/IFactoryCV.sol";
-import {ICV} from "./interfaces/ICV.sol";
+import {CVHub} from "./storage/CVHub.sol";
+
+import {ICollectLikePub} from "./interfaces/ICollectLikePub.sol";
 
 // import {IERC20Token} from "./interfaces/IERC20Token.sol";
 
 contract AccessControl is Ownable {
-    uint public cvPrice = 0.01 ether;
     uint public missionPrice = 0.05 ether;
     uint public launchpadPrice = 0.4 ether;
 
-    IMissionsHub public iMH;
-    IFactoryCV public iFCV;
-    IPubsHub public iPH;
-    IFeaturesHub public iFH;
-    IWorkerProposalHub public iWPH;
-    ILaunchpadCohort public iLC;
-    ILaunchpadHub public iLH;
+    AddressHub private AHub;
+
+    IWorkerProposalHub private iWPH;
+    ICollectLikePub private iCLP;
     // IERC20Hub public iERC20H;
 
-    DataTypes.AccessControlStatus public workflow;
+    DataTypes.InitStatus public workflow;
 
-    modifier onlyInit() {
-        require(
-            workflow == DataTypes.AccessControlStatus.Init,
-            "Init is not ready"
-        );
+    constructor(address _addressHub) {
+        require(_addressHub != address(0), "Must provide a valid address");
+        AHub = AddressHub(_addressHub);
+        AHub.setAccessControl(address(this));
+    }
+
+    modifier hasRegistred(address _ownerOf) {
+        CVHub CVH = CVHub(AHub.cvHub());
+        require(CVH.balanceOf(_ownerOf) == 1, "CV not exist");
         _;
     }
 
-    modifier onlyStart() {
+    function initWorkflow() external {
         require(
-            workflow == DataTypes.AccessControlStatus.Initialization,
-            "Init is not ready"
+            workflow == DataTypes.InitStatus.Initialization,
+            "Already init"
         );
-        _;
-    }
-
-    function hasInit() internal view returns (bool) {
-        if (
-            address(iMH) != address(0) &&
-            address(iFCV) != address(0) &&
-            address(iFH) != address(0) &&
-            address(iWPH) != address(0) &&
-            address(iLH) != address(0) &&
-            address(iLC) != address(0) &&
-            address(iPH) != address(0)
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function hasRegistred(address _forCheck) external view {
-        iFCV.checkRegistred(_forCheck);
-    }
-
-    // *::::::::::::::: -------------- :::::::::::::::* //
-    // *::::::::::::::: Initialisation :::::::::::::::* //
-    // *::::::::::::::: -------------- :::::::::::::::* //
-
-    function setPubHub(address _pubHub) external onlyStart {
-        iPH = IPubsHub(_pubHub);
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function getPubHub() external view returns (address) {
-        return address(iPH);
-    }
-
-    function setFactoryCV(address _factoryCV) external onlyStart {
-        iFCV = IFactoryCV(_factoryCV);
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function getFactoryCV() external view returns (address) {
-        return address(iFCV);
-    }
-
-    function setMissionsHub(address _missionsHub) external onlyStart {
-        iMH = IMissionsHub(_missionsHub);
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function getMissionsHub() external view returns (address) {
-        return address(iMH);
-    }
-
-    function setFeaturesHub(address _featuresHub) external onlyStart {
-        iFH = IFeaturesHub(_featuresHub);
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function getFeaturesHub() external view returns (address) {
-        return address(iFH);
-    }
-
-    function setWorkerProposalHub(
-        address _workerProposalHub
-    ) external onlyStart {
-        iWPH = IWorkerProposalHub(_workerProposalHub);
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function getWorkerProposalHub() external view returns (address) {
-        return address(iWPH);
-    }
-
-    function setLaunchpadCohort(address _launchpadCohort) external onlyStart {
-        require(_launchpadCohort != address(0), "Must set a valid address");
-        iLC = ILaunchpadCohort(_launchpadCohort);
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function setLaunchpadHub(address _launchpadHub) external onlyStart {
-        require(_launchpadHub != address(0), "Must set a valid address");
-        iLH = ILaunchpadHub(_launchpadHub);
-        iLC.setLaunchpadHub(_launchpadHub);
-
-        if (hasInit()) {
-            workflow = DataTypes.AccessControlStatus.Init;
-        }
-    }
-
-    function getLaunchpadCohort() external view returns (address) {
-        return address(iLC);
+        workflow = DataTypes.InitStatus.Init;
     }
 
     // *::::::::::::::: ----------- :::::::::::::::* //
@@ -160,78 +60,83 @@ contract AccessControl is Ownable {
 
     /**
      * @notice This function can called only one time per address
-     * @dev Second call will be reverted by iFCV.createCV(_owner) because sender have already CV
-     * @return address target deployment cv
+     * @dev Second call will be reverted by CVH.createCV(_owner) because sender have already CV
      */
-    function buyCV() external payable onlyInit returns (address) {
-        require(msg.value > cvPrice, "Value must to be equal cv price");
-        address newCV = iFCV.createCV(msg.sender);
-        return newCV;
-    }
-
-    /**
-     * @param _addr owner of cv
-     * @return address of cv
-     */
-    function getCVByAddress(
-        address _addr
-    ) external view onlyInit returns (address) {
-        return iFCV.getCVByAddress(_addr);
+    function createCV(string calldata _tokenURI) external {
+        CVHub CVH = CVHub(AHub.cvHub());
+        CVH.mint(msg.sender, _tokenURI);
     }
 
     // *::::::::::::::: ------------ :::::::::::::::* //
     // *::::::::::::::: PUB BINDINGS :::::::::::::::* //
     // *::::::::::::::: ------------ :::::::::::::::* //
 
-    function createPub(
-        string calldata _tokenURI
-    ) external onlyInit returns (uint) {
-        iFCV.checkRegistred(msg.sender);
-        uint newPub = iPH.postPub(iFCV.getCVByAddress(msg.sender), _tokenURI);
+    function _createPub(
+        string calldata _tokenURI,
+        address _sender
+    ) internal hasRegistred(_sender) returns (uint) {
+        IPubsHub iPH = IPubsHub(AHub.pubsHub());
+        CVHub CVH = CVHub(AHub.cvHub());
+        uint cvID = CVH.getCV(_sender);
+
+        uint newPub = iPH.mint(cvID, _tokenURI);
         return newPub;
     }
+
+    function createPub(string calldata _tokenURI) external returns (uint) {
+        uint newPub = _createPub(_tokenURI, msg.sender);
+        return newPub;
+    }
+
+    function createPub(
+        string calldata _tokenURI,
+        address _sender
+    ) external returns (uint) {
+        uint newPub = _createPub(_tokenURI, _sender);
+        return newPub;
+    }
+
+    // function followPub(uint _pubID) external hasRegistred(msg.sender) {
+    //     iCLP.mint(msg.sender, _pubID);
+    // }
 
     // *:::::::::::: ----------------- ::::::::::::* //
     // *:::::::::::: MISSIONS BINDINGS ::::::::::::* //
     // *:::::::::::: ----------------- ::::::::::::* //
 
-    function buyMission(string calldata _tokenURI) external payable {
+    function buyMission(
+        string calldata _tokenURI
+    ) external payable hasRegistred(msg.sender) {
         require(
-            msg.value >= missionPrice,
+            msg.value == missionPrice,
             "Value must to be equal mission price"
         );
-        iFCV.checkRegistred(msg.sender);
-        address cv = iFCV.getCVByAddress(msg.sender);
-        iMH.createMission(cv, _tokenURI);
+        IMissionsHub iMH = IMissionsHub(AHub.missionsHub());
+        iMH.mint(msg.sender, _tokenURI);
     }
 
     // *:::::::::::: ----------------- ::::::::::::* //
     // *:::::::::::: FEATURES BINDINGS ::::::::::::* //
     // *:::::::::::: ----------------- ::::::::::::* //
 
-    function postFeature(
-        DataTypes.FeatureData memory _data
-    ) external payable onlyInit {
+    function createFeature(
+        uint _missionID,
+        uint16 _estimatedDays,
+        bool _isInviteOnly,
+        string memory _tokenURI
+    ) external payable hasRegistred(msg.sender) {
+        IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
         require(msg.value > 0, "Must provide a value");
-        require(_data.missionID > 0, "Must provide a mission");
-        require(
-            iMH.ownerOf(_data.missionID) == iFCV.getCVByAddress(msg.sender),
-            "Not the owner of mission"
+        require(bytes(_tokenURI).length > 0, "Feature must have a metadata");
+
+        iFH.mint(
+            msg.sender,
+            _missionID,
+            msg.value,
+            _estimatedDays,
+            _isInviteOnly,
+            _tokenURI
         );
-        require(
-            bytes(_data.tokenURI).length > 0,
-            "Feature must have a metadata"
-        );
-        iMH.checkRegistred(_data.missionID);
-        iFCV.checkRegistred(msg.sender);
-        if (_data.assignedWorker != address(0)) {
-            ICV cvWorker = ICV(_data.assignedWorker);
-            iFCV.checkRegistred(cvWorker.owner());
-            _data.isInviteOnly = true;
-        }
-        _data.createdAt = block.timestamp;
-        _data.wadge = msg.value;
-        iFH.createFeature(iFCV.getCVByAddress(msg.sender), _data);
     }
 
     // *:::::::::::: ------------------------ ::::::::::::* //
@@ -241,22 +146,19 @@ contract AccessControl is Ownable {
     function createWorkerProposal(
         string calldata _tokenURI,
         uint _featureID
-    ) external onlyInit {
-        iFCV.checkRegistred(msg.sender);
-        DataTypes.FeatureData memory data = iFH.getDatas(_featureID);
+    ) external hasRegistred(msg.sender) {
+        // IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
 
-        if (data.assignedWorker != address(0)) {
-            require(
-                data.assignedWorker == msg.sender,
-                "Must be assigned for propose a work"
-            );
-        }
+        // DataTypes.FeatureData memory data = iFH.getData(_featureID);
 
-        iWPH.postWorkerProposal(
-            iFCV.getCVByAddress(msg.sender),
-            _tokenURI,
-            _featureID
-        );
+        // if (data.cvWorker != 0) {
+        //     require(
+        //         data.cvWorker == msg.sender,
+        //         "Must be assigned for propose a work"
+        //     );
+        // }
+
+        iWPH.postWorkerProposal(msg.sender, _tokenURI, _featureID);
     }
 
     // *:::::::::::: ------------------ ::::::::::::* //
@@ -268,10 +170,14 @@ contract AccessControl is Ownable {
      */
     function createLaunchpad(
         DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tiersDatas
-    ) external payable onlyInit {
+        DataTypes.TierData[] memory _tiersDatas,
+        string memory _pubURI
+    ) external payable hasRegistred(msg.sender) {
+        ILaunchpadCohort iLC = ILaunchpadCohort(AHub.launchpadCohort());
+        ILaunchpadHub iLH = ILaunchpadHub(iLC.launchpadHub());
+
         require(msg.value == launchpadPrice, "Invalid value for launchpad");
-        iFCV.checkRegistred(msg.sender);
-        iLH.deployLaunchpad(msg.sender, _datas, _tiersDatas);
+        uint newID = iLH.mint(msg.sender, _datas, _tiersDatas, _pubURI);
+        require(newID > 0, "Invalid launchpad ID");
     }
 }
