@@ -15,10 +15,10 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 // import {ICollectLikePub} from "./interfaces/ICollectLikePub.sol";
 
 contract AddressHub is Ownable {
-
-
     address public accessControl;
     address public missionsHub;
+    address public disputesHub;
+    address public arbitratorsHub;
     address public cvHub;
     address public pubsHub;
     address public featuresHub;
@@ -28,6 +28,8 @@ contract AddressHub is Ownable {
     function _hasInit() internal {
         if (
             accessControl != address(0) &&
+            arbitratorsHub != address(0) &&
+            disputesHub != address(0) &&
             missionsHub != address(0) &&
             cvHub != address(0) &&
             pubsHub != address(0) &&
@@ -42,6 +44,16 @@ contract AddressHub is Ownable {
 
     function setAccessControl(address _accessControl) external {
         accessControl = _accessControl;
+        _hasInit();
+    }
+
+    function setArbitratorsHub(address _arbitratorsHub) external {
+        arbitratorsHub = _arbitratorsHub;
+        _hasInit();
+    }
+
+    function setDisputesHub(address _disputesHub) external {
+        disputesHub = _disputesHub;
         _hasInit();
     }
 

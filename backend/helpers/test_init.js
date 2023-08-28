@@ -47,6 +47,10 @@ const _testInitAll = async () => {
   let workerProposalHub = await _testInitWorkerProposalHub(addressHub.target);
   expect(await accessControl.workflow()).to.equal(0);
   let launchpadContracts = await _testInitLaunchpadContracts(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let disputesHub = await _testInitDisputesHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let arbitratorsHub = await _testInitArbitratorsHub(addressHub.target);
   expect(await accessControl.workflow()).to.equal(1);
 
   return {
@@ -56,6 +60,8 @@ const _testInitAll = async () => {
     cvHub,
     pubsHub,
     featuresHub,
+    disputesHub,
+    arbitratorsHub,
     workerProposalHub,
     launchpadContracts,
   };
@@ -72,6 +78,19 @@ const _testInitAccessControl = async (addressHub) => {
   ]);
   await accessControl.waitForDeployment();
   return accessControl;
+};
+
+const _testInitDisputesHub = async (addressHub) => {
+  const disputesHub = await ethers.deployContract("DisputesHub", [addressHub]);
+  await disputesHub.waitForDeployment();
+  return disputesHub;
+};
+const _testInitArbitratorsHub = async (addressHub) => {
+  const arbitratorsHub = await ethers.deployContract("ArbitratorsHub", [
+    addressHub,
+  ]);
+  await arbitratorsHub.waitForDeployment();
+  return arbitratorsHub;
 };
 
 // *:::::::::::::: -- ::::::::::::::*//
@@ -467,7 +486,9 @@ module.exports = {
   _testInitAccessControl,
   _testInitFeaturesHub,
   _testInitWorkerProposalHub,
+  _testInitDisputesHub,
   _testInitWorkerProposal,
+  _testInitArbitratorsHub,
   _testInitCVHub,
   _testInitCV,
   _testInitPub,

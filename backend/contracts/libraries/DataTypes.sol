@@ -2,6 +2,92 @@
 pragma solidity 0.8.20;
 
 library DataTypes {
+    enum EscrowStatus {
+        Initial,
+        Reclaimed,
+        Disputed,
+        Resolved
+    }
+
+    struct DisputeData {
+        uint id;
+        CourtIDs courtID;
+        uint nbArbitrators;
+        uint createdAt;
+        uint reclaimedAt;
+        uint resolvedAt;
+        uint reclamationPeriod;
+        uint value;
+        uint payerID; // cvID
+        uint payeeID; // cvID
+        string tokenURI;
+        bool appeal;
+    }
+
+    enum ArbitrationVote {
+        Waiting,
+        RefusedToArbitrate,
+        PayerWins,
+        PayeeWins
+    }
+
+    enum CourtIDs {
+        Centralized,
+        Kleros,
+        React,
+        Python,
+        NodeJS,
+        Solidity,
+        Java,
+        Cpp,
+        CSharp,
+        Go,
+        Rust,
+        Ruby,
+        PHP,
+        Swift,
+        Kotlin,
+        Dart,
+        Scala,
+        Haskell,
+        Lua,
+        JavaScript,
+        TypeScript,
+        CoffeScript,
+        Shell,
+        SQL,
+        HTML
+    }
+
+    enum ArbitratorStatus {
+        None,
+        Invited,
+        Refused,
+        Accepted
+    }
+
+    struct ArbitratorData {
+        uint id;
+        uint cvID;
+        DataTypes.CourtIDs courtID;
+        uint indexedAtCourt;
+        uint balance;
+        uint nbArbitrations;
+    }
+
+    struct EvidenceData {
+        string missionURI;
+        string featureURI;
+        string disputeURI;
+        string workURI;
+    }
+
+    struct ArbitrationData {
+        uint arbitratorID;
+        uint disputeID;
+        ArbitrationVote vote;
+    }
+
     enum DeploymentStatus {
         Pending,
         Done,
@@ -89,7 +175,6 @@ library DataTypes {
         uint id;
         uint pubID;
         uint indexedAt;
-        
     }
 
     // *::::::::::::: ------- :::::::::::::* //

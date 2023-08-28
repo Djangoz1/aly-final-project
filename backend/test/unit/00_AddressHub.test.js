@@ -6,6 +6,7 @@ const {
   _testInitCV,
   _testInitMission,
   _testInitMissionsHub,
+  _testInitArbitratorsHub,
   _testInitAccessControl,
   _testInitFeature,
   _testInitFeaturesHub,
@@ -17,6 +18,7 @@ const {
   _testInitLaunchpadContracts,
   _testInitAddressHub,
   _testInitAll,
+  _testInitDisputesHub,
 } = require("../../helpers/test_init");
 const {
   PUB_DATAS_EXEMPLE,
@@ -103,6 +105,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         launchpadContracts.cohort.target
       );
     });
+    it("Should deploy disputesHub contracts", async () => {
+      const disputesHub = await _testInitDisputesHub(contract.target);
+
+      expect(await contract.disputesHub()).to.equal(disputesHub.target);
+    });
+    it("Should deploy arbitratorsHub ", async () => {
+      const arbitratorsHub = await _testInitArbitratorsHub(contract.target);
+
+      expect(await contract.arbitratorsHub()).to.equal(arbitratorsHub.target);
+    });
 
     it("Should init workflow", async () => {
       const accessControl = await _testInitAccessControl(contract.target);
@@ -119,6 +131,11 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       await _testInitWorkerProposalHub(contract.target);
       expect(await accessControl.workflow()).to.equal(0);
       await _testInitLaunchpadContracts(contract.target);
+      expect(await accessControl.workflow()).to.equal(0);
+      await _testInitDisputesHub(contract.target);
+      expect(await accessControl.workflow()).to.equal(0);
+      await _testInitArbitratorsHub(contract.target);
+
       expect(await accessControl.workflow()).to.equal(1);
     });
 

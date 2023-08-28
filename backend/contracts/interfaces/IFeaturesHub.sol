@@ -13,6 +13,8 @@ interface IFeaturesHub {
 
     function getAddressHub() external view returns (address);
 
+    function getTokensLength() external view returns (uint);
+
     function mint(
         address _owner,
         uint _missionID,

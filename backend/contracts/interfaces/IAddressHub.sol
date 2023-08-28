@@ -9,7 +9,13 @@ interface IAddressHub {
 
     function pubsHub() external view returns (address);
 
+    function disputesHub() external view returns (address);
+
+    function arbitratorsHub() external view returns (address);
+
     function cvHub() external view returns (address);
+
+    function featuresHub() external view returns (address);
 
     function missionsHub() external view returns (address);
 
@@ -18,6 +24,10 @@ interface IAddressHub {
     function setPubHub(address _pubHub) external;
 
     function setCVHub(address _CVHub) external;
+
+    function setArbitratorsHub(address _arbitratorsHub) external;
+
+    function setDisputesHub(address _disputesHub) external;
 
     function setFeaturesHub(address _featuresHub) external;
 
