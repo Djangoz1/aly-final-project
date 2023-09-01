@@ -46,6 +46,15 @@ contract AccessControl is Ownable {
         _;
     }
 
+    modifier onlySatteliteContracts() {
+        require(
+            AHub.disputesHub() == msg.sender ||
+                AHub.featuresHub() == msg.sender,
+            "Only callable by our contracts"
+        );
+        _;
+    }
+
     function initWorkflow() external {
         require(
             workflow == DataTypes.InitStatus.Initialization,
@@ -96,6 +105,16 @@ contract AccessControl is Ownable {
         return newPub;
     }
 
+    function sendTransaction(
+        address _to,
+        uint _value
+    ) external payable onlySatteliteContracts returns (bool) {
+        // Transférer les ETH à l'adresse spécifiée
+        (bool success, ) = _to.call{value: _value}("");
+        require(success, "Transaction failed");
+        return true;
+    }
+
     // function followPub(uint _pubID) external hasRegistred(msg.sender) {
     //     iCLP.mint(msg.sender, _pubID);
     // }
@@ -123,7 +142,8 @@ contract AccessControl is Ownable {
         uint _missionID,
         uint16 _estimatedDays,
         bool _isInviteOnly,
-        string memory _tokenURI
+        string memory _tokenURI,
+        DataTypes.CourtIDs _specification
     ) external payable hasRegistred(msg.sender) {
         IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
         require(msg.value > 0, "Must provide a value");
@@ -135,7 +155,8 @@ contract AccessControl is Ownable {
             msg.value,
             _estimatedDays,
             _isInviteOnly,
-            _tokenURI
+            _tokenURI,
+            _specification
         );
     }
 

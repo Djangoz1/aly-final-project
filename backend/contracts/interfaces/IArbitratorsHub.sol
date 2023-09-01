@@ -21,7 +21,17 @@ interface IArbitratorsHub {
         uint _amount
     ) external;
 
-    function selectArbitrator(
+    function boostRandomlyArbitrator(
+        DataTypes.CourtIDs _courtID,
+        uint _rand
+    ) external view returns (uint256);
+
+    function randomlyArbitrator(
+        DataTypes.CourtIDs _courtID,
+        uint256 _randomID
+    ) external view returns (uint256);
+
+    function balanceOfCourt(
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256);
 
@@ -39,4 +49,6 @@ interface IArbitratorsHub {
     ) external view returns (uint256);
 
     function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external;
+
+    function ownerOf(uint256 tokenId) external view returns (address owner);
 }

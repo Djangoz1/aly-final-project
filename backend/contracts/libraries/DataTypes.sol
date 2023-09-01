@@ -78,7 +78,6 @@ library DataTypes {
     struct EvidenceData {
         string missionURI;
         string featureURI;
-        string disputeURI;
         string workURI;
     }
 
@@ -243,7 +242,7 @@ library DataTypes {
         uint256 wadge;
         uint16 estimatedDays;
         FeatureStatus status;
-        string tokenURI;
+        CourtIDs specification;
         bool isInviteOnly;
         uint cvWorker;
     }

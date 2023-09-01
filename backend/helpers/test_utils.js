@@ -11,6 +11,9 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 // *::::::::::::: WORK PROPOSAL :::::::::::::* //
 // *::::::::::::: ------------- :::::::::::::* //
 
+const getAccount = (accounts, address) =>
+  accounts.filter((el) => (el.address === address ? el : null));
+
 const PUB_DATAS_URI_EXEMPLE = {
   id: 0,
   title: "Title of my post",
@@ -106,6 +109,7 @@ const TIER_DATAS_EXEMPLE = {
 module.exports = {
   _testParseHex,
   ZERO_ADDRESS,
+  getAccount,
   PUB_DATAS_URI_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
   MISSION_DATAS_URI_EXEMPLE,

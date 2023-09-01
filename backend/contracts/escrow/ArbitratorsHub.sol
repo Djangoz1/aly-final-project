@@ -3,13 +3,15 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "hardhat/console.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
 import {IAddressHub} from "../interfaces/IAddressHub.sol";
 
-contract ArbitratorsHub {
+contract ArbitratorsHub is ERC721URIStorage {
     using Counters for Counters.Counter;
     // We don't use  ERC721 standard for reducing gas cost
     Counters.Counter private _tokenIDs;
@@ -23,6 +25,7 @@ contract ArbitratorsHub {
      * @dev indexers is a mapping of each court ID to an array of arbitrator ID
      */
     mapping(DataTypes.CourtIDs => uint256[]) public indexersCourt;
+    mapping(DataTypes.CourtIDs => uint256) public balancesCourt;
 
     mapping(uint256 => mapping(DataTypes.CourtIDs => uint256))
         public indexersCV;
@@ -32,13 +35,13 @@ contract ArbitratorsHub {
 
     modifier onlyProxy() {
         require(
-            msg.sender == addressHub.accessControl(),
+            msg.sender == addressHub.featuresHub(),
             "Must call by proxy bindings"
         );
         _;
     }
 
-    constructor(address _addressHub) {
+    constructor(address _addressHub) ERC721("Arbitrator", "WA") {
         require(
             _addressHub != address(0),
             "ArbitratorHub: Invalid address hub"
@@ -53,19 +56,15 @@ contract ArbitratorsHub {
     ) external onlyProxy {
         ICVHub cvHub = ICVHub(addressHub.cvHub());
 
-        require(
-            _cvID <= cvHub.getTokensLength(),
-            "ArbitratorHub: Invalid CV ID"
-        );
-        require(
-            indexersCV[_cvID][_courtID] == 0,
-            "ArbitratorHub: Arbitrator already added"
-        );
+        require(_cvID <= cvHub.getTokensLength(), "Invalid CV ID");
+        require(indexersCV[_cvID][_courtID] == 0, "Arbitrator already added");
         _tokenIDs.increment();
         DataTypes.ArbitratorData memory newArbitrator;
         newArbitrator.id = _tokenIDs.current();
         newArbitrator.cvID = _cvID;
-        newArbitrator.indexedAtCourt = indexersCourt[_courtID].length - 1;
+        _mint(cvHub.ownerOf(_cvID), newArbitrator.id);
+        newArbitrator.indexedAtCourt = indexersCourt[_courtID].length;
+        newArbitrator.courtID = _courtID;
         datas[newArbitrator.id] = newArbitrator;
         indexersCourt[_courtID].push(newArbitrator.id);
         indexersCV[_cvID][_courtID] = newArbitrator.id;
@@ -74,11 +73,11 @@ contract ArbitratorsHub {
     function investOnCourt(DataTypes.CourtIDs _courtID) external payable {
         ICVHub cvHub = ICVHub(addressHub.cvHub());
         uint cvID = cvHub.getCV(msg.sender);
-        require(cvID != 0, "ArbitratorHub: CV not found");
         uint arbitratorID = indexersCV[cvID][_courtID];
-        require(arbitratorID != 0, "ArbitratorHub: Arbitrator not found");
-        require(msg.value > 0, "ArbitratorHub: Invalid value");
+        require(arbitratorID != 0, "Arbitrator not found");
+        require(msg.value > 0, "Invalid value");
         datas[arbitratorID].balance += msg.value;
+        balancesCourt[_courtID] += msg.value;
     }
 
     function withdrawFromCourt(
@@ -87,52 +86,117 @@ contract ArbitratorsHub {
     ) external {
         ICVHub cvHub = ICVHub(addressHub.cvHub());
         uint cvID = cvHub.getCV(msg.sender);
-        require(cvID != 0, "ArbitratorHub: CV not found");
-        uint arbitratorID = indexersCV[cvID][_courtID];
-        require(arbitratorID != 0, "ArbitratorHub: Arbitrator not found");
 
-        DataTypes.ArbitratorData storage arbitrator = datas[arbitratorID];
-        require(
-            arbitrator.courtID >= _courtID,
-            "ArbitratorHub: Missmatch court ID"
-        );
-        require(
-            arbitrator.balance >= _amount,
-            "ArbitratorHub: Arbitrator balance is empty"
-        );
-        arbitrator.balance -= _amount;
+        uint arbitratorID = indexersCV[cvID][_courtID];
+        require(arbitratorID != 0, "Arbitrator not found");
+        require(datas[arbitratorID].courtID >= _courtID, "Missmatch court ID");
+        require(datas[arbitratorID].balance >= _amount, "No enough balance");
+        datas[arbitratorID].balance -= _amount;
+        balancesCourt[_courtID] -= _amount;
         payable(msg.sender).transfer(_amount);
         // ! REENTRENCY ?
-        datas[arbitratorID] = arbitrator;
     }
 
-    function selectArbitrator(
-        DataTypes.CourtIDs _courtID
+    function calculateWeight(uint256 balance) internal pure returns (uint256) {
+        // Inverser le solde de l'arbitre (plus le solde est faible, plus le poids est élevé).
+        // Vous pouvez ajuster cette formule en fonction de vos préférences.
+        return 1e18 / balance;
+    }
+
+    function randomlyArbitrator(
+        DataTypes.CourtIDs _courtID,
+        uint _randomID
     ) external view returns (uint256) {
         uint256[] memory arbitrators = indexersCourt[_courtID];
         uint256 nbArbitrators = arbitrators.length;
         require(nbArbitrators > 0, "ArbitratorHub: No arbitrator");
+
+        // Sélection aléatoire avec un biais pour l'arbitre équilibré.
         uint256 random = uint256(
             keccak256(
                 abi.encodePacked(
                     block.timestamp,
-                    block.difficulty,
-                    block.number
+                    block.prevrandao,
+                    block.number,
+                    msg.sender, // Vous pouvez utiliser l'adresse de l'appelant pour introduire un biais.
+                    _randomID
                 )
             )
         );
-        return arbitrators[random % nbArbitrators];
+
+        // Utilisez le modulo pour obtenir un indice dans la plage des arbitres disponibles.
+        uint256 selectedArbitratorIndex = random % nbArbitrators;
+
+        // Assurez-vous que l'indice est dans les limites du tableau des arbitres.
+        require(
+            selectedArbitratorIndex < nbArbitrators,
+            "Invalid selected arbitrator index"
+        );
+
+        // Retournez l'adresse de l'arbitre sélectionné.
+        return arbitrators[selectedArbitratorIndex];
     }
 
-    function selectArbitrator(
+    function boostRandomlyArbitrator(
         DataTypes.CourtIDs _courtID,
-        uint _arbitratorID
+        uint _rand
     ) external view returns (uint256) {
         uint256[] memory arbitrators = indexersCourt[_courtID];
         uint256 nbArbitrators = arbitrators.length;
         require(nbArbitrators > 0, "ArbitratorHub: No arbitrator");
-        return arbitrators[_arbitratorID];
+
+        uint totalBalance = balancesCourt[_courtID];
+
+        // Générez un nombre aléatoire pondéré en fonction des poids.
+        uint256 random = uint256(
+            keccak256(
+                abi.encodePacked(
+                    block.timestamp,
+                    block.prevrandao,
+                    block.number,
+                    _rand
+                )
+            )
+        ) % totalBalance;
+
+        uint256 cumulativeBalance = 0;
+        uint resultID;
+        uint256 randomID;
+
+        for (uint256 i = 1; i <= nbArbitrators; i++) {
+            randomID = (
+                (uint256(
+                    keccak256(
+                        abi.encodePacked(
+                            block.timestamp,
+                            block.prevrandao,
+                            block.number,
+                            _rand
+                        )
+                    )
+                ) % nbArbitrators)
+            );
+            randomID = randomID == 0 ? randomID + 1 : randomID;
+            cumulativeBalance += datas[randomID].balance;
+            if (random < cumulativeBalance) {
+                resultID = arbitrators[randomID];
+                _rand++;
+                break;
+            }
+        }
+
+        return randomID;
     }
+
+    // function selectArbitrator(
+    //     DataTypes.CourtIDs _courtID,
+    //     uint _arbitratorID
+    // ) external view returns (uint256) {
+    //     uint256[] memory arbitrators = indexersCourt[_courtID];
+    //     uint256 nbArbitrators = arbitrators.length;
+    //     require(nbArbitrators > 0, "ArbitratorHub: No arbitrator");
+    //     return arbitrators[_arbitratorID];
+    // }
 
     function getCourtLength(
         DataTypes.CourtIDs _courtID
@@ -140,13 +204,20 @@ contract ArbitratorsHub {
         return indexersCourt[_courtID].length;
     }
 
+    function balanceOfCourt(
+        DataTypes.CourtIDs _courtID
+    ) external view returns (uint256) {
+        return balancesCourt[_courtID];
+    }
+
+    function getTokensLength() external view returns (uint256) {
+        return _tokenIDs.current();
+    }
+
     function getData(
         uint256 _arbitratorID
     ) external view returns (DataTypes.ArbitratorData memory) {
-        require(
-            _arbitratorID <= _tokenIDs.current(),
-            "ArbitratorHub: Invalid arbitrator ID"
-        );
+        require(_arbitratorID <= _tokenIDs.current(), "Invalid arbitrator ID");
         return datas[_arbitratorID];
     }
 
@@ -154,10 +225,7 @@ contract ArbitratorsHub {
         uint _cvID,
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256) {
-        require(
-            indexersCV[_cvID][_courtID] > 0,
-            "ArbitratorHub: Arbitration not found"
-        );
+        require(indexersCV[_cvID][_courtID] > 0, "Arbitration not found");
         return indexersCV[_cvID][_courtID];
     }
 

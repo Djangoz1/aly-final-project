@@ -9,7 +9,8 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
-import {AddressHub} from "../storage/AddressHub.sol";
+import {IAddressHub} from "../interfaces/IAddressHub.sol";
+import {IDisputesHub} from "../interfaces/IDisputesHub.sol";
 
 contract CollectWorkInteraction {
     using Counters for Counters.Counter;
@@ -20,8 +21,8 @@ contract CollectWorkInteraction {
      */
     mapping(uint => DataTypes.FeatureInteractionData) datas;
 
-    address addrFH;
-    address addrHub;
+    address addrFH; // FeaturesHub address
+    address addrHub; // AddressHub address
 
     modifier onlyProxy() {
         require(msg.sender == addrFH, "Must be call by proxy bindings");
@@ -61,7 +62,7 @@ contract CollectWorkInteraction {
         uint _featureID
     ) external onlyOwnerOf(_featureID) onlyFeatureOpen(_featureID) {
         IFeaturesHub iFH = IFeaturesHub(addrFH);
-        AddressHub AH = AddressHub(addrHub);
+        IAddressHub AH = IAddressHub(addrHub);
         ICVHub iCVH = ICVHub(AH.cvHub());
 
         require(iCVH.getCV(msg.sender) != _cvWorkerID, "Can't assign yourself");
@@ -72,7 +73,7 @@ contract CollectWorkInteraction {
 
     function acceptJob(uint _featureID) external {
         IFeaturesHub iFH = IFeaturesHub(addrFH);
-        AddressHub AH = AddressHub(addrHub);
+        IAddressHub AH = IAddressHub(addrHub);
         ICVHub iCVH = ICVHub(AH.cvHub());
         uint cvWorkerID = iCVH.getCV(msg.sender);
         require(
@@ -92,7 +93,7 @@ contract CollectWorkInteraction {
 
     function declineJob(uint _featureID) external {
         IFeaturesHub iFH = IFeaturesHub(addrFH);
-        AddressHub AH = AddressHub(addrHub);
+        IAddressHub AH = IAddressHub(addrHub);
         ICVHub iCVH = ICVHub(AH.cvHub());
         uint cvWorkerID = iCVH.getCV(msg.sender);
         require(
@@ -114,7 +115,7 @@ contract CollectWorkInteraction {
         DataTypes.FeatureData memory featureData = iFH.getData(_featureID);
         require(featureData.isInviteOnly == false, "Only on invitation");
         require(featureData.cvWorker == 0, "Already have worker");
-        AddressHub AH = AddressHub(addrHub);
+        IAddressHub AH = IAddressHub(addrHub);
         ICVHub iCVH = ICVHub(AH.cvHub());
 
         require(
@@ -170,12 +171,17 @@ contract CollectWorkInteraction {
         require(success, "Can't set feature");
     }
 
-    function contestFeature(uint _featureID) external returns (bool) {
+    function contestFeature(
+        uint _featureID,
+        uint _reclamationPeriod,
+        uint _nbArbitrators,
+        string memory _tokenURI
+    ) external returns (bool) {
         IFeaturesHub iFH = IFeaturesHub(addrFH);
-
+        IAddressHub iAH = IAddressHub(addrHub);
+        IDisputesHub iDH = IDisputesHub(iAH.disputesHub());
         require(
-            iFH.getData(_featureID).status !=
-                DataTypes.FeatureStatus.Validated,
+            iFH.getData(_featureID).status != DataTypes.FeatureStatus.Validated,
             "Wrong feature status"
         );
         DataTypes.FeatureData memory featureData = iFH.getData(_featureID);
@@ -192,7 +198,7 @@ contract CollectWorkInteraction {
             require(datas[_featureID].ownerContest == false, "Already contest");
             datas[_featureID].ownerContest = true;
         } else {
-            AddressHub AH = AddressHub(addrHub);
+            IAddressHub AH = IAddressHub(addrHub);
             ICVHub iCVH = ICVHub(AH.cvHub());
             require(
                 featureData.cvWorker == iCVH.getCV(msg.sender),
@@ -204,8 +210,18 @@ contract CollectWorkInteraction {
             );
             datas[_featureID].workerContest = true;
         }
+        bool success = iDH.mint(
+            msg.sender,
+            _featureID,
+            featureData.specification,
+            _reclamationPeriod,
+            _nbArbitrators,
+            _tokenURI
+        );
+        require(success, "Can't create dispute");
         featureData.status = DataTypes.FeatureStatus.Contest;
-        bool success = iFH.setFeature(_featureID, featureData);
+        success = iFH.setFeature(_featureID, featureData);
+
         require(success, "Can't set feature");
     }
 

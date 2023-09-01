@@ -16,7 +16,7 @@ interface IDisputesHub {
     function mint(
         address _to,
         uint _featureID,
-        uint _courtID,
+        DataTypes.CourtIDs _courtID,
         uint _reclamationPeriod,
         uint _nbArbitrators,
         string memory _tokenURI

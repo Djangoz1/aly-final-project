@@ -51,6 +51,8 @@ interface IMissionsHub {
         bool approved
     );
 
+    function tokenURI(uint _tokenID) external view returns (string memory);
+
     /**
      * @dev Returns the number of tokens in ``owner``'s account.
      */

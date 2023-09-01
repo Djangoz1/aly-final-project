@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {AddressHub} from "../storage/AddressHub.sol";
 import {IMissionsHub} from "../interfaces/IMissionsHub.sol";
+import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {IArbitratorsHub} from "../interfaces/IArbitratorsHub.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
 import {CollectWorkInteraction} from "../collect/CollectWorkInteraction.sol";
 
@@ -26,11 +28,18 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
     mapping(uint => DataTypes.FeatureData) datas;
 
     AddressHub addressHub;
-    address addrCWI;
+    address public addrCWI;
 
     modifier onlyProxy() {
         require(
             msg.sender == address(addressHub.accessControl()),
+            "Must call function with proxy bindings"
+        );
+        _;
+    }
+    modifier onlySatteliteContracts() {
+        require(
+            msg.sender == addressHub.disputesHub(),
             "Must call function with proxy bindings"
         );
         _;
@@ -49,6 +58,16 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
             "Mission not open"
         );
         require(_missionID <= iMH.getTokensLength(), "ID mission out of range");
+        _;
+    }
+
+    modifier checkLink(address _to, uint _featureID) {
+        ICVHub iCVH = ICVHub(addressHub.cvHub());
+        require(
+            iCVH.getCV(_to) == datas[_featureID].cvWorker ||
+                _to == ownerOf(_featureID),
+            "Link to feature not found"
+        );
         _;
     }
 
@@ -72,14 +91,6 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         return address(addressHub);
     }
 
-    function getAddressCollectWorkInteraction()
-        external
-        view
-        returns (address)
-    {
-        return addrCWI;
-    }
-
     function getTokensLength() external view returns (uint) {
         return _tokenIDs.current();
     }
@@ -95,7 +106,8 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         uint _wadge,
         uint16 _estimatedDays,
         bool _isInviteOnly,
-        string memory _tokenURI
+        string memory _tokenURI,
+        DataTypes.CourtIDs _specification
     ) external onlyProxy returns (uint) {
         IMissionsHub iMH = IMissionsHub(addressHub.missionsHub());
         // require(_missionID <= iMH.getTokensLength(), "ID mission out of range");
@@ -103,6 +115,11 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         require(
             iMH.getData(_missionID).status == DataTypes.MissionStatus.Process,
             "Mission closed"
+        );
+        require(
+            _specification != DataTypes.CourtIDs.Centralized &&
+                _specification != DataTypes.CourtIDs.Kleros,
+            "Unvalid specification"
         );
         ICVHub cvHub = ICVHub(addressHub.cvHub());
         _tokenIDs.increment();
@@ -113,7 +130,7 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         newFeature.wadge = _wadge;
         newFeature.estimatedDays = _estimatedDays;
         newFeature.isInviteOnly = _isInviteOnly;
-        newFeature.tokenURI = _tokenURI;
+        newFeature.specification = _specification;
         uint cvID = cvHub.getCV(_owner);
         indexer[cvID].push(newFeatureID);
         _mint(_owner, newFeatureID);
@@ -135,6 +152,9 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
 
     function validFeature(uint _featureID) external {
         ICVHub iCVH = ICVHub(addressHub.cvHub());
+        IArbitratorsHub arbitratorsHub = IArbitratorsHub(
+            addressHub.arbitratorsHub()
+        );
         if (ownerOf(_featureID) == msg.sender) {
             require(
                 iCVH.getCV(msg.sender) != _getData(_featureID).cvWorker,
@@ -147,7 +167,7 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
                 "Must call by owner or worker"
             );
             require(
-                datas[_featureID].status != DataTypes.FeatureStatus.Contest,
+                _getData(_featureID).status != DataTypes.FeatureStatus.Contest,
                 "Must wait end of litigation"
             );
             require(
@@ -156,26 +176,40 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
                     block.timestamp,
                 "Must wait end of feature"
             );
-            _validFeature(_featureID, ownerOf(_featureID));
+            _validFeature(
+                _featureID,
+                iCVH.ownerOf(_getData(_featureID).cvWorker)
+            );
         }
+        arbitratorsHub.setArbitrator(
+            _getData(_featureID).cvWorker,
+            _getData(_featureID).specification
+        );
     }
 
     function _validFeature(
         uint _featureID,
-        address _owner
-    ) internal onlyOwnerOf(_owner, _getData(_featureID).missionID) {
+        address _for
+    ) internal checkLink(_for, _featureID) {
         require(
             datas[_featureID].status != DataTypes.FeatureStatus.Validated,
             "Feature already validated"
         );
-       
+
         require(datas[_featureID].cvWorker > 0, "Must have a worker");
         require(datas[_featureID].startedAt > 0, "Feature not start");
+        IAccessControl iAC = IAccessControl(addressHub.accessControl());
 
+        uint amount = datas[_featureID].wadge;
+        bool success = iAC.sendTransaction(_for, amount);
+        require(success, "Transaction failed");
+        datas[_featureID].wadge = 0;
         datas[_featureID].status = DataTypes.FeatureStatus.Validated;
+    }
 
-        // ! TO DO
-        // ! Payment worker
+    function resolvedDispute(uint _cvID, uint _featureID) external payable {
+        ICVHub iCVH = ICVHub(addressHub.cvHub());
+        _validFeature(_featureID, iCVH.ownerOf(_cvID));
     }
 
     function getIndexer(uint _owner) external view returns (uint[] memory) {

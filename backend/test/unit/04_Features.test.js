@@ -17,7 +17,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let accessControl;
   let missionHub;
   let cvHub;
-
+  let arbitratorsHub;
+  let disputesHub;
   let missionID = 1;
   let contract;
   let collecter;
@@ -35,16 +36,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     const contracts = await _testInitAll();
     accessControl = contracts.accessControl;
     cvHub = contracts.cvHub;
+
     await accessControl.createCV("tokenURI");
     await accessControl.connect(this.addr1).createCV("tokenURI");
     await accessControl.connect(this.addr2).createCV("tokenURI");
     missionHub = contracts.missionsHub;
     contract = contracts.featuresHub;
+    arbitratorsHub = contracts.arbitratorsHub;
+    disputesHub = contracts.disputesHub;
     const missionPrice = await accessControl.missionPrice();
-    collecter = await ethers.getContractAt(
-      "CollectWorkInteraction",
-      await contract.getAddressCollectWorkInteraction()
-    );
+    collecter = contracts.collecterWorkInteraction;
     await accessControl.buyMission("tokenURI", {
       value: missionPrice.toString(),
     });
@@ -55,20 +56,18 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       expect(await contract.getTokensLength()).to.equal(0);
     });
     it("Should have collecter", async () => {
-      expect(await contract.getAddressCollectWorkInteraction()).to.not.equal(
-        ZERO_ADDRESS
-      );
+      expect(await contract.addrCWI()).to.not.equal(ZERO_ADDRESS);
     });
 
     it("Should create feature", async () => {
-      await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
       expect(await contract.getTokensLength()).to.equal(1);
       expect(await contract.ownerOf(1)).to.equal(this.owner.address);
     });
     it("Should get feature", async () => {
-      await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
       let data = await contract.getData(1);
@@ -78,13 +77,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       expect(data.wadge).to.equal(10000000);
       expect(data.estimatedDays).to.equal(1000);
       expect(data.status).to.equal(0);
-      expect(data.tokenURI).to.equal("tokenURI");
+      expect(await contract.tokenURI(data.id)).to.equal("tokenURI");
       expect(data.isInviteOnly).to.equal(true);
       expect(data.cvWorker).to.equal(0);
     });
 
     it("Should validate mission", async () => {
-      await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
       await collecter.inviteWorker(2, 1);
@@ -98,14 +97,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("NOT WORKS", () => {
       it("Should NOT create feature with wrong bindings", async () => {
         await expect(
-          contract.mint(this.owner.address, 1, 1000, 1000, true, "tokenURI")
+          contract.mint(this.owner.address, 1, 1000, 1000, true, "tokenURI", 2)
         ).to.be.revertedWith("Must call function with proxy bindings");
       });
       it("Should NOT create feature if not owner of mission", async () => {
         await expect(
           accessControl
             .connect(this.addr1)
-            .createFeature(missionID, 1000, true, "tokenURI", {
+            .createFeature(missionID, 1000, true, "tokenURI", 3, {
               value: "10000000",
             })
         ).to.be.revertedWith("Not the owner");
@@ -113,14 +112,21 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should NOT create feature if no value", async () => {
         await expect(
-          accessControl.createFeature(missionID, 1000, true, "tokenURI")
+          accessControl.createFeature(missionID, 1000, true, "tokenURI", 2)
         ).to.be.revertedWith("Must provide a value");
       });
 
       it("Should NOT validate mission twice", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         await collecter.inviteWorker(2, 1);
         await collecter.connect(this.addr1).acceptJob(1);
         await contract.validFeature(1);
@@ -130,121 +136,232 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should NOT validate mission if no worker", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         await expect(contract.validFeature(1)).to.be.revertedWith(
           "Must have a worker"
         );
       });
     });
   });
+
   describe("Create Feature", () => {
     describe("WORKS", () => {
       it("Should update features length", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         expect(await contract.getTokensLength()).to.equal(1);
       });
 
       it("Should give ownership of feature to owner", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         expect(await contract.ownerOf(1)).to.equal(this.owner.address);
       });
 
       it("Should get feature ID", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.id).to.equal(1);
       });
 
       it("Should get feature mission ID", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
 
         expect(data.missionID).to.equal(1);
       });
 
       it("Should get starter at 0", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.startedAt).to.equal(0);
       });
 
       it("Should get true wadge", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.wadge).to.equal(10000000);
       });
 
       it("Should get true estimated days", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.estimatedDays).to.equal(1000);
       });
 
       it("Should get status at 0", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
 
         expect(data.status).to.equal(0);
       });
 
       it("Should get good token URI", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
+
+        expect(await contract.tokenURI(1)).to.equal("tokenURI");
+      });
+      it("Should get true specification", async () => {
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
 
-        expect(data.tokenURI).to.equal("tokenURI");
-        expect(data.isInviteOnly).to.equal(true);
-        expect(data.cvWorker).to.equal(0);
+        expect(data.specification).to.equal(3);
       });
 
       it("Should set true is invite only", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.isInviteOnly).to.equal(true);
       });
 
       it("Should set false is invite only", async () => {
-        await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          false,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.isInviteOnly).to.equal(false);
       });
 
       it("Should get 0 cvWorker", async () => {
-        await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          false,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         let data = await contract.getData(1);
         expect(data.cvWorker).to.equal(0);
       });
       it("Should update mission data", async () => {
         let data = await missionHub.getData(1);
         expect(data.features.length).to.equal(0);
-        await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          false,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         data = await missionHub.getData(1);
         expect(data.features.length).to.equal(1);
         expect(data.features[0]).to.be.equal(1);
@@ -254,22 +371,45 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("NOT WORKS", () => {
       it("Should NOT create feature with wrong bindings", async () => {
         await expect(
-          contract.mint(this.owner.address, 1, 1000, 1000, true, "tokenURI")
+          contract.mint(this.owner.address, 1, 1000, 1000, true, "tokenURI", 3)
         ).to.be.revertedWith("Must call function with proxy bindings");
       });
       it("Should NOT create feature if not owner of mission", async () => {
         await expect(
           accessControl
             .connect(this.addr1)
-            .createFeature(missionID, 1000, true, "tokenURI", {
+            .createFeature(missionID, 1000, true, "tokenURI", 3, {
               value: "10000000",
             })
         ).to.be.revertedWith("Not the owner");
       });
 
+      it("Should NOT create feature for centralized court", async () => {
+        await expect(
+          accessControl.createFeature(missionID, 1000, true, "tokenURI", 0, {
+            value: "10000000",
+          })
+        ).to.be.revertedWith("Unvalid specification");
+      });
+
+      it("Should NOT create feature for kleros court", async () => {
+        await expect(
+          accessControl.createFeature(missionID, 1000, true, "tokenURI", 1, {
+            value: "10000000",
+          })
+        ).to.be.revertedWith("Unvalid specification");
+      });
+      it("Should NOT create feature for unknow court", async () => {
+        await expect(
+          accessControl.createFeature(missionID, 1000, true, "tokenURI", 72, {
+            value: "10000000",
+          })
+        ).to.be.reverted;
+      });
+
       it("Should NOT create feature if no value", async () => {
         await expect(
-          accessControl.createFeature(missionID, 1000, true, "tokenURI", {
+          accessControl.createFeature(missionID, 1000, true, "tokenURI", 3, {
             value: "0",
           })
         ).to.be.revertedWith("Must provide a value");
@@ -277,7 +417,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should NOT create feature for unknow mission ID", async () => {
         await expect(
-          accessControl.createFeature(4, 1000, true, "tokenURI", {
+          accessControl.createFeature(4, 1000, true, "tokenURI", 3, {
             value: "10000000",
           })
         ).to.be.revertedWith("ERC721: invalid token ID");
@@ -287,7 +427,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(
           accessControl
             .connect(this.addr4)
-            .createFeature(1, 1000, true, "tokenURI", {
+            .createFeature(1, 1000, true, "tokenURI", 3, {
               value: "10000000",
             })
         ).to.be.revertedWith("CV not exist");
@@ -296,7 +436,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       it("Should NOT create feature if mission closed", async () => {
         await missionHub.closeMission(1);
         await expect(
-          accessControl.createFeature(1, 1000, true, "tokenURI", {
+          accessControl.createFeature(1, 1000, true, "tokenURI", 3, {
             value: "10000000",
           })
         ).to.be.revertedWith("Mission closed");
@@ -306,7 +446,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Invite Worker", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
     });
@@ -322,9 +462,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("NOT WORKS", () => {
       it("Should NOT invite worker if mission validated", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         await collecter.inviteWorker(2, 1);
         await collecter.connect(this.addr1).acceptJob(1);
         await contract.validFeature(1);
@@ -334,9 +481,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should NOT invite worker if not owner", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         await expect(
           collecter.connect(this.addr1).inviteWorker(2, 1)
         ).to.be.revertedWith("Not the owner");
@@ -349,9 +503,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should NOT invite yourself for worker", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         await expect(collecter.inviteWorker(1, 1)).to.be.revertedWith(
           "Can't assign yourself"
         );
@@ -361,7 +522,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Worker accept / decline feature", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
     });
@@ -435,7 +596,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Sign worker", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, false, "tokenURI", 3, {
         value: "10000000",
       });
     });
@@ -486,7 +647,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Worker ask to join", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, false, "tokenURI", 3, {
         value: "10000000",
       });
     });
@@ -515,9 +676,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("NOT WORKS", () => {
       it("Should NOT ask to join if is on invite only", async () => {
-        await accessControl.createFeature(missionID, 1000, true, "tokenURI", {
-          value: "10000000",
-        });
+        await accessControl.createFeature(
+          missionID,
+          1000,
+          true,
+          "tokenURI",
+          3,
+          {
+            value: "10000000",
+          }
+        );
         await expect(
           collecter.connect(this.addr1).askToJoin(2)
         ).to.be.revertedWith("Only on invitation");
@@ -558,7 +726,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Validate feature", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, false, "tokenURI", 3, {
         value: "10000000",
       });
       await collecter.connect(this.addr1).askToJoin(1);
@@ -580,7 +748,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update after contestFeature", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         await contract.validFeature(1);
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(2);
@@ -591,6 +765,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await contract.connect(this.addr1).validFeature(1);
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(2);
+      });
+
+      it("Should update arbitrators length", async () => {
+        await contract.validFeature(1);
+
+        let length = await arbitratorsHub.getTokensLength();
+        expect(length).to.be.equal(1);
       });
     });
 
@@ -623,14 +804,27 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         );
       });
       it("Should NOT set contest status", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
         await contract.validFeature(1);
-        await expect(collecter.contestFeature(1)).to.be.revertedWith(
-          "Wrong feature status"
-        );
+        await expect(
+          collecter.contestFeature(
+            1,
+            parseInt(reclamationPeriod) + 20,
+            2,
+            "tokenURI"
+          )
+        ).to.be.revertedWith("Wrong feature status");
       });
 
       it("Should NOT update after contestFeature", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         await expect(
           contract.connect(this.addr1).validFeature(1)
         ).to.be.revertedWith("Must wait end of litigation");
@@ -648,7 +842,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Contest feature", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, false, "tokenURI", 3, {
         value: "10000000",
       });
       await collecter.connect(this.addr1).askToJoin(1);
@@ -657,20 +851,47 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("WORKS", () => {
       it("Should update status", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(3);
       });
 
       it("Should update owner contest", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         let data = await collecter.getData(1);
         expect(data.workerContest).to.be.equal(false);
         expect(data.ownerContest).to.be.equal(true);
       });
+      it("Should update disputesHub length", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
+
+        expect(await disputesHub.getTokensLength()).to.be.equal(1);
+      });
 
       it("Should update worker contest", async () => {
-        await collecter.connect(this.addr1).contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
+        await collecter
+          .connect(this.addr1)
+          .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI");
         let data = await collecter.getData(1);
         expect(data.workerContest).to.be.equal(true);
         expect(data.ownerContest).to.be.equal(false);
@@ -678,25 +899,35 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should update after improveFeature", async () => {
         await collecter.improveFeature(1, 30000);
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(3);
       });
 
       it("Should contest feature by worker", async () => {
-        await collecter.connect(this.addr1).contestFeature(1);
-        let data = await contract.getData(1);
-        expect(data.status).to.be.equal(3);
-      });
-      it("Should contest feature by owner & worker", async () => {
-        await collecter.contestFeature(1);
-        await collecter.connect(this.addr1).contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
+        await collecter
+          .connect(this.addr1)
+          .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI");
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(3);
       });
 
       it("Should validate by owner after contest", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         await contract.validFeature(1);
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(2);
@@ -705,53 +936,120 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("NOT WORKS", () => {
       it("Should NOT contest feature twice by owner", async () => {
-        await collecter.contestFeature(1);
-        await expect(collecter.contestFeature(1)).to.be.revertedWith(
-          "Already contest"
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
         );
+        await expect(
+          collecter.contestFeature(
+            1,
+            parseInt(reclamationPeriod) + 20,
+            2,
+            "tokenURI"
+          )
+        ).to.be.revertedWith("Already contest");
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(3);
       });
       it("Should NOT contest feature twice by worker", async () => {
-        await collecter.connect(this.addr1).contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
+        await collecter
+          .connect(this.addr1)
+          .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI");
         await expect(
-          collecter.connect(this.addr1).contestFeature(1)
+          collecter
+            .connect(this.addr1)
+            .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI")
         ).to.be.revertedWith("Already contest");
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(3);
       });
       it("Should NOT contest feature if validated by owner", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
         await contract.validFeature(1);
 
-        await expect(collecter.contestFeature(1)).to.be.revertedWith(
-          "Wrong feature status"
-        );
+        await expect(
+          collecter.contestFeature(
+            1,
+            parseInt(reclamationPeriod) + 20,
+            2,
+            "tokenURI"
+          )
+        ).to.be.revertedWith("Wrong feature status");
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(2);
       });
+
+      it("Should NOT contest feature by owner & worker", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
+
+        await expect(
+          collecter
+            .connect(this.addr1)
+            .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI")
+        ).to.be.revertedWith("Dispute already added");
+        let data = await contract.getData(1);
+        expect(data.status).to.be.equal(3);
+      });
+
       it("Should NOT contest feature if validated by worker", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
         await collecter.improveFeature(1, 0);
         await contract.connect(this.addr1).validFeature(1);
-        await expect(collecter.contestFeature(1)).to.be.revertedWith(
-          "Wrong feature status"
-        );
+        await expect(
+          collecter.contestFeature(
+            1,
+            parseInt(reclamationPeriod) + 20,
+            2,
+            "tokenURI"
+          )
+        ).to.be.revertedWith("Wrong feature status");
         let data = await contract.getData(1);
         expect(data.status).to.be.equal(2);
       });
 
       it("Should NOT contest an unknow feature ID", async () => {
-        await expect(collecter.contestFeature(2)).to.be.revertedWith(
-          "Feature ID out of range"
-        );
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
+        await expect(
+          collecter.contestFeature(
+            2,
+            parseInt(reclamationPeriod) + 20,
+            2,
+            "tokenURI"
+          )
+        ).to.be.revertedWith("Feature ID out of range");
       });
       it("Should NOT contest feature if no worker or owner", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
         await expect(
-          collecter.connect(this.addr2).contestFeature(1)
+          collecter
+            .connect(this.addr2)
+            .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI")
         ).to.be.revertedWith("Must call by owner or worker");
       });
 
       it("Should NOT validate by worker after contest", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         await expect(
           contract.connect(this.addr1).validFeature(1)
         ).to.be.revertedWith("Must wait end of litigation");
@@ -760,13 +1058,23 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should NOT contest feature if cv didn't exist", async () => {
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+
         await expect(
-          collecter.connect(this.addr3).contestFeature(1)
+          collecter
+            .connect(this.addr3)
+            .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI")
         ).to.be.revertedWith("CV not found");
       });
 
       it("Should NOT set improve status after contest", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         await expect(collecter.improveFeature(1, 40000)).to.be.revertedWith(
           "Wrong feature status"
         );
@@ -776,7 +1084,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Improve feature", () => {
     beforeEach(async () => {
-      await accessControl.createFeature(missionID, 1000, false, "tokenURI", {
+      await accessControl.createFeature(missionID, 1000, false, "tokenURI", 3, {
         value: "10000000",
       });
       await collecter.connect(this.addr1).askToJoin(1);
@@ -823,7 +1131,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should NOT improve a contest feature ID", async () => {
-        await collecter.contestFeature(1);
+        const reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
+        await collecter.contestFeature(
+          1,
+          parseInt(reclamationPeriod) + 20,
+          2,
+          "tokenURI"
+        );
         await expect(collecter.improveFeature(1, 20000)).to.be.revertedWith(
           "Wrong feature status"
         );

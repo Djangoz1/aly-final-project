@@ -53,12 +53,17 @@ const _testInitAll = async () => {
   let arbitratorsHub = await _testInitArbitratorsHub(addressHub.target);
   expect(await accessControl.workflow()).to.equal(1);
 
+  collecterWorkInteraction = await ethers.getContractAt(
+    "CollectWorkInteraction",
+    await featuresHub.addrCWI()
+  );
   return {
     addressHub,
     accessControl,
     missionsHub,
     cvHub,
     pubsHub,
+    collecterWorkInteraction,
     featuresHub,
     disputesHub,
     arbitratorsHub,
@@ -91,6 +96,22 @@ const _testInitArbitratorsHub = async (addressHub) => {
   ]);
   await arbitratorsHub.waitForDeployment();
   return arbitratorsHub;
+};
+
+const _testInitArbitrator = async (contracts, courtID, account) => {
+  const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
+    contracts;
+  let cvArbitrator = await cvHub.getCV(account.address);
+  let newFeature = await _testInitFeature(
+    contracts,
+    { courtID: courtID },
+    account
+  );
+  await featuresHub.validFeature(newFeature);
+
+  let data = await featuresHub.getData(newFeature);
+  expect(data.status).to.be.equal(2);
+  return await arbitratorsHub.getArbitrationOfCV(cvArbitrator, courtID);
 };
 
 // *:::::::::::::: -- ::::::::::::::*//
@@ -169,42 +190,21 @@ const _testInitPub = async (accessControlAdress, account, uriData) => {
 // *:::::::::::::: MISSION ::::::::::::::*//
 // *:::::::::::::: ------- ::::::::::::::*//
 
-const _testInitMission = async (_accessControl, account, _amount, uriData) => {
-  if (!uriData) {
-    uriData = FEATURE_DATAS_URI_EXEMPLE;
+const _testInitMission = async (contracts, tokenURI, account) => {
+  const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
+    contracts;
+
+  const missionPrice = await accessControl.missionPrice();
+  if (account) {
+    await accessControl.connect(account).buyMission(tokenURI || "missionURI", {
+      value: missionPrice.toString(),
+    });
+  } else {
+    await accessControl.buyMission(tokenURI || "missionURI", {
+      value: missionPrice.toString(),
+    });
   }
-  const accessControl = await getProxy(_accessControl);
-  const missionsHub = await getContractAt(
-    "MissionsHub",
-    await accessControl.iMH()
-  );
-
-  const amount = await accessControl.missionPrice();
-  const _cv = await accessControl.getCVByAddress(account.address);
-
-  const id = parseInt(await missionsHub.getTokensLength()) + 1;
-  uriData.id = id;
-
-  const json = await createURIMission(uriData);
-  const tokenURI = json.IpfsHash;
-
-  const beforeLength = parseInt(await missionsHub.balanceOf(_cv));
-
-  const tx = await accessControl
-    .connect(account)
-    .buyMission(tokenURI, { value: `${amount}` });
-  tx.wait();
-  expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
-
-  const afterLength = parseInt(await missionsHub.balanceOf(_cv));
-  expect(beforeLength).to.equal(afterLength - 1);
-
-  const _tokenURI = await missionsHub.tokenURI(parseInt(id));
-  expect(_tokenURI).to.be.equal(tokenURI);
-
-  const owner = await missionsHub.ownerOf(id);
-  expect(owner).to.be.equal(_cv);
-  return id;
+  return await missionsHub.getTokensLength();
 };
 
 const _testInitMissionsHub = async (_addressHub) => {
@@ -221,56 +221,45 @@ const _testInitFeaturesHub = async (addressHub) => {
   return featuresHub;
 };
 
-const _testInitFeature = async (
-  _accessControl,
-  account,
-  _missionId,
-  uriData,
-  datas
-) => {
-  if (!datas) {
-    datas = FEATURE_DATAS_EXEMPLE;
+const _testInitFeature = async (contracts, datas, workerAccount, account) => {
+  const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
+    contracts;
+  let collecter = contracts.collecterWorkInteraction;
+
+  let missionID = await _testInitMission(contracts, "missionURI");
+  const cvWorker = await cvHub.getCV(workerAccount.address);
+  let newFeature;
+  if (account) {
+    await accessControl
+      .connect(account)
+      .createFeature(
+        missionID,
+        datas.estimatedDays || 1000,
+        datas.isInviteOnly || true,
+        datas.tokenURI || "tokenURI",
+        datas.courtID || 3,
+        {
+          value: `${datas.wadge || 10000000}`,
+        }
+      );
+    newFeature = await featuresHub.getTokensLength();
+    await collecter.connect(account).inviteWorker(cvWorker, newFeature);
+  } else {
+    await accessControl.createFeature(
+      missionID,
+      datas.estimatedDays || 1000,
+      datas.isInviteOnly || true,
+      datas.tokenURI || "tokenURI",
+      datas.courtID || 3,
+      {
+        value: `${datas.wadge || 10000000}`,
+      }
+    );
+    newFeature = await featuresHub.getTokensLength();
+    await collecter.inviteWorker(cvWorker, newFeature);
   }
-  if (!uriData) {
-    uriData = FEATURE_DATAS_URI_EXEMPLE;
-  }
-
-  const accessControl = await getProxy(_accessControl);
-  const _cv = await accessControl.getCVByAddress(account.address);
-  const amount = ethers.parseEther(`${datas.wadge}`);
-  const featuresHub = await getContractAt(
-    "FeaturesHub",
-    await accessControl.iFH()
-  );
-
-  const id = parseInt(await featuresHub.getTokensLength()) + 1;
-  uriData.id = id;
-  datas.wadge = amount;
-  const json = await createURIFeature(uriData);
-  const tokenURI = json.IpfsHash;
-  expect(tokenURI).to.not.be.equal("");
-
-  datas.tokenURI = tokenURI;
-  datas.missionID = _missionId;
-  const beforeLength = parseInt(await featuresHub.balanceOf(_cv));
-
-  const tx = await accessControl.connect(account).postFeature(datas, {
-    value: amount,
-  });
-
-  expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
-
-  await tx.wait();
-  const afterLength = parseInt(await featuresHub.balanceOf(_cv));
-  expect(beforeLength).to.equal(afterLength - 1);
-
-  const _tokenURI = await featuresHub.tokenURI(parseInt(id));
-  expect(_tokenURI).to.not.be.equal("");
-
-  const owner = await featuresHub.ownerOf(id);
-  expect(owner).to.be.equal(_cv);
-
-  return id;
+  await collecter.connect(workerAccount).acceptJob(newFeature);
+  return newFeature;
 };
 
 // *:::::::::::::: --------------- ::::::::::::::* //
@@ -482,6 +471,7 @@ const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
 module.exports = {
   getContractAt,
   _testInitAll,
+  _testInitArbitrator,
   _testInitAddressHub,
   _testInitAccessControl,
   _testInitFeaturesHub,

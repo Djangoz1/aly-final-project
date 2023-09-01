@@ -46,4 +46,9 @@ interface IAccessControl {
     function getPubIndexers(
         address _addr
     ) external view returns (uint[] memory);
+
+    function sendTransaction(
+        address _to,
+        uint _value
+    ) external payable returns (bool);
 }
