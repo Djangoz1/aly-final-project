@@ -37,7 +37,7 @@ contract AccessControl is Ownable {
     constructor(address _addressHub) {
         require(_addressHub != address(0), "Must provide a valid address");
         AHub = AddressHub(_addressHub);
-        AHub.setAccessControl(address(this));
+        AHub.setAccessControl();
     }
 
     modifier hasRegistred(address _ownerOf) {
@@ -67,120 +67,120 @@ contract AccessControl is Ownable {
     // *::::::::::::::: CV BINDINGS :::::::::::::::* //
     // *::::::::::::::: ----------- :::::::::::::::* //
 
-    /**
-     * @notice This function can called only one time per address
-     * @dev Second call will be reverted by CVH.createCV(_owner) because sender have already CV
-     */
-    function createCV(string calldata _tokenURI) external {
-        CVHub CVH = CVHub(AHub.cvHub());
-        CVH.mint(msg.sender, _tokenURI);
-    }
-
-    // *::::::::::::::: ------------ :::::::::::::::* //
-    // *::::::::::::::: PUB BINDINGS :::::::::::::::* //
-    // *::::::::::::::: ------------ :::::::::::::::* //
-
-    function _createPub(
-        string calldata _tokenURI,
-        address _sender
-    ) internal hasRegistred(_sender) returns (uint) {
-        IPubsHub iPH = IPubsHub(AHub.pubsHub());
-        CVHub CVH = CVHub(AHub.cvHub());
-        uint cvID = CVH.getCV(_sender);
-
-        uint newPub = iPH.mint(cvID, _tokenURI);
-        return newPub;
-    }
-
-    function createPub(string calldata _tokenURI) external returns (uint) {
-        uint newPub = _createPub(_tokenURI, msg.sender);
-        return newPub;
-    }
-
-    function createPub(
-        string calldata _tokenURI,
-        address _sender
-    ) external returns (uint) {
-        uint newPub = _createPub(_tokenURI, _sender);
-        return newPub;
-    }
-
-    function sendTransaction(
-        address _to,
-        uint _value
-    ) external payable onlySatteliteContracts returns (bool) {
-        // Transférer les ETH à l'adresse spécifiée
-        (bool success, ) = _to.call{value: _value}("");
-        require(success, "Transaction failed");
-        return true;
-    }
-
-    // function followPub(uint _pubID) external hasRegistred(msg.sender) {
-    //     iCLP.mint(msg.sender, _pubID);
+    // /**
+    //  * @notice This function can called only one time per address
+    //  * @dev Second call will be reverted by CVH.createCV(_owner) because sender have already CV
+    //  */
+    // function createCV(string calldata _tokenURI) external {
+    //     CVHub CVH = CVHub(AHub.cvHub());
+    //     CVH.mint(msg.sender, _tokenURI);
     // }
 
-    // *:::::::::::: ----------------- ::::::::::::* //
-    // *:::::::::::: MISSIONS BINDINGS ::::::::::::* //
-    // *:::::::::::: ----------------- ::::::::::::* //
+    // // *::::::::::::::: ------------ :::::::::::::::* //
+    // // *::::::::::::::: PUB BINDINGS :::::::::::::::* //
+    // // *::::::::::::::: ------------ :::::::::::::::* //
 
-    function buyMission(
-        string calldata _tokenURI
-    ) external payable hasRegistred(msg.sender) {
-        require(
-            msg.value == missionPrice,
-            "Value must to be equal mission price"
-        );
-        IMissionsHub iMH = IMissionsHub(AHub.missionsHub());
-        iMH.mint(msg.sender, _tokenURI);
-    }
+    // function _createPub(
+    //     string calldata _tokenURI,
+    //     address _sender
+    // ) internal hasRegistred(_sender) returns (uint) {
+    //     IPubsHub iPH = IPubsHub(AHub.pubsHub());
+    //     CVHub CVH = CVHub(AHub.cvHub());
+    //     uint cvID = CVH.getCV(_sender);
 
-    // *:::::::::::: ----------------- ::::::::::::* //
-    // *:::::::::::: FEATURES BINDINGS ::::::::::::* //
-    // *:::::::::::: ----------------- ::::::::::::* //
+    //     uint newPub = iPH.mint(cvID, _tokenURI);
+    //     return newPub;
+    // }
 
-    function createFeature(
-        uint _missionID,
-        uint16 _estimatedDays,
-        bool _isInviteOnly,
-        string memory _tokenURI,
-        DataTypes.CourtIDs _specification
-    ) external payable hasRegistred(msg.sender) {
-        IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
-        require(msg.value > 0, "Must provide a value");
-        require(bytes(_tokenURI).length > 0, "Feature must have a metadata");
+    // function createPub(string calldata _tokenURI) external returns (uint) {
+    //     uint newPub = _createPub(_tokenURI, msg.sender);
+    //     return newPub;
+    // }
 
-        iFH.mint(
-            msg.sender,
-            _missionID,
-            msg.value,
-            _estimatedDays,
-            _isInviteOnly,
-            _tokenURI,
-            _specification
-        );
-    }
+    // function createPub(
+    //     string calldata _tokenURI,
+    //     address _sender
+    // ) external returns (uint) {
+    //     uint newPub = _createPub(_tokenURI, _sender);
+    //     return newPub;
+    // }
 
-    // *:::::::::::: ------------------------ ::::::::::::* //
-    // *:::::::::::: WORKER PROPOSAL BINDINGS ::::::::::::* //
-    // *:::::::::::: ------------------------ ::::::::::::* //
+    // function sendTransaction(
+    //     address _to,
+    //     uint _value
+    // ) external payable onlySatteliteContracts returns (bool) {
+    //     // Transférer les ETH à l'adresse spécifiée
+    //     require(_to != address(0), "0 address");
+    //     require(_value > 0, "Erorr value");
+    //     (bool success, ) = _to.call{value: _value}("");
+    //     require(success, "AccessControl : Transaction failed");
+    //     return true;
+    // }
 
-    function createWorkerProposal(
-        string calldata _tokenURI,
-        uint _featureID
-    ) external hasRegistred(msg.sender) {
-        // IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
+    // // function followPub(uint _pubID) external hasRegistred(msg.sender) {
+    // //     iCLP.mint(msg.sender, _pubID);
+    // // }
 
-        // DataTypes.FeatureData memory data = iFH.getData(_featureID);
+    // // *:::::::::::: ----------------- ::::::::::::* //
+    // // *:::::::::::: MISSIONS BINDINGS ::::::::::::* //
+    // // *:::::::::::: ----------------- ::::::::::::* //
 
-        // if (data.cvWorker != 0) {
-        //     require(
-        //         data.cvWorker == msg.sender,
-        //         "Must be assigned for propose a work"
-        //     );
-        // }
+    // function buyMission(
+    //     string calldata _tokenURI
+    // ) external payable hasRegistred(msg.sender) {
+    //     require(
+    //         msg.value == missionPrice,
+    //         "Value must to be equal mission price"
+    //     );
+    //     IMissionsHub iMH = IMissionsHub(AHub.missionsHub());
+    //     iMH.mint(msg.sender, _tokenURI);
+    // }
 
-        iWPH.postWorkerProposal(msg.sender, _tokenURI, _featureID);
-    }
+    // // *:::::::::::: ----------------- ::::::::::::* //
+    // // *:::::::::::: FEATURES BINDINGS ::::::::::::* //
+    // // *:::::::::::: ----------------- ::::::::::::* //
+
+    // function createFeature(
+    //     uint _missionID,
+    //     uint16 _estimatedDays,
+    //     bool _isInviteOnly,
+    //     string memory _tokenURI,
+    //     DataTypes.CourtIDs _specification
+    // ) external payable hasRegistred(msg.sender) {
+    //     IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
+    //     require(msg.value > 0, "Must provide a value");
+    //     iFH.mint(
+    //         msg.sender,
+    //         _missionID,
+    //         msg.value,
+    //         _estimatedDays,
+    //         _isInviteOnly,
+    //         _tokenURI,
+    //         _specification
+    //     );
+    // }
+
+    // // *:::::::::::: ------------------------ ::::::::::::* //
+    // // *:::::::::::: WORKER PROPOSAL BINDINGS ::::::::::::* //
+    // // *:::::::::::: ------------------------ ::::::::::::* //
+
+    // function createWorkerProposal(
+    //     string calldata _tokenURI,
+    //     uint _featureID
+    // ) external hasRegistred(msg.sender) {
+    //     // IFeaturesHub iFH = IFeaturesHub(AHub.featuresHub());
+
+    //     // DataTypes.FeatureData memory data = iFH.getData(_featureID);
+
+    //     // if (data.cvWorker != 0) {
+    //     //     require(
+    //     //         data.cvWorker == msg.sender,
+    //     //         "Must be assigned for propose a work"
+    //     //     );
+    //     // }
+
+    //     iWPH.postWorkerProposal(msg.sender, _tokenURI, _featureID);
+    // }
 
     // *:::::::::::: ------------------ ::::::::::::* //
     // *:::::::::::: LAUNCHPAD BINDINGS ::::::::::::* //
@@ -189,16 +189,16 @@ contract AccessControl is Ownable {
     /**
      * @notice launchpad owned by address and not by cv address
      */
-    function createLaunchpad(
-        DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tiersDatas,
-        string memory _pubURI
-    ) external payable hasRegistred(msg.sender) {
-        ILaunchpadCohort iLC = ILaunchpadCohort(AHub.launchpadCohort());
-        ILaunchpadHub iLH = ILaunchpadHub(iLC.launchpadHub());
+    // function createLaunchpad(
+    //     DataTypes.LaunchpadData memory _datas,
+    //     DataTypes.TierData[] memory _tiersDatas,
+    //     string memory _pubURI
+    // ) external payable hasRegistred(msg.sender) {
+    //     ILaunchpadCohort iLC = ILaunchpadCohort(AHub.launchpadCohort());
+    //     ILaunchpadHub iLH = ILaunchpadHub(iLC.launchpadHub());
 
-        require(msg.value == launchpadPrice, "Invalid value for launchpad");
-        uint newID = iLH.mint(msg.sender, _datas, _tiersDatas, _pubURI);
-        require(newID > 0, "Invalid launchpad ID");
-    }
+    //     require(msg.value == launchpadPrice, "Invalid value for launchpad");
+    //     uint newID = iLH.mint(msg.sender, _datas, _tiersDatas, _pubURI);
+    //     require(newID > 0, "Invalid launchpad ID");
+    // }
 }

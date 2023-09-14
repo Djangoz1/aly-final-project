@@ -2,35 +2,6 @@
 pragma solidity 0.8.20;
 
 library DataTypes {
-    enum EscrowStatus {
-        Initial,
-        Reclaimed,
-        Disputed,
-        Resolved
-    }
-
-    struct DisputeData {
-        uint id;
-        CourtIDs courtID;
-        uint nbArbitrators;
-        uint createdAt;
-        uint reclaimedAt;
-        uint resolvedAt;
-        uint reclamationPeriod;
-        uint value;
-        uint payerID; // cvID
-        uint payeeID; // cvID
-        string tokenURI;
-        bool appeal;
-    }
-
-    enum ArbitrationVote {
-        Waiting,
-        RefusedToArbitrate,
-        PayerWins,
-        PayeeWins
-    }
-
     enum CourtIDs {
         Centralized,
         Kleros,
@@ -67,12 +38,12 @@ library DataTypes {
     }
 
     struct ArbitratorData {
-        uint id;
-        uint cvID;
+        uint256 id;
+        uint256 cvID;
         DataTypes.CourtIDs courtID;
-        uint indexedAtCourt;
-        uint balance;
-        uint nbArbitrations;
+        uint256 indexedAtCourt;
+        uint256 balance;
+        uint256 nbArbitrations;
     }
 
     struct EvidenceData {
@@ -81,11 +52,11 @@ library DataTypes {
         string workURI;
     }
 
-    struct ArbitrationData {
-        uint arbitratorID;
-        uint disputeID;
-        ArbitrationVote vote;
-    }
+    // struct ArbitrationData {
+    //     uint256 arbitratorID;
+    //     uint256 disputeID;
+    //     ArbitrationVote vote;
+    // }
 
     enum DeploymentStatus {
         Pending,
@@ -120,7 +91,7 @@ library DataTypes {
     // !
 
     /**
-     *    @dev string name, string imgURI, address[] posts, uint followers, address[] followAccounts, address[] followMissions
+     *    @dev string name, string imgURI, address[] posts, uint256 followers, address[] followAccounts, address[] followMissions
      *    @param name
      *    @param content
      *    @param imgURI
@@ -133,7 +104,7 @@ library DataTypes {
     struct ProfileData {
         string name;
         string imgURI;
-        uint followers;
+        uint256 followers;
         address[] followAccounts;
         address[] followMissions;
         address[] posts;
@@ -145,8 +116,8 @@ library DataTypes {
      */
 
     struct FollowData {
-        uint cvID;
-        uint indexedAt;
+        uint256 cvID;
+        uint256 indexedAt;
     }
 
     // *::::::::::::: ----------- :::::::::::::* //
@@ -171,9 +142,9 @@ library DataTypes {
      *    @param pubID
      */
     struct LikeData {
-        uint id;
-        uint pubID;
-        uint indexedAt;
+        uint256 id;
+        uint256 pubID;
+        uint256 indexedAt;
     }
 
     // *::::::::::::: ------- :::::::::::::* //
@@ -187,7 +158,7 @@ library DataTypes {
     }
 
     struct MissionData {
-        uint id;
+        uint256 id;
         MissionStatus status;
         uint[] features;
     }
@@ -203,8 +174,8 @@ library DataTypes {
 
     struct FeatureInteractionData {
         uint[] workerDemand;
-        uint missionID;
-        uint signedWorker;
+        uint256 missionID;
+        uint256 signedWorker;
         bool workerAcceptJob;
         bool workerContest;
         bool ownerContest;
@@ -236,7 +207,7 @@ library DataTypes {
      */
 
     struct FeatureData {
-        uint id;
+        uint256 id;
         uint256 missionID;
         uint256 startedAt;
         uint256 wadge;
@@ -244,7 +215,7 @@ library DataTypes {
         FeatureStatus status;
         CourtIDs specification;
         bool isInviteOnly;
-        uint cvWorker;
+        uint256 cvWorker;
     }
 
     /**
@@ -289,7 +260,7 @@ library DataTypes {
      */
 
     struct WorkerProposalData {
-        uint featureId;
+        uint256 featureId;
         string metadata;
         uint256 closedAt;
         uint256 createdAt;
@@ -302,7 +273,7 @@ library DataTypes {
      */
 
     struct CreationProposalData {
-        uint featureId;
+        uint256 featureId;
         string title;
         string content;
         string imgURI;

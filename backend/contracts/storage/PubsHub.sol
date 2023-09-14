@@ -6,8 +6,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 
-import {AddressHub} from "../storage/AddressHub.sol";
+import {IAddressHub} from "../interfaces/IAddressHub.sol";
 
 import {CollectLikePub} from "../collect/CollectLikePub.sol";
 import {CollectPubs} from "../collect/CollectPubs.sol";
@@ -24,24 +25,21 @@ contract PubsHub is ERC721URIStorage {
      */
     mapping(uint => uint[]) indexers;
 
-    AddressHub addressHub;
+    IAddressHub _iAH;
     CollectLikePub CLP;
-    address addrCollectPubs;
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(addressHub.accessControl()),
+            msg.sender == address(_iAH.apiPost()),
             "Must call function with proxy bindings"
         );
         _;
     }
 
     constructor(address _addressHub) ERC721("Pub", "WPB") {
-        addressHub = AddressHub(_addressHub);
-        addressHub.setPubHub(address(this));
-        CLP = new CollectLikePub(address(addressHub));
-        CollectPubs CP = new CollectPubs(address(addressHub));
-        addrCollectPubs = address(CP);
+        _iAH = IAddressHub(_addressHub);
+        _iAH.setPubHub();
+        CLP = new CollectLikePub(address(_iAH));
     }
 
     function getTokensLength() external view returns (uint) {
@@ -53,7 +51,7 @@ contract PubsHub is ERC721URIStorage {
     }
 
     function getCollectPubs() external view returns (address) {
-        return addrCollectPubs;
+        return _iAH.collectPubs();
     }
 
     /**
@@ -68,8 +66,7 @@ contract PubsHub is ERC721URIStorage {
         uint _cvID,
         string calldata _tokenURI
     ) external onlyProxy returns (uint) {
-        ICVHub iCVH = ICVHub(addressHub.cvHub());
-        address cvAddr = iCVH.ownerOf(_cvID);
+        address cvAddr = Bindings.ownerOf(_cvID, _iAH.cvHub());
 
         _tokenIDs.increment();
         uint newPubID = _tokenIDs.current();
@@ -79,11 +76,13 @@ contract PubsHub is ERC721URIStorage {
         return newPubID;
     }
 
-    function likePub(uint _id) external {
-        CLP.mint(msg.sender, _id);
+    function likePub(uint _cvID, uint _id) external onlyProxy {
+        address cvAddr = Bindings.ownerOf(_cvID, _iAH.cvHub());
+        CLP.mint(cvAddr, _id);
     }
 
-    function unlikePub(uint _id) external {
-        CLP.burn(msg.sender, _id);
+    function unlikePub(uint _cvID, uint _id) external onlyProxy {
+        address cvAddr = Bindings.ownerOf(_cvID, _iAH.cvHub());
+        CLP.burn(cvAddr, _id);
     }
 }

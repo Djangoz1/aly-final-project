@@ -1,34 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+// OpenZeppelin Contracts (last updated v4.9.0) (token/ERC721/IERC721.sol)
 
-import {DataTypes} from "../libraries/DataTypes.sol";
+pragma solidity ^0.8.0;
 
-// import {IAccessControl} from "./interfaces/IAccessControl.sol";
+import "./IERC165.sol";
 
-interface IMissionsHub {
-    function mint(
-        address _for,
-        string calldata _tokenURI
-    ) external returns (uint);
-
-    function addFeature(
-        address _owner,
-        uint _missionID,
-        uint _featureID
-    ) external;
-
-    function closeMission(uint _missionID) external;
-
-    function checkRegistred(uint _id) external view;
-
-    function getIndexer(uint _cvID) external view returns (uint[] memory);
-
-    function getData(
-        uint _missionID
-    ) external view returns (DataTypes.MissionData memory);
-
-    function getTokensLength() external view returns (uint256);
-
+/**
+ * @dev Required interface of an ERC721 compliant contract.
+ */
+interface IERC721 is IERC165 {
+    /**
+     * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
+     */
     event Transfer(
         address indexed from,
         address indexed to,
@@ -53,7 +36,7 @@ interface IMissionsHub {
         bool approved
     );
 
-    function tokenURI(uint _tokenID) external view returns (string memory);
+    function tokenURI(uint256 tokenId) external view returns (string memory);
 
     /**
      * @dev Returns the number of tokens in ``owner``'s account.
@@ -109,6 +92,22 @@ interface IMissionsHub {
         uint256 tokenId
     ) external;
 
+    /**
+     * @dev Transfers `tokenId` token from `from` to `to`.
+     *
+     * WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721
+     * or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must
+     * understand this adds an external call which potentially creates a reentrancy vulnerability.
+     *
+     * Requirements:
+     *
+     * - `from` cannot be the zero address.
+     * - `to` cannot be the zero address.
+     * - `tokenId` token must be owned by `from`.
+     * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     *
+     * Emits a {Transfer} event.
+     */
     function transferFrom(address from, address to, uint256 tokenId) external;
 
     /**

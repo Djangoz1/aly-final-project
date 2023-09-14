@@ -34,11 +34,15 @@ const getProxy = async (accessControlAddr) => {
 const _testInitAll = async () => {
   let addressHub = await _testInitAddressHub();
   let accessControl = await _testInitAccessControl(addressHub.target);
+  let factory = await _testInitFactory(addressHub.target);
 
   expect(await accessControl.workflow()).to.equal(0);
-  let missionsHub = await _testInitMissionsHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
+
   let cvHub = await _testInitCVHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let escrowDatasHub = await _testInitEscrowDatasHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let missionsHub = await _testInitMissionsHub(addressHub.target);
   expect(await accessControl.workflow()).to.equal(0);
   let pubsHub = await _testInitPubHub(addressHub.target);
   expect(await accessControl.workflow()).to.equal(0);
@@ -51,24 +55,63 @@ const _testInitAll = async () => {
   let disputesHub = await _testInitDisputesHub(addressHub.target);
   expect(await accessControl.workflow()).to.equal(0);
   let arbitratorsHub = await _testInitArbitratorsHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(1);
+  expect(await accessControl.workflow()).to.equal(0);
 
-  collecterWorkInteraction = await ethers.getContractAt(
-    "CollectWorkInteraction",
-    await featuresHub.addrCWI()
+  let balancesHub = await _testInitBalancesHub(addressHub.target);
+  expect(await accessControl.workflow()).to.equal(0);
+  let collectWorkInteraction = await _testInitCollectWorkInteraction(
+    addressHub.target
   );
+
+  let collectFollowCV = await _testInitCollectFollowCV(addressHub.target);
+
+  let collecterLike = await ethers.getContractAt(
+    "CollectLikePub",
+    await pubsHub.getCollectLikePub()
+  );
+
+  let collecterPubs = await _testInitCollectPubs(addressHub.target);
+  let apiPost = await _testInitApiPost(addressHub.target);
+
+  expect(await accessControl.workflow()).to.equal(1);
+  // let contractCode = await ethers.provider.getCode(apiPost.target);
+  // let codeSizeInBytes = contractCode.length / 2;
+  // console.log(
+  //   `Dispute Hub Taille du code du contrat : ${codeSizeInBytes} octets`
+  // );
+  // contractCode = await ethers.provider.getCode(escrowDatasHub.target);
+  // codeSizeInBytes = contractCode.length / 2;
+  // console.log(
+  //   `Escrow Datas Hub Taille du code du contrat : ${codeSizeInBytes} octets`
+  // );
+  // contractCode = await ethers.provider.getCode(collectWorkInteraction.target);
+  // codeSizeInBytes = contractCode.length / 2;
+  // console.log(
+  //   `Collect Work interaction Taille du code du contrat : ${codeSizeInBytes} octets`
+  // );
+  // contractCode = await ethers.provider.getCode(factory.target);
+  // codeSizeInBytes = contractCode.length / 2;
+  // console.log(`Factory Taille du code du contrat : ${codeSizeInBytes} octets`);
+
   return {
     addressHub,
     accessControl,
+    escrowDatasHub,
+    balancesHub,
     missionsHub,
     cvHub,
+    apiPost,
+    factory,
     pubsHub,
-    collecterWorkInteraction,
     featuresHub,
     disputesHub,
     arbitratorsHub,
     workerProposalHub,
+    collectFollowCV,
     launchpadContracts,
+    collectWorkInteraction,
+    collecterLike,
+    collecterPubs,
   };
 };
 
@@ -77,6 +120,36 @@ const _testInitAddressHub = async () => {
   await accessControl.waitForDeployment();
   return accessControl;
 };
+const _testInitEscrowDatasHub = async (addressHub) => {
+  const escrowDatasHub = await ethers.deployContract("EscrowDatasHub", [
+    addressHub,
+  ]);
+  await escrowDatasHub.waitForDeployment();
+  return escrowDatasHub;
+};
+const _testInitCollectWorkInteraction = async (addressHub) => {
+  const collectWorkInteraction = await ethers.deployContract(
+    "CollectWorkInteraction",
+    [addressHub]
+  );
+  await collectWorkInteraction.waitForDeployment();
+  return collectWorkInteraction;
+};
+
+const _testInitBalancesHub = async (addressHub) => {
+  const balancesHub = await ethers.deployContract("BalancesHub", [addressHub]);
+  await balancesHub.waitForDeployment();
+  return balancesHub;
+};
+
+const _testInitCollectFollowCV = async (addressHub) => {
+  const collectFollowCV = await ethers.deployContract("CollectFollowCv", [
+    addressHub,
+  ]);
+  await collectFollowCV.waitForDeployment();
+  return collectFollowCV;
+};
+
 const _testInitAccessControl = async (addressHub) => {
   const accessControl = await ethers.deployContract("AccessControl", [
     addressHub,
@@ -85,9 +158,26 @@ const _testInitAccessControl = async (addressHub) => {
   return accessControl;
 };
 
+const _testInitCollectPubs = async (addressHub) => {
+  const collectPubs = await ethers.deployContract("CollectPubs", [addressHub]);
+  await collectPubs.waitForDeployment();
+  return collectPubs;
+};
+const _testInitFactory = async (addressHub) => {
+  const factory = await ethers.deployContract("Factory", [addressHub]);
+  await factory.waitForDeployment();
+  return factory;
+};
+const _testInitApiPost = async (addressHub) => {
+  const apiPost = await ethers.deployContract("APIPost", [addressHub]);
+  await apiPost.waitForDeployment();
+  return apiPost;
+};
+
 const _testInitDisputesHub = async (addressHub) => {
   const disputesHub = await ethers.deployContract("DisputesHub", [addressHub]);
   await disputesHub.waitForDeployment();
+
   return disputesHub;
 };
 const _testInitArbitratorsHub = async (addressHub) => {
@@ -99,16 +189,29 @@ const _testInitArbitratorsHub = async (addressHub) => {
 };
 
 const _testInitArbitrator = async (contracts, courtID, account) => {
-  const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
-    contracts;
+  const {
+    arbitratorsHub,
+    featuresHub,
+    apiPost,
+
+    cvHub,
+  } = contracts;
+  let courtLength = await arbitratorsHub.getCourtLength(courtID);
   let cvArbitrator = await cvHub.getCV(account.address);
   let newFeature = await _testInitFeature(
     contracts,
     { courtID: courtID },
     account
   );
-  await featuresHub.validFeature(newFeature);
+  await apiPost.validFeature(newFeature);
+  let _courtLength = await arbitratorsHub.getCourtLength(courtID);
 
+  expect(parseInt(courtLength) + 1).to.be.equal(_courtLength);
+
+  let value = 0.3 + 0.1;
+  let price = ethers.parseEther(`${value}`);
+
+  await apiPost.connect(account).investOnCourt(3, { value: `${price}` });
   let data = await featuresHub.getData(newFeature);
   expect(data.status).to.be.equal(2);
   return await arbitratorsHub.getArbitrationOfCV(cvArbitrator, courtID);
@@ -190,17 +293,21 @@ const _testInitPub = async (accessControlAdress, account, uriData) => {
 // *:::::::::::::: MISSION ::::::::::::::*//
 // *:::::::::::::: ------- ::::::::::::::*//
 
+/**
+ * @notice La fonction vient mint un token erc721
+ * @notice Payable function -- msg.value == balancesHub.missionPrice()
+ * @dev La mission est créé par la fonction apiPost.createMission(_tokenURI)
+ */
 const _testInitMission = async (contracts, tokenURI, account) => {
-  const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
-    contracts;
+  const { missionsHub, apiPost, balancesHub } = contracts;
 
-  const missionPrice = await accessControl.missionPrice();
+  const missionPrice = await balancesHub.missionPrice();
   if (account) {
-    await accessControl.connect(account).buyMission(tokenURI || "missionURI", {
+    await apiPost.connect(account).createMission(tokenURI || "missionURI", {
       value: missionPrice.toString(),
     });
   } else {
-    await accessControl.buyMission(tokenURI || "missionURI", {
+    await apiPost.createMission(tokenURI || "missionURI", {
       value: missionPrice.toString(),
     });
   }
@@ -224,13 +331,14 @@ const _testInitFeaturesHub = async (addressHub) => {
 const _testInitFeature = async (contracts, datas, workerAccount, account) => {
   const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
     contracts;
-  let collecter = contracts.collecterWorkInteraction;
+
+  let apiPost = contracts.apiPost;
 
   let missionID = await _testInitMission(contracts, "missionURI");
   const cvWorker = await cvHub.getCV(workerAccount.address);
   let newFeature;
   if (account) {
-    await accessControl
+    await apiPost
       .connect(account)
       .createFeature(
         missionID,
@@ -243,9 +351,9 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
         }
       );
     newFeature = await featuresHub.getTokensLength();
-    await collecter.connect(account).inviteWorker(cvWorker, newFeature);
+    await apiPost.connect(account).inviteWorker(cvWorker, newFeature);
   } else {
-    await accessControl.createFeature(
+    await apiPost.createFeature(
       missionID,
       datas.estimatedDays || 1000,
       datas.isInviteOnly || true,
@@ -256,9 +364,9 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
       }
     );
     newFeature = await featuresHub.getTokensLength();
-    await collecter.inviteWorker(cvWorker, newFeature);
+    await apiPost.inviteWorker(cvWorker, newFeature);
   }
-  await collecter.connect(workerAccount).acceptJob(newFeature);
+  await apiPost.connect(workerAccount).acceptJob(newFeature);
   return newFeature;
 };
 
@@ -353,14 +461,14 @@ const _testInitLaunchpadContracts = async (addressHub, address) => {
 };
 
 const _testInitLaunchpad = async (
-  addressHub,
+  contracts,
   account,
   _token,
   amount,
   datas,
   tierDatas
 ) => {
-  let AddressHub = await getContractAt("AddressHub", addressHub);
+  let AddressHub = contracts.addressHub;
   let accessControl;
   let token;
 
@@ -376,11 +484,7 @@ const _testInitLaunchpad = async (
     datas.saleEnd = futureDate.getTime();
     datas.saleStart = startDate.getTime();
 
-    const pubID = await _testInitPub(_accessControl, account);
-
-    const pubsHub = await getContractAt("PubsHub", await addressHub.pubsHub());
-    const pubURI = await pubsHub.tokenURI(pubID);
-    datas.pubURI = pubURI;
+    datas.pubURI = "pubURI";
     token = await _testInitToken(account, "Django", "DJN", 10000000);
 
     datas.tokenAddress = token.target;
@@ -471,6 +575,8 @@ const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
 module.exports = {
   getContractAt,
   _testInitAll,
+
+  _testInitApiPost,
   _testInitArbitrator,
   _testInitAddressHub,
   _testInitAccessControl,
@@ -485,8 +591,13 @@ module.exports = {
   _testInitPubHub,
   _testInitMissionsHub,
   _testInitMission,
+  _testInitFactory,
   _testInitFeature,
   _testInitToken,
   _testInitLaunchpad,
+  _testInitCollectPubs,
+  _testInitCollectFollowCV,
   _testInitLaunchpadContracts,
+  _testInitCollectWorkInteraction,
+  _testInitEscrowDatasHub,
 };

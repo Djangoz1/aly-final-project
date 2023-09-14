@@ -37,7 +37,12 @@ interface IFeaturesHub {
 
     function ownerOf(uint256 tokenId) external view returns (address owner);
 
+    function validFeature(address _sender, uint _featureID) external;
+
     function tokenURI(uint tokenId) external view returns (string memory);
 
-    function resolvedDispute(uint _cvID, uint _featureID) external payable;
+    function resolvedDispute(
+        uint _cvID,
+        uint _featureID
+    ) external payable returns (bool);
 }

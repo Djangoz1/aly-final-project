@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "hardhat/console.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
 import {IAddressHub} from "../interfaces/IAddressHub.sol";
@@ -19,23 +20,23 @@ contract ArbitratorsHub is ERC721URIStorage {
     /**
      * @dev indexers is a mapping of each arbitrator ID to its data
      */
-    mapping(uint256 => DataTypes.ArbitratorData) public datas;
+    mapping(uint256 => DataTypes.ArbitratorData) internal datas;
 
     /**
      * @dev indexers is a mapping of each court ID to an array of arbitrator ID
      */
-    mapping(DataTypes.CourtIDs => uint256[]) public indexersCourt;
-    mapping(DataTypes.CourtIDs => uint256) public balancesCourt;
+    mapping(DataTypes.CourtIDs => uint256[]) internal indexersCourt;
+    mapping(DataTypes.CourtIDs => uint256) internal balancesCourt;
 
     mapping(uint256 => mapping(DataTypes.CourtIDs => uint256))
-        public indexersCV;
+        internal indexersCV;
     // Ajoutez votre code ici
 
-    IAddressHub public addressHub;
+    IAddressHub private addressHub;
 
     modifier onlyProxy() {
         require(
-            msg.sender == addressHub.featuresHub(),
+            msg.sender == addressHub.featuresHub() || msg.sender == addressHub.apiPost(),
             "Must call by proxy bindings"
         );
         _;
@@ -47,22 +48,21 @@ contract ArbitratorsHub is ERC721URIStorage {
             "ArbitratorHub: Invalid address hub"
         );
         addressHub = IAddressHub(_addressHub);
-        addressHub.setArbitratorsHub(address(this));
+        addressHub.setArbitratorsHub();
     }
 
     function setArbitrator(
         uint _cvID,
         DataTypes.CourtIDs _courtID
     ) external onlyProxy {
-        ICVHub cvHub = ICVHub(addressHub.cvHub());
-
-        require(_cvID <= cvHub.getTokensLength(), "Invalid CV ID");
+        address _addrCVH = addressHub.cvHub();
+        require(_cvID <= Bindings.tokensLength(_addrCVH), "Invalid CV ID");
         require(indexersCV[_cvID][_courtID] == 0, "Arbitrator already added");
         _tokenIDs.increment();
         DataTypes.ArbitratorData memory newArbitrator;
         newArbitrator.id = _tokenIDs.current();
         newArbitrator.cvID = _cvID;
-        _mint(cvHub.ownerOf(_cvID), newArbitrator.id);
+        _mint(Bindings.ownerOf(_cvID, _addrCVH), newArbitrator.id);
         newArbitrator.indexedAtCourt = indexersCourt[_courtID].length;
         newArbitrator.courtID = _courtID;
         datas[newArbitrator.id] = newArbitrator;
@@ -70,30 +70,27 @@ contract ArbitratorsHub is ERC721URIStorage {
         indexersCV[_cvID][_courtID] = newArbitrator.id;
     }
 
-    function investOnCourt(DataTypes.CourtIDs _courtID) external payable {
-        ICVHub cvHub = ICVHub(addressHub.cvHub());
-        uint cvID = cvHub.getCV(msg.sender);
-        uint arbitratorID = indexersCV[cvID][_courtID];
+    function investOnCourt(uint _cvID, uint _amount,  DataTypes.CourtIDs _courtID) external payable onlyProxy {
+        uint arbitratorID = indexersCV[_cvID][_courtID];
         require(arbitratorID != 0, "Arbitrator not found");
-        require(msg.value > 0, "Invalid value");
-        datas[arbitratorID].balance += msg.value;
-        balancesCourt[_courtID] += msg.value;
+        datas[arbitratorID].balance += _amount;
+        balancesCourt[_courtID] += _amount;
     }
 
     function withdrawFromCourt(
-        DataTypes.CourtIDs _courtID,
-        uint _amount
-    ) external {
-        ICVHub cvHub = ICVHub(addressHub.cvHub());
-        uint cvID = cvHub.getCV(msg.sender);
+        uint _cvID, 
+        uint _amount,
+        DataTypes.CourtIDs _courtID
+    ) external onlyProxy{
+        
 
-        uint arbitratorID = indexersCV[cvID][_courtID];
+        uint arbitratorID = indexersCV[_cvID][_courtID];
         require(arbitratorID != 0, "Arbitrator not found");
         require(datas[arbitratorID].courtID >= _courtID, "Missmatch court ID");
         require(datas[arbitratorID].balance >= _amount, "No enough balance");
         datas[arbitratorID].balance -= _amount;
         balancesCourt[_courtID] -= _amount;
-        payable(msg.sender).transfer(_amount);
+        
         // ! REENTRENCY ?
     }
 
@@ -230,10 +227,15 @@ contract ArbitratorsHub is ERC721URIStorage {
     }
 
     function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external {
+        // ! Faire un onlyDisputeHub
         require(
             indexersCV[cvID][_courtID] > 0,
             "ArbitratorHub: Arbitration not found"
         );
         datas[indexersCV[cvID][_courtID]].nbArbitrations++;
+    }
+
+    function _getCV(address _for) internal view returns (uint) {
+        return Bindings.getCV(_for, addressHub.cvHub());
     }
 }

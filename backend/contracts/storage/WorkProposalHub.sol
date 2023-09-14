@@ -35,7 +35,7 @@ contract WorkProposalHub is ERC721URIStorage {
 
     constructor(address _addressHub) ERC721("WorkProposal", "WP") {
         addressHub = AddressHub(_addressHub);
-        addressHub.setWorkerProposalHub(address(this));
+        addressHub.setWorkerProposalHub();
     }
 
     function getTokensLength() public view returns (uint) {

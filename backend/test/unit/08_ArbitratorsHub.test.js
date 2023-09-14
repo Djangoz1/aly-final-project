@@ -11,7 +11,7 @@ const CONTRACT_NAME = "ArbitratorsHub";
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let addressHub;
   let contract;
-  let accessControl;
+  let apiPost;
   let cvHub;
 
   let contracts;
@@ -29,14 +29,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
     contracts = await _testInitAll();
     addressHub = contracts.addressHub;
-    accessControl = contracts.accessControl;
+    apiPost = contracts.apiPost;
     cvHub = contracts.cvHub;
     contract = contracts.arbitratorsHub;
 
     // return;
-    await accessControl.createCV("_tokenURI");
-    await accessControl.connect(this.addr1).createCV("_tokenURI");
-    await accessControl.connect(this.addr2).createCV("_tokenURI");
+    await apiPost.createCV("_tokenURI");
+    await apiPost.connect(this.addr1).createCV("_tokenURI");
+    await apiPost.connect(this.addr2).createCV("_tokenURI");
   });
 
   describe("Initialization", () => {
@@ -146,22 +146,22 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
     describe("WORKS", () => {
       it("investOnCourt: should update balance", async () => {
-        await contract
+        await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
         let data = await contract.getData(arbitratorID);
         expect(data.balance).to.equal(price);
       });
       it("investOnCourt: should used many times", async () => {
-        await contract
+        await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
-        await contract
+        await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
         let data = await contract.getData(arbitratorID);
         expect(data.balance).to.equal(price * 2);
-        await contract
+        await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
         data = await contract.getData(arbitratorID);
@@ -170,7 +170,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       it("investOnCourt: should update true balance", async () => {
         await _testInitArbitrator(contracts, 4, this.addr1);
 
-        await contract
+        await apiPost
           .connect(this.addr1)
           .investOnCourt(4, { value: `${price}` });
         let data = await contract.getData(arbitratorID);
@@ -181,25 +181,34 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
     });
     describe("NOT WORKS", () => {
+      it("should NOT call with wrong bindings", async () => {
+        await expect(
+          contract.investOnCourt(1, 30000, courtID, { value: `${price}` })
+        ).to.be.revertedWith("Must call by proxy bindings");
+      });
+
       it("should NOT works if sender haven't place on indexersCourt ", async () => {
         await expect(
-          contract.investOnCourt(courtID, { value: `${price}` })
+          apiPost.investOnCourt(courtID, { value: `${price}` })
         ).to.be.revertedWith("Arbitrator not found");
       });
+
       it("should NOT works if sender haven't cv ", async () => {
         await expect(
-          contract
+          apiPost
             .connect(this.addr5)
             .investOnCourt(courtID, { value: `${price}` })
         ).to.be.revertedWith("CV not found");
       });
+
       it("should NOT works if 0 value ", async () => {
         await expect(
-          contract.connect(this.addr1).investOnCourt(courtID)
+          apiPost.connect(this.addr1).investOnCourt(courtID)
         ).to.be.revertedWith("Invalid value");
       });
+
       it("should NOT works if invest on unknow court ID ", async () => {
-        await expect(contract.connect(this.addr1).investOnCourt(55)).to.be
+        await expect(apiPost.connect(this.addr1).investOnCourt(55)).to.be
           .reverted;
       });
     });
@@ -211,7 +220,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     let price = ethers.parseEther("4");
     beforeEach(async () => {
       arbitratorID = await _testInitArbitrator(contracts, courtID, this.addr1);
-      await contract
+      await apiPost
         .connect(this.addr1)
         .investOnCourt(courtID, { value: `${price}` });
     });
@@ -219,14 +228,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       it("withdrawFromCourt: should update balance data", async () => {
         let data = await contract.getData(arbitratorID);
         expect(data.balance).to.equal(price);
-        await contract.connect(this.addr1).withdrawFromCourt(courtID, price);
+        await apiPost.connect(this.addr1).withdrawFromCourt(price, courtID);
         let data2 = await contract.getData(arbitratorID);
         expect(data2.balance).to.equal(0);
       });
 
       it("withdrawFromCourt: should update balance sender", async () => {
         let balance = await this.addr1.provider.getBalance(this.addr1);
-        await contract.connect(this.addr1).withdrawFromCourt(courtID, price);
+        await apiPost.connect(this.addr1).withdrawFromCourt(price, courtID);
 
         let balance2 = await this.addr1.provider.getBalance(this.addr1);
 
@@ -240,33 +249,39 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       it("withdrawFromCourt: should can use many times", async () => {
         let _price = ethers.parseEther("1");
 
-        await contract.connect(this.addr1).withdrawFromCourt(courtID, _price);
-        await contract.connect(this.addr1).withdrawFromCourt(courtID, _price);
-        await contract.connect(this.addr1).withdrawFromCourt(courtID, _price);
-        await contract.connect(this.addr1).withdrawFromCourt(courtID, _price);
+        await apiPost.connect(this.addr1).withdrawFromCourt(_price, courtID);
+        await apiPost.connect(this.addr1).withdrawFromCourt(_price, courtID);
+        await apiPost.connect(this.addr1).withdrawFromCourt(_price, courtID);
+        await apiPost.connect(this.addr1).withdrawFromCourt(_price, courtID);
         await expect(
-          contract.connect(this.addr1).withdrawFromCourt(courtID, 1)
+          apiPost.connect(this.addr1).withdrawFromCourt(1, courtID)
         ).to.be.revertedWith("No enough balance");
       });
     });
     describe("NOT WORKS", () => {
+      it("should NOT call with wrong bindings", async () => {
+        await expect(
+          contract.withdrawFromCourt(1, 30000, courtID)
+        ).to.be.revertedWith("Must call by proxy bindings");
+      });
+
       it("should NOT works if sender haven't balance ", async () => {
         let _price = ethers.parseEther("4.1");
         await expect(
-          contract.connect(this.addr1).withdrawFromCourt(courtID, _price)
+          apiPost.connect(this.addr1).withdrawFromCourt(_price, courtID)
         ).to.be.revertedWith("No enough balance");
       });
 
       it("should NOT works if sender haven't cv ", async () => {
         let _price = ethers.parseEther("2");
         await expect(
-          contract.connect(this.addr5).withdrawFromCourt(4, _price)
+          apiPost.connect(this.addr5).withdrawFromCourt(_price, 4)
         ).to.be.revertedWith("CV not found");
       });
       it("should NOT works if sender haven't balance on court ", async () => {
         let _price = ethers.parseEther("2");
         await expect(
-          contract.connect(this.addr1).withdrawFromCourt(4, _price)
+          apiPost.connect(this.addr1).withdrawFromCourt(_price, 4)
         ).to.be.revertedWith("Arbitrator not found");
       });
     });

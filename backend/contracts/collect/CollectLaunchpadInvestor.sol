@@ -16,9 +16,9 @@ import {LaunchpadCohort} from "../cohort/LaunchpadCohort.sol";
 import {CollectLaunchpadDatas} from "../collect/CollectLaunchpadDatas.sol";
 
 contract CollectLaunchpadInvestor is Ownable {
-    LaunchpadCohort launchpadCohort;
-    CollectLaunchpadDatas cLD;
-    ILaunchpadHub iLH;
+    LaunchpadCohort internal launchpadCohort;
+    CollectLaunchpadDatas internal cLD;
+    ILaunchpadHub internal iLH;
 
     using SafeMath for uint256;
 
@@ -27,7 +27,7 @@ contract CollectLaunchpadInvestor is Ownable {
      * @dev tierDetails[investorAddr][launchpadID] = tierDetails
      */
     mapping(address => mapping(uint => DataTypes.InvestorData))
-        public investorDetails;
+        internal investorDetails;
 
     constructor(address _launchpadCohort) {
         launchpadCohort = LaunchpadCohort(_launchpadCohort);

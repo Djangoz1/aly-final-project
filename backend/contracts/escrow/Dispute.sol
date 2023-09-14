@@ -3,128 +3,147 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
 import "hardhat/console.sol";
 
-import {DataTypes} from "../libraries/DataTypes.sol";
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {IAddressHub} from "../interfaces/IAddressHub.sol";
-import {ICVHub} from "../interfaces/ICVHub.sol";
-import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
-import {IMissionsHub} from "../interfaces/IMissionsHub.sol";
-import {IDisputesHub} from "../interfaces/IDisputesHub.sol";
 import {IArbitratorsHub} from "../interfaces/IArbitratorsHub.sol";
+import {IEscrowDatasHub} from "../interfaces/IEscrowDatasHub.sol";
+import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
+import {IDisputesHub} from "../interfaces/IDisputesHub.sol";
+
 import {Bindings} from "../libraries/Bindings.sol";
+import {DataTypes} from "../libraries/DataTypes.sol";
+import {BindingsMint} from "../libraries/BindingsMint.sol";
+
+import {DisputeTimes} from "../libraries/disputes/DisputeTimes.sol";
+import {DisputeDatas} from "../libraries/disputes/DisputeDatas.sol";
+import {DisputeArbitrators} from "../libraries/disputes/DisputeArbitrators.sol";
+import {DisputeTools} from "../libraries/disputes/DisputeTools.sol";
+import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
+import {DisputeCounters} from "../libraries/disputes/DisputeCounters.sol";
 
 contract Dispute is Ownable {
     // Ajoutez votre code ici
-    // Bindings bindings = Bindings(address(this));
+    using DisputeTools for DisputeTools.Tools;
 
-    using Counters for Counters.Counter;
-    Counters.Counter private _arbitratorIDs;
-    Counters.Counter private _voteIDs;
-    Counters.Counter private _payerVote;
-    Counters.Counter private _payeeVote;
+    DisputeTools.Tools private _tools;
 
-    DataTypes.DisputeData public data;
-    DataTypes.EscrowStatus public status;
-    DataTypes.ArbitrationVote public decision;
-    address disputesHub;
-    address addressHub;
-    address cvHub;
-    uint featureID;
+    uint32 public constant APPEAL_PERIOD = 2 seconds; // Change to days on production
+    IAddressHub private _iAH;
 
-    mapping(uint => DataTypes.ArbitratorStatus) arbitratorsAllowed;
-
-    uint[] arbitrators;
-
-    mapping(uint => DataTypes.ArbitrationVote) votes;
-
-    constructor(
-        address _addrHub,
-        address _owner,
-        DataTypes.DisputeData memory _data,
-        uint _featureID
-    ) {
-        IAddressHub _AddressHub = IAddressHub(_addrHub);
+    modifier onlyProxy() {
         require(
-            msg.sender == _AddressHub.disputesHub(),
-            "Dispute: Invalid sender"
+            msg.sender == address(_iAH.apiPost()),
+            "Must call function with proxy bindings"
         );
-        addressHub = _addrHub;
-        cvHub = _AddressHub.cvHub();
-        transferOwnership(_owner);
-        data = _data;
-        _selectRandomlyArbitrator();
-        featureID = _featureID;
+        _;
     }
 
-    function acceptArbitration() external {
-        IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(
-            IAddressHub(addressHub).arbitratorsHub()
-        );
-        require(status == DataTypes.EscrowStatus.Initial, "Invalid status");
-
-        ICVHub _CVHub = ICVHub(IAddressHub(addressHub).cvHub());
-        uint cvID = _CVHub.getCV(msg.sender);
-        uint arbitratorID = _ArbitratorsHub.getArbitrationOfCV(
-            cvID,
-            data.courtID
-        );
-
+    modifier onlyStatus(DisputeRules.Status _status, bool _bool) {
+        require(_status == _rules().status == _bool, "Invalid status");
+        _;
+    }
+    modifier onlyFromClient() {
+        uint256 cvID = _cvOf(msg.sender);
+        DisputeDatas.Data memory _data = _data();
         require(
-            arbitratorsAllowed[arbitratorID] ==
-                DataTypes.ArbitratorStatus.Invited,
-            "Wrong allowance arbitrator"
+            _data.payerID == cvID || _data.payeeID == cvID,
+            "Not part of dispute"
         );
+        _;
+    }
 
-        arbitratorsAllowed[arbitratorID] = DataTypes.ArbitratorStatus.Accepted;
-        arbitrators.push(arbitratorID);
+    modifier checkLink(uint _cvID) {
+        DisputeDatas.Data memory _data = _data();
+        require(
+            _data.payerID == _cvID || _data.payeeID == _cvID,
+            "Not part of dispute"
+        );
+        _;
+    }
 
-        if (arbitrators.length == data.nbArbitrators) {
+    constructor(
+        address _addressHub,
+        address _owner,
+        DisputeDatas.Data memory _data
+    ) {
+        _iAH = IAddressHub(_addressHub);
+        _tools.addressHub = _addressHub;
+
+        _tools.datasHub = _iAH.escrowDatasHub();
+        require(msg.sender == _iAH.factory(), "Dispute : failure constructor");
+
+        _tools.id = _data.id;
+
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        _iEDH.setDatasOf(_tools.id, _data);
+
+        transferOwnership(_owner);
+
+        // data = _data;
+    }
+
+    function init(
+        uint _cvID
+    )
+        external
+        checkLink(_cvID)
+        onlyStatus(DisputeRules.Status.Initial, true)
+        onlyProxy
+    {
+        require(_timers().createdAt == 0, "Dispute already init");
+
+        _selectArbitrators();
+
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        DisputeTimes.Data memory _timers;
+
+        _timers.createdAt = block.timestamp;
+        _iEDH.setTimersOf(_tools.id, _timers);
+    }
+
+    function acceptArbitration(
+        uint _cvID
+    ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        DisputeDatas.Data memory data = _data();
+
+        uint arbitratorID = _arbitratorOf(_cvID);
+        uint _arbitratorsLength = _iEDH.addArbitratorOn(
+            _tools.id,
+            arbitratorID
+        );
+        if (_arbitratorsLength == data.nbArbitrators) {
             _startedVotePeriod();
         }
     }
 
-    function refuseArbitration() external {
-        IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(
-            IAddressHub(addressHub).arbitratorsHub()
-        );
-        require(status == DataTypes.EscrowStatus.Initial, "Invalid status");
+    function refuseArbitration(
+        uint _cvID
+    ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
 
-        ICVHub _CVHub = ICVHub(IAddressHub(addressHub).cvHub());
-        uint cvID = _CVHub.getCV(msg.sender);
-        uint arbitratorID = _ArbitratorsHub.getArbitrationOfCV(
-            cvID,
-            data.courtID
-        );
-
-        require(
-            arbitratorsAllowed[arbitratorID] ==
-                DataTypes.ArbitratorStatus.Invited,
-            "Wrong allowance arbitrator"
-        );
-        arbitratorsAllowed[arbitratorID] = DataTypes.ArbitratorStatus.Refused;
-        _arbitratorIDs.decrement();
-        if (_arbitratorIDs.current() < 3) {
-            _selectRandomlyArbitrator();
+        uint arbitratorID = _arbitratorOf(_cvID);
+        uint slot = _iEDH.refuseArbitration(_tools.id, arbitratorID);
+        if (slot < 3) {
+            _selectArbitrators();
         }
     }
 
-    function _selectRandomlyArbitrator() internal {
-        IAddressHub _AddressHub = IAddressHub(addressHub);
+    function _selectArbitrators() internal {
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        address arbitratorsHub = _iAH.arbitratorsHub();
+        IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(arbitratorsHub);
+        DisputeDatas.Data memory data = _data();
+        DisputeCounters.Data memory counters = _counters();
 
-        IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(
-            _AddressHub.arbitratorsHub()
-        );
-        ICVHub _CVHub = ICVHub(_AddressHub.cvHub());
-        uint arbitratorsSlot = data.nbArbitrators * 2;
-        uint randomID;
+        uint256 arbitratorsSlot = data.nbArbitrators * 2;
+        uint256 randomID;
+        uint courtLength = _ArbitratorsHub.getCourtLength(data.courtID);
 
-        for (
-            uint256 index = 0;
-            index < _ArbitratorsHub.getCourtLength(data.courtID) * 2;
-            index++
-        ) {
+        for (uint256 index = 0; index < courtLength * 2; index++) {
             if (arbitratorsSlot == 0) {
                 break;
             }
@@ -141,148 +160,192 @@ contract Dispute is Ownable {
                 );
             }
             if (data.nbArbitrators >= 3 && arbitratorsSlot != 0) {
+                uint randomCV = _cvOf(
+                    Bindings.ownerOf(randomID, arbitratorsHub)
+                );
                 if (
-                    arbitratorsAllowed[randomID] ==
-                    DataTypes.ArbitratorStatus.None &&
-                    _CVHub.getCV(_ArbitratorsHub.ownerOf(randomID)) !=
-                    data.payerID &&
-                    _CVHub.getCV(_ArbitratorsHub.ownerOf(randomID)) !=
-                    data.payeeID
+                    _iEDH.allowanceOf(_tools.id, randomID) ==
+                    DisputeArbitrators.Status.None &&
+                    !_checkCVLink(randomCV)
                 ) {
-                    arbitratorsAllowed[randomID] = DataTypes
-                        .ArbitratorStatus
-                        .Invited;
+                    _iEDH.setAllowanceOf(
+                        _tools.id,
+                        randomID,
+                        DisputeArbitrators.Status.Invited
+                    );
+
                     arbitratorsSlot--;
-                    _arbitratorIDs.increment();
+                    counters._arbitratorIDs++;
                 }
             }
         }
+        _iEDH.setCountersOf(_tools.id, counters);
     }
 
     function _startedVotePeriod() internal {
-        status = DataTypes.EscrowStatus.Disputed;
-        data.createdAt = block.timestamp;
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        _iEDH.startVotesOf(_tools.id);
     }
 
-    function startedVotePeriod() external onlyOwner {
+    function startedVotePeriod(
+        uint _cvID
+    )
+        external
+        onlyProxy
+        checkLink(_cvID)
+        onlyStatus(DisputeRules.Status.Initial, true)
+    {
         require(
-            status == DataTypes.EscrowStatus.Initial,
-            "Dispute: Invalid status"
+            _timers().createdAt + _data().reclamationPeriod <= block.timestamp,
+            "Must wait started period"
         );
-        require(_arbitratorIDs.current() >= 3, "Invalid arbitrators number");
         _startedVotePeriod();
     }
 
-    function vote(DataTypes.ArbitrationVote _vote) external {
-        IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(
-            IAddressHub(addressHub).arbitratorsHub()
-        );
-        ICVHub _CVHub = ICVHub(IAddressHub(addressHub).cvHub());
-        uint cvID = _CVHub.getCV(msg.sender);
-        uint arbitratorID = _ArbitratorsHub.getArbitrationOfCV(
-            cvID,
-            data.courtID
-        );
-        require(status == DataTypes.EscrowStatus.Disputed, "Invalid status");
-        require(
-            arbitratorsAllowed[arbitratorID] ==
-                DataTypes.ArbitratorStatus.Accepted,
-            "Invalid arbitrator status"
-        );
-        require(
-            votes[arbitratorID] == DataTypes.ArbitrationVote.Waiting,
-            "Already voted"
-        );
-        require(
-            _vote != DataTypes.ArbitrationVote.Waiting,
-            "Invalid ruling vote"
-        );
-        _voteIDs.increment();
-        votes[arbitratorID] = _vote;
+    function vote(
+        uint _cvID,
+        DisputeRules.Vote _vote
+    ) external onlyProxy onlyStatus(DisputeRules.Status.Disputed, true) {
+        IArbitratorsHub _iArbH = IArbitratorsHub(_iAH.arbitratorsHub());
 
-        if (_vote == DataTypes.ArbitrationVote.PayerWins) {
-            _payerVote.increment();
-        }
-        if (_vote == DataTypes.ArbitrationVote.PayeeWins) {
-            _payeeVote.increment();
-        }
-        _ArbitratorsHub.incrementVote(cvID, data.courtID);
-        if (_voteIDs.current() == data.nbArbitrators) {
-            _resolvedDispute();
-        } else if (data.createdAt + data.reclamationPeriod < block.timestamp) {
-            _resolvedDispute();
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        DisputeDatas.Data memory _data = _iEDH.datasOf(_tools.id);
+
+        uint arbitratorID = _arbitratorOf(_cvID);
+
+        uint votesLength = _iEDH.voteFor(_tools.id, arbitratorID, _vote);
+
+        _iArbH.incrementVote(_cvID, _data.courtID);
+        if (
+            votesLength == _arbitrators().length ||
+            _iEDH.timersOf(_tools.id).startedAt + _data.reclamationPeriod <
+            block.timestamp
+        ) {
+            _tally();
         }
     }
 
-    function _resolvedDispute() internal {
-        data.resolvedAt = block.timestamp;
-        status = DataTypes.EscrowStatus.Resolved;
-        IAddressHub iAH = IAddressHub(addressHub);
-        IFeaturesHub iFH = IFeaturesHub(iAH.featuresHub());
-        if (_payerVote.current() > _payeeVote.current()) {
-            decision = DataTypes.ArbitrationVote.PayerWins;
-            iFH.resolvedDispute(data.payerID, featureID);
-        } else if (_payerVote.current() < _payeeVote.current()) {
-            decision = DataTypes.ArbitrationVote.PayeeWins;
-            iFH.resolvedDispute(data.payeeID, featureID);
+    function _reclaimed(uint _winnerID) internal {
+        require(_winnerID > 0, "Unclear decision");
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        DisputeDatas.Data memory data = _data();
+        IFeaturesHub _iFH = IFeaturesHub(_iAH.featuresHub());
+        bool success = _iFH.resolvedDispute(_winnerID, data.featureID);
+        _iEDH.reclaimedFor(_tools.id);
+    }
+
+    function _tally() internal returns (uint) {
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+
+        uint256 winnerID = _iEDH.tallyFor(_tools.id);
+
+        if (_rules().appeal) {
+            _resolvedDispute();
+        }
+        return winnerID;
+    }
+
+    function _checkCVLink(uint _cvID) internal view returns (bool) {
+        DisputeDatas.Data memory data = _data();
+        if (_cvID == data.payerID || _cvID == data.payeeID) {
+            return true;
         } else {
-            decision = DataTypes.ArbitrationVote.RefusedToArbitrate;
+            return false;
         }
     }
 
-    function appeal() external {
-        IAddressHub iAH = IAddressHub(addressHub);
-        require(!data.appeal, "Appeal already done");
-        require(
-            status == DataTypes.EscrowStatus.Resolved,
-            "Wrong dispute status"
-        );
-
-        require(
-            data.payerID == Bindings.getCV(msg.sender, iAH.cvHub()) ||
-                data.payeeID == Bindings.getCV(msg.sender, iAH.cvHub()),
-            "Not part of dispute"
-        );
-        for (uint256 index = 0; index < arbitrators.length; index++) {
-            uint arbitratorID = arbitrators[index];
-            arbitratorsAllowed[arbitratorID] = DataTypes.ArbitratorStatus.None;
+    function _resolvedDispute()
+        internal
+        onlyStatus(DisputeRules.Status.Tally, true)
+    {
+        uint winnerID = DisputeTools.winner(_data(), _counters());
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        _iEDH.resolveDisputeOf(_tools.id);
+        if (winnerID > 0) {
+            _reclaimed(winnerID);
         }
-        _arbitratorIDs.reset();
-        _voteIDs.reset();
-        _payerVote.reset();
-        _payeeVote.reset();
-        arbitrators = new uint[](data.nbArbitrators * 2);
-        _selectRandomlyArbitrator();
     }
 
-    function hisAllowance(
-        uint _arbitratorID
-    ) external view returns (DataTypes.ArbitratorStatus) {
-        return arbitratorsAllowed[_arbitratorID];
+    function doAppeal(
+        uint _cvID
+    )
+        external
+        onlyProxy
+        onlyStatus(DisputeRules.Status.Tally, true)
+        checkLink(_cvID)
+    {
+        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+
+        bool success = _iEDH.appealOf(_tools.id);
+        require(success, "Error appeal");
+        _selectArbitrators();
     }
 
-    function resolvedDispute() external onlyOwner {
+    function resolvedDispute(
+        uint _cvID
+    )
+        external
+        onlyProxy
+        onlyStatus(DisputeRules.Status.Reclaimed, false)
+        checkLink(_cvID)
+    {
+        DisputeRules.Data memory rules = _rules();
+        DisputeDatas.Data memory data = _data();
+        DisputeTimes.Data memory timers = _timers();
+        require(timers.startedAt > 0, "Not started");
         require(
-            status == DataTypes.EscrowStatus.Disputed,
-            "Dispute: Invalid status"
+            (rules.status == DisputeRules.Status.Tally &&
+                timers.talliedAt + APPEAL_PERIOD <= block.timestamp) ||
+                (rules.status == DisputeRules.Status.Disputed &&
+                    timers.startedAt + data.reclamationPeriod + APPEAL_PERIOD <=
+                    block.timestamp),
+            "Must wait release period"
         );
-        require(_voteIDs.current() > 3, "Dispute: Must at least 3 votes");
-        require(
-            data.createdAt + data.reclamationPeriod < block.timestamp,
-            "Dispute: Vote period not finished"
-        );
+
+        if (rules.status == DisputeRules.Status.Disputed) {
+            _tally();
+        }
         _resolvedDispute();
     }
 
-    function getArbitrators() external view returns (uint[] memory) {
-        return arbitrators;
+    function _cvOf(address _for) internal view returns (uint256) {
+        return Bindings.getCV(_for, _iAH.cvHub());
     }
 
-    function getArbitratorsLength() external view returns (uint) {
-        return _arbitratorIDs.current();
+    function _data() internal view returns (DisputeDatas.Data memory _data) {
+        return IEscrowDatasHub(_tools.datasHub).datasOf(_tools.id);
     }
 
-    function getVotesLength() external view returns (uint) {
-        return _voteIDs.current();
+    function _counters()
+        internal
+        view
+        returns (DisputeCounters.Data memory _data)
+    {
+        return IEscrowDatasHub(_tools.datasHub).countersOf(_tools.id);
+    }
+
+    function data() external view returns (DisputeDatas.Data memory _data) {
+        return IEscrowDatasHub(_tools.datasHub).datasOf(_tools.id);
+    }
+
+    function _rules() internal view returns (DisputeRules.Data memory) {
+        return IEscrowDatasHub(_tools.datasHub).rulesOf(_tools.id);
+    }
+
+    function _timers() internal view returns (DisputeTimes.Data memory _data) {
+        return IEscrowDatasHub(_tools.datasHub).timersOf(_tools.id);
+    }
+
+    function _arbitrators() internal view returns (uint[] memory) {
+        return IEscrowDatasHub(_tools.datasHub).arbitratorsOf(_tools.id);
+    }
+
+    function _arbitratorOf(uint _cvID) internal returns (uint) {
+        return
+            Bindings.arbitratorOf(
+                _cvID,
+                IEscrowDatasHub(_tools.datasHub).datasOf(_tools.id).courtID,
+                _iAH.arbitratorsHub()
+            );
     }
 }

@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 import {AddressHub} from "../storage/AddressHub.sol";
 import {IPubsHub} from "../interfaces/IPubsHub.sol";
 import {CVHub} from "../storage/CVHub.sol";
@@ -19,9 +20,9 @@ contract CollectLikePub is ERC721 {
      * @notice uint param is for pub ID
      * @notice return array of ID follow for each pub
      */
-    mapping(uint => uint[]) indexers;
+    mapping(uint => uint[]) internal indexers;
 
-    mapping(uint => DataTypes.LikeData) datas;
+    mapping(uint => DataTypes.LikeData) internal datas;
 
     /**
      * @dev storage indexer like for each CV
@@ -29,11 +30,11 @@ contract CollectLikePub is ERC721 {
      * @notice return likeData for each pubID
      */
 
-    mapping(uint => mapping(uint => uint)) indexersCV;
+    mapping(uint => mapping(uint => uint)) internal indexersCV;
     // mapping(uint => mapping(uint => uint)) indexersCV;
 
-    AddressHub addressHub;
-    IPubsHub iPH;
+    AddressHub internal addressHub;
+    IPubsHub internal iPH;
 
     modifier onlyProxy() {
         require(
@@ -58,7 +59,7 @@ contract CollectLikePub is ERC721 {
 
     function getIndexer(uint _pubID) external view returns (uint[] memory) {
         require(indexers[_pubID].length > 0, "Likes not exist");
-        
+
         return indexers[_pubID];
     }
 
@@ -72,11 +73,12 @@ contract CollectLikePub is ERC721 {
     }
 
     function mint(address _from, uint _pubID) external onlyProxy {
-        IPubsHub pubHub = IPubsHub(addressHub.pubsHub());
-        CVHub CVH = CVHub(addressHub.cvHub());
-        require(CVH.balanceOf(_from) > 0, "You must have CV to like pub");
-        require(_pubID <= pubHub.getTokensLength(), "Pub ID not exist");
-        uint cvID = CVH.getCV(_from);
+        uint cvID = _getCV(_from);
+
+        require(
+            _pubID <= Bindings.tokensLength(addressHub.pubsHub()),
+            "Pub ID not exist"
+        );
 
         _tokenIDs.increment();
         uint newLikeID = _tokenIDs.current();
@@ -93,10 +95,12 @@ contract CollectLikePub is ERC721 {
     }
 
     function burn(address _owner, uint _pubID) external onlyProxy {
-        CVHub CVH = CVHub(addressHub.cvHub());
-        uint cvOwnerID = CVH.getCV(_owner);
+        uint cvOwnerID = _getCV(_owner);
         uint _likeID = indexersCV[cvOwnerID][_pubID];
-        require(_likeID <= _tokenIDs.current() && _likeID != 0, "Like ID not exist");
+        require(
+            _likeID <= _tokenIDs.current() && _likeID != 0,
+            "Like ID not exist"
+        );
         require(datas[_likeID].id == _likeID, "Not liked");
         require(ownerOf(_likeID) == _owner, "Not the owner");
 
@@ -105,9 +109,10 @@ contract CollectLikePub is ERC721 {
         delete indexers[prevDatas.pubID][prevDatas.indexedAt];
         datas[_likeID] = cleanDatas;
         delete indexersCV[cvOwnerID][_pubID];
-        // indexersCV[cvOwnerID][_pubID] = 0;
-        // delete indexers[cvOwnerID][_likeID];
-
         _burn(_likeID);
+    }
+
+    function _getCV(address _for) internal view returns (uint) {
+        return Bindings.getCV(_for, addressHub.cvHub());
     }
 }

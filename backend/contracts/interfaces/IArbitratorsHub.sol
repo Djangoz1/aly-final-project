@@ -14,11 +14,12 @@ interface IArbitratorsHub {
 
     function setArbitrator(uint _cvID, DataTypes.CourtIDs _courtID) external;
 
-    function investOnCourt(DataTypes.CourtIDs _courtID) external payable;
+    function investOnCourt(uint _cvID, uint _amount, DataTypes.CourtIDs _courtID) external payable;
 
     function withdrawFromCourt(
-        DataTypes.CourtIDs _courtID,
-        uint _amount
+        uint _cvID,
+        uint _amount,
+        DataTypes.CourtIDs _courtID
     ) external;
 
     function boostRandomlyArbitrator(
@@ -39,9 +40,9 @@ interface IArbitratorsHub {
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256);
 
-    function getData(
-        uint256 _arbitratorID
-    ) external view returns (DataTypes.ArbitratorData memory);
+    // function getData(
+    //     uint256 _arbitratorID
+    // ) external view returns (DataTypes.ArbitratorData memory);
 
     function getArbitrationOfCV(
         uint _cvID,

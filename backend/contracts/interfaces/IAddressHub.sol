@@ -9,35 +9,69 @@ interface IAddressHub {
 
     function pubsHub() external view returns (address);
 
+    function collectPubs() external view returns (address);
+
+    function collectFollowCV() external view returns (address);
+
+    function collectWorkInteraction() external view returns (address);
+
     function disputesHub() external view returns (address);
+
+    function launchpadCohort() external view returns (address);
+
+    function launchpadsHub() external view returns (address);
 
     function arbitratorsHub() external view returns (address);
 
     function cvHub() external view returns (address);
 
+    function balancesHub() external view returns (address);
+
+    function factory() external view returns (address);
+
     function featuresHub() external view returns (address);
+
+    function apiPost() external view returns (address);
 
     function missionsHub() external view returns (address);
 
-    function setAccessControl(address _accessControl) external;
+    function escrowDatasHub() external view returns (address);
 
-    function setPubHub(address _pubHub) external;
+    function setFactory() external;
 
-    function setCVHub(address _CVHub) external;
+    function setBalancesHub() external;
 
-    function setArbitratorsHub(address _arbitratorsHub) external;
+    function setEscrowDatasHub() external;
 
-    function setDisputesHub(address _disputesHub) external;
+    function setAccessControl() external;
 
-    function setFeaturesHub(address _featuresHub) external;
+    function setApiPost() external;
 
-    function setMissionsHub(address _missionsHub) external;
+    function setLaunchpadsHub() external;
 
-    function setWorkerProposalHub(address _workerProposalHub) external;
+    function setPubHub() external;
 
-    function setLaunchpadHub(address _launchpadHub) external;
+    function setCollectPubs() external;
 
-    function setLaunchpadCohort(address _launchpadCohort) external;
+    function setCVHub() external;
+
+    function setCollectFollowCV() external;
+
+    function setArbitratorsHub() external;
+
+    function setDisputesHub() external;
+
+    function setCollectWorkInteraction() external;
+
+    function setFeaturesHub() external;
+
+    function setMissionsHub() external;
+
+    function setWorkerProposalHub() external;
+
+    function setLaunchpadHub() external;
+
+    function setLaunchpadCohort() external;
 
     // Ajoutez votre code ici
 }

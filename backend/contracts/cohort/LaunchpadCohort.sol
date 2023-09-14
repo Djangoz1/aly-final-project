@@ -25,7 +25,7 @@ contract LaunchpadCohort is Ownable {
 
     constructor(address _addressHub) {
         AddressHub addrHub = AddressHub(_addressHub);
-        addrHub.setLaunchpadCohort(address(this));
+        addrHub.setLaunchpadCohort();
         addressHub = _addressHub;
     }
 

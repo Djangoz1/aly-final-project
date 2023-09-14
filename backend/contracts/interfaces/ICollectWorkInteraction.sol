@@ -6,11 +6,38 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
-import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
 
 interface ICollectWorkInteraction {
-    function setFeature(uint _featureID) external;
+    function addFeature(uint _featureID) external;
 
-    function acceptJob(uint _cvWorkerID, uint _featureID) external;
+    function inviteWorker(
+        uint _cvID,
+        uint _cvWorkerID,
+        uint _featureID
+    ) external;
+
+    function acceptJob(uint _cvID, uint _featureID) external;
+
+    function declineJob(uint _cvID, uint _featureID) external;
+
+    function askToJoin(uint _cvID, uint _featureID) external;
+
+    function signWorker(
+        uint _featureID,
+        uint _cvWorkerID
+    ) external returns (bool);
+
+    function improveFeature(uint _featureID, uint16 _estimatedDays) external;
+
+    function contestFeature(
+        uint _cvID,
+        uint _featureID,
+        uint32 _reclamationPeriod,
+        uint8 _nbArbitrators,
+        string memory _tokenURI
+    ) external returns (bool);
+
+    function getData(
+        uint _featureID
+    ) external view returns (DataTypes.FeatureInteractionData memory);
 }

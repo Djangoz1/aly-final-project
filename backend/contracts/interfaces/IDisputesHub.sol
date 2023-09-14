@@ -13,12 +13,18 @@ interface IDisputesHub {
 
     function MAX_RECLAMATION_PERIOD() external view returns (uint256);
 
+    function addrAH() external view returns (address);
+
+    function getTokensLength() external view returns (uint);
+
     function mint(
         address _to,
-        uint _featureID,
+        uint256 _featureID,
         DataTypes.CourtIDs _courtID,
-        uint _reclamationPeriod,
-        uint _nbArbitrators,
+        uint32 _reclamationPeriod,
+        uint8 _nbArbitrators,
         string memory _tokenURI
     ) external returns (bool);
+
+    function addressOf(uint _disputeID) external view returns (address);
 }

@@ -14,4 +14,8 @@ interface IPubsHub {
         uint _cvID,
         string calldata _tokenURI
     ) external returns (uint);
+
+    function likePub(uint _cvID, uint _id) external;
+
+    function unlikePub(uint _cvID, uint _id) external;
 }

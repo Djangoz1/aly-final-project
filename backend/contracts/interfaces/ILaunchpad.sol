@@ -9,4 +9,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 interface ILaunchpad {
     function setLaunchpadInvestor(address _launchpadInvestor) external;
+
+    function lockTokens(uint _cvID, uint _tokens) external;
+
+    function owner() external view returns (address);
 }

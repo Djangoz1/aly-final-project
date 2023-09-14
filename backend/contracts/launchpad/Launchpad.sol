@@ -6,11 +6,13 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // import "@openzeppelin/contracts/security/Pausable.sol";
-import "hardhat/console.sol";
+
+import {IAddressHub} from "../interfaces/IAddressHub.sol";
 
 // import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {LaunchpadCohort} from "../cohort/LaunchpadCohort.sol";
 
+import {Bindings} from "../libraries/Bindings.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
 import {CollectLaunchpadInvestor} from "../collect/CollectLaunchpadInvestor.sol";
@@ -21,6 +23,7 @@ contract Launchpad is Ownable {
     LaunchpadCohort launchpadCohort;
     CollectLaunchpadDatas cLD;
     CollectLaunchpadInvestor cLI;
+    IAddressHub private _iAH;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tierID;
@@ -45,6 +48,14 @@ contract Launchpad is Ownable {
         _;
     }
 
+    modifier onlyProxy() {
+        require(
+            msg.sender == address(_iAH.apiPost()),
+            "Must call function with proxy bindings"
+        );
+        _;
+    }
+
     modifier onlyProcess() {
         // ! Decoment after test
 
@@ -61,22 +72,16 @@ contract Launchpad is Ownable {
         _;
     }
 
-    /**
-     * @param _launchpadCohort is address of contract where store every contract module
-     * @param _owner is msg.sender of deployer launchpad
-     * @param _id is launchpadID.current
-     * @param _datas is datas set by deployer
-     * @param _tierDatas is tier datas set by deployer
-     */
     constructor(
-        address _launchpadCohort,
+        address _addressHub,
         address _owner,
         uint256 _id,
         DataTypes.LaunchpadData memory _datas,
         DataTypes.TierData[] memory _tierDatas,
-        string memory _pubURI
+        uint _pubID
     ) {
-        launchpadCohort = LaunchpadCohort(_launchpadCohort);
+        _iAH = IAddressHub(_addressHub);
+        launchpadCohort = LaunchpadCohort(_iAH.launchpadCohort());
         launchpadHub = LaunchpadHub(msg.sender);
         cLD = CollectLaunchpadDatas(launchpadCohort.getAddrCollectDatas());
         cLI = CollectLaunchpadInvestor(
@@ -88,8 +93,8 @@ contract Launchpad is Ownable {
             launchpadCohort.getAddrLaunchpadHub() == msg.sender,
             "Must deploy with launchpad cohort"
         );
-_datas.maxCap = 0;
-_datas.minCap = 0;
+        _datas.maxCap = 0;
+        _datas.minCap = 0;
         uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
         uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
         uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
@@ -102,7 +107,7 @@ _datas.minCap = 0;
             _datas.maxCap = _datas.maxCap.add(_tierData.maxTierCap);
             _datas.minCap = _datas.minCap.add(_tierData.minTierCap);
         }
-        
+
         _datas.numberOfTier = uint8(_tierDatas.length);
         cLD.setLaunchpadData(_id, _owner, _datas);
         cLD._setTiers(
@@ -114,7 +119,7 @@ _datas.minCap = 0;
             _tokenPrice
         );
         id = _id;
-        pubID = accessControl.createPub(_pubURI, _owner);
+        pubID = _pubID;
 
         iERC20 = IERC20(_datas.tokenAddress);
     }
@@ -126,21 +131,20 @@ _datas.minCap = 0;
      * @param _tokens is number of token that sender buy
      */
     function transferIfAllow(uint _tokens) external returns (bool) {
-        IERC20 token = IERC20(cLD.getLaunchpadData(id).tokenAddress);
-        uint valueAllowed = token.allowance(owner(), address(this));
+        uint valueAllowed = iERC20.allowance(owner(), address(this));
         require(valueAllowed > 0, "Our funds is empty");
         require(
             valueAllowed >= _tokens,
             "We didn't have enough funds available"
         );
-        if (token.balanceOf(owner()) <= valueAllowed) {
+        if (iERC20.balanceOf(owner()) <= valueAllowed) {
             // _pause();
             require(
-                token.balanceOf(owner()) >= valueAllowed,
+                iERC20.balanceOf(owner()) >= valueAllowed,
                 "Mismatch balance of owner and allowance !"
             );
         } else {
-            bool success = token.transferFrom(owner(), address(this), _tokens);
+            bool success = iERC20.transferFrom(owner(), address(this), _tokens);
             require(success, "Error transfer token");
             return true;
         }
@@ -163,15 +167,17 @@ _datas.minCap = 0;
      * @notice protocol take 1% royalties
      * @param _tokens must be equal of the allowance of contract for sender address
      */
-    function lockTokens(uint _tokens) external onlyOwner {
-        require(iERC20.balanceOf(msg.sender) >= _tokens, "No enough funds");
+    function lockTokens(uint _cvID, uint _tokens) external onlyProxy {
+        address sender = Bindings.ownerOf(_cvID, _iAH.cvHub());
+        require(sender == owner(), "Ownable: caller is not the owner");
+        require(iERC20.balanceOf(sender) >= _tokens, "No enough funds");
         require(
-            iERC20.allowance(msg.sender, address(this)) == _tokens,
+            iERC20.allowance(sender, address(this)) == _tokens,
             "Mismatch allowance amount"
         );
         uint royalties = _tokens.div(100);
         bool success = iERC20.transferFrom(
-            msg.sender,
+            sender,
             address(launchpadCohort.owner()),
             royalties
         );

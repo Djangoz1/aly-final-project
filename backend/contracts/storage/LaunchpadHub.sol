@@ -5,7 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {IAPIPost} from "../interfaces/IAPIPost.sol";
 import {IAddressHub} from "../interfaces/IAddressHub.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
 import "../launchpad/Launchpad.sol";
@@ -18,7 +20,7 @@ contract LaunchpadHub is Ownable {
 
     address private addrLCohort;
     address private addrAccessControl;
-
+    IAddressHub private _iAH;
     uint8 public maxTiers = 5;
 
     /**
@@ -37,7 +39,7 @@ contract LaunchpadHub is Ownable {
 
     modifier onlyProxy() {
         require(
-            msg.sender == ILaunchpadCohort(addrLCohort).getAccessControl(),
+            msg.sender == address(_iAH.apiPost()),
             "Must call function with proxy bindings"
         );
         _;
@@ -48,11 +50,13 @@ contract LaunchpadHub is Ownable {
         addrLCohort = _addrLCohort;
         ILaunchpadCohort iLC = ILaunchpadCohort(_addrLCohort);
         addrAccessControl = iLC.getAccessControl();
+        _iAH = IAddressHub(iLC.addressHub());
+        _iAH.setLaunchpadsHub();
         iLC.setLaunchpadHub(address(this));
     }
 
-    function accessControl() private view returns (IAccessControl) {
-        return IAccessControl(ILaunchpadCohort(addrLCohort).getAccessControl());
+    function _accessControl() internal view returns (address _accessControl) {
+        return ILaunchpadCohort(addrLCohort).getAccessControl();
     }
 
     function getTokensLength() external view returns (uint) {
@@ -70,32 +74,25 @@ contract LaunchpadHub is Ownable {
     }
 
     function mint(
-        address _owner,
+        uint _cvID,
         DataTypes.LaunchpadData calldata _datas,
         DataTypes.TierData[] calldata _tierDatas,
-        string memory _pubURI
-    ) external onlyProxy returns(uint) {
-        require(bytes(_pubURI).length > 0, "Must have pub URI");
-        
-        // require(_datas.tokenAddress != address(0), "Must have token address");
+        uint _pubID
+    ) external onlyProxy returns (uint) {
         _tokenIDs.increment();
-
+        address owner = Bindings.ownerOf(_cvID, _iAH.cvHub());
         Launchpad newLaunchpad = new Launchpad(
-            addrLCohort,
-            _owner,
+            address(_iAH),
+            owner,
             _tokenIDs.current(),
             _datas,
             _tierDatas,
-            _pubURI
+            _pubID
         );
-        ILaunchpadCohort iLC = ILaunchpadCohort(addrLCohort);
-        IAddressHub iAH = IAddressHub(iLC.addressHub());
 
-        ICVHub iCVH = ICVHub(iAH.cvHub());
-        uint cvID = iCVH.getCV(_owner);
-        indexer[cvID].push(_tokenIDs.current());
+        indexer[_cvID].push(_tokenIDs.current());
 
-        newLaunchpad.transferOwnership(_owner);
+        newLaunchpad.transferOwnership(owner);
         launchpads[_tokenIDs.current()] = address(newLaunchpad);
         return _tokenIDs.current();
     }

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import {AddressHub} from "../storage/AddressHub.sol";
+import {IAddressHub} from "../interfaces/IAddressHub.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 
@@ -32,22 +32,23 @@ contract CollectFollowCv {
 
     mapping(uint => mapping(uint => uint)) followed;
 
-    AddressHub addressHub;
+    IAddressHub _iAH;
 
     ICVHub cvHub;
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(addressHub.cvHub()),
+            msg.sender == address(_iAH.apiPost()),
             "Must call function with hub bindings"
         );
         _;
     }
 
     constructor(address _addressHub) {
-        addressHub = AddressHub(_addressHub);
-        require(addressHub.cvHub() == msg.sender, "Wrong cvHub");
-        cvHub = ICVHub(msg.sender);
+        _iAH = IAddressHub(_addressHub);
+        require(_iAH.cvHub() != address(0), "Deployed cvHub first");
+        cvHub = ICVHub(_iAH.cvHub());
+        _iAH.setCollectFollowCV();
     }
 
     function follow(uint _cvSender, uint _cvFollowed) external onlyProxy {

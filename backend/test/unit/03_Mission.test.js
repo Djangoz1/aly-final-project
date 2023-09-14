@@ -9,6 +9,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let contract;
   let cvHub;
   let accessControl;
+  let apiPost;
+  let balancesHub;
 
   beforeEach(async () => {
     [
@@ -25,7 +27,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     try {
       cvHub = await contracts.cvHub;
       accessControl = await contracts.accessControl;
-      await accessControl.createCV("tokenURI");
+      apiPost = await contracts.apiPost;
+      balancesHub = await contracts.balancesHub;
+      await apiPost.createCV("tokenURI");
       contract = await contracts.missionsHub;
     } catch (error) {
       console.log("error", error);
@@ -37,7 +41,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   // ------------------------------------
   describe("Initialization", () => {
     it("Should  get price of mission", async () => {
-      let price = await accessControl.missionPrice();
+      let price = await balancesHub.missionPrice();
       expect(price.toString()).to.equal(ethers.parseEther("0.05"));
     });
 
@@ -60,39 +64,38 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   });
 
   describe("Create Mission", () => {
+    let missionPrice;
+
+    beforeEach(async () => {
+      let price = await balancesHub.missionPrice();
+      missionPrice = price.toString();
+    });
+
     describe("Works", () => {
       it("Should update ownership of mission ID", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
       });
 
       it("Should update balance of owner", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         expect(await contract.balanceOf(this.owner.address)).to.be.equal(1);
       });
 
       it("Should update tokens length", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         expect(await contract.getTokensLength()).to.be.equal(1);
       });
 
       it("Should get token URI", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
 
@@ -102,10 +105,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update indexer", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         let cvID = await cvHub.getCV(this.owner.address);
         let indexer = await contract.getIndexer(cvID);
@@ -114,30 +115,24 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update status", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         const datas = await contract.getData(1);
         expect(datas.status).to.be.equal(0);
       });
 
       it("Should update id", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         const datas = await contract.getData(1);
         expect(datas.id).to.be.equal(1);
       });
 
       it("Should have 0 features", async () => {
-        const missionPrice = await accessControl.missionPrice();
-
-        await accessControl.buyMission("tokenURI", {
-          value: missionPrice.toString(),
+        await apiPost.createMission("tokenURI", {
+          value: missionPrice,
         });
         const datas = await contract.getData(1);
         expect(datas.features.length).to.be.equal(0);
@@ -146,56 +141,69 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("NOT WORK", () => {
       it("Should NOT create mission if no CV", async () => {
-        const missionPrice = await accessControl.missionPrice();
         await expect(
-          accessControl.connect(this.addr1).buyMission("tokenURI", {
-            value: missionPrice.toString(),
+          apiPost.connect(this.addr1).createMission("tokenURI", {
+            value: missionPrice,
           })
-        ).to.be.revertedWith("CV not exist");
+        ).to.be.revertedWith("CV not found");
       });
 
       it("Should NOT create mission if under price", async () => {
         await expect(
-          accessControl.buyMission("tokenURI", {
+          apiPost.createMission("tokenURI", {
             value: "100000",
           })
-        ).to.be.revertedWith("Value must to be equal mission price");
+        ).to.be.revertedWith("Mission price : Invalid value");
       });
     });
   });
 
   describe("Close mission", () => {
     beforeEach(async () => {
-      const missionPrice = await accessControl.missionPrice();
-
-      await accessControl.buyMission("tokenURI", {
-        value: missionPrice.toString(),
+      let price = await balancesHub.missionPrice();
+      let missionPrice = price.toString();
+      await apiPost.createMission("tokenURI", {
+        value: missionPrice,
       });
+      await apiPost.connect(this.addr1).createCV("tokenURI");
     });
+
     describe("WORKS", () => {
       it("Should close mission", async () => {
-        await contract.closeMission(1);
+        await apiPost.closeMission(1);
         const datas = await contract.getData(1);
         expect(datas.status).to.be.equal(1);
       });
     });
 
     describe("NOT WORK", () => {
+      it("Should NOT close mission without proxy bindings", async () => {
+        await expect(contract.closeMission(1)).to.be.revertedWith(
+          "Must call function with proxy bindings"
+        );
+      });
       it("Should NOT close mission if not owner", async () => {
         await expect(
-          contract.connect(this.addr1).closeMission(1)
+          apiPost.connect(this.addr1).closeMission(1)
         ).to.be.revertedWith("Not the owner");
         const datas = await contract.getData(1);
         expect(datas.status).to.be.equal(0);
       });
+
+      it("Should NOT close mission if no cv", async () => {
+        await expect(
+          apiPost.connect(this.addr2).closeMission(1)
+        ).to.be.revertedWith("CV not found");
+      });
+
       it("Should NOT close an unknow mission ID", async () => {
-        await expect(contract.closeMission(2)).to.be.revertedWith(
+        await expect(apiPost.closeMission(2)).to.be.revertedWith(
           "ERC721: invalid token ID"
         );
       });
       it("Should NOT close mission twice", async () => {
-        await contract.closeMission(1);
-        await expect(contract.closeMission(1)).to.be.revertedWith(
+        await apiPost.closeMission(1);
+        await expect(apiPost.closeMission(1)).to.be.revertedWith(
           "Wrong status"
         );
       });

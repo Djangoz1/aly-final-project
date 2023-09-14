@@ -11,16 +11,23 @@ const { ZERO_ADDRESS, getAccount } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "DisputesHub";
 
-describe.only(`Contract ${CONTRACT_NAME} `, () => {
+describe(`Contract ${CONTRACT_NAME} `, () => {
   let addressHub;
   let contract;
-  let accessControl;
+  let apiPost;
   let cvHub;
   let featuresHub;
   let collecter;
+  let escrowDatasHub;
   let contracts;
   let featureID;
   let arbitratorsHub;
+
+  /**
+   * @notice On viens créer les cv des arbitres
+   * Ainsi que celui du worker et du owner de la feature arbitré
+   * Puis on crée la feature
+   */
   beforeEach(async () => {
     [
       this.owner,
@@ -47,19 +54,23 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
     contracts = await _testInitAll();
     addressHub = contracts.addressHub;
-    accessControl = contracts.accessControl;
+    apiPost = contracts.apiPost;
     cvHub = contracts.cvHub;
     featuresHub = contracts.featuresHub;
+    escrowDatasHub = contracts.escrowDatasHub;
     contract = contracts.disputesHub;
-    collecter = contracts.collecterWorkInteraction;
+    collecter = contracts.collectWorkInteraction;
     arbitratorsHub = contracts.arbitratorsHub;
     // return;
-    await accessControl.createCV("_tokenURI");
-    await accessControl.connect(this.addr1).createCV("_tokenURI");
-    await accessControl.connect(this.addr2).createCV("_tokenURI");
+    await apiPost.createCV("_tokenURI");
+    await apiPost.connect(this.addr1).createCV("_tokenURI");
+    await apiPost.connect(this.addr2).createCV("_tokenURI");
     featureID = await _testInitFeature(contracts, {}, this.addr1);
   });
 
+  /**
+   * @notice S'assure que tout les getter de DisputesHub fonctionne bien
+   */
   describe("Initialization", () => {
     describe("WORKS", () => {
       it("DisputesHub : should have featureID", async () => {
@@ -97,1019 +108,1608 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe("Create dispute", () => {
+  describe("Scenario", () => {
+    /**
+     * @notice Test la création d'une dispute par le worker || le owner d'une feature
+     */
     let reclamationPeriod;
+    /**
+     * @notice On récupère le minimum de réclamation period possible afin de pouvoir facilement testé
+     */
     beforeEach(async () => {
       reclamationPeriod = await contract.MIN_RECLAMATION_PERIOD();
     });
-    describe("WORKS", () => {
-      it("contestFeature : should create new dispute", async () => {
-        await collecter.contestFeature(
-          featureID,
-          reclamationPeriod,
-          3,
-          "tokenURI"
-        );
-        let length = await contract.getTokensLength();
-        expect(length).to.equal(1);
-      });
-      it("contestFeature : should get address of new dispute", async () => {
-        await collecter.contestFeature(
-          featureID,
-          reclamationPeriod,
-          3,
-          "tokenURI"
-        );
-        let id = await contract.getTokensLength();
-        let address = await contract.addressOf(id);
-        expect(address).to.not.equal(ZERO_ADDRESS);
-      });
-      it("contestFeature : should get id of new dispute with featureID", async () => {
-        await collecter.contestFeature(
-          featureID,
-          reclamationPeriod,
-          3,
-          "tokenURI"
-        );
-        let id = await contract.getTokensLength();
-        let id2 = await contract.disputeOf(featureID);
-        expect(id).to.be.equal(id2);
-      });
-    });
-    describe("NOT WORKS", () => {
-      it("should NOT create new dispute with reclamation period < Min", async () => {
-        await expect(
-          collecter.contestFeature(
+    describe("Create dispute", () => {
+      describe("WORKS", () => {
+        it("contestFeature : should create new dispute", async () => {
+          await apiPost.contestFeature(
             featureID,
-            parseInt(reclamationPeriod) - 10,
+            reclamationPeriod,
             3,
             "tokenURI"
-          )
-        ).to.be.revertedWith("Invalid reclamation period");
-      });
-      it("should NOT create new dispute with reclamationPeriod > Max", async () => {
-        let _reclamationPeriod = await contract.MAX_RECLAMATION_PERIOD();
-
-        await expect(
-          collecter.contestFeature(
+          );
+          let length = await contract.getTokensLength();
+          expect(length).to.equal(1);
+        });
+        it("contestFeature : should get address of new dispute", async () => {
+          await apiPost.contestFeature(
             featureID,
-            parseInt(_reclamationPeriod) + 10,
+            reclamationPeriod,
             3,
             "tokenURI"
-          )
-        ).to.be.revertedWith("Invalid reclamation period");
+          );
+          let id = await contract.getTokensLength();
+          let address = await contract.addressOf(id);
+          expect(address).to.not.equal(ZERO_ADDRESS);
+        });
+        it("contestFeature : should get id of new dispute with featureID", async () => {
+          await apiPost.contestFeature(
+            featureID,
+            reclamationPeriod,
+            3,
+            "tokenURI"
+          );
+          let id = await contract.getTokensLength();
+          let id2 = await contract.disputeOf(featureID);
+
+          expect(id).to.be.equal(id2);
+        });
+      });
+
+      describe("NOT WORKS", () => {
+        it("should NOT create dispute with wrong bindings", async () => {
+          await expect(
+            collecter.contestFeature(
+              1,
+              featureID,
+              parseInt(reclamationPeriod) - 3,
+              3,
+              "tokenURI"
+            )
+          ).to.be.revertedWith("Must be call by proxy bindings");
+        });
+
+        it("should NOT create new dispute with reclamation period < Min", async () => {
+          await expect(
+            apiPost.contestFeature(
+              featureID,
+              parseInt(reclamationPeriod) - 3,
+              3,
+              "tokenURI"
+            )
+          ).to.be.revertedWith("Invalid reclamation period");
+        });
+
+        it("should NOT create new dispute with reclamationPeriod > Max", async () => {
+          let _reclamationPeriod = await contract.MAX_RECLAMATION_PERIOD();
+
+          await expect(
+            apiPost.contestFeature(
+              featureID,
+              parseInt(_reclamationPeriod) + 10,
+              3,
+              "tokenURI"
+            )
+          ).to.be.revertedWith("Invalid reclamation period");
+        });
       });
     });
-  });
 
-  describe("Dispute Contract", () => {
-    let dispute;
-    let disputeID;
-    let nbArbitrators = 3;
-    let reclamationPeriod;
-    let tokenURI = "disputesURI";
-    beforeEach(async () => {
-      reclamationPeriod = await contract.MIN_RECLAMATION_PERIOD();
-      await collecter.contestFeature(
-        featureID,
-        reclamationPeriod,
-        nbArbitrators,
-        tokenURI
-      );
-      disputeID = await contract.getTokensLength();
-      let address = await contract.addressOf(disputeID);
-      expect(address).to.not.equal(ZERO_ADDRESS);
-      dispute = await getContractAt("Dispute", address);
-    });
-    describe("WORKS", () => {
-      it("data : should update id", async () => {
-        let data = await dispute.data();
-        expect(data.id).to.equal(disputeID);
-      });
+    describe("Dispute Contract", () => {
+      let dispute;
+      let disputeID;
+      let tokenURI = "disputesURI";
+      let nbArbitrators = 4;
+      let accounts;
 
-      it("data : should update reclamationPeriod", async () => {
-        let data = await dispute.data();
-        expect(data.reclamationPeriod).to.equal(reclamationPeriod);
-      });
-
-      it("data : should update value", async () => {
-        let data = await dispute.data();
-        let featureData = await featuresHub.getData(featureID);
-        expect(data.value).to.equal(featureData.wadge);
-      });
-
-      it("data : should have centralized courtID if not enough arbitrators", async () => {
-        let data = await dispute.data();
-        expect(data.courtID).to.equal(0);
-      });
-
-      it("data : should have new address dispute", async () => {
-        const accounts = [this.addr3, this.addr4, this.addr5, this.addr6];
-
-        for (let index = 0; index < accounts.length; index++) {
-          const account = accounts[index];
-          await accessControl.connect(account).createCV("_tokenURI");
-          let _featureID = await _testInitFeature(contracts, {}, account);
-          await featuresHub.validFeature(_featureID);
-          let value = 0.3 * index + 0.1;
-          let price = ethers.parseEther(`${value}`);
-
-          await arbitratorsHub
-            .connect(account)
-            .investOnCourt(3, { value: `${price}` });
-        }
-
-        let _featureID = await _testInitFeature(contracts, {}, this.addr1);
-
-        await collecter.contestFeature(
-          _featureID,
-          reclamationPeriod,
-          nbArbitrators,
-          tokenURI
-        );
-        let _disputeID = await contract.getTokensLength();
-        let address = await contract.addressOf(_disputeID);
-        expect(address).to.not.equal(ZERO_ADDRESS);
-      });
-
-      it("data : should have true courtID if enough arbitrators", async () => {
-        const accounts = [
+      /**
+       * @notice Le owner de la feature viens la contesté
+       * Et on viens récupérer l'instance du contrat dispute créée
+       * Avec seulement 3 arbitres demandés
+       */
+      beforeEach(async () => {
+        accounts = [
           this.addr3,
-
-          this.addr4,
-          this.addr5,
-          this.addr6,
-          this.addr7,
-
-          //   this.addr20,
-        ];
-
-        for (let index = 0; index < accounts.length; index++) {
-          const account = accounts[index];
-          await accessControl.connect(account).createCV("_tokenURI");
-          let _featureID = await _testInitFeature(contracts, {}, account);
-          await featuresHub.validFeature(_featureID);
-          let value = 0.3 * index + 0.1;
-          let price = ethers.parseEther(`${value}`);
-
-          await arbitratorsHub
-            .connect(account)
-            .investOnCourt(3, { value: `${price}` });
-        }
-
-        let _featureID = await _testInitFeature(contracts, {}, this.addr1);
-
-        await collecter.contestFeature(
-          _featureID,
-          reclamationPeriod,
-          nbArbitrators,
-          tokenURI
-        );
-        let _disputeID = await contract.getTokensLength();
-        let address = await contract.addressOf(_disputeID);
-
-        expect((await arbitratorsHub.getCourtLength(3)) > 3).to.equal(true);
-        let _dispute = await getContractAt("Dispute", address);
-        let data = await _dispute.data();
-        expect(data.courtID).to.equal(3);
-      });
-
-      it("data : should have good nbArbitrators", async () => {
-        const accounts = [
-          this.addr3,
-
           this.addr4,
           this.addr5,
           this.addr6,
           this.addr7,
           this.addr8,
           this.addr9,
-
-          //   this.addr20,
+          this.addr10,
+          this.addr11,
+          this.addr12,
+          this.addr13,
+          this.addr14,
         ];
 
         for (let index = 0; index < accounts.length; index++) {
           const account = accounts[index];
-          await accessControl.connect(account).createCV("_tokenURI");
-          let _featureID = await _testInitFeature(contracts, {}, account);
-          await featuresHub.validFeature(_featureID);
+          await apiPost.connect(account).createCV("_tokenURI");
+
+          await _testInitArbitrator(contracts, 3, account);
+
           let value = 0.3 * index + 0.1;
           let price = ethers.parseEther(`${value}`);
 
-          await arbitratorsHub
+          await apiPost
             .connect(account)
             .investOnCourt(3, { value: `${price}` });
         }
 
-        let _featureID = await _testInitFeature(contracts, {}, this.addr1);
-
-        await collecter.contestFeature(
-          _featureID,
+        await apiPost.contestFeature(
+          featureID,
           reclamationPeriod,
           nbArbitrators,
           tokenURI
         );
-        let _disputeID = await contract.getTokensLength();
-        let address = await contract.addressOf(_disputeID);
-
-        let _dispute = await getContractAt("Dispute", address);
-        let data = await _dispute.data();
-
-        expect(data.nbArbitrators).to.equal(3);
-
-        let arbitrators = await _dispute.getArbitrators();
-        expect(arbitrators.length).to.equal(0);
+        disputeID = await contract.getTokensLength();
+        let address = await contract.addressOf(disputeID);
+        expect(address).to.not.equal(ZERO_ADDRESS);
+        dispute = await getContractAt("Dispute", address);
       });
 
-      it("data : should update payeeID", async () => {
-        let data = await dispute.data();
-        let featureData = await featuresHub.getData(featureID);
-        expect(data.payeeID).to.equal(featureData.cvWorker);
+      /**
+       * @notice S'assure que tout les getter de Dispute fonctionne bien
+       */
+      describe("Initialisation", () => {
+        describe("WORKS", () => {
+          it("data : should update id", async () => {
+            let data = await dispute.data();
+            expect(data.id).to.equal(disputeID);
+          });
+
+          it("data : should update reclamationPeriod", async () => {
+            let data = await dispute.data();
+            expect(data.reclamationPeriod).to.equal(reclamationPeriod);
+          });
+
+          it("data : should update value", async () => {
+            let data = await dispute.data();
+            let featureData = await featuresHub.getData(featureID);
+            expect(data.value).to.equal(featureData.wadge);
+          });
+
+          it("data : should have new address dispute", async () => {
+            let _featureID = await _testInitFeature(contracts, {}, this.addr1);
+
+            await apiPost.contestFeature(
+              _featureID,
+              reclamationPeriod,
+              nbArbitrators,
+              tokenURI
+            );
+            let _disputeID = await contract.getTokensLength();
+            let address = await contract.addressOf(_disputeID);
+            expect(address).to.not.equal(ZERO_ADDRESS);
+            expect(address).to.not.equal(dispute.target);
+          });
+
+          it("data : should have true courtID if enough arbitrators", async () => {
+            expect((await arbitratorsHub.getCourtLength(3)) > 3).to.equal(true);
+            let data = await dispute.data();
+            expect(data.courtID).to.equal(3);
+          });
+
+          it("data : should have good nbArbitrators", async () => {
+            let data = await dispute.data();
+            expect(data.nbArbitrators).to.equal(nbArbitrators);
+            let arbitrators = await escrowDatasHub.arbitratorsOf(disputeID);
+            expect(arbitrators.length).to.equal(0);
+          });
+
+          it("data : should update payeeID", async () => {
+            let data = await dispute.data();
+            let featureData = await featuresHub.getData(featureID);
+            expect(data.payeeID).to.equal(featureData.cvWorker);
+          });
+
+          it("data : should update payerID", async () => {
+            let data = await dispute.data();
+            let owner = await featuresHub.ownerOf(featureID);
+            let cvOwner = await cvHub.getCV(owner);
+            expect(data.payerID).to.equal(cvOwner);
+          });
+
+          it("data : should update tokenURI", async () => {
+            let data = await dispute.data();
+            expect(data.tokenURI).to.equal(tokenURI);
+          });
+
+          it("timersOf : should have 0 resolvedAt", async () => {
+            let timers = await escrowDatasHub.timersOf(disputeID);
+            expect(timers.resolvedAt).to.equal(0);
+          });
+
+          it("timersOf : should have 0 reclaimedAt", async () => {
+            let timers = await escrowDatasHub.timersOf(disputeID);
+            expect(timers.reclaimedAt).to.equal(0);
+          });
+
+          it("rulesOf : should have appeal false", async () => {
+            let rules = await escrowDatasHub.rulesOf(disputeID);
+            expect(rules.appeal).to.equal(false);
+          });
+        });
+
+        describe("NOT WORKS", () => {
+          it("Should have centralized courtID if not enough arbitrators", async () => {
+            let _featureID = await _testInitFeature(
+              contracts,
+              { courtID: 4 },
+              this.addr1
+            );
+
+            await apiPost.contestFeature(
+              _featureID,
+              reclamationPeriod,
+              nbArbitrators,
+              tokenURI
+            );
+            let _disputeID = await contract.getTokensLength();
+            let address = await contract.addressOf(_disputeID);
+
+            let _dispute = await getContractAt("Dispute", address);
+            let data = await _dispute.data();
+
+            expect(data.nbArbitrators).to.not.equal(nbArbitrators);
+            expect(data.nbArbitrators).to.equal(1); // nbArbitrators == 1 if centralized or kleros court
+            expect(data.courtID).to.equal(0);
+          });
+        });
       });
 
-      it("data : should update payerID", async () => {
-        let data = await dispute.data();
-        let owner = await featuresHub.ownerOf(featureID);
-        let cvOwner = await cvHub.getCV(owner);
-        expect(data.payerID).to.equal(cvOwner);
-      });
+      describe("Scenario", () => {
+        describe("Senario : With 4 arbitrators", () => {
+          /**
+           * @notice Test de l'init de la dispute
+           * Il est obligatoire de l'initialisé pour pouvoir progresser dans le workflow
+           */
+          describe("Init dispute", () => {
+            describe("WORKS", () => {
+              it("init : Should update arbitrator length", async () => {
+                let counters = await escrowDatasHub.countersOf(disputeID);
+                expect(counters._arbitratorIDs).to.be.equal(0);
+                await apiPost.initDispute(disputeID);
+                counters = await escrowDatasHub.countersOf(disputeID);
+                expect(counters._arbitratorIDs > 0).to.be.equal(true);
+              });
 
-      it("data : should update tokenURI", async () => {
-        let data = await dispute.data();
-        expect(data.tokenURI).to.equal(tokenURI);
-      });
+              it("init : Should update createdAt", async () => {
+                let timers = await escrowDatasHub.timersOf(disputeID);
+                expect(timers.createdAt).to.be.equal(0);
+                await apiPost.initDispute(disputeID);
+                timers = await escrowDatasHub.timersOf(disputeID);
+                expect(timers.createdAt > 0).to.be.equal(true);
+              });
 
-      it("data : should have 0 createdAt", async () => {
-        let data = await dispute.data();
-        expect(data.createdAt).to.equal(0);
-      });
+              it("init : Should work with worker account", async () => {
+                let timers = await escrowDatasHub.timersOf(disputeID);
+                expect(timers.createdAt).to.be.equal(0);
+                await apiPost.connect(this.addr1).initDispute(disputeID);
+                timers = await escrowDatasHub.timersOf(disputeID);
+                expect(timers.createdAt > 0).to.be.equal(true);
+              });
+            });
 
-      it("data : should have 0 resolvedAt", async () => {
-        let data = await dispute.data();
-        expect(data.resolvedAt).to.equal(0);
-      });
+            describe("NOT WORKS", () => {
+              it("Should can NOT init with wrong bindings", async () => {
+                await expect(dispute.init(1)).to.be.revertedWith(
+                  "Must call function with proxy bindings"
+                );
+              });
 
-      it("data : should have 0 reclaimedAt", async () => {
-        let data = await dispute.data();
-        expect(data.reclaimedAt).to.equal(0);
-      });
+              it("Should NOT init not owner or worker account", async () => {
+                await expect(
+                  apiPost.connect(this.addr2).initDispute(disputeID)
+                ).to.be.revertedWith("Not part of dispute");
+              });
 
-      it("data : should have appeal false", async () => {
-        let data = await dispute.data();
-        expect(data.appeal).to.equal(false);
-      });
-    });
-    describe("NOT WORKS", () => {
-      it("should NOT update numbers arbitrators if no 3 arbitrators on Court", async () => {
-        let data = await dispute.data();
-        expect(data.nbArbitrators).to.not.equal(nbArbitrators);
-        expect(data.nbArbitrators).to.equal(0);
-      });
-    });
-  });
+              it("Should NOT init an unknow ID", async () => {
+                await expect(apiPost.initDispute(3)).to.be.revertedWith(
+                  "Dispute not found"
+                );
+              });
 
-  describe("Dispute Contract : Accept Arbitration", () => {
-    let dispute;
-    let disputeID;
-    let nbArbitrators = 3;
-    let reclamationPeriod;
-    let tokenURI = "disputesURI";
-    let accounts;
-    beforeEach(async () => {
-      accounts = [
-        this.addr3,
+              it("Should NOT init twice", async () => {
+                await apiPost.initDispute(disputeID);
+                await expect(apiPost.initDispute(disputeID)).to.be.revertedWith(
+                  "Dispute already init"
+                );
+              });
+            });
+          });
 
-        this.addr4,
-        this.addr5,
-        this.addr6,
-        this.addr7,
-        this.addr8,
-        this.addr9,
-        this.addr10,
-        this.addr11,
-        this.addr12,
-        this.addr13,
-        this.addr14,
-        this.addr15,
-        this.addr16,
-        this.addr17,
-        this.addr18,
+          describe("Scenario : Dispute init", () => {
+            /**
+             * Init de la dispute
+             */
 
-        //   this.addr20,
-      ];
-      reclamationPeriod = await contract.MIN_RECLAMATION_PERIOD();
+            let addrs = [];
 
-      for (let index = 0; index < accounts.length; index++) {
-        const account = accounts[index];
-        await accessControl.connect(account).createCV("_tokenURI");
-        let _featureID = await _testInitFeature(contracts, {}, account);
+            beforeEach(async () => {
+              await apiPost.initDispute(disputeID);
+              let data = await escrowDatasHub.datasOf(disputeID);
+              let courtLength = await arbitratorsHub.getCourtLength(
+                data.courtID
+              );
+              addrs = [];
+              for (let index = 1; index <= courtLength; index++) {
+                let allowed = await escrowDatasHub.allowanceOf(
+                  disputeID,
+                  index
+                );
 
-        await featuresHub.validFeature(_featureID);
-        let value = 0.3 * index + 0.1;
-        let price = ethers.parseEther(`${value}`);
-
-        await arbitratorsHub
-          .connect(account)
-          .investOnCourt(3, { value: `${price}` });
-      }
-      await collecter.contestFeature(
-        featureID,
-        reclamationPeriod,
-        nbArbitrators,
-        tokenURI
-      );
-      disputeID = await contract.getTokensLength();
-      let address = await contract.addressOf(disputeID);
-
-      dispute = await getContractAt("Dispute", address);
-    });
-    describe("WORKS", () => {
-      it("acceptArbitration : Should can accept arbitration", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-
-        async () => {
-          let allowed;
-          for (let i = 0; i < accounts.length; i++) {
-            const account = accounts[i];
-            addrs.filter((el) => {
-              if (el.addr == account.address) {
-                async () => await dispute.connect(account).acceptArbitration();
-                allowed = async () =>
-                  await dispute.hisAllowance(el.arbitratorID);
+                if (allowed == 1) {
+                  const address = await arbitratorsHub.ownerOf(index);
+                  let cvID = await cvHub.getCV(address);
+                  let arbitratorID = await arbitratorsHub.getArbitrationOfCV(
+                    cvID,
+                    data.courtID
+                  );
+                  addrs.push({ addr: address, arbitratorID: arbitratorID });
+                }
               }
             });
-          }
-        };
-      });
-
-      it("acceptArbitration : Should update allowance", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-
-        let account = getAccount(accounts, addrs[0].addr);
-        let cvID = await cvHub.getCV(account[0].address);
-        let arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).acceptArbitration();
-        expect(await dispute.hisAllowance(arbitratorID)).to.equal(3);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        cvID = await cvHub.getCV(account[0].address);
-        arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).acceptArbitration();
-        expect(await dispute.hisAllowance(arbitratorID)).to.equal(3);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        cvID = await cvHub.getCV(account[0].address);
-        arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).acceptArbitration();
-        expect(await dispute.hisAllowance(arbitratorID)).to.equal(3);
-      });
-
-      it("acceptArbitration : Should update arbritators length", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-        let arbitrators = await dispute.getArbitrators();
-        expect(arbitrators.length).to.equal(0);
-
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        arbitrators = await dispute.getArbitrators();
-        expect(arbitrators.length).to.equal(1);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        arbitrators = await dispute.getArbitrators();
-        expect(arbitrators.length).to.equal(2);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        arbitrators = await dispute.getArbitrators();
-        expect(arbitrators.length).to.equal(3);
-
-        expect(await dispute.status()).to.equal(2);
-      });
-
-      it("acceptArbitration : Should update dispute status", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.status()).to.equal(2);
-      });
-    });
-    describe("NOT WORKS", () => {
-      it("Should can NOT accept arbitration if haven't arbitrator", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-        await expect(dispute.acceptArbitration()).to.be.revertedWith(
-          "Arbitration not found"
-        );
-      });
-
-      it("Should can NOT accept arbitration if no CV", async () => {
-        await expect(
-          dispute.connect(this.addr19).acceptArbitration()
-        ).to.be.revertedWith("CV not found");
-      });
-
-      it("Should can NOT accept arbitration if status != Initial", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-        let account = getAccount(accounts, addrs[0].addr);
-
-        await dispute.connect(account[0]).acceptArbitration();
-        account = getAccount(accounts, addrs[1].addr);
-
-        await dispute.connect(account[0]).acceptArbitration();
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        account = getAccount(accounts, addrs[3].addr);
-
-        await expect(
-          dispute.connect(account[0]).acceptArbitration()
-        ).to.be.revertedWith("Invalid status");
-        account = getAccount(accounts, addrs[4].addr);
-        await expect(
-          dispute.connect(account[0]).acceptArbitration()
-        ).to.be.revertedWith("Invalid status");
-        account = getAccount(accounts, addrs[5].addr);
-        await expect(
-          dispute.connect(account[0]).acceptArbitration()
-        ).to.be.revertedWith("Invalid status");
-      });
-
-      it("Should can NOT accept arbitration twice", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        await expect(
-          dispute.connect(account[0]).acceptArbitration()
-        ).to.be.revertedWith("Wrong allowance arbitrator");
-      });
-
-      it("Should can NOT accept arbitration after refused arbitration", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).refuseArbitration();
-        await expect(
-          dispute.connect(account[0]).acceptArbitration()
-        ).to.be.revertedWith("Wrong allowance arbitrator");
-      });
-
-      it("Should can NOT accept arbitration if not invited", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 0) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-
-        let account = getAccount(accounts, addrs[0].addr);
-
-        await expect(
-          dispute.connect(account[0]).acceptArbitration()
-        ).to.be.revertedWith("Wrong allowance arbitrator");
-      });
-    });
-  });
-
-  describe("Dispute Contract : Vote", () => {
-    let dispute;
-    let disputeID;
-    let nbArbitrators = 3;
-    let reclamationPeriod;
-    let tokenURI = "disputesURI";
-    let accounts;
-    let addrs;
-
-    beforeEach(async () => {
-      accounts = [
-        this.addr3,
-
-        this.addr4,
-        this.addr5,
-        this.addr6,
-        this.addr7,
-        this.addr8,
-        this.addr9,
-        this.addr10,
-        this.addr11,
-        this.addr12,
-        this.addr13,
-        this.addr14,
-        this.addr15,
-        this.addr16,
-        this.addr17,
-        this.addr18,
-
-        //   this.addr20,
-      ];
-      reclamationPeriod = await contract.MIN_RECLAMATION_PERIOD();
-
-      for (let index = 0; index < accounts.length; index++) {
-        const account = accounts[index];
-        await accessControl.connect(account).createCV("_tokenURI");
-        let _featureID = await _testInitFeature(contracts, {}, account);
-
-        await featuresHub.validFeature(_featureID);
-        let value = 0.3 * index + 0.1;
-        let price = ethers.parseEther(`${value}`);
-
-        await arbitratorsHub
-          .connect(account)
-          .investOnCourt(3, { value: `${price}` });
-      }
-      await collecter.contestFeature(
-        featureID,
-        reclamationPeriod,
-        nbArbitrators,
-        tokenURI
-      );
-      disputeID = await contract.getTokensLength();
-      let address = await contract.addressOf(disputeID);
-
-      dispute = await getContractAt("Dispute", address);
-      let data = await dispute.data();
-      let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-      addrs = [];
-
-      for (let index = 1; index <= courtLength; index++) {
-        let allowed = await dispute.hisAllowance(index);
-
-        if (allowed == 1) {
-          const address = await arbitratorsHub.ownerOf(index);
-
-          addrs.push({ addr: address, arbitratorID: index });
-
-          if (addrs.length > data.nbArbitrators) {
-            break;
-          }
-        }
-      }
-    });
-
-    describe("WORKS", () => {
-      it("vote : Should update vote status", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        await dispute.connect(account[0]).vote(3);
-        await expect(dispute.connect(account[0]).vote(3)).to.be.revertedWith(
-          "Already voted"
-        );
-      });
-
-      it("vote : Should update dispute status if voteLength == nbArbitrators", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.status()).to.equal(2);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(3);
-        expect(await dispute.status()).to.equal(3);
-      });
-
-      it("vote : Should update decision if voteLength == nbArbitrators", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.decision()).to.equal(0);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(2);
-
-        expect(await dispute.decision()).to.equal(2);
-      });
-
-      it("vote : Should have true decision if voteLength == nbArbitrators", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.decision()).to.equal(0);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(3);
-
-        expect(await dispute.decision()).to.equal(3);
-      });
-
-      it("vote : Should update wadge feature data", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.decision()).to.equal(0);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(3);
-
-        let data = await featuresHub.getData(featureID);
-        expect(data.wadge).to.be.equal(0);
-      });
-
-      it("vote : Should update balance of winner", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        let _accounts = [this.addr1, this.owner];
-        await dispute.connect(account[0]).acceptArbitration();
-        let data = await dispute.data();
-        let winner = await cvHub.ownerOf(data.payeeID);
-        let winnerAccount = getAccount(_accounts, winner)[0];
-
-        let balance = await winnerAccount.provider.getBalance(winner);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(3);
-        let _balance = await winnerAccount.provider.getBalance(winner);
-        expect(balance < _balance).to.equal(true);
-      });
-
-      it("vote : Should haven't winner if vote equal", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(1);
-
-        expect(await dispute.decision()).to.equal(1);
-      });
-
-      it("vote : Should update data resolvedAt if voteLength == nbArbitrators", async () => {
-        let data = await dispute.data();
-        expect(data.resolvedAt).to.equal(0);
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.decision()).to.equal(0);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(2);
-
-        data = await dispute.data();
-        expect(data.resolvedAt).to.not.equal(0);
-      });
-
-      it("vote : Should update feature data status to Validated", async () => {
-        let data = await dispute.data();
-        expect(data.resolvedAt).to.equal(0);
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        expect(await dispute.decision()).to.equal(0);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(2);
-
-        data = await featuresHub.getData(featureID);
-        expect(data.status).to.equal(2);
-      });
-    });
-    describe("NOT WORKS", () => {
-      it("Should NOT update if vote status == Waiting", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        await expect(dispute.connect(account[0]).vote(0)).to.be.revertedWith(
-          "Invalid ruling vote"
-        );
-      });
-
-      it("Should NOT update vote if status != Disputed", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await expect(dispute.connect(account[0]).vote(0)).to.be.revertedWith(
-          "Invalid status"
-        );
-      });
-
-      it("Should NOT update vote if no arbitrator", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        await expect(dispute.vote(0)).to.be.revertedWith(
-          "Arbitration not found"
-        );
-      });
-
-      it("Should NOT update vote if no cv", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        await expect(dispute.connect(this.addr19).vote(0)).to.be.revertedWith(
-          "CV not found"
-        );
-      });
-
-      it("Should NOT update vote twice ", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(2);
-        await expect(dispute.connect(account[0]).vote(2)).to.be.revertedWith(
-          "Already voted"
-        );
-      });
-
-      it("Should NOT update vote if not  accepted", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        let status = await dispute.status();
-
-        expect(status).to.equal(2);
-        account = getAccount(accounts, addrs[3].addr);
-
-        await expect(dispute.connect(account[0]).vote(0)).to.be.revertedWith(
-          "Invalid arbitrator status"
-        );
-      });
-
-      it("Should NOT vote if dispute status == Resolved", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(3);
-
-        await expect(dispute.connect(account[0]).vote(3)).to.be.revertedWith(
-          "Invalid status"
-        );
-      });
-
-      it("Should NOT update balance", async () => {
-        let account = getAccount(accounts, addrs[0].addr);
-        let _accounts = [this.addr1, this.owner];
-        await dispute.connect(account[0]).acceptArbitration();
-        let data = await dispute.data();
-        let winner = await cvHub.ownerOf(data.payeeID);
-        let winner1 = await cvHub.ownerOf(data.payerID);
-        let winnerAccount = getAccount(_accounts, winner)[0];
-
-        let balance = await winnerAccount.provider.getBalance(winner);
-        let balance1 = await winnerAccount.provider.getBalance(winner1);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        await dispute.connect(account[0]).vote(3);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(1);
-
-        let _balance = await winnerAccount.provider.getBalance(winner);
-        let _balance1 = await winnerAccount.provider.getBalance(winner1);
-
-        expect(balance).to.equal(_balance);
-        expect(balance1).to.equal(_balance1);
-      });
-
-      it("Should NOT update feature data status to Validated", async () => {
-        let data = await featuresHub.getData(featureID);
-
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // expect(await dispute.decision()).to.equal(0);
-        await dispute.connect(account[0]).vote(2);
-        account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).vote(1);
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).vote(3);
-
-        let _data = await featuresHub.getData(featureID);
-        expect(data.status).to.equal(_data.status);
+
+            describe("Scenario : Before accept arbitration ", () => {
+              /**
+               * @notice Test de l'acceptation par un arbitre de jugée la dispute
+               * Les arbitres sont invités à participé aléatoirement avec un avantage pour ceux qui ont stack de l'argent dans une court
+               */
+              describe("Accept Arbitration", () => {
+                describe("WORKS", () => {
+                  it("acceptArbitration : Should update allowance", async () => {
+                    let data = await dispute.data();
+
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        expect(
+                          await escrowDatasHub.allowanceOf(
+                            disputeID,
+                            user.arbitratorID
+                          )
+                        ).to.equal(3);
+                        counter++;
+                      }
+                    }
+                  });
+
+                  it("acceptArbitration : Should update arbritators length", async () => {
+                    let data = await dispute.data();
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                        let arbitrators = await escrowDatasHub.arbitratorsOf(
+                          disputeID
+                        );
+                        expect(arbitrators.length).to.equal(counter);
+                      }
+                    }
+                  });
+
+                  it("acceptArbitration : Should update dispute status if nbArbitrators == nbAccept", async () => {
+                    let data = await dispute.data();
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let account = getAccount(
+                          accounts,
+                          addrs[index].addr
+                        )[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(2);
+                  });
+                });
+
+                describe("NOT WORKS", () => {
+                  it("Should can NOT accept arbitration with wrong bindings", async () => {
+                    await expect(
+                      dispute.acceptArbitration(1)
+                    ).to.be.revertedWith(
+                      "Must call function with proxy bindings"
+                    );
+                  });
+
+                  it("Should can NOT accept arbitration if haven't arbitrator", async () => {
+                    await expect(
+                      apiPost.acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Arbitration not found");
+                  });
+
+                  it("Should can NOT accept arbitration if no CV", async () => {
+                    await expect(
+                      apiPost.connect(this.addr19).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("CV not found");
+                  });
+
+                  it("Should can NOT accept arbitration twice", async () => {
+                    let account = getAccount(accounts, addrs[0].addr);
+                    await apiPost
+                      .connect(account[0])
+                      .acceptArbitration(disputeID);
+                    await expect(
+                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+
+                  it("Should can NOT accept arbitration after refused arbitration", async () => {
+                    let account = getAccount(accounts, addrs[0].addr);
+                    await apiPost
+                      .connect(account[0])
+                      .refuseArbitration(disputeID);
+                    await expect(
+                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+
+                  it("Should can NOT accept arbitration if not invited", async () => {
+                    let data = await dispute.data();
+                    let courtLength = await arbitratorsHub.getCourtLength(
+                      data.courtID
+                    );
+                    let _addrs = [];
+                    for (let index = 1; index <= courtLength; index++) {
+                      let allowed = await escrowDatasHub.allowanceOf(
+                        disputeID,
+                        index
+                      );
+
+                      if (allowed == 0) {
+                        const address = await arbitratorsHub.ownerOf(index);
+                        _addrs.push({ addr: address, arbitratorID: index });
+                        break;
+                      }
+                    }
+
+                    let account = getAccount(accounts, _addrs[0].addr);
+
+                    await expect(
+                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+                });
+              });
+
+              /**
+               * @notice Test du commencement des votes de la dispute
+               * Cette fonction ne peut être appelé que par le worker ou le owner de la feature
+               */
+              describe("Started vote period", () => {
+                describe("WORKS", () => {
+                  it("startedVotePeriod : Should started vote period after call", async () => {
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < parseInt(data.nbArbitrators) - 1) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(0);
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    await apiPost.startedVotePeriod(disputeID);
+                    rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(2);
+                  });
+
+                  it("startedVotePeriod : Should started vote period if arbitrators == nbArbitrators", async () => {
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(2);
+                  });
+
+                  it("startedVotePeriod : Should started vote period with worker account", async () => {
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < parseInt(data.nbArbitrators) - 1) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(0);
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    await apiPost
+                      .connect(this.addr1)
+                      .startedVotePeriod(disputeID);
+                    rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(2);
+                  });
+
+                  it("startedVotePeriod : Should started vote period before & after appeal", async () => {
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < parseInt(data.nbArbitrators) - 1) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    await apiPost
+                      .connect(this.addr1)
+                      .startedVotePeriod(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (index < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost.connect(account).vote(disputeID, 3);
+                      }
+                    }
+
+                    await apiPost.appeal(disputeID);
+
+                    let courtLength = await arbitratorsHub.getCourtLength(
+                      data.courtID
+                    );
+                    let _counter = 0;
+                    for (let index = 1; index <= courtLength; index++) {
+                      let allowed = await escrowDatasHub.allowanceOf(
+                        disputeID,
+                        index
+                      );
+                      if (
+                        allowed == 1 &&
+                        _counter < parseInt(data.nbArbitrators) - 1
+                      ) {
+                        const address = await arbitratorsHub.ownerOf(index);
+                        let account = getAccount(accounts, address);
+                        const counter = await escrowDatasHub.countersOf(
+                          disputeID
+                        );
+
+                        await apiPost
+                          .connect(account[0])
+                          .acceptArbitration(disputeID);
+                        _counter++;
+                      }
+                    }
+
+                    await apiPost
+                      .connect(this.addr1)
+                      .startedVotePeriod(disputeID);
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+
+                    expect(rules.status).to.equal(2);
+                  });
+                });
+
+                describe("NOT WORKS", () => {
+                  it("Should NOT call with wrong bindings", async () => {
+                    await expect(
+                      dispute.startedVotePeriod(disputeID)
+                    ).to.be.revertedWith(
+                      "Must call function with proxy bindings"
+                    );
+                  });
+
+                  it("Should NOT call started vote period twice", async () => {
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < parseInt(data.nbArbitrators) - 1) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    await apiPost.startedVotePeriod(disputeID);
+                    await expect(
+                      apiPost.startedVotePeriod(disputeID)
+                    ).to.be.revertedWith("Invalid status");
+                  });
+
+                  it("Should NOT started vote period if startedAt + reclamationPeriod <= block.timestamp", async () => {
+                    await expect(
+                      apiPost.startedVotePeriod(disputeID)
+                    ).to.be.revertedWith("Must wait started period");
+                  });
+
+                  it("Should NOT started vote period if arbitrators accept <  3", async () => {
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < 2) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+                    await expect(
+                      apiPost.startedVotePeriod(disputeID)
+                    ).to.be.revertedWith("Insuficient arbitrators");
+                  });
+
+                  it("Should NOT started vote period by not part of dispute account", async () => {
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    let account;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                      }
+                    }
+                    await expect(
+                      apiPost.connect(account).startedVotePeriod(disputeID)
+                    ).to.be.revertedWith("Not part of dispute");
+                  });
+                });
+              });
+
+              describe("Refuse Arbitration", () => {
+                describe("WORKS", () => {
+                  it("refuseArbitration : Should update allowance", async () => {
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < 4) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .refuseArbitration(disputeID);
+                        expect(
+                          await escrowDatasHub.allowanceOf(
+                            disputeID,
+                            user.arbitratorID
+                          )
+                        ).to.equal(2);
+                        counter++;
+                      }
+                    }
+                  });
+
+                  it("refuseArbitration : Should update length", async () => {
+                    let counters = await escrowDatasHub.countersOf(disputeID);
+                    let length = parseInt(counters._arbitratorIDs);
+
+                    let counter = 0;
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < 4) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost
+                          .connect(account)
+                          .refuseArbitration(disputeID);
+                        counters = await escrowDatasHub.countersOf(disputeID);
+                        let _length = parseInt(counters._arbitratorIDs);
+                        counter++;
+                        expect(_length + counter).to.equal(length);
+                      }
+                    }
+                  });
+
+                  /**
+                   * Lorsqu'il y a moins de 3 arbitres restant qui est invité. Une nouvelle sélection s'effectue
+                   * data.nbArbitrators = 4
+                   * slot == nbArbitrators * 2
+                   * Alors il faut ici que 6 arbitres refuse pour que slot < 3
+                   */
+                  it("refuseArbitration : Should upgrade length if length < 3", async () => {
+                    for (let index = 1; index <= addrs.length; index++) {
+                      let counters = await escrowDatasHub.countersOf(disputeID);
+                      let length = parseInt(counters._arbitratorIDs);
+                      let user = addrs[index];
+                      let account = getAccount(accounts, user.addr)[0];
+                      await apiPost
+                        .connect(account)
+                        .refuseArbitration(disputeID);
+                      if (length == 3) {
+                        break;
+                      }
+                    }
+                    let counters = await escrowDatasHub.countersOf(disputeID);
+                    let _length = parseInt(counters._arbitratorIDs);
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    expect(_length > data.nbArbitrators).to.equal(true);
+                  });
+                });
+
+                describe("NOT WORKS", () => {
+                  it("Should NOT call with wrong bindings", async () => {
+                    await expect(
+                      dispute.refuseArbitration(1)
+                    ).to.be.revertedWith(
+                      "Must call function with proxy bindings"
+                    );
+                  });
+
+                  it("Should NOT works if already accepted", async () => {
+                    let account = getAccount(accounts, addrs[0].addr);
+                    await apiPost
+                      .connect(account[0])
+                      .acceptArbitration(disputeID);
+                    await expect(
+                      apiPost.connect(account[0]).refuseArbitration(disputeID)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+
+                  it("Should NOT refused twice", async () => {
+                    let account = getAccount(accounts, addrs[0].addr);
+                    await apiPost
+                      .connect(account[0])
+                      .refuseArbitration(disputeID);
+                    await expect(
+                      apiPost.connect(account[0]).refuseArbitration(disputeID)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+
+                  it("Should NOT works if arbitrator isn't invited", async () => {
+                    let data = await dispute.data();
+                    let courtLength = await arbitratorsHub.getCourtLength(
+                      data.courtID
+                    );
+                    let addrs = [];
+
+                    for (let index = 1; index <= courtLength; index++) {
+                      let allowed = await escrowDatasHub.allowanceOf(
+                        disputeID,
+                        index
+                      );
+
+                      if (allowed == 0) {
+                        const address = await arbitratorsHub.ownerOf(index);
+                        addrs.push({ addr: address, arbitratorID: index });
+                        break;
+                      }
+                    }
+                    let account = getAccount(accounts, addrs[0].addr);
+                    await expect(
+                      apiPost.connect(account[0]).refuseArbitration(disputeID)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+
+                  it("Should NOT works if arbitrator haven't cv", async () => {
+                    await expect(
+                      apiPost.connect(this.addr19).refuseArbitration(disputeID)
+                    ).to.be.revertedWith("CV not found");
+                  });
+                });
+              });
+
+              /**
+               * @notice Les votes ne fonctionneras pas tant que la période de vote n'a pas démarré
+               */
+              describe("NOT WORKS Vote", () => {
+                it("Should NOT update vote if status != Disputed", async () => {
+                  let account = getAccount(accounts, addrs[0].addr);
+                  await expect(
+                    apiPost.connect(account[0]).vote(disputeID, 0)
+                  ).to.be.revertedWith("Invalid status");
+                });
+              });
+            });
+
+            describe("After accept arbitration", () => {
+              /**
+               *  On accepte l'arbitration et ainsi lancé la session des votes
+               */
+              beforeEach(async () => {
+                let counter = 0;
+                let data = await escrowDatasHub.datasOf(disputeID);
+                for (let index = 1; index <= addrs.length; index++) {
+                  if (counter < data.nbArbitrators) {
+                    let user = addrs[index];
+                    let account = getAccount(accounts, user.addr)[0];
+                    await apiPost.connect(account).acceptArbitration(disputeID);
+                    counter++;
+                  }
+                }
+                let rules = await escrowDatasHub.rulesOf(disputeID);
+                expect(rules.status).to.equal(2);
+              });
+
+              describe("INVALID WORKFLOW", () => {
+                /**
+                 * @notice Lorsque le workflow est passé au vote period
+                 * Alors il n'est plus possible de refuser une arbitration
+                 */
+                describe("NOT WORKS Refuse Arbitration", () => {
+                  it("Should NOT works if dispute status != Initial", async () => {
+                    let account = getAccount(accounts, addrs[3].addr);
+                    await expect(
+                      apiPost.connect(account[0]).refuseArbitration(disputeID)
+                    ).to.be.revertedWith("Invalid status");
+                  });
+                });
+
+                /**
+                 * @notice Lorsque le workflow est passé au vote period
+                 * Alors il n'est plus possible d'accepter une arbitration
+                 */
+                describe("NOT WORKS Accept Arbitration ", () => {
+                  it("Should can NOT accept arbitration if status != Initial", async () => {
+                    let account = getAccount(accounts, addrs[3].addr);
+                    await expect(
+                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Invalid status");
+                    account = getAccount(accounts, addrs[4].addr);
+                    await expect(
+                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Invalid status");
+                    account = getAccount(accounts, addrs[5].addr);
+                    await expect(
+                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                    ).to.be.revertedWith("Invalid status");
+                  });
+                });
+
+                /**
+                 * @notice L'appel ne peux pas être trigger tant que les votes n'ont pas commencé
+                 */
+                describe("NOT WORKS Appeal ", () => {
+                  it("Should NOT appeal if no session vote", async () => {
+                    await expect(apiPost.appeal(disputeID)).to.be.revertedWith(
+                      "Invalid status"
+                    );
+                  });
+                });
+
+                /**
+                 * @notice Si le nombre d'arbitre qui a été accepté == nbArbitrators
+                 * Alors started vote period ne peux pas fonctionner
+                 */
+                describe("NOT WORKS Started vote period", () => {
+                  it("Should NOT started vote period if already started because arbitrators == nbArbitrators", async () => {
+                    await expect(
+                      apiPost.startedVotePeriod(disputeID)
+                    ).to.be.revertedWith("Invalid status");
+                  });
+                });
+              });
+
+              /**
+               * @notice Test des votes
+               * Cette fonction ne peut être appelé que par un arbitre qui y a été accepté
+               */
+              describe("Vote", () => {
+                describe("WORKS", () => {
+                  it("vote : Should update vote status", async () => {
+                    let account = getAccount(accounts, addrs[1].addr);
+                    await apiPost.connect(account[0]).vote(disputeID, 3);
+                    await expect(
+                      apiPost.connect(account[0]).vote(disputeID, 3)
+                    ).to.be.revertedWith("Already voted");
+                  });
+
+                  it("vote : Should update counters votes length", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                        let counters = await escrowDatasHub.countersOf(
+                          disputeID
+                        );
+                        expect(counters._voteIDs).to.equal(counter);
+                      }
+                    }
+                  });
+
+                  it("vote : Should update counters payeeVote if vote == Vote.PayeeVote ", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                        let counters = await escrowDatasHub.countersOf(
+                          disputeID
+                        );
+                        expect(counters._payeeVote).to.equal(counter);
+                        expect(counters._payerVote).to.equal(0);
+                      }
+                    }
+                  });
+
+                  it("vote : Should update counters payerVote if vote == Vote.PayerVote ", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 2);
+                        counter++;
+                        let counters = await escrowDatasHub.countersOf(
+                          disputeID
+                        );
+                        expect(counters._payerVote).to.equal(counter);
+                        expect(counters._payeeVote).to.equal(0);
+                      }
+                    }
+                  });
+
+                  it("vote : Should update dispute status if voteLength == nbArbitrators", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                      }
+                    }
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(3);
+                  });
+
+                  it("vote : Should PayeeWin decision when voteLength == nbArbitrators", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                      }
+                    }
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.decision).to.equal(3);
+                  });
+
+                  it("vote : Should PayerWin decision if voteLength == nbArbitrators", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+                        await apiPost.connect(account).vote(disputeID, 2);
+                        counter++;
+                      }
+                    }
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.decision).to.equal(2);
+                  });
+
+                  it("vote : Should haven't winner if vote equal", async () => {
+                    let account = getAccount(accounts, addrs[1].addr);
+                    await apiPost.connect(account[0]).vote(disputeID, 3);
+                    account = getAccount(accounts, addrs[2].addr);
+                    await apiPost.connect(account[0]).vote(disputeID, 1);
+                    account = getAccount(accounts, addrs[3].addr);
+                    await apiPost.connect(account[0]).vote(disputeID, 1);
+                    account = getAccount(accounts, addrs[4].addr);
+                    await apiPost.connect(account[0]).vote(disputeID, 2);
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.decision).to.equal(1);
+                  });
+                });
+
+                describe("NOT WORKS", () => {
+                  it("Should NOT call with wrong bindings", async () => {
+                    await expect(dispute.vote(disputeID, 0)).to.be.revertedWith(
+                      "Must call function with proxy bindings"
+                    );
+                  });
+
+                  it("Should NOT update if vote status == Waiting", async () => {
+                    let account = getAccount(accounts, addrs[1].addr);
+                    await expect(
+                      apiPost.connect(account[0]).vote(disputeID, 0)
+                    ).to.be.revertedWith("Invalid vote");
+                  });
+
+                  it("Should NOT update vote if no arbitrator", async () => {
+                    await expect(apiPost.vote(disputeID, 0)).to.be.revertedWith(
+                      "Arbitration not found"
+                    );
+                  });
+
+                  it("Should NOT update vote if no cv", async () => {
+                    await expect(
+                      apiPost.connect(this.addr19).vote(disputeID, 0)
+                    ).to.be.revertedWith("CV not found");
+                  });
+
+                  it("Should NOT update vote twice ", async () => {
+                    let account = getAccount(accounts, addrs[1].addr);
+                    await apiPost.connect(account[0]).vote(disputeID, 2);
+                    await expect(
+                      apiPost.connect(account[0]).vote(disputeID, 2)
+                    ).to.be.revertedWith("Already voted");
+                  });
+
+                  it("Should NOT update vote if not  accepted", async () => {
+                    let account = getAccount(accounts, addrs[6].addr);
+                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    expect(rules.status).to.equal(2);
+                    await expect(
+                      apiPost.connect(account[0]).vote(disputeID, 0)
+                    ).to.be.revertedWith("Not allowed");
+                  });
+
+                  it("Should NOT vote if dispute status == Resolved", async () => {
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                      }
+                    }
+                    let account = getAccount(accounts, addrs[1].addr);
+                    await expect(
+                      apiPost.connect(account[0]).vote(disputeID, 3)
+                    ).to.be.revertedWith("Invalid status");
+                  });
+
+                  it("Should NOT update balance before appeal", async () => {
+                    let _accounts = [this.addr1, this.owner];
+
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let winner = await cvHub.ownerOf(data.payeeID);
+                    let winner1 = await cvHub.ownerOf(data.payerID);
+                    let winnerAccount = getAccount(_accounts, winner)[0];
+
+                    let balance = await winnerAccount.provider.getBalance(
+                      winner
+                    );
+                    let balance1 = await winnerAccount.provider.getBalance(
+                      winner1
+                    );
+
+                    let counter = 0;
+
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                      }
+                    }
+
+                    let _balance = await winnerAccount.provider.getBalance(
+                      winner
+                    );
+                    let _balance1 = await winnerAccount.provider.getBalance(
+                      winner1
+                    );
+
+                    expect(balance).to.equal(_balance);
+                    expect(balance1).to.equal(_balance1);
+                  });
+
+                  it("Should NOT update feature data status to Validated", async () => {
+                    let fdata = await featuresHub.getData(featureID);
+                    let counter = 0;
+                    let data = await escrowDatasHub.datasOf(disputeID);
+                    for (let index = 1; index <= addrs.length; index++) {
+                      if (counter < data.nbArbitrators) {
+                        let user = addrs[index];
+                        let account = getAccount(accounts, user.addr)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                      }
+                    }
+                    let _fdata = await featuresHub.getData(featureID);
+                    expect(fdata.status).to.equal(_fdata.status);
+                  });
+                });
+              });
+              describe("Workflow : After vote", () => {
+                /**
+                 * Les arbitres votes pour résoudre le conflit et on passe au tallied
+                 */
+                beforeEach(async () => {
+                  let counter = 0;
+                  let data = await escrowDatasHub.datasOf(disputeID);
+                  for (let index = 1; index <= addrs.length; index++) {
+                    if (counter < data.nbArbitrators) {
+                      let user = addrs[index];
+                      let account = getAccount(accounts, user.addr)[0];
+
+                      await apiPost.connect(account).vote(disputeID, 3);
+                      counter++;
+                    }
+                  }
+                });
+
+                /**
+                 * @notice Test de la fonction appel
+                 * Cette fonction ne peut être appelé qu'une fois que lorque la décision a été rendu
+                 * Seulement utilisable par le owner ou le worker de la feature
+                 */
+                describe("Appeal", () => {
+                  describe("WORKS", () => {
+                    it("appeal : Should update appeal bool", async () => {
+                      await apiPost.appeal(disputeID);
+                      let rules = await escrowDatasHub.rulesOf(disputeID);
+                      expect(rules.appeal).to.equal(true);
+                    });
+
+                    it("appeal : Should appeal with worker contract", async () => {
+                      await apiPost.connect(this.addr1).appeal(disputeID);
+                      let rules = await escrowDatasHub.rulesOf(disputeID);
+                      expect(rules.appeal).to.equal(true);
+                    });
+
+                    it("appeal : Should refresh votes ", async () => {
+                      let counters = await escrowDatasHub.countersOf(disputeID);
+                      expect(counters._voteIDs).to.not.equal(0);
+                      await apiPost.appeal(disputeID);
+                      counters = await escrowDatasHub.countersOf(disputeID);
+                      expect(counters._voteIDs).to.equal(0);
+                      expect(counters._payerVote).to.equal(0);
+                      expect(counters._payeeVote).to.equal(0);
+                    });
+
+                    it("appeal : Should renew arbitrators length", async () => {
+                      let arbitrators = await escrowDatasHub.arbitratorsOf(
+                        disputeID
+                      );
+                      expect(arbitrators.length).to.not.equal(0);
+                      await apiPost.appeal(disputeID);
+                      arbitrators = await escrowDatasHub.arbitratorsOf(
+                        disputeID
+                      );
+                      expect(arbitrators.length).to.equal(0);
+                    });
+
+                    it("appeal : Should refresh arbitrators ", async () => {
+                      let data = await dispute.data();
+                      let courtLength = await arbitratorsHub.getCourtLength(
+                        data.courtID
+                      );
+
+                      let counterIDs = 0;
+                      for (let index = 1; index <= addrs.length; index++) {
+                        let allowed = await escrowDatasHub.allowanceOf(
+                          disputeID,
+                          index
+                        );
+                        if (allowed == 1) {
+                          counterIDs += index;
+                        }
+                      }
+
+                      await apiPost.appeal(disputeID);
+
+                      let _counterIDs = 0;
+                      for (let index = 1; index <= courtLength; index++) {
+                        let allowed = await escrowDatasHub.allowanceOf(
+                          disputeID,
+                          index
+                        );
+                        if (allowed == 1) {
+                          _counterIDs += index;
+                        }
+                      }
+                      expect(counterIDs).to.not.be.equal(_counterIDs);
+                    });
+
+                    it("appeal : Should update value after voting appeal session", async () => {
+                      let data = await escrowDatasHub.datasOf(disputeID);
+                      let courtLength = await arbitratorsHub.getCourtLength(
+                        data.courtID
+                      );
+
+                      await apiPost.appeal(disputeID);
+
+                      let _addrs = [];
+                      let counter = 0;
+                      for (let index = 1; index <= courtLength; index++) {
+                        let allowed = await escrowDatasHub.allowanceOf(
+                          disputeID,
+                          index
+                        );
+                        if (allowed == 1) {
+                          const address = await arbitratorsHub.ownerOf(index);
+                          _addrs.push({ addr: address, arbitratorID: index });
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost
+                            .connect(account)
+                            .acceptArbitration(disputeID);
+                          counter++;
+                          if (counter == data.nbArbitrators) {
+                            break;
+                          }
+                        }
+                      }
+
+                      for (let index = 0; index < _addrs.length; index++) {
+                        const address = _addrs[index].addr;
+                        let account = getAccount(accounts, address)[0];
+
+                        await apiPost.connect(account).vote(disputeID, 3);
+                        counter++;
+                        if (counter == data.nbArbitrators) {
+                          break;
+                        }
+                      }
+                      let _data = await dispute.data();
+                      expect(data.value).to.not.be.equal(_data.value);
+                      expect(_data.value).to.be.equal(0);
+                    });
+                  });
+
+                  describe("NOT WORKS", () => {
+                    it("Should NOT call with wrong bindings", async () => {
+                      let account = getAccount(accounts, addrs[0].addr);
+                      await expect(
+                        dispute.connect(account[0]).doAppeal(1)
+                      ).to.be.revertedWith(
+                        "Must call function with proxy bindings"
+                      );
+                    });
+
+                    it("Should NOT appeal with not worker or owner account", async () => {
+                      let account = getAccount(accounts, addrs[0].addr);
+                      await expect(
+                        apiPost.connect(account[0]).appeal(disputeID)
+                      ).to.be.revertedWith("Not part of dispute");
+                    });
+
+                    it("Should NOT appeal twice", async () => {
+                      await apiPost.appeal(disputeID);
+
+                      await expect(
+                        apiPost.appeal(disputeID)
+                      ).to.be.revertedWith("Invalid status");
+                    });
+
+                    it("Should NOT appeal with worker account after appeal", async () => {
+                      await apiPost.appeal(disputeID);
+                      await expect(
+                        apiPost.connect(this.addr1).appeal(disputeID)
+                      ).to.be.revertedWith("Invalid status");
+                    });
+                  });
+                });
+
+                describe("Resolved dispute", () => {
+                  let data;
+                  let timing;
+                  beforeEach(async () => {
+                    // Vote != data.nbArbitrators
+
+                    data = await escrowDatasHub.datasOf(disputeID);
+
+                    let appeal = parseInt(await dispute.APPEAL_PERIOD());
+                    let reclamationPeriod = parseInt(
+                      await data.reclamationPeriod
+                    );
+
+                    timing = appeal + reclamationPeriod;
+                  });
+                  describe("WORKS", () => {
+                    it("resolvedDispute : Should update ALL GOOD datas with owner account", async () => {
+                      await new Promise((resolve) =>
+                        setTimeout(resolve, 12000)
+                      );
+                      await apiPost.resolvedDispute(disputeID);
+                      let data = await escrowDatasHub.datasOf(disputeID);
+                      let rules = await escrowDatasHub.rulesOf(disputeID);
+                      let timers = await escrowDatasHub.timersOf(disputeID);
+                      expect(data.value).to.equal(0);
+                      expect(rules.status).to.equal(1);
+                      expect(timers.reclaimedAt).to.not.equal(0);
+                      data = await featuresHub.getData(featureID);
+                      expect(data.wadge).to.equal(0);
+                      expect(data.status).to.equal(2);
+                    });
+
+                    it("resolvedDispute : Should update ALL GOOD datas with worker account", async () => {
+                      await new Promise((resolve) =>
+                        setTimeout(resolve, 12000)
+                      );
+                      await apiPost
+                        .connect(this.addr1)
+                        .resolvedDispute(disputeID);
+                      let data = await dispute.data();
+                      let rules = await escrowDatasHub.rulesOf(disputeID);
+                      let timers = await escrowDatasHub.timersOf(disputeID);
+                      expect(data.value).to.equal(0);
+                      expect(rules.status).to.equal(1);
+                      expect(timers.reclaimedAt).to.not.equal(0);
+                      data = await featuresHub.getData(featureID);
+                      expect(data.wadge).to.equal(0);
+                      expect(data.status).to.equal(2);
+                    });
+                  });
+
+                  describe("NOT WORKS", () => {
+                    it("Should NOT work with wrong bindings", async () => {
+                      await expect(
+                        dispute.resolvedDispute(1)
+                      ).to.be.revertedWith(
+                        "Must call function with proxy bindings"
+                      );
+                    });
+
+                    it("Should NOT work twice", async () => {
+                      await new Promise((resolve) =>
+                        setTimeout(resolve, 12000)
+                      );
+                      await apiPost.resolvedDispute(disputeID);
+                      await expect(
+                        apiPost.resolvedDispute(disputeID)
+                      ).to.be.revertedWith("Invalid status");
+                    });
+
+                    it("Should NOT work twice if account == worker && owner", async () => {
+                      await new Promise((resolve) =>
+                        setTimeout(resolve, 12000)
+                      );
+                      await apiPost.resolvedDispute(disputeID);
+                      await expect(
+                        apiPost.connect(this.addr1).resolvedDispute(disputeID)
+                      ).to.be.revertedWith("Invalid status");
+                    });
+
+                    it("Should NOT work if account != worker && owner", async () => {
+                      await expect(
+                        apiPost.connect(this.addr9).resolvedDispute(disputeID)
+                      ).to.be.revertedWith("Not part of dispute");
+                    });
+
+                    it("Should NOT work if trigger before released period", async () => {
+                      await expect(
+                        apiPost.resolvedDispute(disputeID)
+                      ).to.be.revertedWith("Must wait release period");
+                    });
+                  });
+                });
+
+                describe("Workflow after appeal", () => {
+                  let addrs = [];
+                  let timers;
+                  beforeEach(async () => {
+                    timers = await escrowDatasHub.timersOf(disputeID);
+                    await apiPost.appeal(disputeID);
+                    let datas = await escrowDatasHub.datasOf(disputeID);
+                    let counter = 0;
+                    addrs = [];
+                    let courtLength = await arbitratorsHub.getCourtLength(
+                      datas.courtID
+                    );
+                    for (let index = 1; index <= courtLength; index++) {
+                      let allowed = await escrowDatasHub.allowanceOf(
+                        disputeID,
+                        index
+                      );
+
+                      if (allowed == 1) {
+                        const address = await arbitratorsHub.ownerOf(index);
+
+                        addrs.push({ addr: address, arbitratorID: index });
+                        account = getAccount(accounts, address)[0];
+                        await apiPost
+                          .connect(account)
+                          .acceptArbitration(disputeID);
+                        counter++;
+                        if (counter == datas.nbArbitrators) {
+                          break;
+                        }
+                      }
+                    }
+                  });
+
+                  describe("Vote", () => {
+                    describe("WORKS", () => {
+                      it("vote : Should update status to Reclaimed after appeal ", async () => {
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+                        let rules = await escrowDatasHub.rulesOf(disputeID);
+                        expect(rules.status).to.equal(1);
+                      });
+
+                      it("vote : Should update data resolvedAt if voteLength == nbArbitrators && appeal == true", async () => {
+                        let timers = await escrowDatasHub.timersOf(disputeID);
+                        expect(timers.resolvedAt).to.equal(0);
+
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        timers = await escrowDatasHub.timersOf(disputeID);
+
+                        expect(timers.resolvedAt).to.not.equal(0);
+                      });
+
+                      it("vote : Should update value after voting appeal session", async () => {
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+                        let _data = await dispute.data();
+                        expect(_data.value).to.be.equal(0);
+                      });
+
+                      it("vote : Should update wadge feature data", async () => {
+                        let _data = await featuresHub.getData(featureID);
+                        expect(_data.wadge).to.not.be.equal(0);
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        let data = await featuresHub.getData(featureID);
+                        expect(data.wadge).to.be.equal(0);
+                      });
+
+                      it("vote : Should update balance of winner", async () => {
+                        let _accounts = [this.addr1, this.owner];
+                        let _data = await dispute.data();
+                        let winner = await cvHub.ownerOf(_data.payeeID);
+                        let winnerAccount = getAccount(_accounts, winner)[0];
+                        let balance = await winnerAccount.provider.getBalance(
+                          winner
+                        );
+
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        let _balance = await winnerAccount.provider.getBalance(
+                          winner
+                        );
+                        expect(balance < _balance).to.equal(true);
+                      });
+
+                      it("vote : Should update resolvedAt value after 2 voting session", async () => {
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        let _timers = await escrowDatasHub.timersOf(disputeID);
+                        expect(timers.resolvedAt).to.not.be.equal(
+                          _timers.resolvedAt
+                        );
+                        expect(
+                          timers.resolvedAt < _timers.resolvedAt
+                        ).to.be.equal(true);
+                      });
+
+                      it("vote : Should refresh startedAt ", async () => {
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        let _timers = await escrowDatasHub.timersOf(disputeID);
+                        expect(timers.startedAt).to.not.be.equal(
+                          _timers.startedAt
+                        );
+                        expect(
+                          timers.startedAt < _timers.startedAt
+                        ).to.be.equal(true);
+                      });
+
+                      it("vote : Should update feature data status to Validated", async () => {
+                        let data = await dispute.data();
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        data = await featuresHub.getData(featureID);
+                        expect(data.status).to.equal(2);
+                      });
+                    });
+
+                    describe("NOT WORKS", () => {
+                      it("Should NOT appeal with worker account after first appeal", async () => {
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+
+                        await expect(
+                          apiPost.connect(this.addr1).appeal(disputeID)
+                        ).to.be.revertedWith("Invalid status");
+                      });
+
+                      it("Should NOT appeal twice with owner account after new session vote", async () => {
+                        for (let index = 0; index < addrs.length; index++) {
+                          const address = addrs[index].addr;
+                          let account = getAccount(accounts, address)[0];
+                          await apiPost.connect(account).vote(disputeID, 3);
+                        }
+                        await expect(
+                          apiPost.appeal(disputeID)
+                        ).to.be.revertedWith("Invalid status");
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
       });
     });
   });
@@ -1129,312 +1729,45 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     describe("NOT WORKS", () => {
       it("Should NOT update if vote status == Waiting", async () => {
         // let account = getAccount(accounts, addrs[0].addr);
-        // await dispute.connect(account[0]).acceptArbitration();
+        // await apiPost.connect(account[0]).acceptArbitration(disputeID);
         // // New arbitre
         // account = getAccount(accounts, addrs[1].addr);
-        // await dispute.connect(account[0]).acceptArbitration();
+        // await apiPost.connect(account[0]).acceptArbitration(disputeID);
         // // New arbitre
         // account = getAccount(accounts, addrs[2].addr);
-        // await dispute.connect(account[0]).acceptArbitration();
-        // await expect(dispute.connect(account[0]).vote(0)).to.be.revertedWith(
+        // await apiPost.connect(account[0]).acceptArbitration(disputeID);
+        // await expect(apiPost.connect(account[0]).vote(disputeID, 0)).to.be.revertedWith(
         //   "Invalid ruling vote"
         // );
       });
     });
   });
 
-  describe("Dispute Contract : Refuse Arbitration", () => {
-    let dispute;
-    let disputeID;
-    let nbArbitrators = 3;
-    let reclamationPeriod;
-    let tokenURI = "disputesURI";
-    let accounts;
-    beforeEach(async () => {
-      accounts = [
-        this.addr3,
-
-        this.addr4,
-        this.addr5,
-        this.addr6,
-        this.addr7,
-        this.addr8,
-        this.addr9,
-        this.addr10,
-        this.addr11,
-        this.addr12,
-        this.addr13,
-        this.addr14,
-        this.addr15,
-        this.addr16,
-        this.addr17,
-        this.addr18,
-
-        //   this.addr20,
-      ];
-      reclamationPeriod = await contract.MIN_RECLAMATION_PERIOD();
-
-      for (let index = 0; index < accounts.length; index++) {
-        const account = accounts[index];
-        await accessControl.connect(account).createCV("_tokenURI");
-        let _featureID = await _testInitFeature(contracts, {}, account);
-
-        await featuresHub.validFeature(_featureID);
-        let value = 0.3 * index + 0.1;
-        let price = ethers.parseEther(`${value}`);
-
-        await arbitratorsHub
-          .connect(account)
-          .investOnCourt(3, { value: `${price}` });
-      }
-      await collecter.contestFeature(
-        featureID,
-        reclamationPeriod,
-        nbArbitrators,
-        tokenURI
-      );
-      disputeID = await contract.getTokensLength();
-      let address = await contract.addressOf(disputeID);
-
-      dispute = await getContractAt("Dispute", address);
-    });
-    describe("WORKS", () => {
-      it("refuseArbitration : Should update allowance", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-
-        let account = getAccount(accounts, addrs[0].addr);
-        let cvID = await cvHub.getCV(account[0].address);
-        let arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).refuseArbitration();
-        expect(await dispute.hisAllowance(arbitratorID)).to.equal(2);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        cvID = await cvHub.getCV(account[0].address);
-        arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).refuseArbitration();
-        expect(await dispute.hisAllowance(arbitratorID)).to.equal(2);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        cvID = await cvHub.getCV(account[0].address);
-        arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).refuseArbitration();
-        expect(await dispute.hisAllowance(arbitratorID)).to.equal(2);
-      });
-
-      it("refuseArbitration : Should update length", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-
-        let length = parseInt(await dispute.getArbitratorsLength());
-        let account = getAccount(accounts, addrs[0].addr);
-        let cvID = await cvHub.getCV(account[0].address);
-        let arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).refuseArbitration();
-        let _length = parseInt(await dispute.getArbitratorsLength());
-        expect(_length + 1).to.equal(length);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        cvID = await cvHub.getCV(account[0].address);
-        arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).refuseArbitration();
-        _length = parseInt(await dispute.getArbitratorsLength());
-        expect(_length + 2).to.equal(length);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        cvID = await cvHub.getCV(account[0].address);
-        arbitratorID = await arbitratorsHub.getArbitrationOfCV(
-          cvID,
-          data.courtID
-        );
-        await dispute.connect(account[0]).refuseArbitration();
-        _length = parseInt(await dispute.getArbitratorsLength());
-        expect(_length + 3).to.equal(length);
-      });
-
-      it("refuseArbitration : Should upgrade length if length < 3", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-
-        let length = parseInt(await dispute.getArbitratorsLength());
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).refuseArbitration();
-        let _length = parseInt(await dispute.getArbitratorsLength());
-        expect(_length + 1).to.equal(length);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).refuseArbitration();
-        _length = parseInt(await dispute.getArbitratorsLength());
-        expect(_length + 2).to.equal(length);
-
-        // New arbitre
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).refuseArbitration();
-        _length = parseInt(await dispute.getArbitratorsLength());
-        expect(_length + 3).to.equal(length);
-
-        // ! New arbitre
-        account = getAccount(accounts, addrs[3].addr);
-        await dispute.connect(account[0]).refuseArbitration();
-        _length = parseInt(await dispute.getArbitratorsLength());
-
-        expect(_length > length).to.equal(true);
-      });
-    });
+  describe("Escrow datas hub : Setter not works", () => {
     describe("NOT WORKS", () => {
-      it("Should NOT works if already accepted", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-
-        let account = getAccount(accounts, addrs[0].addr);
-
-        await dispute.connect(account[0]).acceptArbitration();
-        await expect(
-          dispute.connect(account[0]).refuseArbitration()
-        ).to.be.revertedWith("Wrong allowance arbitrator");
+      it("Should NOT start vote of without dispute bindings", async () => {
+        await expect(escrowDatasHub.startVotesOf(1)).to.be.reverted;
       });
-      it("Should NOT works if dispute status != Initial", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-          }
-        }
-        expect(data.nbArbitrators).to.equal(3);
-        // New arbitrator
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // New arbitrator
-        account = getAccount(accounts, addrs[1].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // New arbitrator
-        account = getAccount(accounts, addrs[2].addr);
-        await dispute.connect(account[0]).acceptArbitration();
-
-        // ! New arbitrator
-        account = getAccount(accounts, addrs[3].addr);
-        await expect(
-          dispute.connect(account[0]).refuseArbitration()
-        ).to.be.revertedWith("Invalid status");
+      it("Should NOT add arbitrator without dispute bindings", async () => {
+        await expect(escrowDatasHub.addArbitratorOn(1, 1)).to.be.reverted;
       });
-      it("Should NOT refused twice", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 1) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-
-        let account = getAccount(accounts, addrs[0].addr);
-        await dispute.connect(account[0]).refuseArbitration();
-        await expect(
-          dispute.connect(account[0]).refuseArbitration()
-        ).to.be.revertedWith("Wrong allowance arbitrator");
+      it("Should NOT vote for without dispute bindings", async () => {
+        await expect(escrowDatasHub.voteFor(1, 1, 2)).to.be.reverted;
       });
-
-      it("Should NOT works if arbitrator isn't invited", async () => {
-        let data = await dispute.data();
-        let courtLength = await arbitratorsHub.getCourtLength(data.courtID);
-        let addrs = [];
-
-        for (let index = 1; index <= courtLength; index++) {
-          let allowed = await dispute.hisAllowance(index);
-
-          if (allowed == 0) {
-            const address = await arbitratorsHub.ownerOf(index);
-            addrs.push({ addr: address, arbitratorID: index });
-            break;
-          }
-        }
-        let account = getAccount(accounts, addrs[0].addr);
-        await expect(
-          dispute.connect(account[0]).refuseArbitration()
-        ).to.be.revertedWith("Wrong allowance arbitrator");
+      it("Should NOT tally for without dispute bindings", async () => {
+        await expect(escrowDatasHub.tallyFor(1)).to.be.reverted;
       });
-
-      it("Should NOT works if arbitrator haven't cv", async () => {
-        await expect(
-          dispute.connect(this.addr19).refuseArbitration()
-        ).to.be.revertedWith("CV not found");
+      it("Should NOT resolve dispute of without dispute bindings", async () => {
+        await expect(escrowDatasHub.resolveDisputeOf(1)).to.be.reverted;
+      });
+      it("Should NOT reclaimed for without dispute bindings", async () => {
+        await expect(escrowDatasHub.reclaimedFor(1)).to.be.reverted;
+      });
+      it("Should NOT refuse arbitration for without dispute bindings", async () => {
+        await expect(escrowDatasHub.refuseArbitration(1, 1)).to.be.reverted;
+      });
+      it("Should NOT appeal of without dispute bindings", async () => {
+        await expect(escrowDatasHub.appealOf(1)).to.be.reverted;
       });
     });
   });

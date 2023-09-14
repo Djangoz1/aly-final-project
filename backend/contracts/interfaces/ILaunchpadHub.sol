@@ -9,10 +9,10 @@ import {IAccessControl} from "../interfaces/IAccessControl.sol";
 
 interface ILaunchpadHub {
     function mint(
-        address _owner,
+        uint _cvID,
         DataTypes.LaunchpadData calldata _datas,
         DataTypes.TierData[] calldata _tierDatas,
-        string memory _pubURI
+        uint _pubID
     ) external returns (uint);
 
     function getTokensLength() external view returns (uint);

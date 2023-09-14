@@ -4,33 +4,31 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-import {AddressHub} from "../storage/AddressHub.sol";
+import {IAddressHub} from "../interfaces/IAddressHub.sol";
 import {ICVHub} from "../interfaces/ICVHub.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 
 contract MissionsHub is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
 
-    AddressHub addrHub;
+    IAddressHub private _iAH;
 
     /**
      * @notice cv ID return array of ID missions
      */
-    mapping(uint => uint[]) indexers;
+    mapping(uint => uint[]) private indexers;
 
     /**
      * @notice mission ID return data mission
      */
-    mapping(uint => DataTypes.MissionData) datas;
+    mapping(uint => DataTypes.MissionData) private datas;
 
-    modifier onlyOwnerOf(uint _missionID, address _owner) {
-        require(ownerOf(_missionID) == _owner, "Not the owner");
-        _;
-    }
+    
     modifier onlyProxy() {
         require(
-            msg.sender == address(addrHub.accessControl()),
+            msg.sender == address(_iAH.apiPost()),
             "Must call function with proxy bindings"
         );
         _;
@@ -38,7 +36,7 @@ contract MissionsHub is ERC721URIStorage {
 
     modifier onlyFeaturesHub() {
         require(
-            msg.sender == addrHub.featuresHub(),
+            msg.sender == _iAH.featuresHub(),
             "Must call function with featuresHub bindings"
         );
         _;
@@ -48,9 +46,9 @@ contract MissionsHub is ERC721URIStorage {
     // *::::::::::::: CONSTRUCTOR ::::::::::::* //
     // *::::::::::::: ----------- ::::::::::::* //
 
-    constructor(address _addressHub) ERC721("Mission", "WM") {
-        addrHub = AddressHub(_addressHub);
-        addrHub.setMissionsHub(address(this));
+    constructor(address _addrHub) ERC721("Mission", "WM") {
+        _iAH = IAddressHub(_addrHub);
+        _iAH.setMissionsHub();
     }
 
     function checkRegistred(uint _id) external view {
@@ -66,12 +64,11 @@ contract MissionsHub is ERC721URIStorage {
         address _for,
         string calldata _tokenURI
     ) external onlyProxy returns (uint) {
-        ICVHub iCVH = ICVHub(addrHub.cvHub());
         _tokenIDs.increment();
         uint newMissionID = _tokenIDs.current();
         DataTypes.MissionData memory newMission;
         newMission.id = newMissionID;
-        indexers[iCVH.getCV(_for)].push(newMissionID);
+        indexers[_getCV(_for)].push(newMissionID);
         datas[newMissionID] = newMission;
         _mint(_for, newMissionID);
         _setTokenURI(newMissionID, _tokenURI);
@@ -82,7 +79,7 @@ contract MissionsHub is ERC721URIStorage {
         address _owner,
         uint _missionID,
         uint _featureID
-    ) external onlyFeaturesHub onlyOwnerOf(_missionID, _owner) {
+    ) external onlyFeaturesHub  {
         require(
             datas[_missionID].status == DataTypes.MissionStatus.Process,
             "Mission closed"
@@ -92,7 +89,8 @@ contract MissionsHub is ERC721URIStorage {
 
     function closeMission(
         uint _missionID
-    ) external onlyOwnerOf(_missionID, msg.sender) {
+        
+    ) external onlyProxy  {
         require(
             datas[_missionID].status == DataTypes.MissionStatus.Process,
             "Wrong status"
@@ -125,9 +123,7 @@ contract MissionsHub is ERC721URIStorage {
         return _tokenIDs.current();
     }
 
-    // function getFeaturesIndexer(
-    //     uint _missionID
-    // ) external view returns (uint[] memory) {
-    //     return featuresIndexer[_missionID];
-    // }
+    function _getCV(address _for) internal view returns (uint) {
+        return Bindings.getCV(_for, _iAH.cvHub());
+    }
 }
