@@ -71,29 +71,31 @@ contract PubsDatasHub is ERC721, Ownable {
         DataTypes.LikeData memory newDatas;
         _mint(_from, newLikeID);
 
+        newDatas.indexedAt = pubsToLikes[_pubID].length;
         pubsToLikes[_pubID].push(newLikeID);
-        newDatas.indexedAt = pubsToLikes[_pubID].length - 1;
         newDatas.pubID = _pubID;
         newDatas.id = newLikeID;
         cvsToLikes[_cvID][_pubID] = newLikeID;
         likesToDatas[newLikeID] = newDatas;
     }
 
-    function unlike(address _owner, uint _pubID) external onlyProxy {
-        uint cvOwnerID = _cvOf(_owner);
-        uint _likeID = cvsToLikes[cvOwnerID][_pubID];
+    function unlike(uint _cvID, uint _pubID) external onlyProxy {
+                address _from = Bindings.ownerOf(_cvID, _iAS.cvsHub());
+
+        uint _likeID = cvsToLikes[_cvID][_pubID];
         require(
             _likeID <= _likeIDs.current() && _likeID != 0,
             "Like ID not exist"
         );
         require(likesToDatas[_likeID].id == _likeID, "Not liked");
-        require(ownerOf(_likeID) == _owner, "Not the owner");
-
+        require(ownerOf(_likeID) == _from, "Not the owner");
         DataTypes.LikeData memory prevDatas = likesToDatas[_likeID];
+        require(prevDatas.pubID == _pubID, 'Missmatch pubID');
+        require(_likeID == prevDatas.id, 'Missmatch likeID');
         DataTypes.LikeData memory cleanDatas;
         delete pubsToLikes[prevDatas.pubID][prevDatas.indexedAt];
         likesToDatas[_likeID] = cleanDatas;
-        delete cvsToLikes[cvOwnerID][_pubID];
+        delete cvsToLikes[_cvID][_pubID];
         _burn(_likeID);
     }
 
@@ -161,10 +163,7 @@ contract PubsDatasHub is ERC721, Ownable {
         ifTokenExist(_missionID, _iAS.missionsHub())
         returns (uint[] memory)
     {
-        require(
-            Bindings.tokensLength(_iAS.missionsHub()) >= _missionID,
-            "Mission not exist"
-        );
+       
         return missionsToPubs[_missionID];
     }
 

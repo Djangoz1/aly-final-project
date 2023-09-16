@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 const { codeSize, _testInitAll } = require("../../helpers/test_init");
 
-describe.only(`TEST CODE SIZE`, () => {
+describe(`TEST CODE SIZE`, () => {
   let contracts;
 
   beforeEach(async () => {
@@ -19,72 +19,49 @@ describe.only(`TEST CODE SIZE`, () => {
     contracts = await _testInitAll();
   });
 
-  it("AccessControl size", async () => {
-    let contract = contracts.systems.accessControl;
-    await codeSize(contract.target);
+  describe("System contracts", () => {
+    afterEach(async () => {
+      await codeSize(contracts.systems.accessControl.target);
+      await codeSize(contracts.systems.apiPost.target);
+      await codeSize(contracts.systems.apiGet.target);
+      await codeSize(contracts.systems.factory.target);
+      await codeSize(contracts.systems.balancesHub.target);
+      await codeSize(contracts.systems.addressSystem.target);
+    });
+
+    it(`AccessControl | APIPost | APIGet | Factory | BalancesHub | AddressSystem`, () => {});
   });
-  it("APIPost size", async () => {
-    let contract = contracts.systems.apiPost;
-    await codeSize(contract.target);
+  describe("Works contracts", () => {
+    afterEach(async () => {
+      await codeSize(contracts.works.missionsHub.target);
+      await codeSize(contracts.works.featuresHub.target);
+      await codeSize(contracts.works.workProposalHub.target);
+      await codeSize(contracts.works.collectWorkInteraction.target);
+    });
+
+    it(`MissionsHub | FeaturesHub | WorkProposal | CollectWorkInteraction`, () => {});
   });
-  it("APIGet size", async () => {
-    let contract = contracts.systems.apiGet;
-    await codeSize(contract.target);
+  describe("CV contracts", () => {
+    afterEach(async () => {
+      await codeSize(contracts.cvs.hub.target);
+      await codeSize(contracts.cvs.datas.target);
+    });
+
+    it(`CVsHub | CVsDatasHub`, () => {});
   });
-  it("Factory size", async () => {
-    let contract = contracts.systems.factory;
-    await codeSize(contract.target);
+  describe("Escrow contracts", () => {
+    afterEach(async () => {
+      await codeSize(contracts.escrows.datas.target);
+      await codeSize(contracts.escrows.disputesHub.target);
+      await codeSize(contracts.escrows.arbitratorsHub.target);
+    });
+    it(`DisputesDatasHub | DisputesHub | ArbitratorsHub`, () => {});
   });
-  it("BalancesHub size", async () => {
-    let contract = contracts.systems.balancesHub;
-    await codeSize(contract.target);
-  });
-  it("AddressSystem size", async () => {
-    let contract = contracts.systems.addressSystem;
-    await codeSize(contract.target);
-  });
-  it("MissionsHub size", async () => {
-    let contract = contracts.works.missionsHub;
-    await codeSize(contract.target);
-  });
-  it("WorkProposalHub size", async () => {
-    let contract = contracts.works.workProposalHub;
-    await codeSize(contract.target);
-  });
-  it("FeaturesHub size", async () => {
-    let contract = contracts.works.featuresHub;
-    await codeSize(contract.target);
-  });
-  it("CollectWorkInteraction size", async () => {
-    let contract = contracts.works.collectWorkInteraction;
-    await codeSize(contract.target);
-  });
-  it("CVsHub size", async () => {
-    let contract = contracts.cvs.hub;
-    await codeSize(contract.target);
-  });
-  it("CVsDatasHub size", async () => {
-    let contract = contracts.cvs.datas;
-    await codeSize(contract.target);
-  });
-  it("DisputesDatasHub size", async () => {
-    let contract = contracts.escrows.datas;
-    await codeSize(contract.target);
-  });
-  it("DisputesHub size", async () => {
-    let contract = contracts.escrows.disputesHub;
-    await codeSize(contract.target);
-  });
-  it("ArbitratorsHub size", async () => {
-    let contract = contracts.escrows.arbitratorsHub;
-    await codeSize(contract.target);
-  });
-  it("PubsHub size", async () => {
-    let contract = contracts.pubs.hub;
-    await codeSize(contract.target);
-  });
-  it("PubsDatasHub size", async () => {
-    let contract = contracts.pubs.datas;
-    await codeSize(contract.target);
+  describe("Pubs contracts", () => {
+    afterEach(async () => {
+      await codeSize(contracts.pubs.datas.target);
+      await codeSize(contracts.pubs.hub.target);
+    });
+    it(`PubsDatasHub | PubsHub`, () => {});
   });
 });

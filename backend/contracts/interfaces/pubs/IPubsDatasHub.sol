@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+import {DataTypes} from "../../libraries/DataTypes.sol";
+
 interface IPubsDatasHub {
     // -------------------------- //
     // ********** LIKE ********** //
@@ -31,6 +33,10 @@ interface IPubsDatasHub {
     ) external;
 
     function answersOfPub(uint _pubID) external view returns (uint[] memory);
+
+    function dataOf(
+        uint _likeID
+    ) external view returns (DataTypes.LikeData memory);
 
     function pubsOfMission(
         uint _missionID

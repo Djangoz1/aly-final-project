@@ -73,10 +73,7 @@ contract Launchpad is Ownable {
         DataTypes.TierData[] memory _tierDatas,
         uint _pubID
     ) {
-        require(
-            ILaunchpadHub(msg.sender).addressOf(_id) == address(this),
-            "Launchpad: Error deployment"
-        );
+        
         _iAS = IAddressSystem(_addressSystem);
         cLD = ILaunchpadsDatasHub(_iAS.launchpadsDatasHub());
         cLI = ILaunchpadsInvestorsHub(_iAS.launchpadsInvestorsHub());

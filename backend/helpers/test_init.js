@@ -29,7 +29,14 @@ const getContractAt = async (_contract, _address) => {
 const codeSize = async (address) => {
   let contractCode = await ethers.provider.getCode(address);
   let codeSizeInBytes = contractCode.length / 2;
-  console.log(`Taille du code du contrat : ${codeSizeInBytes} octets`);
+  if (codeSizeInBytes > 20000) {
+    console.log(
+      `Attention ! Taille du code du contrat : ${codeSizeInBytes} octets`
+    );
+  } else {
+    console.log(`Taille du code du contrat : ${codeSizeInBytes} octets`);
+  }
+  return codeSizeInBytes;
 };
 
 const getProxy = async (accessControlAddr) => {
@@ -38,7 +45,7 @@ const getProxy = async (accessControlAddr) => {
 };
 
 const _testInitAll = async () => {
-  let addressSystem = await _testInitAddressHub();
+  let addressSystem = await _testInitaddressSystem();
   let cvs = await _testInitCVsContracts(addressSystem.target);
   let escrows = await _testInitEscrowsContracts(addressSystem.target);
   let works = await _testInitWorksContracts(addressSystem.target);
@@ -120,7 +127,7 @@ let _testInitCVsContracts = async (addressSystem) => {
   };
 };
 
-let _testInitAddressHub = async () => {
+let _testInitaddressSystem = async () => {
   const addressSystem = await ethers.deployContract("AddressSystem");
   await addressSystem.waitForDeployment();
   return addressSystem;
@@ -146,10 +153,11 @@ let _testInitSystemsContracts = async (addressSystem) => {
 
   const apiPost = await ethers.deployContract("APIPost", [addressSystem]);
   await apiPost.waitForDeployment();
+  expect(await _iAS.apiPost()).to.be.equal(apiPost.target);
 
   const apiGet = await ethers.deployContract("APIGet", [addressSystem]);
   await apiGet.waitForDeployment();
-  expect(await _iAS.apiPost()).to.be.equal(apiPost.target);
+  expect(await _iAS.apiGet()).to.be.equal(apiGet.target);
   return {
     apiGet,
     balancesHub,
@@ -160,22 +168,20 @@ let _testInitSystemsContracts = async (addressSystem) => {
 };
 
 const _testInitArbitrator = async (contracts, courtID, account) => {
-  const {
-    arbitratorsHub,
-    featuresHub,
-    apiPost,
+  let arbitratorsHub = contracts.escrows.arbitratorsHub;
+  let featuresHub = contracts.works.featuresHub;
+  let apiPost = contracts.systems.apiPost;
+  let apiGet = contracts.systems.apiGet;
 
-    CVsHub,
-  } = contracts;
-  let courtLength = await arbitratorsHub.lengthOfCourt(courtID);
-  let cvArbitrator = await CVsHub.cvOf(account.address);
+  let courtLength = await apiGet.lengthOfCourt(courtID);
+  let cvArbitrator = await apiGet.cvOf(account.address);
   let newFeature = await _testInitFeature(
     contracts,
     { courtID: courtID },
     account
   );
   await apiPost.validFeature(newFeature);
-  let _courtLength = await arbitratorsHub.lengthOfCourt(courtID);
+  let _courtLength = await apiGet.lengthOfCourt(courtID);
 
   expect(parseInt(courtLength) + 1).to.be.equal(_courtLength);
 
@@ -183,7 +189,7 @@ const _testInitArbitrator = async (contracts, courtID, account) => {
   let price = ethers.parseEther(`${value}`);
 
   await apiPost.connect(account).investOnCourt(3, { value: `${price}` });
-  let data = await featuresHub.dataOf(newFeature);
+  let data = await apiGet.datasOfFeature(newFeature);
   expect(data.status).to.be.equal(2);
   return await arbitratorsHub.arbitrationOfCV(cvArbitrator, courtID);
 };
@@ -308,7 +314,10 @@ const _testInitWorksContracts = async (addressSystem) => {
  * @dev La mission est créé par la fonction apiPost.createMission(_tokenURI)
  */
 const _testInitMission = async (contracts, tokenURI, account) => {
-  const { missionsHub, apiPost, balancesHub } = contracts;
+  let missionsHub = contracts.works.missionsHub;
+  let apiPost = contracts.systems.apiPost;
+  let apiGet = contracts.systems.apiGet;
+  let balancesHub = contracts.systems.balancesHub;
 
   const missionPrice = await balancesHub.missionPrice();
   if (account) {
@@ -328,13 +337,14 @@ const _testInitMission = async (contracts, tokenURI, account) => {
 // *:::::::::::::: ------- ::::::::::::::* //
 
 const _testInitFeature = async (contracts, datas, workerAccount, account) => {
-  const { arbitratorsHub, featuresHub, missionsHub, accessControl, CVsHub } =
-    contracts;
-
-  let apiPost = contracts.apiPost;
+  let missionsHub = contracts.works.missionsHub;
+  let featuresHub = contracts.works.featuresHub;
+  let apiPost = contracts.systems.apiPost;
+  let apiGet = contracts.systems.apiGet;
+  let balancesHub = contracts.systems.balancesHub;
 
   let missionID = await _testInitMission(contracts, "missionURI");
-  const cvWorker = await CVsHub.cvOf(workerAccount.address);
+  const cvWorker = await apiGet.cvOf(workerAccount.address);
   let newFeature;
   if (account) {
     await apiPost
@@ -424,11 +434,9 @@ const _testInitWorkerProposal = async (
 const _testInitLaunchpadsContracts = async (addressSystem, address) => {
   let _iAS = await getContractAt("AddressSystem", addressSystem);
 
-  const launchpadsHub = await ethers.deployContract("LaunchpadHub", [
-    addressSystem,
-  ]);
-  await launchpadsHub.waitForDeployment();
-  expect(await _iAS.launchpadsHub()).to.be.equal(launchpadsHub.target);
+  const hub = await ethers.deployContract("LaunchpadHub", [addressSystem]);
+  await hub.waitForDeployment();
+  expect(await _iAS.launchpadsHub()).to.be.equal(hub.target);
 
   const datas = await ethers.deployContract("LaunchpadsDatasHub", [
     addressSystem,
@@ -443,14 +451,14 @@ const _testInitLaunchpadsContracts = async (addressSystem, address) => {
   expect(await _iAS.launchpadsInvestorsHub()).to.be.equal(investors.target);
 
   expect(await datas.owner()).to.be.equal(await investors.owner());
-  expect(await investors.owner()).to.be.equal(await launchpadsHub.owner());
-  expect(await launchpadsHub.owner()).to.be.equal(await datas.owner());
+  expect(await investors.owner()).to.be.equal(await hub.owner());
+  expect(await hub.owner()).to.be.equal(await datas.owner());
   if (address) {
     expect(await datas.owner()).to.be.equal(address);
     expect(await investors.owner()).to.be.equal(address);
-    expect(await launchpadsHub.owner()).to.be.equal(address);
+    expect(await hub.owner()).to.be.equal(address);
   }
-  return { investors, datas, launchpadsHub };
+  return { investors, datas, hub };
 };
 
 const _testInitLaunchpad = async (
@@ -569,7 +577,7 @@ module.exports = {
   getContractAt,
   codeSize,
   _testInitAll,
-  _testInitAddressHub,
+  _testInitaddressSystem,
   _testInitSystemsContracts,
   _testInitCVsContracts,
   _testInitPubsContracts,

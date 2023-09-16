@@ -8,6 +8,7 @@ import {IAccessControl} from "../interfaces/system/IAccessControl.sol";
 
 contract AddressSystem is Ownable {
     address public apiPost;
+    address public apiGet;
     address public accessControl;
     address public missionsHub;
     address public factory;
@@ -33,6 +34,7 @@ contract AddressSystem is Ownable {
     function _hasInit() internal {
         if (
             apiPost != address(0) &&
+            apiGet != address(0) &&
             accessControl != address(0) &&
             arbitratorsHub != address(0) &&
             balancesHub != address(0) &&
@@ -143,6 +145,11 @@ contract AddressSystem is Ownable {
     function setApiPost() external {
         require(apiPost == address(0), "APIPost already init");
         apiPost = msg.sender;
+        _hasInit();
+    }
+    function setApiGet() external {
+        require(apiGet == address(0), "APIGet already init");
+        apiGet = msg.sender;
         _hasInit();
     }
 

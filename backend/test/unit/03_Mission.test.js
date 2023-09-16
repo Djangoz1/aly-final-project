@@ -8,7 +8,8 @@ const CONTRACT_NAME = "MissionsHub";
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let contract;
   let CVsHub;
-  let accessControl;
+
+  let apiGet;
   let apiPost;
   let balancesHub;
 
@@ -25,12 +26,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
     const contracts = await _testInitAll();
     try {
-      CVsHub = await contracts.CVsHub;
-      accessControl = await contracts.accessControl;
-      apiPost = await contracts.apiPost;
-      balancesHub = await contracts.balancesHub;
+      CVsHub = await contracts.cvs.hub;
+      apiGet = await contracts.systems.apiGet;
+      apiPost = await contracts.systems.apiPost;
+      balancesHub = await contracts.systems.balancesHub;
       await apiPost.createCV("tokenURI");
-      contract = await contracts.missionsHub;
+      contract = await contracts.works.missionsHub;
     } catch (error) {
       console.log("error", error);
     }
@@ -46,11 +47,11 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should get 0 token", async () => {
-      expect(await contract.tokensLength()).to.equal(0);
+      expect(await apiGet.lengthOfMissions()).to.equal(0);
     });
 
     describe("NOT WORK", () => {
-      it("Should NOT create mission out of bindings accessControl", async () => {
+      it("Should NOT create mission out of bindings apiPost", async () => {
         await expect(
           contract.mint(this.owner.address, "tokenURI")
         ).to.be.revertedWith("Must call function with proxy bindings");
@@ -90,7 +91,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createMission("tokenURI", {
           value: missionPrice,
         });
-        expect(await contract.tokensLength()).to.be.equal(1);
+        expect(await apiGet.lengthOfMissions()).to.be.equal(1);
       });
 
       it("Should get token URI", async () => {
@@ -98,10 +99,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           value: missionPrice,
         });
         expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
-
-        let cvID = await CVsHub.cvOf(this.owner.address);
-        let indexer = await contract.indexerOf(cvID);
-        expect(indexer.length).to.be.equal(1);
       });
 
       it("Should update indexer", async () => {
@@ -109,7 +106,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           value: missionPrice,
         });
         let cvID = await CVsHub.cvOf(this.owner.address);
-        let indexer = await contract.indexerOf(cvID);
+        let indexer = await apiGet.missionsOfCV(cvID);
         expect(indexer.length).to.be.equal(1);
         expect(indexer[0]).to.be.equal(1);
       });
@@ -118,7 +115,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createMission("tokenURI", {
           value: missionPrice,
         });
-        const datas = await contract.dataOf(1);
+        const datas = await apiGet.datasOfMission(1);
         expect(datas.status).to.be.equal(0);
       });
 
@@ -126,7 +123,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createMission("tokenURI", {
           value: missionPrice,
         });
-        const datas = await contract.dataOf(1);
+        const datas = await apiGet.datasOfMission(1);
         expect(datas.id).to.be.equal(1);
       });
 
@@ -134,7 +131,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createMission("tokenURI", {
           value: missionPrice,
         });
-        const datas = await contract.dataOf(1);
+        const datas = await apiGet.datasOfMission(1);
         expect(datas.features.length).to.be.equal(0);
       });
     });
@@ -171,7 +168,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("WORKS", () => {
       it("Should close mission", async () => {
         await apiPost.closeMission(1);
-        const datas = await contract.dataOf(1);
+        const datas = await apiGet.datasOfMission(1);
         expect(datas.status).to.be.equal(1);
       });
     });
@@ -186,7 +183,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(
           apiPost.connect(this.addr1).closeMission(1)
         ).to.be.revertedWith("Not the owner");
-        const datas = await contract.dataOf(1);
+        const datas = await apiGet.datasOfMission(1);
         expect(datas.status).to.be.equal(0);
       });
 

@@ -16,7 +16,7 @@ library DisputeTools {
 
     struct Tools {
         uint id;
-        address addressHub;
+        address addressSystem;
         address datasHub;
     }
 
@@ -28,7 +28,7 @@ library DisputeTools {
     // }
 
     function hub(Tools storage _tools) internal view returns (address) {
-        return _tools.addressHub;
+        return _tools.addressSystem;
     }
 
     function winner(

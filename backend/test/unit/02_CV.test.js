@@ -8,6 +8,8 @@ const CONTRACT_NAME = "CVsHub";
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let contract;
   let apiPost;
+  let apiGet;
+  let datasHub;
   beforeEach(async () => {
     [
       this.owner,
@@ -21,44 +23,26 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
 
     let contracts = await _testInitAll();
-    addressHub = await contracts.addressHub;
-    accessControl = await contracts.accessControl;
-    contract = await contracts.CVsHub;
-    apiPost = await contracts.apiPost;
-    factoryMission = await contracts.missionsHub;
+
+    contract = await contracts.cvs.hub;
+    datasHub = await contracts.cvs.datas;
+    apiPost = await contracts.systems.apiPost;
+    apiGet = await contracts.systems.apiGet;
   });
 
   // *:::::::: INITIALISATION ::::::::* //
 
   describe("Initialization CV Hub", () => {
-    it("Should have a collecter", async () => {
-      expect(await contract.cvOfsDatasHub()).to.be.not.equal(ZERO_ADDRESS);
-    });
-
     it("Should have 0 token", async () => {
-      expect(await contract.tokensLength()).to.be.equal(0);
+      expect(await apiGet.lengthOfCVs()).to.be.equal(0);
     });
 
     it("Should create a CV", async () => {
       await apiPost.createCV("tokenURI");
-      expect(await contract.tokensLength()).to.be.equal(1);
+      expect(await apiGet.lengthOfCVs()).to.be.equal(1);
+      expect(await apiGet.cvOf(this.owner.address)).to.be.equal(1);
       expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
-      expect(await contract.cvOf(this.owner.address)).to.be.equal(1);
       expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
-    });
-
-    describe("NOT WORKS", () => {
-      it("Should NOT mint CV", async () => {
-        await expect(
-          contract.mint(this.owner.address, "tokenURI")
-        ).to.be.revertedWith("Must call function with proxy bindings");
-      });
-      it("Should NOT mint CV twice", async () => {
-        await apiPost.createCV("tokenURI");
-        await expect(apiPost.createCV("tokenURI")).to.be.revertedWith(
-          "CV already exist"
-        );
-      });
     });
   });
 
@@ -67,14 +51,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("WORKS", () => {
       it("Should create a cv", async () => {
-        expect(await contract.tokensLength()).to.be.equal(0);
+        expect(await apiGet.lengthOfCVs()).to.be.equal(0);
         await apiPost.connect(this.addr1).createCV("tokenURI");
-        expect(await contract.tokensLength()).to.be.equal(1);
+        expect(await apiGet.lengthOfCVs()).to.be.equal(1);
       });
 
       it("Should return true id", async () => {
         await apiPost.connect(this.addr1).createCV("tokenURI");
-        expect(await contract.cvOf(this.addr1.address)).to.be.equal(1);
+        expect(await apiGet.cvOf(this.addr1.address)).to.be.equal(1);
       });
 
       it("Should return true tokenURI", async () => {
@@ -105,72 +89,73 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   });
 
   describe("Follow CV", () => {
-    let collecter;
-
     beforeEach(async () => {
-      collecter = await getContractAt(
-        "cvsDatasHub",
-        await contract.cvOfsDatasHub()
-      );
       await apiPost.createCV("tokenURI");
       await apiPost.connect(this.addr1).createCV("tokenURI");
     });
     describe("WORKS", () => {
-      it("Should have a collecter", async () => {
-        expect(await contract.cvOfsDatasHub()).to.be.equal(collecter.target);
-      });
       it("Should isFollow return true", async () => {
         await apiPost.followCV(2);
-        let isFollow = await collecter.isFollow(1, 2);
+        let isFollow = await apiGet.isFollow(1, 2);
         expect(isFollow).to.be.equal(true);
       });
+
       it("Should update length followers", async () => {
-        let length = await collecter.lengthOfFollower(2);
+        let length = await apiGet.lengthOfFollower(2);
         expect(length).to.be.equal(0);
         await apiPost.followCV(2);
-        length = await collecter.lengthOfFollower(2);
+        length = await apiGet.lengthOfFollower(2);
 
         expect(length).to.be.equal(1);
       });
       it("Should update length followed", async () => {
-        let length = await collecter.lengthOfFollowed(1);
+        let length = await apiGet.lengthOfFollowed(1);
         expect(length).to.be.equal(0);
         await apiPost.followCV(2);
-        length = await collecter.lengthOfFollowed(1);
+        length = await apiGet.lengthOfFollowed(1);
 
         expect(length).to.be.equal(1);
       });
 
       it("Should get cv follower", async () => {
         await apiPost.followCV(2);
-        let follower = await collecter.followerOf(2, 0);
+        let follower = await apiGet.followerOf(2, 0);
         expect(follower).to.be.equal(1);
       });
 
       it("Should get cv followed", async () => {
         await apiPost.followCV(2);
-        let follower = await collecter.followedOf(1, 0);
+        let follower = await apiGet.followedOf(1, 0);
         expect(follower).to.be.equal(2);
       });
     });
 
     describe("NOT WORKS", () => {
+      it("Should NOT follow CV with wrong proxy bindings", async () => {
+        await expect(datasHub.follow(this.owner.address, 1)).to.be.revertedWith(
+          "Must call function with hub bindings"
+        );
+      });
+
       it("Should NOT follow CV twice", async () => {
         await apiPost.followCV(2);
         await expect(apiPost.followCV(2)).to.be.revertedWith(
           "Already followed"
         );
       });
+
       it("Should NOT follow CV if sender haven't CV", async () => {
         await expect(
           apiPost.connect(this.addr3).followCV(2)
         ).to.be.revertedWith("CV not found");
       });
+
       it("Should NOT follow CV wich not exist", async () => {
         await expect(apiPost.followCV(3)).to.be.revertedWith(
           "ERC721: invalid token ID"
         );
       });
+
       it("Should NOT follow own cv", async () => {
         await expect(apiPost.followCV(1)).to.be.revertedWith(
           "Can't follow yourself"
@@ -180,13 +165,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   });
 
   describe("Unfollow CV", () => {
-    let collecter;
-
     beforeEach(async () => {
-      collecter = await getContractAt(
-        "cvsDatasHub",
-        await contract.cvOfsDatasHub()
-      );
       await apiPost.createCV("tokenURI");
       await apiPost.connect(this.addr1).createCV("tokenURI");
       await apiPost.followCV(2);
@@ -194,48 +173,53 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("WORKS", () => {
       it("Should unfollow CV", async () => {
         await apiPost.unfollowCV(2);
-        let isFollow = await collecter.isFollow(1, 2);
+        let isFollow = await apiGet.isFollow(1, 2);
         expect(isFollow).to.be.equal(false);
       });
 
       it("Should update length followers", async () => {
-        let length = await collecter.lengthOfFollower(2);
+        let length = await apiGet.lengthOfFollower(2);
         expect(length).to.be.equal(1);
         await apiPost.unfollowCV(2);
-        length = await collecter.lengthOfFollower(2);
+        length = await apiGet.lengthOfFollower(2);
 
         expect(length).to.be.equal(0);
       });
+
       it("Should update length followed", async () => {
-        let length = await collecter.lengthOfFollowed(1);
+        let length = await apiGet.lengthOfFollowed(1);
         expect(length).to.be.equal(1);
         await apiPost.unfollowCV(2);
-        length = await collecter.lengthOfFollowed(1);
+        length = await apiGet.lengthOfFollowed(1);
 
         expect(length).to.be.equal(0);
       });
     });
 
     describe("NOT WORKS", () => {
-      it("Should NOT unfollow CV with no proxy bindings", async () => {
+      it("Should NOT unfollow CV with wrong proxy bindings", async () => {
         await expect(
-          collecter.unfollow(this.owner.address, 2)
+          datasHub.unfollow(this.owner.address, 2)
         ).to.be.revertedWith("Must call function with hub bindings");
       });
+
       it("Should NOT unfollow CV twice", async () => {
         await apiPost.unfollowCV(2);
         await expect(apiPost.unfollowCV(2)).to.be.revertedWith("Not followed");
       });
+
       it("Should NOT unfollow CV if sender haven't CV", async () => {
         await expect(
           apiPost.connect(this.addr3).unfollowCV(2)
         ).to.be.revertedWith("CV not found");
       });
+
       it("Should NOT unfollow CV wich not exist", async () => {
         await expect(apiPost.unfollowCV(3)).to.be.revertedWith(
           "ERC721: invalid token ID"
         );
       });
+
       it("Should NOT unfollow own cv", async () => {
         await expect(apiPost.unfollowCV(1)).to.be.revertedWith(
           "Can't unfollow yourself"

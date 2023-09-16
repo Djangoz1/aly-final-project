@@ -19,11 +19,10 @@ const CONTRACT_NAME = "LaunchpadHub";
 
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let apiPost;
-  let addressHub;
+  let apiGet;
+  let addressSystem;
   let pubsHub;
-  let cLI;
-  let LC;
-  let cLD;
+
   let balancesHub;
   let contract;
   let contracts;
@@ -39,22 +38,18 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       this.addr7,
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
     contracts = await _testInitAll();
-    apiPost = contracts.apiPost;
-    addressHub = contracts.addressHub;
-    pubsHub = contracts.pubsHub;
-    balancesHub = contracts.balancesHub;
+    apiPost = contracts.systems.apiPost;
+    apiGet = contracts.systems.apiGet;
+    addressSystem = contracts.systems.addressSystem;
+    pubsHub = contracts.pubs.hub;
+    balancesHub = contracts.systems.balancesHub;
     // return;
-    let launchpadContracts = contracts.launchpadContracts;
 
     await apiPost.createCV("_tokenURI");
     await apiPost.connect(this.addr1).createCV("_tokenURI");
     await apiPost.connect(this.addr2).createCV("_tokenURI");
 
-    lHub = launchpadContracts.hub;
-    contract = launchpadContracts.hub;
-    cLI = launchpadContracts.investors;
-    LC = launchpadContracts.cohort;
-    cLD = launchpadContracts.datas;
+    contract = contracts.launchpads.hub;
   });
 
   describe("Init : Launchpad", () => {
@@ -63,53 +58,18 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       expect(price).to.be.equal(ethers.parseEther("0.4"));
     });
 
-    it("Should  have cohort", async () => {
-      expect(cLI.target).to.not.be.equal(ZERO_ADDRESS);
-      expect(contract.target).to.not.be.equal(ZERO_ADDRESS);
-      expect(LC.target).to.not.be.equal(ZERO_ADDRESS);
-      expect(cLD.target).to.not.be.equal(ZERO_ADDRESS);
-    });
-
-    it("Should  have collecter launchpadInvestor", async () => {
-      expect(cLI.target).to.be.equal(await LC.launchpadInvestor());
-    });
-    it("Should  have collecter launchpadDatas", async () => {
-      expect(cLD.target).to.be.equal(await LC.launchpadDatas());
-    });
-    it("Should  have launchpads hub", async () => {
-      expect(contract.target).to.be.equal(await LC.launchpadHub());
-    });
-    it("Should  have launchpad cohort", async () => {
-      expect(LC.target).to.be.equal(await addressHub.launchpadCohort());
-    });
-    it("Should  have address hub", async () => {
-      expect(addressHub.target).to.be.equal(await LC.addressHub());
-    });
-    it("Should  return all address", async () => {
-      expect(cLI.target).to.be.equal(await LC.launchpadInvestor());
-      expect(cLD.target).to.be.equal(await LC.launchpadDatas());
-      expect(contract.target).to.be.equal(await LC.launchpadHub());
-      expect(LC.target).to.be.equal(await addressHub.launchpadCohort());
-      expect(addressHub.target).to.be.equal(await LC.addressHub());
-    });
-
     it("Should  have 0 token", async () => {
-      expect(await contract.tokensLength()).to.be.equal(0);
+      expect(await apiGet.lengthOfLaunchpads()).to.be.equal(0);
     });
     describe("NOT WORKS", () => {
       it("Should  NOT use getLaunchpad for unknow ID", async () => {
-        await expect(contract.getLaunchpad(1)).to.be.revertedWith(
+        await expect(apiGet.addressOfLaunchpad(1)).to.be.revertedWith(
           "ID out of range"
         );
       });
       it("Should  NOT mint launchpad without proxyBindings", async () => {
         await expect(
-          contract.mint(
-            this.owner.address,
-            LAUNCHPAD_DATAS_EXEMPLE,
-            [TIER_DATAS_EXEMPLE],
-            "pubURI"
-          )
+          contract.mint(1, LAUNCHPAD_DATAS_EXEMPLE, [TIER_DATAS_EXEMPLE], 1)
         ).to.be.revertedWith("Must call function with proxy bindings");
       });
     });
@@ -135,14 +95,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        expect(await contract.tokensLength()).to.be.equal(1);
+        expect(await apiGet.lengthOfLaunchpads()).to.be.equal(1);
       });
 
       it("Should return true token address", async () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
 
         expect(_datas.tokenAddress).to.be.equal(token.target);
       });
@@ -151,14 +111,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.totalUser).to.be.equal(0);
       });
       it("Should return true pub URI", async () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI1", {
           value: `${price}`,
         });
-        let _length = await pubsHub.tokensLength();
+        let _length = await apiGet.lengthOfPubs();
         let uri = await pubsHub.tokenURI(_length);
 
         expect(uri).to.be.equal("pubURI1");
@@ -167,7 +127,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.numberOfTier).to.be.equal(1);
       });
 
@@ -175,35 +135,35 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.lockedTime).to.be.equal(datas.lockedTime);
       });
       it("Should return true min invest", async () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.minInvest).to.be.equal(datas.minInvest);
       });
       it("Should return true max invest", async () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.maxInvest).to.be.equal(datas.maxInvest);
       });
       it("Should return true sale start", async () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.saleStart).to.be.equal(datas.saleStart);
       });
       it("Should return true sale end", async () => {
         await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         expect(_datas.saleEnd).to.be.equal(datas.saleEnd);
       });
       it("Should return true id", async () => {
@@ -211,7 +171,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           value: `${price}`,
         });
 
-        let length = await contract.tokensLength();
+        let length = await apiGet.lengthOfLaunchpads();
         expect(length).to.be.equal(1);
       });
 
@@ -220,7 +180,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createLaunchpad(datas, tierDatas, "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
         let _maxCap = 0;
         for (let index = 0; index < tierDatas.length; index++) {
           const element = tierDatas[index];
@@ -233,7 +193,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createLaunchpad(datas, tierDatas, "pubURI", {
           value: `${price}`,
         });
-        let _datas = await cLD.datasOf(1);
+        let _datas = await apiGet.datasOfLaunchpad(1);
 
         let _minCap = 0;
         for (let index = 0; index < tierDatas.length; index++) {
@@ -411,7 +371,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       let launchpads = await contract.launchpadsOfCV(2);
 
-      let _launchpad = await contract.getLaunchpad(launchpads[0]);
+      let _launchpad = await apiGet.addressOfLaunchpad(launchpads[0]);
 
       await token.connect(this.addr1).approve(_launchpad, tokens);
       launchpad = await ethers.getContractAt("Launchpad", _launchpad);
@@ -427,7 +387,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.connect(this.addr1).lockTokens(launchpadID, tokens);
         const royalties = tokens / 100;
 
-        expect(await token.balanceOf(LC.owner())).to.be.equal(royalties);
+        expect(await token.balanceOf(contract.owner())).to.be.equal(royalties);
       });
 
       it("Should  substract royalties", async () => {
@@ -505,7 +465,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         datas,
         _tDatas
       );
-      _lDatas = await launchpad.dataOfs();
+      _lDatas = await apiGet.datasOfLaunchpad();
     });
 
     // describe("Launchpad : Buy test", () => {
@@ -551,7 +511,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     //   it("Should  have true datas after buying", async () => {
     //     await launchpad.connect(this.addr2).buyTokens({ value: txValue });
 
-    //     let datas = await launchpad.dataOfs();
+    //     let datas = await apiGet.datasOfLaunchpad();
     //     let tierData = await launchpad.tierOfs(
     //       await launchpad.getCurrentTierID()
     //     );

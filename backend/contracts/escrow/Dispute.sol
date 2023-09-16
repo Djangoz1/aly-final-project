@@ -70,12 +70,8 @@ contract Dispute is Ownable {
     ) {
         _iAS = IAddressSystem(_addressSystem);
         require(msg.sender == _iAS.factory(), "Dispute : failure constructor");
-        require(
-            IDisputesHub(_iAS.disputesHub()).addressOf(_data.id) ==
-                address(this),
-            "Dispute : Error deployment"
-        );
-        _tools.addressHub = _addressSystem;
+
+        _tools.addressSystem = _addressSystem;
         _tools.datasHub = _iAS.disputesDatasHub();
         _tools.id = _data.id;
 

@@ -39,6 +39,8 @@ contract APIGet {
 
     constructor(address _addressSystem) {
         _iAS = IAddressSystem(_addressSystem);
+        _iAS.setApiGet();
+        require(_iAS.apiGet() == address(this), "APIGet: Error deployment");
         // _iAS.setApiGet();
     }
 
@@ -86,6 +88,14 @@ contract APIGet {
 
     function lengthOfArbitrators() external view returns (uint) {
         return Bindings.tokensLength(_iAS.arbitratorsHub());
+    }
+
+     function arbitrationOfCV(
+        uint _cvID,
+        DataTypes.CourtIDs _courtID
+    ) external view returns (uint256){
+        return IArbitratorsHub(_iAS.arbitratorsHub()).arbitrationOfCV(_cvID, _courtID);
+
     }
 
     function balanceOfCourt(
@@ -226,13 +236,27 @@ contract APIGet {
     function lengthOfPubs() external view returns (uint) {
         return Bindings.tokensLength(_iAS.pubsHub());
     }
+    
+    function lengthOfLikes() external view returns (uint) {
+        return Bindings.tokensLength(_iAS.pubsDatasHub());
+    }
 
     function pubsOfCV(uint _cvID) external view returns (uint[] memory) {
         return IPubsHub(_iAS.pubsHub()).indexerOf(_cvID);
     }
 
+    function likesOfPub(uint _pubID) external view returns (uint[] memory) {
+        return IPubsDatasHub(_iAS.pubsDatasHub()).indexerOf(_pubID);
+    }
     function answersOfPub(uint _pubID) external view returns (uint[] memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).answersOfPub(_pubID);
+    }
+
+     function datasOfLike(
+        uint _likeID
+    ) external view returns (DataTypes.LikeData memory) {
+        return IPubsDatasHub(_iAS.pubsDatasHub()).dataOf(_likeID);
+        
     }
 
     function pubsOfMission(

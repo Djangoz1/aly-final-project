@@ -36,7 +36,9 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
 
     modifier onlyProxy() {
         require(
-            msg.sender == _iAS.featuresHub() || msg.sender == _iAS.apiPost() || msg.sender == _iAS.disputesHub(),
+            msg.sender == _iAS.featuresHub() ||
+                msg.sender == _iAS.apiPost() ||
+                msg.sender == _iAS.disputesHub(),
             "Must call by proxy bindings"
         );
         _;
@@ -228,7 +230,7 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         return indexersCV[_cvID][_courtID];
     }
 
-    function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external onlyProxy {
+    function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external {
         // ! Faire un onlyDisputeHub
         require(
             indexersCV[cvID][_courtID] > 0,

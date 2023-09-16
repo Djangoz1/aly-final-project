@@ -36,6 +36,7 @@ interface IAddressSystem {
     function factory() external view returns (address);
 
     function apiPost() external view returns (address);
+    function apiGet() external view returns (address);
 
     function setFactory() external;
 
@@ -44,6 +45,7 @@ interface IAddressSystem {
     function setAccessControl() external;
 
     function setApiPost() external;
+    function setApiGet() external;
 
     // *********** PUBLICATIONS *********** //
 

@@ -7,7 +7,7 @@ interface IFeaturesHub {
     // Ajoutez votre code ici
     function addrCWI() external view returns (address);
 
-    function getAddressHub() external view returns (address);
+    function getaddressSystem() external view returns (address);
 
     function tokensLength() external view returns (uint);
 
