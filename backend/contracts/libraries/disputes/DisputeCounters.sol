@@ -2,7 +2,6 @@
 pragma solidity 0.8.20;
 
 import {DisputeRules} from "./DisputeRules.sol";
-import {IEscrowDatasHub} from "../../interfaces/IEscrowDatasHub.sol";
 
 library DisputeCounters {
     // Ajoutez votre code ici

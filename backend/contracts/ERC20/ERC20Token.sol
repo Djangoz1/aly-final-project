@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
+import {IAccessControl} from "../interfaces/system/IAccessControl.sol";
 
 contract ERC20Token is ERC20 {
     // Ajoutez votre code ici

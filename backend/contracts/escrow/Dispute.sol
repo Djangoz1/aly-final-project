@@ -1,17 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+// import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
-import "hardhat/console.sol";
-
-import {IAddressHub} from "../interfaces/IAddressHub.sol";
-import {IArbitratorsHub} from "../interfaces/IArbitratorsHub.sol";
-import {IEscrowDatasHub} from "../interfaces/IEscrowDatasHub.sol";
-import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
-import {IDisputesHub} from "../interfaces/IDisputesHub.sol";
+// import "@openzeppelin/contracts/utils/Counters.sol";
+// import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import {Bindings} from "../libraries/Bindings.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
@@ -24,6 +17,12 @@ import {DisputeTools} from "../libraries/disputes/DisputeTools.sol";
 import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
 import {DisputeCounters} from "../libraries/disputes/DisputeCounters.sol";
 
+import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
+import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
+import {IDisputesDatasHub} from "../interfaces/escrow/IDisputesDatasHub.sol";
+import {IFeaturesHub} from "../interfaces/works/IFeaturesHub.sol";
+import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
+
 contract Dispute is Ownable {
     // Ajoutez votre code ici
     using DisputeTools for DisputeTools.Tools;
@@ -31,11 +30,11 @@ contract Dispute is Ownable {
     DisputeTools.Tools private _tools;
 
     uint32 public constant APPEAL_PERIOD = 2 seconds; // Change to days on production
-    IAddressHub private _iAH;
+    IAddressSystem private _iAS;
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(_iAH.apiPost()),
+            msg.sender == address(_iAS.apiPost()),
             "Must call function with proxy bindings"
         );
         _;
@@ -65,24 +64,29 @@ contract Dispute is Ownable {
     }
 
     constructor(
-        address _addressHub,
+        address _addressSystem,
         address _owner,
         DisputeDatas.Data memory _data
     ) {
-        _iAH = IAddressHub(_addressHub);
-        _tools.addressHub = _addressHub;
-
-        _tools.datasHub = _iAH.escrowDatasHub();
-        require(msg.sender == _iAH.factory(), "Dispute : failure constructor");
-
+        _iAS = IAddressSystem(_addressSystem);
+        require(msg.sender == _iAS.factory(), "Dispute : failure constructor");
+        require(
+            IDisputesHub(_iAS.disputesHub()).addressOf(_data.id) ==
+                address(this),
+            "Dispute : Error deployment"
+        );
+        _tools.addressHub = _addressSystem;
+        _tools.datasHub = _iAS.disputesDatasHub();
         _tools.id = _data.id;
 
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         _iEDH.setDatasOf(_tools.id, _data);
 
         transferOwnership(_owner);
+    }
 
-        // data = _data;
+    function id() external view returns (uint) {
+        return _tools.id;
     }
 
     function init(
@@ -97,7 +101,7 @@ contract Dispute is Ownable {
 
         _selectArbitrators();
 
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeTimes.Data memory _timers;
 
         _timers.createdAt = block.timestamp;
@@ -107,7 +111,7 @@ contract Dispute is Ownable {
     function acceptArbitration(
         uint _cvID
     ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeDatas.Data memory data = _data();
 
         uint arbitratorID = _arbitratorOf(_cvID);
@@ -123,7 +127,7 @@ contract Dispute is Ownable {
     function refuseArbitration(
         uint _cvID
     ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
 
         uint arbitratorID = _arbitratorOf(_cvID);
         uint slot = _iEDH.refuseArbitration(_tools.id, arbitratorID);
@@ -133,15 +137,15 @@ contract Dispute is Ownable {
     }
 
     function _selectArbitrators() internal {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
-        address arbitratorsHub = _iAH.arbitratorsHub();
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        address arbitratorsHub = _iAS.arbitratorsHub();
         IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(arbitratorsHub);
         DisputeDatas.Data memory data = _data();
         DisputeCounters.Data memory counters = _counters();
 
         uint256 arbitratorsSlot = data.nbArbitrators * 2;
         uint256 randomID;
-        uint courtLength = _ArbitratorsHub.getCourtLength(data.courtID);
+        uint courtLength = _ArbitratorsHub.lengthOfCourt(data.courtID);
 
         for (uint256 index = 0; index < courtLength * 2; index++) {
             if (arbitratorsSlot == 0) {
@@ -183,7 +187,7 @@ contract Dispute is Ownable {
     }
 
     function _startedVotePeriod() internal {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         _iEDH.startVotesOf(_tools.id);
     }
 
@@ -206,9 +210,9 @@ contract Dispute is Ownable {
         uint _cvID,
         DisputeRules.Vote _vote
     ) external onlyProxy onlyStatus(DisputeRules.Status.Disputed, true) {
-        IArbitratorsHub _iArbH = IArbitratorsHub(_iAH.arbitratorsHub());
+        IArbitratorsHub _iArbH = IArbitratorsHub(_iAS.arbitratorsHub());
 
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeDatas.Data memory _data = _iEDH.datasOf(_tools.id);
 
         uint arbitratorID = _arbitratorOf(_cvID);
@@ -227,15 +231,15 @@ contract Dispute is Ownable {
 
     function _reclaimed(uint _winnerID) internal {
         require(_winnerID > 0, "Unclear decision");
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeDatas.Data memory data = _data();
-        IFeaturesHub _iFH = IFeaturesHub(_iAH.featuresHub());
+        IFeaturesHub _iFH = IFeaturesHub(_iAS.featuresHub());
         bool success = _iFH.resolvedDispute(_winnerID, data.featureID);
         _iEDH.reclaimedFor(_tools.id);
     }
 
     function _tally() internal returns (uint) {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
 
         uint256 winnerID = _iEDH.tallyFor(_tools.id);
 
@@ -259,7 +263,7 @@ contract Dispute is Ownable {
         onlyStatus(DisputeRules.Status.Tally, true)
     {
         uint winnerID = DisputeTools.winner(_data(), _counters());
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         _iEDH.resolveDisputeOf(_tools.id);
         if (winnerID > 0) {
             _reclaimed(winnerID);
@@ -274,7 +278,7 @@ contract Dispute is Ownable {
         onlyStatus(DisputeRules.Status.Tally, true)
         checkLink(_cvID)
     {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
 
         bool success = _iEDH.appealOf(_tools.id);
         require(success, "Error appeal");
@@ -309,11 +313,11 @@ contract Dispute is Ownable {
     }
 
     function _cvOf(address _for) internal view returns (uint256) {
-        return Bindings.getCV(_for, _iAH.cvHub());
+        return Bindings.cvOf(_for, _iAS.cvsHub());
     }
 
     function _data() internal view returns (DisputeDatas.Data memory _data) {
-        return IEscrowDatasHub(_tools.datasHub).datasOf(_tools.id);
+        return IDisputesDatasHub(_tools.datasHub).datasOf(_tools.id);
     }
 
     function _counters()
@@ -321,31 +325,27 @@ contract Dispute is Ownable {
         view
         returns (DisputeCounters.Data memory _data)
     {
-        return IEscrowDatasHub(_tools.datasHub).countersOf(_tools.id);
-    }
-
-    function data() external view returns (DisputeDatas.Data memory _data) {
-        return IEscrowDatasHub(_tools.datasHub).datasOf(_tools.id);
+        return IDisputesDatasHub(_tools.datasHub).countersOf(_tools.id);
     }
 
     function _rules() internal view returns (DisputeRules.Data memory) {
-        return IEscrowDatasHub(_tools.datasHub).rulesOf(_tools.id);
+        return IDisputesDatasHub(_tools.datasHub).rulesOf(_tools.id);
     }
 
     function _timers() internal view returns (DisputeTimes.Data memory _data) {
-        return IEscrowDatasHub(_tools.datasHub).timersOf(_tools.id);
+        return IDisputesDatasHub(_tools.datasHub).timersOf(_tools.id);
     }
 
     function _arbitrators() internal view returns (uint[] memory) {
-        return IEscrowDatasHub(_tools.datasHub).arbitratorsOf(_tools.id);
+        return IDisputesDatasHub(_tools.datasHub).arbitratorsOf(_tools.id);
     }
 
     function _arbitratorOf(uint _cvID) internal returns (uint) {
         return
             Bindings.arbitratorOf(
                 _cvID,
-                IEscrowDatasHub(_tools.datasHub).datasOf(_tools.id).courtID,
-                _iAH.arbitratorsHub()
+                IDisputesDatasHub(_tools.datasHub).datasOf(_tools.id).courtID,
+                _iAS.arbitratorsHub()
             );
     }
 }

@@ -2,29 +2,15 @@ const { ethers } = require("hardhat");
 const { expect, assert } = require("chai");
 
 const {
-  _testInitCVHub,
-  _testInitCV,
-  _testInitMission,
-  _testInitMissionsHub,
-  _testInitArbitratorsHub,
-  _testInitAccessControl,
-  _testInitFeature,
-  _testInitFeaturesHub,
-  _testInitWorkerProposalHub,
-  _testInitWorkerProposal,
-  _testInitPubHub,
-  _testInitPub,
-  _testInitLaunchpad,
-  _testInitLaunchpadContracts,
+  _testInitLaunchpadsContracts,
   _testInitAddressHub,
   _testInitAll,
-  _testInitDisputesHub,
-  _testInitFactory,
-  _testInitCollectWorkInteraction,
-  _testInitEscrowDatasHub,
-  _testInitApiPost,
-  _testInitCollectPubs,
-  _testInitCollectFollowCV,
+  _testInitSystemsContracts,
+  _testInitCVsContracts,
+  _testInitWorksContracts,
+  _testInitPubsContracts,
+  _testInitEscrowsContracts,
+  codeSize,
 } = require("../../helpers/test_init");
 const { ZERO_ADDRESS } = require("../../helpers/test_utils");
 
@@ -57,234 +43,238 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should have 0 address for each contracts", async () => {
+      expect(await contract.apiPost()).to.equal(ZERO_ADDRESS);
       expect(await contract.accessControl()).to.equal(ZERO_ADDRESS);
       expect(await contract.missionsHub()).to.equal(ZERO_ADDRESS);
-      expect(await contract.cvHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.factory()).to.equal(ZERO_ADDRESS);
-      expect(await contract.escrowDatasHub()).to.equal(ZERO_ADDRESS);
-      expect(await contract.pubsHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.balancesHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.featuresHub()).to.equal(ZERO_ADDRESS);
-      expect(await contract.workerProposalHub()).to.equal(ZERO_ADDRESS);
-      expect(await contract.launchpadCohort()).to.equal(ZERO_ADDRESS);
+      expect(await contract.collectWorkInteraction()).to.equal(ZERO_ADDRESS);
+      expect(await contract.disputesHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.arbitratorsHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.workProposalHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.disputesDatasHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.cvsDatasHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.cvsHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.pubsHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.pubsDatasHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.LaunchpadsDatasHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.LaunchpadsInvestorsHub()).to.equal(ZERO_ADDRESS);
+      expect(await contract.launchpadsHub()).to.equal(ZERO_ADDRESS);
     });
 
-    it("Should deploy accessControl", async () => {
-      const accessControl = await _testInitAccessControl(contract.target);
-      expect(await contract.accessControl()).to.equal(accessControl.target);
+    describe("CV Contracts", () => {
+      it("Should deploy CVsDatasHub", async () => {
+        let contracts = await _testInitCVsContracts(contract.target);
+        const cvsDatasHub = contracts.datas;
+        expect(await contract.cvsDatasHub()).to.equal(cvsDatasHub.target);
+      });
+      it("Should deploy CVsHub", async () => {
+        let contracts = await _testInitCVsContracts(contract.target);
+        const cvsHub = contracts.hub;
+        expect(await contract.cvsHub()).to.equal(cvsHub.target);
+      });
+    });
+    describe("System Contracts", () => {
+      it("Should deploy accessControl", async () => {
+        const accessControl = await ethers.deployContract("AccessControl", [
+          contract.target,
+        ]);
+        await accessControl.waitForDeployment();
+        expect(await contract.accessControl()).to.equal(accessControl.target);
+      });
+
+      it("Should deploy apiPost", async () => {
+        await _testInitPubsContracts(contract.target);
+        await _testInitWorksContracts(contract.target);
+        await _testInitCVsContracts(contract.target);
+        await _testInitLaunchpadsContracts(contract.target);
+        let contracts = await _testInitSystemsContracts(contract.target);
+        const apiPost = contracts.apiPost;
+        expect(await contract.apiPost()).to.equal(apiPost.target);
+        await codeSize(apiPost.target);
+      });
+
+      it("Should deploy factory ", async () => {
+        const factory = await ethers.deployContract("Factory", [
+          contract.target,
+        ]);
+        await factory.waitForDeployment();
+        expect(await contract.factory()).to.equal(factory.target);
+      });
     });
 
-    it("Should deploy collectFollowCV", async () => {
-      await _testInitCVHub(contract.target);
-      const collectFollowCV = await _testInitCollectFollowCV(contract.target);
-      expect(await contract.collectFollowCV()).to.equal(collectFollowCV.target);
+    describe("Launchpads Contracts", () => {
+      it("Should deploy launchpadHub", async () => {
+        let contracts = await _testInitLaunchpadsContracts(contract.target);
+        const launchpadHub = contracts.launchpadsHub;
+        expect(await contract.launchpadsHub()).to.be.equal(launchpadHub.target);
+      });
+
+      it("Should deploy LaunchpadsDatasHub", async () => {
+        let contracts = await _testInitLaunchpadsContracts(contract.target);
+        const launchpadData = contracts.datas;
+        expect(await contract.LaunchpadsDatasHub()).to.be.equal(
+          launchpadData.target
+        );
+      });
+
+      it("Should deploy LaunchpadsInvestorsHub", async () => {
+        let contracts = await _testInitLaunchpadsContracts(contract.target);
+        const launchpadInvestor = contracts.investors;
+        expect(await contract.LaunchpadsInvestorsHub()).to.be.equal(
+          launchpadInvestor.target
+        );
+      });
     });
 
-    it("Should deploy apiPost", async () => {
-      const apiPost = await _testInitApiPost(contract.target);
-      expect(await contract.apiPost()).to.equal(apiPost.target);
+    describe("Pubs Contracts", () => {
+      it("Should deploy pubsHub", async () => {
+        const contracts = await _testInitPubsContracts(contract.target);
+        const pubsHub = contracts.hub;
+        expect(await contract.pubsHub()).to.equal(pubsHub.target);
+      });
+      it("Should deploy pubsDatasHub", async () => {
+        const contracts = await _testInitPubsContracts(contract.target);
+        const pubsDatasHub = contracts.datas;
+        expect(await contract.pubsDatasHub()).to.equal(pubsDatasHub.target);
+      });
     });
 
-    it("Should deploy missionsHub", async () => {
-      const missionsHub = await _testInitMissionsHub(contract.target);
-      expect(await contract.missionsHub()).to.equal(missionsHub.target);
+    describe("Escrow Contracts", () => {
+      it("Should deploy disputesHub contracts", async () => {
+        let contracts = await _testInitEscrowsContracts(contract.target);
+        const disputesHub = contracts.disputesHub;
+        expect(await contract.disputesHub()).to.equal(disputesHub.target);
+      });
+
+      it("Should deploy arbitratorsHub ", async () => {
+        let contracts = await _testInitEscrowsContracts(contract.target);
+        const arbitratorsHub = contracts.arbitratorsHub;
+        expect(await contract.arbitratorsHub()).to.equal(arbitratorsHub.target);
+      });
+
+      it("Should deploy escrow datas hub ", async () => {
+        let contracts = await _testInitEscrowsContracts(contract.target);
+        const datas = contracts.datas;
+        expect(await contract.disputesDatasHub()).to.equal(datas.target);
+      });
     });
 
-    it("Should deploy cvHub", async () => {
-      const cvHub = await _testInitCVHub(contract.target);
-      expect(await contract.cvHub()).to.equal(cvHub.target);
+    describe("Works Contracts", () => {
+      it("Should deploy missionsHub", async () => {
+        let contracts = await _testInitWorksContracts(contract.target);
+        const missionsHub = contracts.missionsHub;
+        expect(await contract.missionsHub()).to.equal(missionsHub.target);
+      });
+
+      it("Should deploy featuresHub", async () => {
+        const contracts = await _testInitWorksContracts(contract.target);
+        const featuresHub = contracts.featuresHub;
+        expect(await contract.featuresHub()).to.equal(featuresHub.target);
+      });
+
+      it("Should deploy workProposalHub", async () => {
+        const contracts = await _testInitWorksContracts(contract.target);
+        const workProposalHub = contracts.workProposalHub;
+        expect(await contract.workProposalHub()).to.equal(
+          workProposalHub.target
+        );
+      });
+
+      it("Should deploy collect work interaction ", async () => {
+        let contracts = await _testInitWorksContracts(contract.target);
+        const collectWorkInteraction = contracts.collectWorkInteraction;
+        expect(await contract.collectWorkInteraction()).to.equal(
+          collectWorkInteraction.target
+        );
+      });
     });
 
-    it("Should deploy pubsHub", async () => {
-      const pubsHub = await _testInitPubHub(contract.target);
-      expect(await contract.pubsHub()).to.equal(pubsHub.target);
+    it("FUNCTION TEST : _testInitAll() init workflow", async () => {
+      await _testInitAll();
     });
-
-    it("Should deploy featuresHub", async () => {
-      const featuresHub = await _testInitFeaturesHub(contract.target);
-      expect(await contract.featuresHub()).to.equal(featuresHub.target);
-    });
-
-    it("Should deploy workerProposalHub", async () => {
-      const workerProposalHub = await _testInitWorkerProposalHub(
-        contract.target
-      );
-      expect(await contract.workerProposalHub()).to.equal(
-        workerProposalHub.target
-      );
-    });
-
-    it("Should deploy launchpad contracts", async () => {
-      const launchpadContracts = await _testInitLaunchpadContracts(
-        contract.target
-      );
-      expect(await contract.launchpadCohort()).to.equal(
-        launchpadContracts.cohort.target
-      );
-    });
-    it("Should deploy disputesHub contracts", async () => {
-      const disputesHub = await _testInitDisputesHub(contract.target);
-      expect(await contract.disputesHub()).to.equal(disputesHub.target);
-    });
-
-    it("Should deploy factory ", async () => {
-      const factory = await _testInitFactory(contract.target);
-      expect(await contract.factory()).to.equal(factory.target);
-    });
-
-    it("Should deploy collectPubs ", async () => {
-      const collectPubs = await _testInitCollectPubs(contract.target);
-      // expect(await contract.collectPubs()).to.equal(collectPubs.target);
-    });
-
-    it("Should deploy arbitratorsHub ", async () => {
-      const arbitratorsHub = await _testInitArbitratorsHub(contract.target);
-      expect(await contract.arbitratorsHub()).to.equal(arbitratorsHub.target);
-    });
-
-    it("Should deploy escrow datas hub ", async () => {
-      const escrowDatasHub = await _testInitEscrowDatasHub(contract.target);
-      expect(await contract.escrowDatasHub()).to.equal(escrowDatasHub.target);
-    });
-
-    it("Should deploy collect work interaction ", async () => {
-      const collectWorkInteraction = await _testInitCollectWorkInteraction(
-        contract.target
-      );
-      expect(await contract.collectWorkInteraction()).to.equal(
-        collectWorkInteraction.target
-      );
-    });
-
-    it("Should init workflow", async () => {
-      const accessControl = await _testInitAccessControl(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitMissionsHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitFactory(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitCVHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitPubHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitFeaturesHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitWorkerProposalHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitLaunchpadContracts(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitDisputesHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitCollectWorkInteraction(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitCollectFollowCV(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitEscrowDatasHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitCollectPubs(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitApiPost(contract.target);
-      expect(await accessControl.workflow()).to.equal(0);
-      await _testInitArbitratorsHub(contract.target);
-      expect(await accessControl.workflow()).to.equal(1);
-    });
-
-    // ! TO DO
-    // ! Launchpad cohort to do
 
     describe("NOT WORKS", () => {
-      it("Should NOT set accessControl twice", async () => {
-        await _testInitAccessControl(contract.target);
-        await expect(contract.setAccessControl()).to.revertedWith(
-          "AccessControl already init"
+      it("Should NOT set cvContracts twice", async () => {
+        await _testInitCVsContracts(contract.target);
+        await expect(contract.setCVsHub()).to.revertedWith(
+          "CVsHub already init"
+        );
+        await expect(contract.setCVsDatasHub()).to.revertedWith(
+          "CVsDatasHub already init"
         );
       });
 
-      it("Should NOT set apiPost twice", async () => {
-        await _testInitApiPost(contract.target);
-        await expect(contract.setApiPost()).to.revertedWith(
-          "APIPost already init"
+      it("Should NOT set workscontracts twice", async () => {
+        await _testInitWorksContracts(contract.target);
+        await expect(contract.setFeaturesHub()).to.revertedWith(
+          "FeaturesHub already init"
         );
-      });
-
-      it("Should NOT set missionsHub twice", async () => {
-        await _testInitMissionsHub(contract.target);
+        await expect(contract.setWorkProposalHub()).to.revertedWith(
+          "workProposalHub already init"
+        );
+        await expect(contract.setCollectWorkInteraction()).to.revertedWith(
+          "CollectWorkInteraction already init"
+        );
         await expect(contract.setMissionsHub()).to.revertedWith(
           "MissionsHub already init"
         );
       });
 
-      it("Should NOT set cvHub twice", async () => {
-        await _testInitCVHub(contract.target);
-        await expect(contract.setCVHub()).to.revertedWith("CVHub already init");
-      });
-
-      it("Should NOT set pubsHub twice", async () => {
-        await _testInitPubHub(contract.target);
-        await expect(contract.setPubHub()).to.revertedWith(
-          "PubsHub already init"
+      it("Should NOT set launchpadContracts twice", async () => {
+        await _testInitLaunchpadsContracts(contract.target);
+        await expect(contract.setLaunchpadsHub()).to.revertedWith(
+          "LaunchpadsHub already init"
+        );
+        await expect(contract.setLaunchpadsDatasHub()).to.revertedWith(
+          "LaunchpadsDatasHub already init"
+        );
+        await expect(contract.setLaunchpadsInvestorsHub()).to.revertedWith(
+          "LaunchpadsInvestorsHub already init"
         );
       });
 
-      it("Should NOT set featuresHub twice", async () => {
-        await _testInitFeaturesHub(contract.target);
-        await expect(contract.setFeaturesHub()).to.revertedWith(
-          "FeaturesHub already init"
-        );
-      });
-
-      it("Should NOT set workerProposalHub twice", async () => {
-        await _testInitWorkerProposalHub(contract.target);
-        await expect(contract.setWorkerProposalHub()).to.revertedWith(
-          "WorkerProposalHub already init"
-        );
-      });
-
-      it("Should NOT set launchpadCohort twice", async () => {
-        await _testInitLaunchpadContracts(contract.target);
-        await expect(contract.setLaunchpadCohort()).to.revertedWith(
-          "LaunchpadCohort already init"
-        );
-      });
-
-      it("Should NOT set disputesHub twice", async () => {
-        await _testInitDisputesHub(contract.target);
+      it("Should NOT set escrowContracts twice", async () => {
+        await _testInitEscrowsContracts(contract.target);
         await expect(contract.setDisputesHub()).to.revertedWith(
           "DisputesHub already init"
         );
-      });
-
-      it("Should NOT set collectPubs twice", async () => {
-        await _testInitCollectPubs(contract.target);
-        await expect(contract.setCollectPubs()).to.revertedWith(
-          "CollectPubs already init"
-        );
-      });
-
-      it("Should NOT set factory twice ", async () => {
-        await _testInitFactory(contract.target);
-        await expect(contract.setFactory()).to.revertedWith(
-          "Factory already init"
-        );
-      });
-
-      it("Should NOT set arbitratorsHub twice ", async () => {
-        await _testInitArbitratorsHub(contract.target);
         await expect(contract.setArbitratorsHub()).to.revertedWith(
           "ArbitratorsHub already init"
         );
-      });
-
-      it("Should NOT set escrow datas hub twice ", async () => {
-        await _testInitEscrowDatasHub(contract.target);
-        await expect(contract.setEscrowDatasHub()).to.revertedWith(
-          "EscrowDatasHub already init"
+        await expect(contract.setDisputesDatasHub()).to.revertedWith(
+          "DisputesDatasHub already init"
         );
       });
 
-      it("Should NOT set collectWorkInteraction twice ", async () => {
-        await _testInitCollectWorkInteraction(contract.target);
-        await expect(contract.setCollectWorkInteraction()).to.revertedWith(
-          "CollectWorkInteraction already init"
+      it("Should NOT set pubsContracts twice", async () => {
+        await _testInitPubsContracts(contract.target);
+        await expect(contract.setPubHub()).to.revertedWith(
+          "PubsHub already init"
+        );
+        await expect(contract.setPubsDatasHub()).to.revertedWith(
+          "pubsDatasHub already init"
+        );
+      });
+
+      it("Should NOT set systemContracts twice ", async () => {
+        await _testInitPubsContracts(contract.target);
+        await _testInitWorksContracts(contract.target);
+        await _testInitCVsContracts(contract.target);
+        await _testInitLaunchpadsContracts(contract.target);
+        await _testInitSystemsContracts(contract.target);
+        await expect(contract.setFactory()).to.revertedWith(
+          "Factory already init"
+        );
+        await expect(contract.setBalancesHub()).to.revertedWith(
+          "BalancesHub already init"
+        );
+        await expect(contract.setAccessControl()).to.revertedWith(
+          "AccessControl already init"
+        );
+        await expect(contract.setApiPost()).to.revertedWith(
+          "APIPost already init"
         );
       });
     });

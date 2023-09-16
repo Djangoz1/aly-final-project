@@ -26,60 +26,35 @@ const getContractAt = async (_contract, _address) => {
   return contract;
 };
 
+const codeSize = async (address) => {
+  let contractCode = await ethers.provider.getCode(address);
+  let codeSizeInBytes = contractCode.length / 2;
+  console.log(`Taille du code du contrat : ${codeSizeInBytes} octets`);
+};
+
 const getProxy = async (accessControlAddr) => {
   const accessControl = await getContractAt("AccessControl", accessControlAddr);
   return accessControl;
 };
 
 const _testInitAll = async () => {
-  let addressHub = await _testInitAddressHub();
-  let accessControl = await _testInitAccessControl(addressHub.target);
-  let factory = await _testInitFactory(addressHub.target);
-
-  expect(await accessControl.workflow()).to.equal(0);
-
-  let cvHub = await _testInitCVHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let escrowDatasHub = await _testInitEscrowDatasHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let missionsHub = await _testInitMissionsHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let pubsHub = await _testInitPubHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let featuresHub = await _testInitFeaturesHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let workerProposalHub = await _testInitWorkerProposalHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let launchpadContracts = await _testInitLaunchpadContracts(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let disputesHub = await _testInitDisputesHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let arbitratorsHub = await _testInitArbitratorsHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-
-  let balancesHub = await _testInitBalancesHub(addressHub.target);
-  expect(await accessControl.workflow()).to.equal(0);
-  let collectWorkInteraction = await _testInitCollectWorkInteraction(
-    addressHub.target
-  );
-
-  let collectFollowCV = await _testInitCollectFollowCV(addressHub.target);
-
-  let collecterLike = await ethers.getContractAt(
-    "CollectLikePub",
-    await pubsHub.getCollectLikePub()
-  );
-
-  let collecterPubs = await _testInitCollectPubs(addressHub.target);
-  let apiPost = await _testInitApiPost(addressHub.target);
-
+  let addressSystem = await _testInitAddressHub();
+  let cvs = await _testInitCVsContracts(addressSystem.target);
+  let escrows = await _testInitEscrowsContracts(addressSystem.target);
+  let works = await _testInitWorksContracts(addressSystem.target);
+  let pubs = await _testInitPubsContracts(addressSystem.target);
+  let launchpads = await _testInitLaunchpadsContracts(addressSystem.target);
+  let systems = await _testInitSystemsContracts(addressSystem.target);
+  let accessControl = systems.accessControl;
+  systems.addressSystem = addressSystem;
   expect(await accessControl.workflow()).to.equal(1);
+
   // let contractCode = await ethers.provider.getCode(apiPost.target);
   // let codeSizeInBytes = contractCode.length / 2;
   // console.log(
   //   `Dispute Hub Taille du code du contrat : ${codeSizeInBytes} octets`
   // );
-  // contractCode = await ethers.provider.getCode(escrowDatasHub.target);
+  // contractCode = await ethers.provider.getCode(DisputesDatasHub.target);
   // codeSizeInBytes = contractCode.length / 2;
   // console.log(
   //   `Escrow Datas Hub Taille du code du contrat : ${codeSizeInBytes} octets`
@@ -94,98 +69,94 @@ const _testInitAll = async () => {
   // console.log(`Factory Taille du code du contrat : ${codeSizeInBytes} octets`);
 
   return {
-    addressHub,
-    accessControl,
-    escrowDatasHub,
-    balancesHub,
-    missionsHub,
-    cvHub,
-    apiPost,
-    factory,
-    pubsHub,
-    featuresHub,
-    disputesHub,
-    arbitratorsHub,
-    workerProposalHub,
-    collectFollowCV,
-    launchpadContracts,
-    collectWorkInteraction,
-    collecterLike,
-    collecterPubs,
+    systems,
+    cvs,
+    launchpads,
+    escrows,
+    works,
+    pubs,
   };
 };
 
-const _testInitAddressHub = async () => {
-  const accessControl = await ethers.deployContract("AddressHub");
-  await accessControl.waitForDeployment();
-  return accessControl;
-};
-const _testInitEscrowDatasHub = async (addressHub) => {
-  const escrowDatasHub = await ethers.deployContract("EscrowDatasHub", [
-    addressHub,
+let _testInitEscrowsContracts = async (addressSystem) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
+  const datas = await ethers.deployContract("DisputesDatasHub", [
+    addressSystem,
   ]);
-  await escrowDatasHub.waitForDeployment();
-  return escrowDatasHub;
-};
-const _testInitCollectWorkInteraction = async (addressHub) => {
-  const collectWorkInteraction = await ethers.deployContract(
-    "CollectWorkInteraction",
-    [addressHub]
-  );
-  await collectWorkInteraction.waitForDeployment();
-  return collectWorkInteraction;
-};
+  await datas.waitForDeployment();
+  expect(await _iAS.disputesDatasHub()).to.be.equal(datas.target);
 
-const _testInitBalancesHub = async (addressHub) => {
-  const balancesHub = await ethers.deployContract("BalancesHub", [addressHub]);
-  await balancesHub.waitForDeployment();
-  return balancesHub;
-};
-
-const _testInitCollectFollowCV = async (addressHub) => {
-  const collectFollowCV = await ethers.deployContract("CollectFollowCv", [
-    addressHub,
+  const disputesHub = await ethers.deployContract("DisputesHub", [
+    addressSystem,
   ]);
-  await collectFollowCV.waitForDeployment();
-  return collectFollowCV;
-};
-
-const _testInitAccessControl = async (addressHub) => {
-  const accessControl = await ethers.deployContract("AccessControl", [
-    addressHub,
-  ]);
-  await accessControl.waitForDeployment();
-  return accessControl;
-};
-
-const _testInitCollectPubs = async (addressHub) => {
-  const collectPubs = await ethers.deployContract("CollectPubs", [addressHub]);
-  await collectPubs.waitForDeployment();
-  return collectPubs;
-};
-const _testInitFactory = async (addressHub) => {
-  const factory = await ethers.deployContract("Factory", [addressHub]);
-  await factory.waitForDeployment();
-  return factory;
-};
-const _testInitApiPost = async (addressHub) => {
-  const apiPost = await ethers.deployContract("APIPost", [addressHub]);
-  await apiPost.waitForDeployment();
-  return apiPost;
-};
-
-const _testInitDisputesHub = async (addressHub) => {
-  const disputesHub = await ethers.deployContract("DisputesHub", [addressHub]);
   await disputesHub.waitForDeployment();
+  expect(await _iAS.disputesHub()).to.be.equal(disputesHub.target);
 
-  return disputesHub;
-};
-const _testInitArbitratorsHub = async (addressHub) => {
   const arbitratorsHub = await ethers.deployContract("ArbitratorsHub", [
-    addressHub,
+    addressSystem,
   ]);
   await arbitratorsHub.waitForDeployment();
-  return arbitratorsHub;
+  expect(await _iAS.arbitratorsHub()).to.be.equal(arbitratorsHub.target);
+
+  return {
+    datas,
+    disputesHub,
+    arbitratorsHub,
+  };
+};
+
+let _testInitCVsContracts = async (addressSystem) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
+  const hub = await ethers.deployContract("CVsHub", [addressSystem]);
+  await hub.waitForDeployment();
+  expect(await _iAS.cvsHub()).to.be.equal(hub.target);
+  const datas = await ethers.deployContract("CVsDatasHub", [addressSystem]);
+  await datas.waitForDeployment();
+  expect(await _iAS.cvsDatasHub()).to.be.equal(datas.target);
+
+  return {
+    datas,
+    hub,
+  };
+};
+
+let _testInitAddressHub = async () => {
+  const addressSystem = await ethers.deployContract("AddressSystem");
+  await addressSystem.waitForDeployment();
+  return addressSystem;
+};
+
+let _testInitSystemsContracts = async (addressSystem) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
+  const balancesHub = await ethers.deployContract("BalancesHub", [
+    addressSystem,
+  ]);
+  await balancesHub.waitForDeployment();
+  expect(await _iAS.balancesHub()).to.be.equal(balancesHub.target);
+
+  const accessControl = await ethers.deployContract("AccessControl", [
+    addressSystem,
+  ]);
+  await accessControl.waitForDeployment();
+  expect(await _iAS.accessControl()).to.be.equal(accessControl.target);
+
+  const factory = await ethers.deployContract("Factory", [addressSystem]);
+  await factory.waitForDeployment();
+  expect(await _iAS.factory()).to.be.equal(factory.target);
+
+  const apiPost = await ethers.deployContract("APIPost", [addressSystem]);
+  await apiPost.waitForDeployment();
+
+  const apiGet = await ethers.deployContract("APIGet", [addressSystem]);
+  await apiGet.waitForDeployment();
+  expect(await _iAS.apiPost()).to.be.equal(apiPost.target);
+  return {
+    apiGet,
+    balancesHub,
+    accessControl,
+    factory,
+    apiPost,
+  };
 };
 
 const _testInitArbitrator = async (contracts, courtID, account) => {
@@ -194,17 +165,17 @@ const _testInitArbitrator = async (contracts, courtID, account) => {
     featuresHub,
     apiPost,
 
-    cvHub,
+    CVsHub,
   } = contracts;
-  let courtLength = await arbitratorsHub.getCourtLength(courtID);
-  let cvArbitrator = await cvHub.getCV(account.address);
+  let courtLength = await arbitratorsHub.lengthOfCourt(courtID);
+  let cvArbitrator = await CVsHub.cvOf(account.address);
   let newFeature = await _testInitFeature(
     contracts,
     { courtID: courtID },
     account
   );
   await apiPost.validFeature(newFeature);
-  let _courtLength = await arbitratorsHub.getCourtLength(courtID);
+  let _courtLength = await arbitratorsHub.lengthOfCourt(courtID);
 
   expect(parseInt(courtLength) + 1).to.be.equal(_courtLength);
 
@@ -212,26 +183,18 @@ const _testInitArbitrator = async (contracts, courtID, account) => {
   let price = ethers.parseEther(`${value}`);
 
   await apiPost.connect(account).investOnCourt(3, { value: `${price}` });
-  let data = await featuresHub.getData(newFeature);
+  let data = await featuresHub.dataOf(newFeature);
   expect(data.status).to.be.equal(2);
-  return await arbitratorsHub.getArbitrationOfCV(cvArbitrator, courtID);
+  return await arbitratorsHub.arbitrationOfCV(cvArbitrator, courtID);
 };
 
 // *:::::::::::::: -- ::::::::::::::*//
 // *:::::::::::::: CV ::::::::::::::*//
 // *:::::::::::::: -- ::::::::::::::*//
 
-const getCV = async (_cv) => {
+const cvOf = async (_cv) => {
   const cv = await ethers.getContractAt("CV", _cv);
   return cv;
-};
-
-const _testInitCVHub = async (accessControl) => {
-  const factoryCV = await ethers.deployContract("CVHub", [accessControl]);
-
-  await factoryCV.waitForDeployment();
-
-  return factoryCV;
 };
 
 const _testInitCV = async (_accessControl, account, amount) => {
@@ -239,8 +202,8 @@ const _testInitCV = async (_accessControl, account, amount) => {
   const newCV = await accessControl.connect(account).createCV("tokenURI");
   const _cv = await accessControl
     .connect(account)
-    .getCVByAddress(account.address);
-  const cv = await getCV(_cv);
+    .cvOfByAddress(account.address);
+  const cv = await cvOf(_cv);
 
   return cv;
 };
@@ -249,10 +212,18 @@ const _testInitCV = async (_accessControl, account, amount) => {
 // *:::::::::::::: PUB ::::::::::::::*//
 // *:::::::::::::: --- ::::::::::::::*//
 
-const _testInitPubHub = async (addressHub) => {
-  const pubHub = await ethers.deployContract("PubsHub", [addressHub]);
-  await pubHub.waitForDeployment();
-  return pubHub;
+const _testInitPubsContracts = async (addressSystem) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
+
+  const hub = await ethers.deployContract("PubsHub", [addressSystem]);
+  await hub.waitForDeployment();
+  expect(await _iAS.pubsHub()).to.equal(hub.target);
+
+  const datas = await ethers.deployContract("PubsDatasHub", [addressSystem]);
+  await datas.waitForDeployment();
+  expect(await _iAS.pubsDatasHub()).to.equal(datas.target);
+
+  return { hub, datas };
 };
 
 const _testInitPub = async (accessControlAdress, account, uriData) => {
@@ -264,27 +235,27 @@ const _testInitPub = async (accessControlAdress, account, uriData) => {
     accessControlAdress
   );
 
-  const _cv = await accessControl.getCVByAddress(account.address);
+  const _cv = await accessControl.cvOfByAddress(account.address);
 
-  const pubsHub = await getContractAt("PubsHub", await accessControl.iPH());
-  const id = parseInt(await pubsHub.getTokensLength()) + 1;
+  const hub = await getContractAt("hub", await accessControl.iPH());
+  const id = parseInt(await hub.tokensLength()) + 1;
   uriData.id = id;
   const json = await createURIPub(uriData);
   const tokenURI = json.IpfsHash;
-  const beforeLength = parseInt(await pubsHub.balanceOf(_cv));
+  const beforeLength = parseInt(await hub.balanceOf(_cv));
 
   const tx = await accessControl.connect(account).createPub(tokenURI);
 
   await tx.wait();
-  expect(await accessControl.getCVByAddress(tx.from)).to.be.equal(_cv);
-  const afterLength = parseInt(await pubsHub.balanceOf(_cv));
+  expect(await accessControl.cvOfByAddress(tx.from)).to.be.equal(_cv);
+  const afterLength = parseInt(await hub.balanceOf(_cv));
 
   expect(beforeLength).to.equal(afterLength - 1);
 
-  const _tokenURI = await pubsHub.tokenURI(parseInt(id));
+  const _tokenURI = await hub.tokenURI(parseInt(id));
   expect(_tokenURI).to.be.equal(tokenURI);
 
-  const owner = await pubsHub.ownerOf(id);
+  const owner = await hub.ownerOf(id);
   expect(owner).to.be.equal(_cv);
   return id;
 };
@@ -292,6 +263,44 @@ const _testInitPub = async (accessControlAdress, account, uriData) => {
 // *:::::::::::::: ------- ::::::::::::::*//
 // *:::::::::::::: MISSION ::::::::::::::*//
 // *:::::::::::::: ------- ::::::::::::::*//
+
+const _testInitWorksContracts = async (addressSystem) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
+
+  const missionsHub = await ethers.deployContract("MissionsHub", [
+    addressSystem,
+  ]);
+  await missionsHub.waitForDeployment();
+  expect(await _iAS.missionsHub()).to.be.equal(missionsHub.target);
+
+  const featuresHub = await ethers.deployContract("FeaturesHub", [
+    addressSystem,
+  ]);
+  await featuresHub.waitForDeployment();
+  expect(await _iAS.featuresHub()).to.be.equal(featuresHub.target);
+
+  const collectWorkInteraction = await ethers.deployContract(
+    "CollectWorkInteraction",
+    [addressSystem]
+  );
+  await collectWorkInteraction.waitForDeployment();
+  expect(await _iAS.collectWorkInteraction()).to.be.equal(
+    collectWorkInteraction.target
+  );
+
+  const workProposalHub = await ethers.deployContract("WorkProposalHub", [
+    addressSystem,
+  ]);
+  await workProposalHub.waitForDeployment();
+  expect(await _iAS.workProposalHub()).to.be.equal(workProposalHub.target);
+
+  return {
+    missionsHub,
+    workProposalHub,
+    featuresHub,
+    collectWorkInteraction,
+  };
+};
 
 /**
  * @notice La fonction vient mint un token erc721
@@ -311,31 +320,21 @@ const _testInitMission = async (contracts, tokenURI, account) => {
       value: missionPrice.toString(),
     });
   }
-  return await missionsHub.getTokensLength();
-};
-
-const _testInitMissionsHub = async (_addressHub) => {
-  const missionsHub = await ethers.deployContract("MissionsHub", [_addressHub]);
-  return missionsHub;
+  return await missionsHub.tokensLength();
 };
 
 // *:::::::::::::: ------- ::::::::::::::* //
 // *:::::::::::::: FEATURE ::::::::::::::* //
 // *:::::::::::::: ------- ::::::::::::::* //
 
-const _testInitFeaturesHub = async (addressHub) => {
-  const featuresHub = await ethers.deployContract("FeaturesHub", [addressHub]);
-  return featuresHub;
-};
-
 const _testInitFeature = async (contracts, datas, workerAccount, account) => {
-  const { arbitratorsHub, featuresHub, missionsHub, accessControl, cvHub } =
+  const { arbitratorsHub, featuresHub, missionsHub, accessControl, CVsHub } =
     contracts;
 
   let apiPost = contracts.apiPost;
 
   let missionID = await _testInitMission(contracts, "missionURI");
-  const cvWorker = await cvHub.getCV(workerAccount.address);
+  const cvWorker = await CVsHub.cvOf(workerAccount.address);
   let newFeature;
   if (account) {
     await apiPost
@@ -350,7 +349,7 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
           value: `${datas.wadge || 10000000}`,
         }
       );
-    newFeature = await featuresHub.getTokensLength();
+    newFeature = await featuresHub.tokensLength();
     await apiPost.connect(account).inviteWorker(cvWorker, newFeature);
   } else {
     await apiPost.createFeature(
@@ -363,7 +362,7 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
         value: `${datas.wadge || 10000000}`,
       }
     );
-    newFeature = await featuresHub.getTokensLength();
+    newFeature = await featuresHub.tokensLength();
     await apiPost.inviteWorker(cvWorker, newFeature);
   }
   await apiPost.connect(workerAccount).acceptJob(newFeature);
@@ -373,14 +372,6 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
 // *:::::::::::::: --------------- ::::::::::::::* //
 // *:::::::::::::: WORKER PROPOSAL ::::::::::::::* //
 // *:::::::::::::: --------------- ::::::::::::::* //
-
-const _testInitWorkerProposalHub = async (addressHub) => {
-  const workerProposalHub = await ethers.deployContract("WorkProposalHub", [
-    addressHub,
-  ]);
-  await workerProposalHub.waitForDeployment();
-  return workerProposalHub;
-};
 
 const _testInitWorkerProposal = async (
   _accessControl,
@@ -394,12 +385,12 @@ const _testInitWorkerProposal = async (
     datas = _datas;
   }
   const accessControl = await getProxy(_accessControl);
-  const _cv = await accessControl.getCVByAddress(account.address);
+  const _cv = await accessControl.cvOfByAddress(account.address);
   const workProposalHub = await getContractAt(
     "WorkProposalHub",
     await accessControl.iWPH()
   );
-  const targetID = parseInt(await workProposalHub.getTokensLength()) + 1;
+  const targetID = parseInt(await workProposalHub.tokensLength()) + 1;
   datas.id = targetID;
 
   const json = await createURIWorkerProposal(datas);
@@ -415,7 +406,7 @@ const _testInitWorkerProposal = async (
   const afterLength = parseInt(await workProposalHub.balanceOf(_cv));
   expect(beforeLength).to.equal(afterLength - 1);
 
-  const id = parseInt(await workProposalHub.getTokensLength());
+  const id = parseInt(await workProposalHub.tokensLength());
 
   const _tokenURI = await workProposalHub.tokenURI(parseInt(id));
   expect(_tokenURI).to.not.be.equal("");
@@ -430,34 +421,36 @@ const _testInitWorkerProposal = async (
 // *:::::::::::::: LAUNCHPAD ::::::::::::::* //
 // *:::::::::::::: --------- ::::::::::::::* //
 
-const _testInitLaunchpadContracts = async (addressHub, address) => {
-  const cohort = await ethers.deployContract("LaunchpadCohort", [addressHub]);
-  await cohort.waitForDeployment();
+const _testInitLaunchpadsContracts = async (addressSystem, address) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
 
-  const hub = await ethers.deployContract("LaunchpadHub", [cohort.target]);
-  await hub.waitForDeployment();
+  const launchpadsHub = await ethers.deployContract("LaunchpadHub", [
+    addressSystem,
+  ]);
+  await launchpadsHub.waitForDeployment();
+  expect(await _iAS.launchpadsHub()).to.be.equal(launchpadsHub.target);
 
-  const datas = await ethers.deployContract("CollectLaunchpadDatas", [
-    cohort.target,
+  const datas = await ethers.deployContract("LaunchpadsDatasHub", [
+    addressSystem,
   ]);
   await datas.waitForDeployment();
+  expect(await _iAS.launchpadsDatasHub()).to.be.equal(datas.target);
 
-  const investors = await ethers.deployContract("CollectLaunchpadInvestor", [
-    cohort.target,
+  const investors = await ethers.deployContract("LaunchpadsInvestorsHub", [
+    addressSystem,
   ]);
   await investors.waitForDeployment();
+  expect(await _iAS.launchpadsInvestorsHub()).to.be.equal(investors.target);
 
   expect(await datas.owner()).to.be.equal(await investors.owner());
-  expect(await investors.owner()).to.be.equal(await hub.owner());
-  expect(await hub.owner()).to.be.equal(await cohort.owner());
-  expect(await cohort.owner()).to.be.equal(await datas.owner());
+  expect(await investors.owner()).to.be.equal(await launchpadsHub.owner());
+  expect(await launchpadsHub.owner()).to.be.equal(await datas.owner());
   if (address) {
     expect(await datas.owner()).to.be.equal(address);
     expect(await investors.owner()).to.be.equal(address);
-    expect(await hub.owner()).to.be.equal(address);
-    expect(await cohort.owner()).to.be.equal(address);
+    expect(await launchpadsHub.owner()).to.be.equal(address);
   }
-  return { investors, datas, cohort, hub };
+  return { investors, datas, launchpadsHub };
 };
 
 const _testInitLaunchpad = async (
@@ -468,7 +461,7 @@ const _testInitLaunchpad = async (
   datas,
   tierDatas
 ) => {
-  let AddressHub = contracts.addressHub;
+  let AddressSystem = contracts.addressSystem;
   let accessControl;
   let token;
 
@@ -503,7 +496,7 @@ const _testInitLaunchpad = async (
     await accessControl.launchpadHub()
   );
 
-  const beforeLength = parseInt(await launchpadHub.getTokensLength());
+  const beforeLength = parseInt(await launchpadHub.tokensLength());
   if (!amount) {
     amount = parseInt(await accessControl.launchpadPrice());
   }
@@ -513,14 +506,14 @@ const _testInitLaunchpad = async (
     .createLaunchpad(datas, tierDatas, { value: `${amount}` });
   tx.wait();
   expect(tx.from).to.be.equal(account.address);
-  const id = parseInt(await launchpadHub.getTokensLength());
+  const id = parseInt(await launchpadHub.tokensLength());
   expect(beforeLength).to.be.equal(id - 1);
 
   const launchpadAddr = await launchpadHub.getLaunchpad(id);
   const launchpad = await getContractAt("Launchpad", launchpadAddr);
   expect(await launchpad.owner()).to.be.equal(account.address);
 
-  let lDatas = await launchpad.getDatas();
+  let lDatas = await launchpad.dataOfs();
 
   expect(lDatas.tokenAddress).to.be.equal(datas.tokenAddress);
   expect(lDatas.pubURI).to.be.equal(datas.pubURI);
@@ -529,7 +522,7 @@ const _testInitLaunchpad = async (
   let _tDatas = [];
   for (let index = 0; index < tierDatas.length; index++) {
     const element = tierDatas[index];
-    let tierData = await launchpad.getTierDatas(index);
+    let tierData = await launchpad.tierOfs(index);
     _tDatas.push(tierData);
     expect(parseInt(tierData.maxTierCap)).to.be.equal(element.maxTierCap);
     expect(parseInt(tierData.minTierCap)).to.be.equal(element.minTierCap);
@@ -546,7 +539,7 @@ const _testInitLaunchpad = async (
   expect(lDatas.lockedTime).to.be.equal(datas.lockedTime);
   expect(lDatas.totalUser).to.be.equal(0);
   expect(lDatas.numberOfTier).to.be.equal(tierDatas.length);
-  await expect(launchpad.getTierDatas(tierDatas.length)).to.be.revertedWith(
+  await expect(launchpad.tierOfs(tierDatas.length)).to.be.revertedWith(
     "ID tier out of range"
   );
 
@@ -574,30 +567,21 @@ const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
 
 module.exports = {
   getContractAt,
+  codeSize,
   _testInitAll,
-
-  _testInitApiPost,
-  _testInitArbitrator,
   _testInitAddressHub,
-  _testInitAccessControl,
-  _testInitFeaturesHub,
-  _testInitWorkerProposalHub,
-  _testInitDisputesHub,
+  _testInitSystemsContracts,
+  _testInitCVsContracts,
+  _testInitPubsContracts,
+  _testInitLaunchpadsContracts,
+  _testInitWorksContracts,
+  _testInitEscrowsContracts,
+  _testInitArbitrator,
   _testInitWorkerProposal,
-  _testInitArbitratorsHub,
-  _testInitCVHub,
   _testInitCV,
   _testInitPub,
-  _testInitPubHub,
-  _testInitMissionsHub,
   _testInitMission,
-  _testInitFactory,
   _testInitFeature,
   _testInitToken,
   _testInitLaunchpad,
-  _testInitCollectPubs,
-  _testInitCollectFollowCV,
-  _testInitLaunchpadContracts,
-  _testInitCollectWorkInteraction,
-  _testInitEscrowDatasHub,
 };

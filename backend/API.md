@@ -1,10 +1,10 @@
 # CV
 
-| Function                 | Contract      | Description                                                                                                                                        | Address                       | Payable | Proxy           |
-| ------------------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------- | --------------- |
-| createCV(tokenURI)       | AccessControl | Permet de créer un CV. Il est obligatoire d'en avoir un pour la plupart des interraction avec nos contrats. Ca équivaut a un compte sur notre dApp | `${AddressHub.accessControl}` | false   | CVHub           |
-| followCV(cvFollowedID)   | CVHub         | Permet de suivre un CV. Le front viendras mettre en avant les followers du user connecté lié au CV                                                 | `${AddressHub.cvHub}`         | false   | CollectFollowCV |
-| unfollowCV(cvFollowedID) | CVHub         | Permet de se désabonner du CV. Ainsi il ne sera plus mis en avant                                                                                  | `${AddressHub.cvHub}`         | false   | CollectFollowCV |
+| Function                 | Contract      | Description                                                                                                                                        | Address                       | Payable | Proxy       |
+| ------------------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------- | ----------- |
+| createCV(tokenURI)       | AccessControl | Permet de créer un CV. Il est obligatoire d'en avoir un pour la plupart des interraction avec nos contrats. Ca équivaut a un compte sur notre dApp | `${AddressHub.accessControl}` | false   | CVsHub      |
+| followCV(cvFollowedID)   | CVsHub        | Permet de suivre un CV. Le front viendras mettre en avant les followers du user connecté lié au CV                                                 | `${AddressHub.CVsHub}`        | false   | cvsDatasHub |
+| unfollowCV(cvFollowedID) | CVsHub        | Permet de se désabonner du CV. Ainsi il ne sera plus mis en avant                                                                                  | `${AddressHub.CVsHub}`        | false   | cvsDatasHub |
 
 # Mission
 

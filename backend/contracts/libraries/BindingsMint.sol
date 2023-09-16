@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+// import "hardhat/console.sol";
 import {DataTypes} from "./DataTypes.sol";
 import {Bindings} from "./Bindings.sol";
 import {DisputeDatas} from "./disputes/DisputeDatas.sol";
-import "hardhat/console.sol";
 
-import {IAddressHub} from "../interfaces/IAddressHub.sol";
-import {IArbitratorsHub} from "../interfaces/IArbitratorsHub.sol";
-import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
-import {IDisputesHub} from "../interfaces/IDisputesHub.sol";
+import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
+import {IFeaturesHub} from "../interfaces/works/IFeaturesHub.sol";
+import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
+import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 import {Dispute} from "../escrow/Dispute.sol";
 
 library BindingsMint {
@@ -41,7 +41,7 @@ library BindingsMint {
     }
 
     function checked(
-        address _addressHub,
+        address _addressSystem,
         uint256 _featureID,
         DataTypes.CourtIDs _courtID,
         uint8 _nbArbitrators,
@@ -49,15 +49,16 @@ library BindingsMint {
         string memory _tokenURI
     ) internal view returns (DisputeDatas.Data memory) {
         DisputeDatas.Data memory _data;
-        IAddressHub iAH = IAddressHub(_addressHub);
-        address _addrFH = iAH.featuresHub();
+        IAddressSystem _iAS = IAddressSystem(_addressSystem);
+        address _addrFH = _iAS.featuresHub();
 
-        IArbitratorsHub iArH = IArbitratorsHub(iAH.arbitratorsHub());
+        IArbitratorsHub iArH = IArbitratorsHub(_iAS.arbitratorsHub());
 
-        uint courtLength = iArH.getCourtLength(DataTypes.CourtIDs(_courtID));
+        uint courtLength = iArH.lengthOfCourt(DataTypes.CourtIDs(_courtID));
 
-        DataTypes.FeatureData memory featureData = IFeaturesHub(_addrFH)
-            .getData(_featureID);
+        DataTypes.FeatureData memory featureData = IFeaturesHub(_addrFH).dataOf(
+            _featureID
+        );
 
         if (
             _courtID == DataTypes.CourtIDs.Centralized ||
@@ -77,9 +78,9 @@ library BindingsMint {
         _data.nbArbitrators = _nbArbitrators;
         _data.value = featureData.wadge;
         _data.payeeID = featureData.cvWorker;
-        _data.payerID = Bindings.getCV(
+        _data.payerID = Bindings.cvOf(
             Bindings.ownerOf(_featureID, _addrFH),
-            iAH.cvHub()
+            _iAS.cvsHub()
         );
         _data.reclamationPeriod = _reclamationPeriod;
         _data.tokenURI = _tokenURI;

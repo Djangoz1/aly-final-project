@@ -15,10 +15,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let addressHub;
   let contract;
   let apiPost;
-  let cvHub;
+  let CVsHub;
   let featuresHub;
   let collecter;
-  let escrowDatasHub;
+  let DisputesDatasHub;
   let contracts;
   let featureID;
   let arbitratorsHub;
@@ -55,9 +55,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     contracts = await _testInitAll();
     addressHub = contracts.addressHub;
     apiPost = contracts.apiPost;
-    cvHub = contracts.cvHub;
+    CVsHub = contracts.CVsHub;
     featuresHub = contracts.featuresHub;
-    escrowDatasHub = contracts.escrowDatasHub;
+    DisputesDatasHub = contracts.DisputesDatasHub;
     contract = contracts.disputesHub;
     collecter = contracts.collectWorkInteraction;
     arbitratorsHub = contracts.arbitratorsHub;
@@ -77,7 +77,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         expect(featureID > 0).to.equal(true);
       });
       it("DisputesHub : should have 0 tokens", async () => {
-        expect(await contract.getTokensLength()).to.equal(0);
+        expect(await contract.tokensLength()).to.equal(0);
       });
     });
     describe("NOT WORKS", () => {
@@ -128,7 +128,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             3,
             "tokenURI"
           );
-          let length = await contract.getTokensLength();
+          let length = await contract.tokensLength();
           expect(length).to.equal(1);
         });
         it("contestFeature : should get address of new dispute", async () => {
@@ -138,7 +138,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             3,
             "tokenURI"
           );
-          let id = await contract.getTokensLength();
+          let id = await contract.tokensLength();
           let address = await contract.addressOf(id);
           expect(address).to.not.equal(ZERO_ADDRESS);
         });
@@ -149,7 +149,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             3,
             "tokenURI"
           );
-          let id = await contract.getTokensLength();
+          let id = await contract.tokensLength();
           let id2 = await contract.disputeOf(featureID);
 
           expect(id).to.be.equal(id2);
@@ -243,7 +243,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           nbArbitrators,
           tokenURI
         );
-        disputeID = await contract.getTokensLength();
+        disputeID = await contract.tokensLength();
         let address = await contract.addressOf(disputeID);
         expect(address).to.not.equal(ZERO_ADDRESS);
         dispute = await getContractAt("Dispute", address);
@@ -266,7 +266,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
           it("data : should update value", async () => {
             let data = await dispute.data();
-            let featureData = await featuresHub.getData(featureID);
+            let featureData = await featuresHub.dataOf(featureID);
             expect(data.value).to.equal(featureData.wadge);
           });
 
@@ -279,14 +279,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
               nbArbitrators,
               tokenURI
             );
-            let _disputeID = await contract.getTokensLength();
+            let _disputeID = await contract.tokensLength();
             let address = await contract.addressOf(_disputeID);
             expect(address).to.not.equal(ZERO_ADDRESS);
             expect(address).to.not.equal(dispute.target);
           });
 
           it("data : should have true courtID if enough arbitrators", async () => {
-            expect((await arbitratorsHub.getCourtLength(3)) > 3).to.equal(true);
+            expect((await arbitratorsHub.lengthOfCourt(3)) > 3).to.equal(true);
             let data = await dispute.data();
             expect(data.courtID).to.equal(3);
           });
@@ -294,20 +294,20 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           it("data : should have good nbArbitrators", async () => {
             let data = await dispute.data();
             expect(data.nbArbitrators).to.equal(nbArbitrators);
-            let arbitrators = await escrowDatasHub.arbitratorsOf(disputeID);
+            let arbitrators = await DisputesDatasHub.arbitratorsOf(disputeID);
             expect(arbitrators.length).to.equal(0);
           });
 
           it("data : should update payeeID", async () => {
             let data = await dispute.data();
-            let featureData = await featuresHub.getData(featureID);
+            let featureData = await featuresHub.dataOf(featureID);
             expect(data.payeeID).to.equal(featureData.cvWorker);
           });
 
           it("data : should update payerID", async () => {
             let data = await dispute.data();
             let owner = await featuresHub.ownerOf(featureID);
-            let cvOwner = await cvHub.getCV(owner);
+            let cvOwner = await CVsHub.cvOf(owner);
             expect(data.payerID).to.equal(cvOwner);
           });
 
@@ -317,17 +317,17 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           });
 
           it("timersOf : should have 0 resolvedAt", async () => {
-            let timers = await escrowDatasHub.timersOf(disputeID);
+            let timers = await DisputesDatasHub.timersOf(disputeID);
             expect(timers.resolvedAt).to.equal(0);
           });
 
           it("timersOf : should have 0 reclaimedAt", async () => {
-            let timers = await escrowDatasHub.timersOf(disputeID);
+            let timers = await DisputesDatasHub.timersOf(disputeID);
             expect(timers.reclaimedAt).to.equal(0);
           });
 
           it("rulesOf : should have appeal false", async () => {
-            let rules = await escrowDatasHub.rulesOf(disputeID);
+            let rules = await DisputesDatasHub.rulesOf(disputeID);
             expect(rules.appeal).to.equal(false);
           });
         });
@@ -346,7 +346,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
               nbArbitrators,
               tokenURI
             );
-            let _disputeID = await contract.getTokensLength();
+            let _disputeID = await contract.tokensLength();
             let address = await contract.addressOf(_disputeID);
 
             let _dispute = await getContractAt("Dispute", address);
@@ -368,26 +368,26 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           describe("Init dispute", () => {
             describe("WORKS", () => {
               it("init : Should update arbitrator length", async () => {
-                let counters = await escrowDatasHub.countersOf(disputeID);
+                let counters = await DisputesDatasHub.countersOf(disputeID);
                 expect(counters._arbitratorIDs).to.be.equal(0);
                 await apiPost.initDispute(disputeID);
-                counters = await escrowDatasHub.countersOf(disputeID);
+                counters = await DisputesDatasHub.countersOf(disputeID);
                 expect(counters._arbitratorIDs > 0).to.be.equal(true);
               });
 
               it("init : Should update createdAt", async () => {
-                let timers = await escrowDatasHub.timersOf(disputeID);
+                let timers = await DisputesDatasHub.timersOf(disputeID);
                 expect(timers.createdAt).to.be.equal(0);
                 await apiPost.initDispute(disputeID);
-                timers = await escrowDatasHub.timersOf(disputeID);
+                timers = await DisputesDatasHub.timersOf(disputeID);
                 expect(timers.createdAt > 0).to.be.equal(true);
               });
 
               it("init : Should work with worker account", async () => {
-                let timers = await escrowDatasHub.timersOf(disputeID);
+                let timers = await DisputesDatasHub.timersOf(disputeID);
                 expect(timers.createdAt).to.be.equal(0);
                 await apiPost.connect(this.addr1).initDispute(disputeID);
-                timers = await escrowDatasHub.timersOf(disputeID);
+                timers = await DisputesDatasHub.timersOf(disputeID);
                 expect(timers.createdAt > 0).to.be.equal(true);
               });
             });
@@ -429,21 +429,21 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
             beforeEach(async () => {
               await apiPost.initDispute(disputeID);
-              let data = await escrowDatasHub.datasOf(disputeID);
-              let courtLength = await arbitratorsHub.getCourtLength(
+              let data = await DisputesDatasHub.datasOf(disputeID);
+              let courtLength = await arbitratorsHub.lengthOfCourt(
                 data.courtID
               );
               addrs = [];
               for (let index = 1; index <= courtLength; index++) {
-                let allowed = await escrowDatasHub.allowanceOf(
+                let allowed = await DisputesDatasHub.allowanceOf(
                   disputeID,
                   index
                 );
 
                 if (allowed == 1) {
                   const address = await arbitratorsHub.ownerOf(index);
-                  let cvID = await cvHub.getCV(address);
-                  let arbitratorID = await arbitratorsHub.getArbitrationOfCV(
+                  let cvID = await CVsHub.cvOf(address);
+                  let arbitratorID = await arbitratorsHub.arbitrationOfCV(
                     cvID,
                     data.courtID
                   );
@@ -471,7 +471,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           .connect(account)
                           .acceptArbitration(disputeID);
                         expect(
-                          await escrowDatasHub.allowanceOf(
+                          await DisputesDatasHub.allowanceOf(
                             disputeID,
                             user.arbitratorID
                           )
@@ -492,7 +492,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           .connect(account)
                           .acceptArbitration(disputeID);
                         counter++;
-                        let arbitrators = await escrowDatasHub.arbitratorsOf(
+                        let arbitrators = await DisputesDatasHub.arbitratorsOf(
                           disputeID
                         );
                         expect(arbitrators.length).to.equal(counter);
@@ -516,7 +516,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       }
                     }
 
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(2);
                   });
                 });
@@ -564,12 +564,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("Should can NOT accept arbitration if not invited", async () => {
                     let data = await dispute.data();
-                    let courtLength = await arbitratorsHub.getCourtLength(
+                    let courtLength = await arbitratorsHub.lengthOfCourt(
                       data.courtID
                     );
                     let _addrs = [];
                     for (let index = 1; index <= courtLength; index++) {
-                      let allowed = await escrowDatasHub.allowanceOf(
+                      let allowed = await DisputesDatasHub.allowanceOf(
                         disputeID,
                         index
                       );
@@ -597,7 +597,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
               describe("Started vote period", () => {
                 describe("WORKS", () => {
                   it("startedVotePeriod : Should started vote period after call", async () => {
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < parseInt(data.nbArbitrators) - 1) {
@@ -610,16 +610,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       }
                     }
 
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(0);
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     await apiPost.startedVotePeriod(disputeID);
-                    rules = await escrowDatasHub.rulesOf(disputeID);
+                    rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(2);
                   });
 
                   it("startedVotePeriod : Should started vote period if arbitrators == nbArbitrators", async () => {
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
@@ -632,12 +632,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       }
                     }
 
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(2);
                   });
 
                   it("startedVotePeriod : Should started vote period with worker account", async () => {
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < parseInt(data.nbArbitrators) - 1) {
@@ -650,18 +650,18 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       }
                     }
 
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(0);
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     await apiPost
                       .connect(this.addr1)
                       .startedVotePeriod(disputeID);
-                    rules = await escrowDatasHub.rulesOf(disputeID);
+                    rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(2);
                   });
 
                   it("startedVotePeriod : Should started vote period before & after appeal", async () => {
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < parseInt(data.nbArbitrators) - 1) {
@@ -688,12 +688,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                     await apiPost.appeal(disputeID);
 
-                    let courtLength = await arbitratorsHub.getCourtLength(
+                    let courtLength = await arbitratorsHub.lengthOfCourt(
                       data.courtID
                     );
                     let _counter = 0;
                     for (let index = 1; index <= courtLength; index++) {
-                      let allowed = await escrowDatasHub.allowanceOf(
+                      let allowed = await DisputesDatasHub.allowanceOf(
                         disputeID,
                         index
                       );
@@ -703,7 +703,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       ) {
                         const address = await arbitratorsHub.ownerOf(index);
                         let account = getAccount(accounts, address);
-                        const counter = await escrowDatasHub.countersOf(
+                        const counter = await DisputesDatasHub.countersOf(
                           disputeID
                         );
 
@@ -717,7 +717,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                     await apiPost
                       .connect(this.addr1)
                       .startedVotePeriod(disputeID);
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
 
                     expect(rules.status).to.equal(2);
                   });
@@ -733,7 +733,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   });
 
                   it("Should NOT call started vote period twice", async () => {
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < parseInt(data.nbArbitrators) - 1) {
@@ -777,7 +777,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   });
 
                   it("Should NOT started vote period by not part of dispute account", async () => {
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     let account;
                     for (let index = 1; index <= addrs.length; index++) {
@@ -809,7 +809,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           .connect(account)
                           .refuseArbitration(disputeID);
                         expect(
-                          await escrowDatasHub.allowanceOf(
+                          await DisputesDatasHub.allowanceOf(
                             disputeID,
                             user.arbitratorID
                           )
@@ -820,7 +820,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   });
 
                   it("refuseArbitration : Should update length", async () => {
-                    let counters = await escrowDatasHub.countersOf(disputeID);
+                    let counters = await DisputesDatasHub.countersOf(disputeID);
                     let length = parseInt(counters._arbitratorIDs);
 
                     let counter = 0;
@@ -831,7 +831,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         await apiPost
                           .connect(account)
                           .refuseArbitration(disputeID);
-                        counters = await escrowDatasHub.countersOf(disputeID);
+                        counters = await DisputesDatasHub.countersOf(disputeID);
                         let _length = parseInt(counters._arbitratorIDs);
                         counter++;
                         expect(_length + counter).to.equal(length);
@@ -847,7 +847,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                    */
                   it("refuseArbitration : Should upgrade length if length < 3", async () => {
                     for (let index = 1; index <= addrs.length; index++) {
-                      let counters = await escrowDatasHub.countersOf(disputeID);
+                      let counters = await DisputesDatasHub.countersOf(
+                        disputeID
+                      );
                       let length = parseInt(counters._arbitratorIDs);
                       let user = addrs[index];
                       let account = getAccount(accounts, user.addr)[0];
@@ -858,9 +860,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         break;
                       }
                     }
-                    let counters = await escrowDatasHub.countersOf(disputeID);
+                    let counters = await DisputesDatasHub.countersOf(disputeID);
                     let _length = parseInt(counters._arbitratorIDs);
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     expect(_length > data.nbArbitrators).to.equal(true);
                   });
                 });
@@ -896,13 +898,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("Should NOT works if arbitrator isn't invited", async () => {
                     let data = await dispute.data();
-                    let courtLength = await arbitratorsHub.getCourtLength(
+                    let courtLength = await arbitratorsHub.lengthOfCourt(
                       data.courtID
                     );
                     let addrs = [];
 
                     for (let index = 1; index <= courtLength; index++) {
-                      let allowed = await escrowDatasHub.allowanceOf(
+                      let allowed = await DisputesDatasHub.allowanceOf(
                         disputeID,
                         index
                       );
@@ -946,7 +948,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                */
               beforeEach(async () => {
                 let counter = 0;
-                let data = await escrowDatasHub.datasOf(disputeID);
+                let data = await DisputesDatasHub.datasOf(disputeID);
                 for (let index = 1; index <= addrs.length; index++) {
                   if (counter < data.nbArbitrators) {
                     let user = addrs[index];
@@ -955,7 +957,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                     counter++;
                   }
                 }
-                let rules = await escrowDatasHub.rulesOf(disputeID);
+                let rules = await DisputesDatasHub.rulesOf(disputeID);
                 expect(rules.status).to.equal(2);
               });
 
@@ -1034,7 +1036,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("vote : Should update counters votes length", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1042,7 +1044,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                         await apiPost.connect(account).vote(disputeID, 3);
                         counter++;
-                        let counters = await escrowDatasHub.countersOf(
+                        let counters = await DisputesDatasHub.countersOf(
                           disputeID
                         );
                         expect(counters._voteIDs).to.equal(counter);
@@ -1052,7 +1054,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("vote : Should update counters payeeVote if vote == Vote.PayeeVote ", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1060,7 +1062,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                         await apiPost.connect(account).vote(disputeID, 3);
                         counter++;
-                        let counters = await escrowDatasHub.countersOf(
+                        let counters = await DisputesDatasHub.countersOf(
                           disputeID
                         );
                         expect(counters._payeeVote).to.equal(counter);
@@ -1071,7 +1073,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("vote : Should update counters payerVote if vote == Vote.PayerVote ", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1079,7 +1081,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                         await apiPost.connect(account).vote(disputeID, 2);
                         counter++;
-                        let counters = await escrowDatasHub.countersOf(
+                        let counters = await DisputesDatasHub.countersOf(
                           disputeID
                         );
                         expect(counters._payerVote).to.equal(counter);
@@ -1090,7 +1092,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("vote : Should update dispute status if voteLength == nbArbitrators", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1100,13 +1102,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         counter++;
                       }
                     }
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(3);
                   });
 
                   it("vote : Should PayeeWin decision when voteLength == nbArbitrators", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1116,13 +1118,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         counter++;
                       }
                     }
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.decision).to.equal(3);
                   });
 
                   it("vote : Should PayerWin decision if voteLength == nbArbitrators", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1131,7 +1133,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         counter++;
                       }
                     }
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.decision).to.equal(2);
                   });
 
@@ -1144,7 +1146,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                     await apiPost.connect(account[0]).vote(disputeID, 1);
                     account = getAccount(accounts, addrs[4].addr);
                     await apiPost.connect(account[0]).vote(disputeID, 2);
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.decision).to.equal(1);
                   });
                 });
@@ -1185,7 +1187,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("Should NOT update vote if not  accepted", async () => {
                     let account = getAccount(accounts, addrs[6].addr);
-                    let rules = await escrowDatasHub.rulesOf(disputeID);
+                    let rules = await DisputesDatasHub.rulesOf(disputeID);
                     expect(rules.status).to.equal(2);
                     await expect(
                       apiPost.connect(account[0]).vote(disputeID, 0)
@@ -1194,7 +1196,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("Should NOT vote if dispute status == Resolved", async () => {
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1213,9 +1215,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   it("Should NOT update balance before appeal", async () => {
                     let _accounts = [this.addr1, this.owner];
 
-                    let data = await escrowDatasHub.datasOf(disputeID);
-                    let winner = await cvHub.ownerOf(data.payeeID);
-                    let winner1 = await cvHub.ownerOf(data.payerID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
+                    let winner = await CVsHub.ownerOf(data.payeeID);
+                    let winner1 = await CVsHub.ownerOf(data.payerID);
                     let winnerAccount = getAccount(_accounts, winner)[0];
 
                     let balance = await winnerAccount.provider.getBalance(
@@ -1249,9 +1251,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   });
 
                   it("Should NOT update feature data status to Validated", async () => {
-                    let fdata = await featuresHub.getData(featureID);
+                    let fdata = await featuresHub.dataOf(featureID);
                     let counter = 0;
-                    let data = await escrowDatasHub.datasOf(disputeID);
+                    let data = await DisputesDatasHub.datasOf(disputeID);
                     for (let index = 1; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
@@ -1261,7 +1263,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         counter++;
                       }
                     }
-                    let _fdata = await featuresHub.getData(featureID);
+                    let _fdata = await featuresHub.dataOf(featureID);
                     expect(fdata.status).to.equal(_fdata.status);
                   });
                 });
@@ -1272,7 +1274,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                  */
                 beforeEach(async () => {
                   let counter = 0;
-                  let data = await escrowDatasHub.datasOf(disputeID);
+                  let data = await DisputesDatasHub.datasOf(disputeID);
                   for (let index = 1; index <= addrs.length; index++) {
                     if (counter < data.nbArbitrators) {
                       let user = addrs[index];
@@ -1293,33 +1295,35 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   describe("WORKS", () => {
                     it("appeal : Should update appeal bool", async () => {
                       await apiPost.appeal(disputeID);
-                      let rules = await escrowDatasHub.rulesOf(disputeID);
+                      let rules = await DisputesDatasHub.rulesOf(disputeID);
                       expect(rules.appeal).to.equal(true);
                     });
 
                     it("appeal : Should appeal with worker contract", async () => {
                       await apiPost.connect(this.addr1).appeal(disputeID);
-                      let rules = await escrowDatasHub.rulesOf(disputeID);
+                      let rules = await DisputesDatasHub.rulesOf(disputeID);
                       expect(rules.appeal).to.equal(true);
                     });
 
                     it("appeal : Should refresh votes ", async () => {
-                      let counters = await escrowDatasHub.countersOf(disputeID);
+                      let counters = await DisputesDatasHub.countersOf(
+                        disputeID
+                      );
                       expect(counters._voteIDs).to.not.equal(0);
                       await apiPost.appeal(disputeID);
-                      counters = await escrowDatasHub.countersOf(disputeID);
+                      counters = await DisputesDatasHub.countersOf(disputeID);
                       expect(counters._voteIDs).to.equal(0);
                       expect(counters._payerVote).to.equal(0);
                       expect(counters._payeeVote).to.equal(0);
                     });
 
                     it("appeal : Should renew arbitrators length", async () => {
-                      let arbitrators = await escrowDatasHub.arbitratorsOf(
+                      let arbitrators = await DisputesDatasHub.arbitratorsOf(
                         disputeID
                       );
                       expect(arbitrators.length).to.not.equal(0);
                       await apiPost.appeal(disputeID);
-                      arbitrators = await escrowDatasHub.arbitratorsOf(
+                      arbitrators = await DisputesDatasHub.arbitratorsOf(
                         disputeID
                       );
                       expect(arbitrators.length).to.equal(0);
@@ -1327,13 +1331,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                     it("appeal : Should refresh arbitrators ", async () => {
                       let data = await dispute.data();
-                      let courtLength = await arbitratorsHub.getCourtLength(
+                      let courtLength = await arbitratorsHub.lengthOfCourt(
                         data.courtID
                       );
 
                       let counterIDs = 0;
                       for (let index = 1; index <= addrs.length; index++) {
-                        let allowed = await escrowDatasHub.allowanceOf(
+                        let allowed = await DisputesDatasHub.allowanceOf(
                           disputeID,
                           index
                         );
@@ -1346,7 +1350,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                       let _counterIDs = 0;
                       for (let index = 1; index <= courtLength; index++) {
-                        let allowed = await escrowDatasHub.allowanceOf(
+                        let allowed = await DisputesDatasHub.allowanceOf(
                           disputeID,
                           index
                         );
@@ -1358,8 +1362,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                     });
 
                     it("appeal : Should update value after voting appeal session", async () => {
-                      let data = await escrowDatasHub.datasOf(disputeID);
-                      let courtLength = await arbitratorsHub.getCourtLength(
+                      let data = await DisputesDatasHub.datasOf(disputeID);
+                      let courtLength = await arbitratorsHub.lengthOfCourt(
                         data.courtID
                       );
 
@@ -1368,7 +1372,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       let _addrs = [];
                       let counter = 0;
                       for (let index = 1; index <= courtLength; index++) {
-                        let allowed = await escrowDatasHub.allowanceOf(
+                        let allowed = await DisputesDatasHub.allowanceOf(
                           disputeID,
                           index
                         );
@@ -1442,7 +1446,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   beforeEach(async () => {
                     // Vote != data.nbArbitrators
 
-                    data = await escrowDatasHub.datasOf(disputeID);
+                    data = await DisputesDatasHub.datasOf(disputeID);
 
                     let appeal = parseInt(await dispute.APPEAL_PERIOD());
                     let reclamationPeriod = parseInt(
@@ -1457,13 +1461,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         setTimeout(resolve, 12000)
                       );
                       await apiPost.resolvedDispute(disputeID);
-                      let data = await escrowDatasHub.datasOf(disputeID);
-                      let rules = await escrowDatasHub.rulesOf(disputeID);
-                      let timers = await escrowDatasHub.timersOf(disputeID);
+                      let data = await DisputesDatasHub.datasOf(disputeID);
+                      let rules = await DisputesDatasHub.rulesOf(disputeID);
+                      let timers = await DisputesDatasHub.timersOf(disputeID);
                       expect(data.value).to.equal(0);
                       expect(rules.status).to.equal(1);
                       expect(timers.reclaimedAt).to.not.equal(0);
-                      data = await featuresHub.getData(featureID);
+                      data = await featuresHub.dataOf(featureID);
                       expect(data.wadge).to.equal(0);
                       expect(data.status).to.equal(2);
                     });
@@ -1476,12 +1480,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                         .connect(this.addr1)
                         .resolvedDispute(disputeID);
                       let data = await dispute.data();
-                      let rules = await escrowDatasHub.rulesOf(disputeID);
-                      let timers = await escrowDatasHub.timersOf(disputeID);
+                      let rules = await DisputesDatasHub.rulesOf(disputeID);
+                      let timers = await DisputesDatasHub.timersOf(disputeID);
                       expect(data.value).to.equal(0);
                       expect(rules.status).to.equal(1);
                       expect(timers.reclaimedAt).to.not.equal(0);
-                      data = await featuresHub.getData(featureID);
+                      data = await featuresHub.dataOf(featureID);
                       expect(data.wadge).to.equal(0);
                       expect(data.status).to.equal(2);
                     });
@@ -1534,16 +1538,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   let addrs = [];
                   let timers;
                   beforeEach(async () => {
-                    timers = await escrowDatasHub.timersOf(disputeID);
+                    timers = await DisputesDatasHub.timersOf(disputeID);
                     await apiPost.appeal(disputeID);
-                    let datas = await escrowDatasHub.datasOf(disputeID);
+                    let datas = await DisputesDatasHub.datasOf(disputeID);
                     let counter = 0;
                     addrs = [];
-                    let courtLength = await arbitratorsHub.getCourtLength(
+                    let courtLength = await arbitratorsHub.lengthOfCourt(
                       datas.courtID
                     );
                     for (let index = 1; index <= courtLength; index++) {
-                      let allowed = await escrowDatasHub.allowanceOf(
+                      let allowed = await DisputesDatasHub.allowanceOf(
                         disputeID,
                         index
                       );
@@ -1572,12 +1576,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           let account = getAccount(accounts, address)[0];
                           await apiPost.connect(account).vote(disputeID, 3);
                         }
-                        let rules = await escrowDatasHub.rulesOf(disputeID);
+                        let rules = await DisputesDatasHub.rulesOf(disputeID);
                         expect(rules.status).to.equal(1);
                       });
 
                       it("vote : Should update data resolvedAt if voteLength == nbArbitrators && appeal == true", async () => {
-                        let timers = await escrowDatasHub.timersOf(disputeID);
+                        let timers = await DisputesDatasHub.timersOf(disputeID);
                         expect(timers.resolvedAt).to.equal(0);
 
                         for (let index = 0; index < addrs.length; index++) {
@@ -1586,7 +1590,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           await apiPost.connect(account).vote(disputeID, 3);
                         }
 
-                        timers = await escrowDatasHub.timersOf(disputeID);
+                        timers = await DisputesDatasHub.timersOf(disputeID);
 
                         expect(timers.resolvedAt).to.not.equal(0);
                       });
@@ -1602,7 +1606,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                       });
 
                       it("vote : Should update wadge feature data", async () => {
-                        let _data = await featuresHub.getData(featureID);
+                        let _data = await featuresHub.dataOf(featureID);
                         expect(_data.wadge).to.not.be.equal(0);
                         for (let index = 0; index < addrs.length; index++) {
                           const address = addrs[index].addr;
@@ -1610,14 +1614,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           await apiPost.connect(account).vote(disputeID, 3);
                         }
 
-                        let data = await featuresHub.getData(featureID);
+                        let data = await featuresHub.dataOf(featureID);
                         expect(data.wadge).to.be.equal(0);
                       });
 
                       it("vote : Should update balance of winner", async () => {
                         let _accounts = [this.addr1, this.owner];
                         let _data = await dispute.data();
-                        let winner = await cvHub.ownerOf(_data.payeeID);
+                        let winner = await CVsHub.ownerOf(_data.payeeID);
                         let winnerAccount = getAccount(_accounts, winner)[0];
                         let balance = await winnerAccount.provider.getBalance(
                           winner
@@ -1642,7 +1646,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           await apiPost.connect(account).vote(disputeID, 3);
                         }
 
-                        let _timers = await escrowDatasHub.timersOf(disputeID);
+                        let _timers = await DisputesDatasHub.timersOf(
+                          disputeID
+                        );
                         expect(timers.resolvedAt).to.not.be.equal(
                           _timers.resolvedAt
                         );
@@ -1658,7 +1664,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           await apiPost.connect(account).vote(disputeID, 3);
                         }
 
-                        let _timers = await escrowDatasHub.timersOf(disputeID);
+                        let _timers = await DisputesDatasHub.timersOf(
+                          disputeID
+                        );
                         expect(timers.startedAt).to.not.be.equal(
                           _timers.startedAt
                         );
@@ -1675,7 +1683,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                           await apiPost.connect(account).vote(disputeID, 3);
                         }
 
-                        data = await featuresHub.getData(featureID);
+                        data = await featuresHub.dataOf(featureID);
                         expect(data.status).to.equal(2);
                       });
                     });
@@ -1746,28 +1754,28 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   describe("Escrow datas hub : Setter not works", () => {
     describe("NOT WORKS", () => {
       it("Should NOT start vote of without dispute bindings", async () => {
-        await expect(escrowDatasHub.startVotesOf(1)).to.be.reverted;
+        await expect(DisputesDatasHub.startVotesOf(1)).to.be.reverted;
       });
       it("Should NOT add arbitrator without dispute bindings", async () => {
-        await expect(escrowDatasHub.addArbitratorOn(1, 1)).to.be.reverted;
+        await expect(DisputesDatasHub.addArbitratorOn(1, 1)).to.be.reverted;
       });
       it("Should NOT vote for without dispute bindings", async () => {
-        await expect(escrowDatasHub.voteFor(1, 1, 2)).to.be.reverted;
+        await expect(DisputesDatasHub.voteFor(1, 1, 2)).to.be.reverted;
       });
       it("Should NOT tally for without dispute bindings", async () => {
-        await expect(escrowDatasHub.tallyFor(1)).to.be.reverted;
+        await expect(DisputesDatasHub.tallyFor(1)).to.be.reverted;
       });
       it("Should NOT resolve dispute of without dispute bindings", async () => {
-        await expect(escrowDatasHub.resolveDisputeOf(1)).to.be.reverted;
+        await expect(DisputesDatasHub.resolveDisputeOf(1)).to.be.reverted;
       });
       it("Should NOT reclaimed for without dispute bindings", async () => {
-        await expect(escrowDatasHub.reclaimedFor(1)).to.be.reverted;
+        await expect(DisputesDatasHub.reclaimedFor(1)).to.be.reverted;
       });
       it("Should NOT refuse arbitration for without dispute bindings", async () => {
-        await expect(escrowDatasHub.refuseArbitration(1, 1)).to.be.reverted;
+        await expect(DisputesDatasHub.refuseArbitration(1, 1)).to.be.reverted;
       });
       it("Should NOT appeal of without dispute bindings", async () => {
-        await expect(escrowDatasHub.appealOf(1)).to.be.reverted;
+        await expect(DisputesDatasHub.appealOf(1)).to.be.reverted;
       });
     });
   });

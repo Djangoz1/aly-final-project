@@ -16,7 +16,7 @@
 //   let addressHub;
 //   let contract;
 //   let balancesHub;
-//   let cvHub;
+//   let CVsHub;
 //   let CollectLike;
 //   let CollectPubs;
 //   let apiPost;
@@ -36,7 +36,7 @@
 //     addressHub = contracts.addressHub;
 
 //     apiPost = contracts.apiPost;
-//     cvHub = contracts.cvHub;
+//     CVsHub = contracts.CVsHub;
 //     contract = contracts.pubsHub;
 //     balancesHub = contracts.balancesHub;
 //     CollectLike = contracts.collecterLike;
@@ -55,12 +55,12 @@
 //     });
 
 //     it("should have no pub", async () => {
-//       expect(await contract.getTokensLength()).to.be.equal(0);
+//       expect(await contract.tokensLength()).to.be.equal(0);
 //     });
 //     it("should create pub", async () => {
-//       const length = await contract.getTokensLength();
+//       const length = await contract.tokensLength();
 //       await apiPost.createPub("tokenURI");
-//       expect(await contract.getTokensLength()).to.be.equal(
+//       expect(await contract.tokensLength()).to.be.equal(
 //         parseInt(length) + 1
 //       );
 //     });
@@ -90,7 +90,7 @@
 //     });
 
 //     it("should have 1 pub", async () => {
-//       expect(await contract.getTokensLength()).to.be.equal(1);
+//       expect(await contract.tokensLength()).to.be.equal(1);
 //     });
 
 //     it("ownerOf(like) should be work", async () => {
@@ -99,34 +99,34 @@
 //     });
 
 //     it("should return updated lengths", async () => {
-//       const cvID = await cvHub.getCV(this.owner.address);
+//       const cvID = await CVsHub.cvOf(this.owner.address);
 //       await apiPost.likePub(1);
-//       const indexer = await CollectLike.getIndexer(1);
+//       const indexer = await CollectLike.indexerOf(1);
 
-//       expect(await CollectLike.getTokensLength()).to.be.equal(1);
+//       expect(await CollectLike.tokensLength()).to.be.equal(1);
 //       expect(indexer.length).to.be.equal(1);
 //     });
 
 //     it("should like pub", async () => {
 //       await apiPost.likePub(1);
 
-//       const indexer = await CollectLike.getIndexer(1);
+//       const indexer = await CollectLike.indexerOf(1);
 //       expect(indexer[0]).to.be.equal(1);
 //     });
 
 //     it("should uptdated data indexedAt", async () => {
 //       await apiPost.likePub(1);
-//       const datas = await CollectLike.getData(1);
+//       const datas = await CollectLike.dataOf(1);
 //       expect(datas.indexedAt).to.be.equal(0);
 //     });
 //     it("should uptdated data pub ID", async () => {
 //       await apiPost.likePub(1);
-//       const datas = await CollectLike.getData(1);
+//       const datas = await CollectLike.dataOf(1);
 //       expect(datas.pubID).to.be.equal(1);
 //     });
 //     it("should uptdated data id", async () => {
 //       await apiPost.likePub(1);
-//       const datas = await CollectLike.getData(1);
+//       const datas = await CollectLike.dataOf(1);
 //       expect(datas.id).to.be.equal(1);
 //     });
 
@@ -158,10 +158,10 @@
 //     });
 
 //     it("unlikePub: should update indexers pub", async () => {
-//       let indexerPub = await CollectLike.getIndexer(1);
+//       let indexerPub = await CollectLike.indexerOf(1);
 //       expect(indexerPub[0]).to.be.equal(1);
 //       await apiPost.unlikePub(1);
-//       let afterUnlike = await CollectLike.getIndexer(1);
+//       let afterUnlike = await CollectLike.indexerOf(1);
 //       expect(indexerPub[0]).to.be.not.equal(afterUnlike[0]);
 //       expect(afterUnlike[0]).to.be.equal(0);
 //     });
@@ -202,9 +202,9 @@
 //           "ERC721: invalid token ID"
 //         );
 //       });
-//       it("should NOT use getData(likeID) after unlike", async () => {
+//       it("should NOT use dataOf(likeID) after unlike", async () => {
 //         await apiPost.unlikePub(1);
-//         await expect(CollectLike.getData(1)).to.be.revertedWith("Not liked");
+//         await expect(CollectLike.dataOf(1)).to.be.revertedWith("Not liked");
 //       });
 //     });
 //   });
@@ -219,35 +219,35 @@
 //     });
 
 //     it("should get 0 answer", async () => {
-//       let answers = await CollectPubs.getPubAnswers(1);
+//       let answers = await CollectPubs.answersOfPub(1);
 //       expect(answers.length).to.be.equal(0);
 //     });
 
 //     describe("Pub Answer", () => {
 //       it("addPubAnswer : should update pubs length", async () => {
-//         let prevLength = await contract.getTokensLength();
+//         let prevLength = await contract.tokensLength();
 //         await apiPost.createPubAnswer(1, "tokenURI");
-//         let length = await contract.getTokensLength();
+//         let length = await contract.tokensLength();
 //         expect(length).to.be.equal(parseInt(prevLength) + 1);
 //       });
 
 //       it("addPubAnswer : should get answers", async () => {
 //         await apiPost.createPubAnswer(1, "tokenURI");
-//         let answers = await CollectPubs.getPubAnswers(1);
+//         let answers = await CollectPubs.answersOfPub(1);
 //         expect(answers.length).to.be.equal(1);
 //         expect(answers[0]).to.be.equal(2);
 //       });
 
 //       it("addPubAnswer : should get token URI", async () => {
 //         await apiPost.createPubAnswer(1, "answerURI");
-//         let answers = await CollectPubs.getPubAnswers(1);
+//         let answers = await CollectPubs.answersOfPub(1);
 //         expect(answers.length).to.be.equal(1);
 //         expect(await contract.tokenURI(answers[0])).to.be.equal("answerURI");
 //       });
 
 //       describe("NOT WORKS", () => {
 //         it("should NOT get answer for unknow ID", async () => {
-//           await expect(CollectPubs.getPubAnswers(2)).to.be.revertedWith(
+//           await expect(CollectPubs.answersOfPub(2)).to.be.revertedWith(
 //             "Pub not exist"
 //           );
 //         });
@@ -274,29 +274,29 @@
 
 //       describe("WORKS", () => {
 //         it("AddPubMission : should update pubs length", async () => {
-//           let prevLength = await contract.getTokensLength();
+//           let prevLength = await contract.tokensLength();
 //           await apiPost.createPubMission(1, "tokenURI");
-//           let length = await contract.getTokensLength();
+//           let length = await contract.tokensLength();
 //           expect(length).to.be.equal(parseInt(prevLength) + 1);
 //         });
 
 //         it("AddPubMission : should get pubs mission", async () => {
 //           await apiPost.createPubMission(1, "tokenURI");
-//           let indexers = await CollectPubs.getPubsMission(1);
+//           let indexers = await CollectPubs.pubsOfMission(1);
 //           expect(indexers.length).to.be.equal(1);
 //           expect(indexers[0]).to.be.equal(2);
 //         });
 
 //         it("AddPubMission : should get tokenURI", async () => {
 //           await apiPost.createPubMission(1, "tokenURI");
-//           let indexers = await CollectPubs.getPubsMission(1);
+//           let indexers = await CollectPubs.pubsOfMission(1);
 //           expect(await contract.tokenURI(indexers[0])).to.be.equal("tokenURI");
 //         });
 //       });
 
 //       describe("NOT WORKS", () => {
 //         it("should NOT get pubs mission for unknow ID", async () => {
-//           await expect(CollectPubs.getPubsMission(2)).to.be.revertedWith(
+//           await expect(CollectPubs.pubsOfMission(2)).to.be.revertedWith(
 //             "Mission not exist"
 //           );
 //         });

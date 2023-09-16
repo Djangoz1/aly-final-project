@@ -9,7 +9,7 @@ const CONTRACT_NAME = "FeaturesHub";
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let accessControl;
   let missionHub;
-  let cvHub;
+  let CVsHub;
   let arbitratorsHub;
   let disputesHub;
   let missionID = 1;
@@ -32,7 +32,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
     const contracts = await _testInitAll();
     accessControl = contracts.accessControl;
-    cvHub = contracts.cvHub;
+    CVsHub = contracts.CVsHub;
     addressHub = contracts.addressHub;
     apiPost = contracts.apiPost;
     balancesHub = contracts.balancesHub;
@@ -52,7 +52,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Enterprise", () => {
     it("Should have 0 token", async () => {
-      expect(await contract.getTokensLength()).to.equal(0);
+      expect(await contract.tokensLength()).to.equal(0);
     });
 
     it("Should have collecter", async () => {
@@ -65,14 +65,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
-      expect(await contract.getTokensLength()).to.equal(1);
+      expect(await contract.tokensLength()).to.equal(1);
       expect(await contract.ownerOf(1)).to.equal(this.owner.address);
     });
     it("Should get feature", async () => {
       await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.id).to.equal(1);
       expect(data.missionID).to.equal(1);
       expect(data.startedAt).to.equal(0);
@@ -92,7 +92,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       await apiPost.connect(this.addr1).acceptJob(1);
 
       await apiPost.validFeature(1);
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.status).to.be.equal(2);
     });
 
@@ -147,7 +147,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        expect(await contract.getTokensLength()).to.equal(1);
+        expect(await contract.tokensLength()).to.equal(1);
       });
 
       it("Should give ownership of feature to owner", async () => {
@@ -161,7 +161,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.id).to.equal(1);
       });
 
@@ -169,7 +169,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
 
         expect(data.missionID).to.equal(1);
       });
@@ -178,7 +178,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.startedAt).to.equal(0);
       });
 
@@ -186,7 +186,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.wadge).to.equal(10000000);
       });
 
@@ -194,7 +194,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.estimatedDays).to.equal(1000);
       });
 
@@ -202,7 +202,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
 
         expect(data.status).to.equal(0);
       });
@@ -218,7 +218,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
 
         expect(data.specification).to.equal(3);
       });
@@ -227,7 +227,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.isInviteOnly).to.equal(true);
       });
 
@@ -235,7 +235,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, false, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.isInviteOnly).to.equal(false);
       });
 
@@ -243,16 +243,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, false, "tokenURI", 3, {
           value: "10000000",
         });
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.cvWorker).to.equal(0);
       });
       it("Should update mission data", async () => {
-        let data = await missionHub.getData(1);
+        let data = await missionHub.dataOf(1);
         expect(data.features.length).to.equal(0);
         await apiPost.createFeature(missionID, 1000, false, "tokenURI", 3, {
           value: "10000000",
         });
-        data = await missionHub.getData(1);
+        data = await missionHub.dataOf(1);
         expect(data.features.length).to.equal(1);
         expect(data.features[0]).to.be.equal(1);
       });
@@ -343,10 +343,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     it("Should invite worker", async () => {
       await apiPost.inviteWorker(2, 1);
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.cvWorker).to.be.equal(2);
 
-      const collecterData = await collecter.getData(1);
+      const collecterData = await collecter.dataOf(1);
       expect(collecterData.missionID).to.be.equal(data.missionID);
     });
 
@@ -399,14 +399,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     it("Should worker accept job & update datas hub", async () => {
       await apiPost.inviteWorker(2, 1);
       await apiPost.connect(this.addr1).acceptJob(1);
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.startedAt).to.not.be.equal(0);
       expect(data.cvWorker).to.be.equal(2);
     });
     it("Should worker accept job & update collecter", async () => {
       await apiPost.inviteWorker(2, 1);
       await apiPost.connect(this.addr1).acceptJob(1);
-      const collecterData = await collecter.getData(1);
+      const collecterData = await collecter.dataOf(1);
       expect(collecterData.workerAcceptJob).to.be.equal(true);
       expect(collecterData.workerDemand.length).to.be.equal(0);
       expect(collecterData.signedWorker).to.be.equal(2);
@@ -415,7 +415,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     it("Should worker decline job", async () => {
       await apiPost.inviteWorker(2, 1);
       await apiPost.connect(this.addr1).declineJob(1);
-      const data = await contract.getData(1);
+      const data = await contract.dataOf(1);
       expect(data.cvWorker).to.be.equal(0);
     });
 
@@ -472,7 +472,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       await apiPost.connect(this.addr1).askToJoin(1);
       await apiPost.signWorker(1, 2);
 
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.startedAt).to.not.be.equal(0);
       expect(data.cvWorker).to.be.equal(2);
     });
@@ -481,7 +481,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       await apiPost.connect(this.addr1).askToJoin(1);
       await apiPost.signWorker(1, 2);
 
-      let data = await collecter.getData(1);
+      let data = await collecter.dataOf(1);
       expect(data.signedWorker).to.be.equal(2);
       expect(data.workerAcceptJob).to.be.equal(true);
       expect(data.workerDemand.length).to.be.equal(0);
@@ -521,22 +521,22 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     it("Should worker can ask to join", async () => {
       await apiPost.connect(this.addr1).askToJoin(1);
-      const collecterData = await collecter.getData(1);
+      const collecterData = await collecter.dataOf(1);
       expect(collecterData.workerDemand.length).to.be.equal(1);
       expect(collecterData.workerAcceptJob).to.be.equal(false);
       expect(collecterData.signedWorker).to.be.equal(0);
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.cvWorker).to.be.equal(0);
     });
 
     it("Should owner can sign worker who ask join", async () => {
       await apiPost.connect(this.addr1).askToJoin(1);
       await apiPost.signWorker(1, 2);
-      const collecterData = await collecter.getData(1);
+      const collecterData = await collecter.dataOf(1);
       expect(collecterData.workerDemand.length).to.be.equal(0);
       expect(collecterData.workerAcceptJob).to.be.equal(true);
       expect(collecterData.signedWorker).to.be.equal(2);
-      let data = await contract.getData(1);
+      let data = await contract.dataOf(1);
       expect(data.cvWorker).to.be.equal(2);
       expect(data.startedAt).to.not.be.equal(0);
     });
@@ -549,9 +549,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(
           apiPost.connect(this.addr1).askToJoin(2)
         ).to.be.revertedWith("Only on invitation");
-        const collecterData = await collecter.getData(2);
+        const collecterData = await collecter.dataOf(2);
         expect(collecterData.workerDemand.length).to.be.equal(0);
-        let data = await contract.getData(2);
+        let data = await contract.dataOf(2);
         expect(data.cvWorker).to.be.equal(0);
       });
 
@@ -596,14 +596,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("WORKS", () => {
       it("Should update status", async () => {
         await apiPost.validFeature(1);
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
 
       it("Should update after improveFeature", async () => {
         await apiPost.improveFeature(1, 30000);
         await apiPost.validFeature(1);
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
 
@@ -616,21 +616,21 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           "tokenURI"
         );
         await apiPost.validFeature(1);
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
 
       it("Should validate feature by worker if calc estimated days < 0", async () => {
         await apiPost.improveFeature(1, 0);
         await apiPost.connect(this.addr1).validFeature(1);
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
 
       it("Should update arbitrators length", async () => {
         await apiPost.validFeature(1);
 
-        let length = await arbitratorsHub.getTokensLength();
+        let length = await arbitratorsHub.tokensLength();
         expect(length).to.be.equal(1);
       });
     });
@@ -688,7 +688,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(
           apiPost.connect(this.addr1).validFeature(1)
         ).to.be.revertedWith("Must wait end of litigation");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
 
@@ -708,7 +708,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         value: "10000000",
       });
       await apiPost.connect(this.addr1).askToJoin(1);
-      let cvWorker = await cvHub.getCV(this.addr1);
+      let cvWorker = await CVsHub.cvOf(this.addr1);
       await apiPost.signWorker(1, cvWorker);
       reclamationPeriod = await disputesHub.MIN_RECLAMATION_PERIOD();
     });
@@ -721,7 +721,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           2,
           "tokenURI"
         );
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
 
@@ -732,7 +732,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           2,
           "tokenURI"
         );
-        let data = await collecter.getData(1);
+        let data = await collecter.dataOf(1);
         expect(data.workerContest).to.be.equal(false);
         expect(data.ownerContest).to.be.equal(true);
       });
@@ -745,14 +745,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           "tokenURI"
         );
 
-        expect(await disputesHub.getTokensLength()).to.be.equal(1);
+        expect(await disputesHub.tokensLength()).to.be.equal(1);
       });
 
       it("Should update worker contest", async () => {
         await apiPost
           .connect(this.addr1)
           .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI");
-        let data = await collecter.getData(1);
+        let data = await collecter.dataOf(1);
         expect(data.workerContest).to.be.equal(true);
         expect(data.ownerContest).to.be.equal(false);
       });
@@ -765,7 +765,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           2,
           "tokenURI"
         );
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
 
@@ -773,7 +773,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost
           .connect(this.addr1)
           .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
 
@@ -785,7 +785,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           "tokenURI"
         );
         await apiPost.validFeature(1);
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
     });
@@ -806,7 +806,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             "tokenURI"
           )
         ).to.be.revertedWith("Already contest");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
       it("Should NOT contest feature twice by worker", async () => {
@@ -818,7 +818,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             .connect(this.addr1)
             .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI")
         ).to.be.revertedWith("Already contest");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
       it("Should NOT contest feature if validated by owner", async () => {
@@ -832,7 +832,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             "tokenURI"
           )
         ).to.be.revertedWith("Wrong feature status");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
 
@@ -849,13 +849,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             .connect(this.addr1)
             .contestFeature(1, parseInt(reclamationPeriod) + 20, 2, "tokenURI")
         ).to.be.revertedWith("Dispute already added");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
 
       it("Should NOT contest feature if validated by worker", async () => {
         await apiPost.improveFeature(1, 0);
-        let _data = await contract.getData(1);
+        let _data = await contract.dataOf(1);
         expect(_data.cvWorker).to.be.equal(2);
         await apiPost.connect(this.addr1).validFeature(1);
 
@@ -867,7 +867,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             "tokenURI"
           )
         ).to.be.revertedWith("Wrong feature status");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(2);
       });
 
@@ -899,7 +899,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(
           apiPost.connect(this.addr1).validFeature(1)
         ).to.be.revertedWith("Must wait end of litigation");
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(3);
       });
 
@@ -937,13 +937,13 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("WORKS", () => {
       it("Should update status", async () => {
         await apiPost.improveFeature(1, 20000);
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         expect(data.status).to.be.equal(1);
       });
       it("Should update estimated days", async () => {
-        let data = await contract.getData(1);
+        let data = await contract.dataOf(1);
         await apiPost.improveFeature(1, 20000);
-        data = await contract.getData(1);
+        data = await contract.dataOf(1);
       });
     });
 

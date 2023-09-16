@@ -12,7 +12,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let addressHub;
   let contract;
   let apiPost;
-  let cvHub;
+  let CVsHub;
 
   let contracts;
 
@@ -30,7 +30,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     contracts = await _testInitAll();
     addressHub = contracts.addressHub;
     apiPost = contracts.apiPost;
-    cvHub = contracts.cvHub;
+    CVsHub = contracts.CVsHub;
     contract = contracts.arbitratorsHub;
 
     // return;
@@ -45,7 +45,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         expect(await addressHub.arbitratorsHub()).to.equal(contract.target);
       });
       it("ArbitratorsHub : should have 0 tokens length", async () => {
-        expect(await contract.getTokensLength()).to.equal(0);
+        expect(await contract.tokensLength()).to.equal(0);
       });
     });
     describe("NOT WORKS", () => {});
@@ -56,48 +56,48 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       await _testInitArbitrator(contracts, 3, this.addr1);
     });
     describe("WORKS", () => {
-      it("getData : should return tokens Length", async () => {
-        let length = await contract.getTokensLength();
+      it("dataOf : should return tokens Length", async () => {
+        let length = await contract.tokensLength();
         expect(length).to.equal(1);
       });
-      it("getData : should return arbitrator ID", async () => {
-        let data = await contract.getData(1);
+      it("dataOf : should return arbitrator ID", async () => {
+        let data = await contract.dataOf(1);
         expect(data.id).to.equal(1);
       });
 
-      it("getData : should return cvID", async () => {
-        let cvID = await cvHub.getCV(this.addr1.address);
-        let data = await contract.getData(1);
+      it("dataOf : should return cvID", async () => {
+        let cvID = await CVsHub.cvOf(this.addr1.address);
+        let data = await contract.dataOf(1);
         expect(data.cvID).to.equal(cvID);
       });
-      it("getData : should return court ID", async () => {
-        let data = await contract.getData(1);
+      it("dataOf : should return court ID", async () => {
+        let data = await contract.dataOf(1);
         expect(data.courtID).to.equal(3);
       });
-      it("getData : should return indexedAtCourt & courtLength", async () => {
-        let data = await contract.getData(1);
-        let length = await contract.getCourtLength(data.courtID);
+      it("dataOf : should return indexedAtCourt & courtLength", async () => {
+        let data = await contract.dataOf(1);
+        let length = await contract.lengthOfCourt(data.courtID);
         expect(data.indexedAtCourt).to.equal(parseInt(length) - 1);
       });
-      it("getData : should return 0 balance", async () => {
-        let data = await contract.getData(1);
+      it("dataOf : should return 0 balance", async () => {
+        let data = await contract.dataOf(1);
 
         expect(data.balance).to.equal(0);
       });
-      it("getData : should return 0 nbArbitrations", async () => {
-        let data = await contract.getData(1);
+      it("dataOf : should return 0 nbArbitrations", async () => {
+        let data = await contract.dataOf(1);
 
         expect(data.nbArbitrations).to.equal(0);
       });
-      it("getData : should return id from indexersCV", async () => {
-        let data = await contract.getData(1);
-        let _id = await contract.getArbitrationOfCV(data.cvID, data.courtID);
+      it("dataOf : should return id from indexersCV", async () => {
+        let data = await contract.dataOf(1);
+        let _id = await contract.arbitrationOfCV(data.cvID, data.courtID);
         expect(data.id).to.equal(_id);
       });
     });
     describe("NOT WORKS", () => {
       it("Should NOT return data for unexisting ID", async () => {
-        await expect(contract.getData(2)).to.be.revertedWith(
+        await expect(contract.dataOf(2)).to.be.revertedWith(
           "Invalid arbitrator ID"
         );
       });
@@ -108,12 +108,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("WORKS", () => {
       it("validateMission : should set arbitrator after validate mission from sender", async () => {
         await _testInitArbitrator(contracts, 3, this.addr1);
-        expect(await contract.getTokensLength()).to.equal(1);
+        expect(await contract.tokensLength()).to.equal(1);
       });
       it("validateMission : should used twice for different court ID", async () => {
         await _testInitArbitrator(contracts, 3, this.addr1);
         await _testInitArbitrator(contracts, 4, this.addr1);
-        expect(await contract.getTokensLength()).to.equal(2);
+        expect(await contract.tokensLength()).to.equal(2);
       });
     });
     describe("NOT WORKS", () => {
@@ -149,7 +149,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
-        let data = await contract.getData(arbitratorID);
+        let data = await contract.dataOf(arbitratorID);
         expect(data.balance).to.equal(price);
       });
       it("investOnCourt: should used many times", async () => {
@@ -159,12 +159,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
-        let data = await contract.getData(arbitratorID);
+        let data = await contract.dataOf(arbitratorID);
         expect(data.balance).to.equal(price * 2);
         await apiPost
           .connect(this.addr1)
           .investOnCourt(courtID, { value: `${price}` });
-        data = await contract.getData(arbitratorID);
+        data = await contract.dataOf(arbitratorID);
         expect(data.balance).to.equal(price * 3);
       });
       it("investOnCourt: should update true balance", async () => {
@@ -173,9 +173,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost
           .connect(this.addr1)
           .investOnCourt(4, { value: `${price}` });
-        let data = await contract.getData(arbitratorID);
+        let data = await contract.dataOf(arbitratorID);
         expect(data.balance).to.equal(0);
-        let data2 = await contract.getData(parseInt(arbitratorID) + 1);
+        let data2 = await contract.dataOf(parseInt(arbitratorID) + 1);
         expect(data.cvID).to.equal(data2.cvID);
         expect(data2.balance).to.equal(price);
       });
@@ -226,10 +226,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
     describe("WORKS", () => {
       it("withdrawFromCourt: should update balance data", async () => {
-        let data = await contract.getData(arbitratorID);
+        let data = await contract.dataOf(arbitratorID);
         expect(data.balance).to.equal(price);
         await apiPost.connect(this.addr1).withdrawFromCourt(price, courtID);
-        let data2 = await contract.getData(arbitratorID);
+        let data2 = await contract.dataOf(arbitratorID);
         expect(data2.balance).to.equal(0);
       });
 

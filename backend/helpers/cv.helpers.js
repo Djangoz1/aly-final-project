@@ -3,7 +3,7 @@ const { expect, assert } = require("chai");
 
 const getContractCV = async ({ factoryCV, owner }) => {
   await factoryCV.createCV(owner);
-  let cvAddr = await factoryCV.getCV(owner);
+  let cvAddr = await factoryCV.cvOf(owner);
   const CV = await ethers.getContractAt("CV", cvAddr);
   return CV;
 };

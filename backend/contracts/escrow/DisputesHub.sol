@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {DisputeDatas} from "../libraries/disputes/DisputeDatas.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 import {BindingsMint} from "../libraries/BindingsMint.sol";
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
-import {IAddressHub} from "../interfaces/IAddressHub.sol";
-import {IArbitratorsHub} from "../interfaces/IArbitratorsHub.sol";
-import {IFactory} from "../interfaces/IFactory.sol";
+import {IAccessControl} from "../interfaces/system/IAccessControl.sol";
+import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
+import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
+import {IFactory} from "../interfaces/system/IFactory.sol";
 
-import {IFeaturesHub} from "../interfaces/IFeaturesHub.sol";
-import {IMissionsHub} from "../interfaces/IMissionsHub.sol";
+import {IFeaturesHub} from "../interfaces/works/IFeaturesHub.sol";
+import {IMissionsHub} from "../interfaces/works/IMissionsHub.sol";
 import {Dispute} from "./Dispute.sol";
 
-contract DisputesHub {
+contract DisputesHub is Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIDs;
@@ -39,26 +40,27 @@ contract DisputesHub {
     uint32 public constant MAX_RECLAMATION_PERIOD = 30 seconds;
     uint8 public maxArbitrators = 10; // Increase on production
 
-    IAddressHub private _iAH;
+    IAddressSystem private _iAS;
 
     modifier onlyProxy() {
         require(
-            msg.sender == _iAH.collectWorkInteraction(),
+            msg.sender == _iAS.collectWorkInteraction(),
             "Must call by proxy bindings"
         );
         _;
     }
 
-    constructor(address _addressHub) {
-        require(_addressHub != address(0), "DisputesHub: Invalid address hub");
-        _iAH = IAddressHub(_addressHub);
-        _iAH.setDisputesHub();
+    constructor(address _addressSystem) {
         require(
-            _iAH.disputesHub() == address(this),
+            _addressSystem != address(0),
+            "DisputesHub: Invalid address hub"
+        );
+        _iAS = IAddressSystem(_addressSystem);
+        _iAS.setDisputesHub();
+        require(
+            _iAS.disputesHub() == address(this),
             "Failed construct disputes hub"
         );
-
-        // _iAH.collectWorkInteraction() = featuresHub.addrCWI();
     }
 
     // Ajoutez votre code ici
@@ -72,11 +74,11 @@ contract DisputesHub {
         string memory _tokenURI
     ) external onlyProxy returns (bool) {
         DataTypes.FeatureData memory featureData = IFeaturesHub(
-            _iAH.featuresHub()
-        ).getData(_featureID);
+            _iAS.featuresHub()
+        ).dataOf(_featureID);
         if (
-            Bindings.ownerOf(_featureID, _iAH.featuresHub()) == _to ||
-            Bindings.ownerOf(featureData.cvWorker, _iAH.cvHub()) == _to
+            Bindings.ownerOf(_featureID, _iAS.featuresHub()) == _to ||
+            Bindings.ownerOf(featureData.cvWorker, _iAS.cvsHub()) == _to
         ) {
             require(indexersFeatures[_featureID] == 0, "Dispute already added");
             require(
@@ -86,7 +88,7 @@ contract DisputesHub {
             );
             require(_nbArbitrators <= maxArbitrators, "Exceed max arbitrators");
             DisputeDatas.Data memory _data = BindingsMint.checked(
-                address(_iAH),
+                address(_iAS),
                 _featureID,
                 _courtID,
                 _nbArbitrators,
@@ -95,7 +97,7 @@ contract DisputesHub {
             );
             _tokenIDs.increment();
             _data.id = _tokenIDs.current();
-            indexersDisputes[_tokenIDs.current()] = IFactory(_iAH.factory())
+            indexersDisputes[_tokenIDs.current()] = IFactory(_iAS.factory())
                 .mintDispute(_to, _data);
             indexersFeatures[_featureID] = _tokenIDs.current();
             return true;
@@ -107,19 +109,19 @@ contract DisputesHub {
     function metaevidence(
         uint _featureID
     ) external view returns (DataTypes.EvidenceData memory) {
-        address _addrMH = _iAH.missionsHub();
+        address _addrMH = _iAS.missionsHub();
         DataTypes.EvidenceData memory evidence;
 
         evidence.missionURI = Bindings.tokenURI(
-            IFeaturesHub(_iAH.featuresHub()).getData(_featureID).missionID,
+            IFeaturesHub(_iAS.featuresHub()).dataOf(_featureID).missionID,
             _addrMH
         );
-        evidence.featureURI = Bindings.tokenURI(_featureID, _iAH.featuresHub());
+        evidence.featureURI = Bindings.tokenURI(_featureID, _iAS.featuresHub());
 
         return evidence;
     }
 
-    function getTokensLength() external view returns (uint) {
+    function tokensLength() external view returns (uint) {
         return _tokenIDs.current();
     }
 

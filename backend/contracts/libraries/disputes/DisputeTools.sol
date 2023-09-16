@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {DisputeRules} from "./DisputeRules.sol";
-
 import {Bindings} from "../Bindings.sol";
+
+import {DisputeRules} from "./DisputeRules.sol";
 import {DisputeDatas} from "./DisputeDatas.sol";
 import {DisputeArbitrators} from "./DisputeArbitrators.sol";
-import {IAddressHub} from "../../interfaces/IAddressHub.sol";
-import {IEscrowDatasHub} from "../../interfaces/IEscrowDatasHub.sol";
-import {IArbitratorsHub} from "../../interfaces/IArbitratorsHub.sol";
+import {DisputeCounters} from "./DisputeCounters.sol";
 import {DisputeTimes} from "./DisputeTimes.sol";
 
-import {DisputeCounters} from "./DisputeCounters.sol";
+import {IDisputesDatasHub} from "../../interfaces/escrow/IDisputesDatasHub.sol";
 
 library DisputeTools {
     // Ajoutez votre code ici
@@ -48,7 +46,7 @@ library DisputeTools {
     }
 
     function start(Tools storage _tools) internal {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeRules.Data memory _rules = _iEDH.rulesOf(_tools.id);
         DisputeTimes.Data memory _timers = _iEDH.timersOf(_tools.id);
         DisputeCounters.Data memory _counter = _iEDH.countersOf(_tools.id);
@@ -62,7 +60,7 @@ library DisputeTools {
     function allowanceOf(
         uint _arbitratorID,
         DisputeArbitrators.Status _status,
-        IEscrowDatasHub _iEDH,
+        IDisputesDatasHub _iEDH,
         Tools storage _tools
     ) internal returns (bool) {
         if (_iEDH.allowanceOf(_tools.id, _arbitratorID) == _status) {
@@ -75,7 +73,7 @@ library DisputeTools {
         DisputeRules.Vote _vote,
         Tools memory _tools
     ) internal returns (uint) {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
 
         require(
             _iEDH.voteOf(_tools.id, _arbitratorID) == DisputeRules.Vote.Waiting,
@@ -93,7 +91,7 @@ library DisputeTools {
     }
 
     function tally(Tools storage _tools) internal returns (uint) {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeCounters.Data memory _counter = _iEDH.countersOf(_tools.id);
         DisputeRules.Data memory _rules = _iEDH.rulesOf(_tools.id);
         DisputeDatas.Data memory _datas = _iEDH.datasOf(_tools.id);
@@ -116,7 +114,7 @@ library DisputeTools {
     }
 
     function appeal(Tools storage _tools) internal returns (bool) {
-        IEscrowDatasHub _iEDH = IEscrowDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
         DisputeRules.Data memory _rules = _iEDH.rulesOf(_tools.id);
         DisputeTimes.Data memory _timers = _iEDH.timersOf(_tools.id);
         uint[] memory _arbitrators = _iEDH.arbitratorsOf(_tools.id);

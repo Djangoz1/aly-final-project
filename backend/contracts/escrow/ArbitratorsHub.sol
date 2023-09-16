@@ -4,15 +4,15 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Bindings} from "../libraries/Bindings.sol";
-import {IAccessControl} from "../interfaces/IAccessControl.sol";
-import {ICVHub} from "../interfaces/ICVHub.sol";
-import {IAddressHub} from "../interfaces/IAddressHub.sol";
 
-contract ArbitratorsHub is ERC721URIStorage {
+import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
+import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
+
+contract ArbitratorsHub is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     // We don't use  ERC721 standard for reducing gas cost
     Counters.Counter private _tokenIDs;
@@ -32,30 +32,30 @@ contract ArbitratorsHub is ERC721URIStorage {
         internal indexersCV;
     // Ajoutez votre code ici
 
-    IAddressHub private addressHub;
+    IAddressSystem private _iAS;
 
     modifier onlyProxy() {
         require(
-            msg.sender == addressHub.featuresHub() || msg.sender == addressHub.apiPost(),
+            msg.sender == _iAS.featuresHub() || msg.sender == _iAS.apiPost() || msg.sender == _iAS.disputesHub(),
             "Must call by proxy bindings"
         );
         _;
     }
 
-    constructor(address _addressHub) ERC721("Arbitrator", "WA") {
+    constructor(address _addressSystem) ERC721("Arbitrator", "WA") {
+        _iAS = IAddressSystem(_addressSystem);
+        _iAS.setArbitratorsHub();
         require(
-            _addressHub != address(0),
-            "ArbitratorHub: Invalid address hub"
+            _iAS.arbitratorsHub() == address(this),
+            "ArbitratorsHub : Error deployment"
         );
-        addressHub = IAddressHub(_addressHub);
-        addressHub.setArbitratorsHub();
     }
 
     function setArbitrator(
         uint _cvID,
         DataTypes.CourtIDs _courtID
     ) external onlyProxy {
-        address _addrCVH = addressHub.cvHub();
+        address _addrCVH = _iAS.cvsHub();
         require(_cvID <= Bindings.tokensLength(_addrCVH), "Invalid CV ID");
         require(indexersCV[_cvID][_courtID] == 0, "Arbitrator already added");
         _tokenIDs.increment();
@@ -70,7 +70,11 @@ contract ArbitratorsHub is ERC721URIStorage {
         indexersCV[_cvID][_courtID] = newArbitrator.id;
     }
 
-    function investOnCourt(uint _cvID, uint _amount,  DataTypes.CourtIDs _courtID) external payable onlyProxy {
+    function investOnCourt(
+        uint _cvID,
+        uint _amount,
+        DataTypes.CourtIDs _courtID
+    ) external payable onlyProxy {
         uint arbitratorID = indexersCV[_cvID][_courtID];
         require(arbitratorID != 0, "Arbitrator not found");
         datas[arbitratorID].balance += _amount;
@@ -78,19 +82,17 @@ contract ArbitratorsHub is ERC721URIStorage {
     }
 
     function withdrawFromCourt(
-        uint _cvID, 
+        uint _cvID,
         uint _amount,
         DataTypes.CourtIDs _courtID
-    ) external onlyProxy{
-        
-
+    ) external onlyProxy {
         uint arbitratorID = indexersCV[_cvID][_courtID];
         require(arbitratorID != 0, "Arbitrator not found");
         require(datas[arbitratorID].courtID >= _courtID, "Missmatch court ID");
         require(datas[arbitratorID].balance >= _amount, "No enough balance");
         datas[arbitratorID].balance -= _amount;
         balancesCourt[_courtID] -= _amount;
-        
+
         // ! REENTRENCY ?
     }
 
@@ -195,7 +197,7 @@ contract ArbitratorsHub is ERC721URIStorage {
     //     return arbitrators[_arbitratorID];
     // }
 
-    function getCourtLength(
+    function lengthOfCourt(
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256) {
         return indexersCourt[_courtID].length;
@@ -207,18 +209,18 @@ contract ArbitratorsHub is ERC721URIStorage {
         return balancesCourt[_courtID];
     }
 
-    function getTokensLength() external view returns (uint256) {
+    function tokensLength() external view returns (uint256) {
         return _tokenIDs.current();
     }
 
-    function getData(
+    function dataOf(
         uint256 _arbitratorID
     ) external view returns (DataTypes.ArbitratorData memory) {
         require(_arbitratorID <= _tokenIDs.current(), "Invalid arbitrator ID");
         return datas[_arbitratorID];
     }
 
-    function getArbitrationOfCV(
+    function arbitrationOfCV(
         uint _cvID,
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256) {
@@ -226,7 +228,7 @@ contract ArbitratorsHub is ERC721URIStorage {
         return indexersCV[_cvID][_courtID];
     }
 
-    function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external {
+    function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external onlyProxy {
         // ! Faire un onlyDisputeHub
         require(
             indexersCV[cvID][_courtID] > 0,
@@ -235,7 +237,7 @@ contract ArbitratorsHub is ERC721URIStorage {
         datas[indexersCV[cvID][_courtID]].nbArbitrations++;
     }
 
-    function _getCV(address _for) internal view returns (uint) {
-        return Bindings.getCV(_for, addressHub.cvHub());
+    function _cvOf(address _for) internal view returns (uint) {
+        return Bindings.cvOf(_for, _iAS.cvsHub());
     }
 }

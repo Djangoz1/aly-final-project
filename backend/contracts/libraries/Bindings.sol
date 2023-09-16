@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import {DataTypes} from "./DataTypes.sol";
 
-import {DataTypes} from "../libraries/DataTypes.sol";
-
-import {ICVHub} from "../interfaces/ICVHub.sol";
-import {IERC721} from "../interfaces/IERC721.sol";
-import {IArbitratorsHub} from "../interfaces/IArbitratorsHub.sol";
-import {IContract} from "../interfaces/IContract.sol";
+import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
+import {IERC721} from "../interfaces/erc/IERC721.sol";
+import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
+import {IContract} from "../interfaces/system/IContract.sol";
 
 library Bindings {
-    function getCV(address _for, address _cvHub) internal view returns (uint) {
-        return ICVHub(_cvHub).getCV(_for);
+    function cvOf(address _for, address _CVsHub) internal view returns (uint) {
+        return ICVsHub(_CVsHub).cvOf(_for);
     }
 
     function arbitratorOf(
@@ -22,10 +19,7 @@ library Bindings {
         address _arbitratorsHub
     ) internal view returns (uint) {
         return
-            IArbitratorsHub(_arbitratorsHub).getArbitrationOfCV(
-                _cvID,
-                _courtID
-            );
+            IArbitratorsHub(_arbitratorsHub).arbitrationOfCV(_cvID, _courtID);
     }
 
     function ownerOf(
@@ -43,7 +37,7 @@ library Bindings {
     }
 
     function tokensLength(address _ercAddr) internal view returns (uint) {
-        return IContract(_ercAddr).getTokensLength();
+        return IContract(_ercAddr).tokensLength();
     }
 
     // Ajoutez votre code ici

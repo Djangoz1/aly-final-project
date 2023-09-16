@@ -3,7 +3,7 @@ const { expect, assert } = require("chai");
 const { _testInitAll, getContractAt } = require("../../helpers/test_init");
 const { ZERO_ADDRESS } = require("../../helpers/test_utils");
 
-const CONTRACT_NAME = "CVHub";
+const CONTRACT_NAME = "CVsHub";
 
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let contract;
@@ -23,7 +23,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     let contracts = await _testInitAll();
     addressHub = await contracts.addressHub;
     accessControl = await contracts.accessControl;
-    contract = await contracts.cvHub;
+    contract = await contracts.CVsHub;
     apiPost = await contracts.apiPost;
     factoryMission = await contracts.missionsHub;
   });
@@ -32,18 +32,18 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Initialization CV Hub", () => {
     it("Should have a collecter", async () => {
-      expect(await contract.getCollectFollowCv()).to.be.not.equal(ZERO_ADDRESS);
+      expect(await contract.cvOfsDatasHub()).to.be.not.equal(ZERO_ADDRESS);
     });
 
     it("Should have 0 token", async () => {
-      expect(await contract.getTokensLength()).to.be.equal(0);
+      expect(await contract.tokensLength()).to.be.equal(0);
     });
 
     it("Should create a CV", async () => {
       await apiPost.createCV("tokenURI");
-      expect(await contract.getTokensLength()).to.be.equal(1);
+      expect(await contract.tokensLength()).to.be.equal(1);
       expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
-      expect(await contract.getCV(this.owner.address)).to.be.equal(1);
+      expect(await contract.cvOf(this.owner.address)).to.be.equal(1);
       expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
     });
 
@@ -67,14 +67,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("WORKS", () => {
       it("Should create a cv", async () => {
-        expect(await contract.getTokensLength()).to.be.equal(0);
+        expect(await contract.tokensLength()).to.be.equal(0);
         await apiPost.connect(this.addr1).createCV("tokenURI");
-        expect(await contract.getTokensLength()).to.be.equal(1);
+        expect(await contract.tokensLength()).to.be.equal(1);
       });
 
       it("Should return true id", async () => {
         await apiPost.connect(this.addr1).createCV("tokenURI");
-        expect(await contract.getCV(this.addr1.address)).to.be.equal(1);
+        expect(await contract.cvOf(this.addr1.address)).to.be.equal(1);
       });
 
       it("Should return true tokenURI", async () => {
@@ -109,17 +109,15 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     beforeEach(async () => {
       collecter = await getContractAt(
-        "CollectFollowCv",
-        await contract.getCollectFollowCv()
+        "cvsDatasHub",
+        await contract.cvOfsDatasHub()
       );
       await apiPost.createCV("tokenURI");
       await apiPost.connect(this.addr1).createCV("tokenURI");
     });
     describe("WORKS", () => {
       it("Should have a collecter", async () => {
-        expect(await contract.getCollectFollowCv()).to.be.equal(
-          collecter.target
-        );
+        expect(await contract.cvOfsDatasHub()).to.be.equal(collecter.target);
       });
       it("Should isFollow return true", async () => {
         await apiPost.followCV(2);
@@ -127,31 +125,31 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         expect(isFollow).to.be.equal(true);
       });
       it("Should update length followers", async () => {
-        let length = await collecter.getFollowerLength(2);
+        let length = await collecter.lengthOfFollower(2);
         expect(length).to.be.equal(0);
         await apiPost.followCV(2);
-        length = await collecter.getFollowerLength(2);
+        length = await collecter.lengthOfFollower(2);
 
         expect(length).to.be.equal(1);
       });
       it("Should update length followed", async () => {
-        let length = await collecter.getFollowedLength(1);
+        let length = await collecter.lengthOfFollowed(1);
         expect(length).to.be.equal(0);
         await apiPost.followCV(2);
-        length = await collecter.getFollowedLength(1);
+        length = await collecter.lengthOfFollowed(1);
 
         expect(length).to.be.equal(1);
       });
 
       it("Should get cv follower", async () => {
         await apiPost.followCV(2);
-        let follower = await collecter.getFollower(2, 0);
+        let follower = await collecter.followerOf(2, 0);
         expect(follower).to.be.equal(1);
       });
 
       it("Should get cv followed", async () => {
         await apiPost.followCV(2);
-        let follower = await collecter.getFollowed(1, 0);
+        let follower = await collecter.followedOf(1, 0);
         expect(follower).to.be.equal(2);
       });
     });
@@ -186,8 +184,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     beforeEach(async () => {
       collecter = await getContractAt(
-        "CollectFollowCv",
-        await contract.getCollectFollowCv()
+        "cvsDatasHub",
+        await contract.cvOfsDatasHub()
       );
       await apiPost.createCV("tokenURI");
       await apiPost.connect(this.addr1).createCV("tokenURI");
@@ -201,18 +199,18 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update length followers", async () => {
-        let length = await collecter.getFollowerLength(2);
+        let length = await collecter.lengthOfFollower(2);
         expect(length).to.be.equal(1);
         await apiPost.unfollowCV(2);
-        length = await collecter.getFollowerLength(2);
+        length = await collecter.lengthOfFollower(2);
 
         expect(length).to.be.equal(0);
       });
       it("Should update length followed", async () => {
-        let length = await collecter.getFollowedLength(1);
+        let length = await collecter.lengthOfFollowed(1);
         expect(length).to.be.equal(1);
         await apiPost.unfollowCV(2);
-        length = await collecter.getFollowedLength(1);
+        length = await collecter.lengthOfFollowed(1);
 
         expect(length).to.be.equal(0);
       });
