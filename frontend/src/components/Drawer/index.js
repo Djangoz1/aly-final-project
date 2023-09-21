@@ -18,20 +18,19 @@ import {
 } from "icones";
 
 import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
-import { _setterCV, _setterFactoryCV } from "utils/ui-tools/web3-tools";
+
 import { useAccount } from "wagmi";
 import Link from "next/link";
 
 export const Drawer = ({ setter, isOpen }) => {
   const { cv } = useAuthState();
 
-  const currentUrl = window.location.pathname;
-  console.log(currentUrl);
+  const currentUrl = window?.location?.pathname || null;
 
   const { address, isConnected } = useAccount();
   const dispatch = useAuthDispatch();
   const createCV = async () => {
-    await _setterFactoryCV("createCV", [address]);
+    // await _setterFactoryCV("createCV", [address]);
     doAuthCV(dispatch, address);
   };
 
@@ -39,7 +38,7 @@ export const Drawer = ({ setter, isOpen }) => {
     { path: "/", icon: icfyHOME, title: "Home" },
     { path: "/community", icon: icfyMAIL, title: "Community" },
     { path: "/community/launchpad", icon: icfyROCKET, title: "Launchpad" },
-    { path: `/profile/cv/${cv}`, icon: icfyCV, title: "Profile" },
+    { path: `/profile`, icon: icfyCV, title: "Profile" },
     { path: `/profile/mission`, icon: icfyMISSION, title: "Mission" },
     { path: `/settings`, icon: icfySETTINGS, title: "Settings" },
     { path: `/about`, icon: icfyINFO, title: "About" },
@@ -67,11 +66,12 @@ export const Drawer = ({ setter, isOpen }) => {
           isOpen ? "w-[18vw]" : "w-[6vw]"
         } h-screen top-0  left-0  fixed`}
       >
-        <ul className="menu  p-4 w-full relative  h-full bg-base-200 text-base-content">
+        <ul className="menu  p-2 w-full relative  h-full page text-base-content">
           {links?.map((el) => (
             <Link
+              key={uuidv4()}
               href={el?.path}
-              className={`btn border mx-auto border-black/50 shadow flex justify-between ${
+              className={`btn  mx-auto shadow btn-ghost flex justify-between ${
                 isOpen ? "w-full" : "w-fit"
               }`}
             >

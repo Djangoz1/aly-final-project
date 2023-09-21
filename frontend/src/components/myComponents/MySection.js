@@ -1,9 +1,9 @@
 import React from "react";
-
+import { v4 as uuidv4 } from "uuid";
 export const MySection = ({ children, styles }) => {
   return (
     <div
-      className={`w-5/6 h-full min-h-[90vh] relative items-center flex mx-auto ${styles}`}
+      className={`w-[90%] h-full min-h-[90vh] relative items-center flex mx-auto ${styles}`}
     >
       {children}
     </div>
@@ -21,6 +21,7 @@ export const MyBottomSection = ({ stats }) => {
               : "border-r-0"
           }`}
           style={{ width: `${80 / stats?.length}%` }}
+          key={uuidv4()}
         >
           <span className="text-white font-black text-2xl mr-3">
             {e?.value}

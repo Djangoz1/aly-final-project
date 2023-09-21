@@ -58,6 +58,11 @@ contract LaunchpadHub is Ownable {
         return indexer[_cvID];
     }
 
+    function balanceOf(address _owner) external view returns (uint) {
+        uint _cvID = Bindings.cvOf(_owner, _iAS.cvsHub());
+        return indexer[_cvID].length;
+    }
+
     function addressOf(uint _launchpadID) external view returns (address) {
         require(_launchpadID <= _tokenIDs.current(), "ID out of range");
         require(launchpads[_launchpadID] != address(0), "Launchpad not found");

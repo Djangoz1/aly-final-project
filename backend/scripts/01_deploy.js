@@ -56,9 +56,12 @@ async function main() {
   const apiPost = contracts.systems.apiPost;
   console.log(`apiPost deployed to ${apiPost.target}`);
 
+  const apiGet = contracts.systems.apiGet;
+  console.log(`apiGet deployed to ${apiGet.target}`);
+
   const factory = contracts.systems.factory;
   console.log(`factory deployed to ${factory.target}`);
-  s;
+
   const disputesHub = contracts.escrows.disputesHub;
   console.log(`disputesHub deployed to ${disputesHub.target}`);
 
@@ -90,6 +93,7 @@ async function main() {
     disputesDatasHub: disputesDatasHub.target,
     balancesHub: balancesHub.target,
     apiPost: apiPost.target,
+    apiGet: apiGet.target,
     factory: factory.target,
     disputesHub: disputesHub.target,
     arbitratorsHub: arbitratorsHub.target,
@@ -101,12 +105,12 @@ async function main() {
   await writeFileAsync("addresses.json", jsonString);
   console.log("JSON file created: addresses.json");
 
-  return jsonContent;
+  return contracts;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// main().catch((error) => {
+//   console.error(error);
+//   process.exitCode = 1;
+// });
 
 module.exports = { main };

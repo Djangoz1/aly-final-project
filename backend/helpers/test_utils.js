@@ -14,13 +14,44 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const getAccount = (accounts, address) =>
   accounts.filter((el) => (el.address === address ? el : null));
 
+const CV_DATAS_URI_EXEMPLE = {
+  cv: "img/cv.jpeg",
+  title: "Work3 CV",
+  username: "Django",
+  description: "CEO of deWork 🫅🏽",
+  image: "img/profile.jpeg",
+  attributes: [
+    {
+      visibility: true,
+      cvImg: "stringURI",
+      banniere: "",
+      identity: {
+        firstName: "Julien",
+        lastName: "Djangone",
+        phone: "07 83 91 30 31",
+        dateOfBirth: "02/10/1997",
+      },
+      social: {
+        linkedin: null,
+        facebook: null,
+        twitter: null,
+        github: null,
+      },
+      createdAt: Date.now(),
+      skills: [2, 4, 8, 10],
+      domain: 2,
+      languages: [
+        { langue: "Français", level: 3 },
+        { langue: "Anglais", level: 2 },
+      ],
+    },
+  ],
+};
 const PUB_DATAS_URI_EXEMPLE = {
-  id: 0,
-  title: "Title of my post",
+  title: "Work3 Pub",
   description:
     "This is a part where content value stored. I can write everything I want to share at the community or missions community or private community.",
-  image: "https://picsum.photos/id/100/200",
-  name: "Mission #",
+  image: "img/pub.jpeg",
 };
 
 // *::::::::::::: ------- :::::::::::::* //
@@ -29,15 +60,26 @@ const PUB_DATAS_URI_EXEMPLE = {
 
 const MISSION_DATAS_URI_EXEMPLE = {
   id: 0,
-  title: "Title of my mission",
+  title: "Work3 Mission",
   description:
     "This is a part where content value stored. I can write everything I want to describe my mission. This description must provide a maximum of information about the mission. This is a kind of roadmap.",
-  image: "https://picsum.photos/id/100/200",
+  image: "img/mission.png",
   name: "Mission #",
   // Other mission id
-  reference: null,
+
+  attributes: {
+    reference: null,
+    facebook: null,
+    evaluation: [],
+    experience: 0,
+    disponibilite: 0,
+
+    twitter: null,
+    linkedin: null,
+    github: null,
+    domain: "Blockchain enterprise",
+  },
   // you can provide a link for more information about the mission like current website
-  url: "https://currentwebsite.com/Djangoz1/aly-final-project",
 };
 
 // *::::::::::::: -------- :::::::::::::* //
@@ -46,26 +88,18 @@ const MISSION_DATAS_URI_EXEMPLE = {
 
 const FEATURE_DATAS_EXEMPLE = {
   missionID: 0,
-  tokenURI: "uritoken",
-  startedAt: 0,
-  createdAt: 0,
+  specification: 3,
   estimatedDays: 30,
-  assignedWorker: ZERO_ADDRESS,
-  status: 0,
-  isInviteOnly: true,
   wadge: 0.02,
+  isInviteOnly: true,
 };
 
 const FEATURE_DATAS_URI_EXEMPLE = {
-  id: 0,
   title: "Dev blockchain",
   description:
     "This is a part where content value stored. I can write everything I want to describe my feature. Once a worker join this feature, I must follow instruction of this content. In the end, if a litigation arrived between owner(me) and worker, this content will be shared on Kleros Court",
   image: "https://picsum.photos/id/100/200",
-  name: "Feature #",
-  url: "https://github.com/Djangoz1/aly-final-project",
-  devLanguage: "solidity",
-  domain: "web3",
+  attributes: { domain: "web3" },
 };
 
 // *::::::::::::: ------------- :::::::::::::* //
@@ -110,6 +144,7 @@ module.exports = {
   _testParseHex,
   ZERO_ADDRESS,
   getAccount,
+  CV_DATAS_URI_EXEMPLE,
   PUB_DATAS_URI_EXEMPLE,
   WORKER_PROPOSAL_DATAS_EXEMPLE,
   MISSION_DATAS_URI_EXEMPLE,

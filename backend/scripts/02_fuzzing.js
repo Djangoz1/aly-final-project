@@ -4,19 +4,28 @@ const { main: deployMain } = require("./01_deploy");
 const hre = require("hardhat");
 const {
   _testInitFeature,
-  _testInitCV,
+
   _testInitMission,
   _testInitPub,
   _testInitWorkerProposal,
+  _testInitArbitrator,
 } = require("../helpers/test_init");
-const CONTRACT_NAME = "FactoryMission";
+const { createURICV } = require("../utils/pinata");
+const {
+  _createCV,
+  _createMission,
+  _createFeature,
+  _createPub,
+} = require("../utils/web3-tools");
 
 async function main() {
   const mainDeploy = await deployMain();
 
-  const _accessControl = mainDeploy["accessControl"];
-
-  const addresses = ([
+  let addressSystem = mainDeploy.systems.addressSystem;
+  let apiPost = mainDeploy.systems.apiPost;
+  let apiGet = mainDeploy.systems.apiGet;
+  let cvsHub = mainDeploy.cvs.hub;
+  [
     this.owner,
     this.addr1,
     this.addr2,
@@ -25,32 +34,118 @@ async function main() {
     this.addr5,
     this.addr6,
     this.addr7,
-  ] = await ethers.getSigners());
+  ] = await ethers.getSigners();
 
-  // for (let index = 0; index < addresses.length; index++) {
+  let cv = await _createCV("Django", this.owner, addressSystem.target);
+  console.log("cv#", cv, "created");
+  cv = await _createCV("Testor1", this.addr1, addressSystem.target);
+  console.log("cv#", cv, "created");
+  cv = await _createCV("Testor2", this.addr2, addressSystem.target);
+  console.log("cv#", cv, "created");
+  cv = await _createCV("Testor3", this.addr3, addressSystem.target);
+  console.log("cv#", cv, "created");
+  cv = await _createCV("Testor4", this.addr4, addressSystem.target);
+  console.log("cv#", cv, "created");
+  cv = await _createCV("Testor5", this.addr5, addressSystem.target);
+  console.log("cv#", cv, "created");
+  cv = await _createCV("Testor6", this.addr6, addressSystem.target);
+  console.log("cv#", cv, "created");
 
-  const user = this.owner;
+  let pub = await _createPub({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+  console.log("pub#", pub, "created");
+  pub = await _createPub({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+  console.log("pub#", pub, "created");
+  pub = await _createPub({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+  console.log("pub#", pub, "created");
+  pub = await _createPub({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+  console.log("pub#", pub, "created");
 
-  const cv = await _testInitCV(_accessControl, user, 0.2);
-  console.log("CV create on ", cv.target);
+  let feature = await _createFeature({
+    account: this.owner,
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+  });
+  let _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
+  feature = await _createFeature({
+    account: this.owner,
+    isInviteOnly: false,
+    missionID: _missionID,
+    specification: 8,
+    title: "Dev Backend",
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
+  feature = await _createFeature({
+    account: this.owner,
+    isInviteOnly: false,
+    missionID: _missionID,
+    specification: 12,
+    title: "IA engeneer",
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
+  feature = await _createFeature({
+    account: this.owner,
+    isInviteOnly: false,
+    missionID: _missionID,
+    specification: 15,
+    title: "Dev frontend",
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
 
-  const pub = await _testInitPub(_accessControl, user);
-  console.log("Pub create on id", pub);
+  feature = await _createFeature({
+    account: this.owner,
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
 
-  const mission = await _testInitMission(_accessControl, user, 1);
-  console.log("Mission create on id", mission);
+  feature = await _createFeature({
+    account: this.owner,
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+    specification: 5,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
 
-  const feature = await _testInitFeature(_accessControl, user, mission);
-  console.log("Feature create on id", feature);
+  feature = await _createFeature({
+    account: this.addr2,
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
 
-  const workerProposal = await _testInitWorkerProposal(
-    _accessControl,
-    user,
-    feature
-  );
-  console.log("WorkerProposal create on id", feature);
+  feature = await _createFeature({
+    account: this.addr3,
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
 
-  await cv.connect(user).setName("Ownie");
+  return;
+
   // if (index === 0) {
   // } else {
   //   await cv.connect(user).setName(`Testor${index}`);

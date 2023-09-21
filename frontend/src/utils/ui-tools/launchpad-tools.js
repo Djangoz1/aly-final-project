@@ -1,9 +1,4 @@
 import { fetchJSONByCID } from "./pinata-tools";
-import {
-  _getterAccessControl,
-  _getterERC20,
-  _getterLaunchpad,
-} from "./web3-tools";
 
 export const calcTierAverage = (datas, target) => {
   let result = 0;
@@ -17,34 +12,34 @@ export const calcTierAverage = (datas, target) => {
   return result;
 };
 
-export const getLaunchpadDatas = async (address) => {
-  const datas = await _getterLaunchpad(address, "getDatas");
-  let amountRaised = 0;
+// export const getLaunchpadDatas = async (address) => {
+//   const datas = await _getterLaunchpad(address, "getDatas");
+//   let amountRaised = 0;
 
-  for (let index = 0; index < datas?.numberOfTier; index++) {
-    const element = await _getterLaunchpad(address, "getTierDatas", [index]);
-    amountRaised += parseInt(element?.amountRaised);
-  }
-  const currentTier = await _getterLaunchpad(address, "getCurrentTierID");
-  const tier = await _getterLaunchpad(address, "getTierDatas", [currentTier]);
-  datas.tokenPrice = tier.tokenPrice;
+//   for (let index = 0; index < datas?.numberOfTier; index++) {
+//     const element = await _getterLaunchpad(address, "getTierDatas", [index]);
+//     amountRaised += parseInt(element?.amountRaised);
+//   }
+//   const currentTier = await _getterLaunchpad(address, "getCurrentTierID");
+//   const tier = await _getterLaunchpad(address, "getTierDatas", [currentTier]);
+//   datas.tokenPrice = tier.tokenPrice;
 
-  let owner = await _getterLaunchpad(address, "owner");
-  datas.owner = await _getterAccessControl("getCVByAddress", [owner]);
-  datas.metadata = await fetchJSONByCID(datas.pubURI);
-  datas.currentTier = parseInt(currentTier) + 1;
-  datas.amountRaised = amountRaised;
+//   let owner = await _getterLaunchpad(address, "owner");
+//   datas.owner = await _getterAccessControl("getCVByAddress", [owner]);
+//   datas.metadata = await fetchJSONByCID(datas.pubURI);
+//   datas.currentTier = parseInt(currentTier) + 1;
+//   datas.amountRaised = amountRaised;
 
-  let token = {};
-  token.symbol = await _getterERC20(datas?.tokenAddress, "symbol");
-  token.name = await _getterERC20(datas?.tokenAddress, "name");
-  token.totalSupply = await _getterERC20(datas?.tokenAddress, "totalSupply");
-  token.allowance = await _getterERC20(datas?.tokenAddress, "totalSupply", [
-    owner,
-    address,
-  ]);
+//   let token = {};
+//   token.symbol = await _getterERC20(datas?.tokenAddress, "symbol");
+//   token.name = await _getterERC20(datas?.tokenAddress, "name");
+//   token.totalSupply = await _getterERC20(datas?.tokenAddress, "totalSupply");
+//   token.allowance = await _getterERC20(datas?.tokenAddress, "totalSupply", [
+//     owner,
+//     address,
+//   ]);
 
-  datas.token = token;
+//   datas.token = token;
 
-  return datas;
-};
+//   return datas;
+// };

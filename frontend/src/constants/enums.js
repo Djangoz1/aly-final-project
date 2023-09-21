@@ -1,2 +1,50 @@
-export const ENUMS_FEATURE_STATUS = ["Pending", "Approved", "Rejected"];
+import {
+  icfyC,
+  icfyGITHUB,
+  icfyHTML,
+  icfyJAVA,
+  icfyJS,
+  icfyPHP,
+  icfyPYTHON,
+  icfyREACT,
+  icfyRUST,
+  icfySOL,
+  icfySQL,
+  icfyTS,
+} from "icones";
+
+export const ENUMS_FEATURE_STATUS = [
+  "Process",
+  "Improve",
+  "Validated",
+  "Contest",
+];
 export const ENUMS_FEATURE_TYPE = ["New Feature", "Bug", "Improvement"];
+
+export const ENUMS_COURTS = [
+  { badge: icfyGITHUB, court: "Centralized" },
+  { badge: icfyGITHUB, court: "Kleros" },
+  { badge: icfyREACT, court: "React" },
+  { badge: icfyPYTHON, court: "Python" },
+  { badge: icfyGITHUB, court: "NodeJS" },
+  { badge: icfySOL, court: "Solidity" },
+  { badge: icfyJAVA, court: "Java" },
+  { badge: icfyC, court: "Cpp" },
+  { badge: icfyGITHUB, court: "CSharp" },
+  { badge: icfyGITHUB, court: "Go" },
+  { badge: icfyRUST, court: "Rust" },
+  { badge: icfyGITHUB, court: "Ruby" },
+  { badge: icfyPHP, court: "PHP" },
+  { badge: icfyGITHUB, court: "Swift" },
+  { badge: icfyGITHUB, court: "Kotlin" },
+  { badge: icfyGITHUB, court: "Dart" },
+  { badge: icfyGITHUB, court: "Scala" },
+  { badge: icfyGITHUB, court: "Haskell" },
+  { badge: icfyGITHUB, court: "Lua" },
+  { badge: icfyJS, court: "JavaScript" },
+  { badge: icfyTS, court: "TypeScript" },
+  { badge: icfyGITHUB, court: "CoffeScript" },
+  { badge: icfyGITHUB, court: "Shell" },
+  { badge: icfySQL, court: "SQL" },
+  { badge: icfyHTML, court: "HTML" },
+];

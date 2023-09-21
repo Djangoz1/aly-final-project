@@ -37,11 +37,51 @@ contract APIGet {
     // Ajoutez votre code ici
     IAddressSystem _iAS;
 
+    address public addressSystem;
+
     constructor(address _addressSystem) {
         _iAS = IAddressSystem(_addressSystem);
         _iAS.setApiGet();
+        addressSystem = _addressSystem;
         require(_iAS.apiGet() == address(this), "APIGet: Error deployment");
         // _iAS.setApiGet();
+    }
+
+    // ---------------------------- //
+    // ************ GENERAL ************ //
+    // ************ -- ************ //
+
+    function balanceOfToken(
+        uint _cvID,
+        address _ercAddr
+    ) external view returns (uint) {
+        address _owner = Bindings.ownerOf(_cvID, _iAS.cvsHub());
+        return Bindings.balanceOf(_owner, _ercAddr);
+    }
+
+    function ownerOfToken(
+        uint _tokenID,
+        address _ercAddr
+    ) external view returns (address) {
+        return Bindings.ownerOf(_tokenID, _ercAddr);
+    }
+
+    function indexerOfToken(
+        uint _tokenID,
+        address _contract
+    ) external view returns (uint[] memory) {
+        return Bindings.indexerOf(_tokenID, _contract);
+    }
+
+    function tokenURIOf(
+        uint _tokenID,
+        address _ercAddr
+    ) external view returns (string memory) {
+        return Bindings.tokenURI(_tokenID, _ercAddr);
+    }
+
+    function tokensLengthOf(address _ercAddr) external view returns (uint) {
+        return Bindings.tokensLength(_ercAddr);
     }
 
     // ---------------------------- //
@@ -90,12 +130,15 @@ contract APIGet {
         return Bindings.tokensLength(_iAS.arbitratorsHub());
     }
 
-     function arbitrationOfCV(
+    function arbitrationOfCV(
         uint _cvID,
         DataTypes.CourtIDs _courtID
-    ) external view returns (uint256){
-        return IArbitratorsHub(_iAS.arbitratorsHub()).arbitrationOfCV(_cvID, _courtID);
-
+    ) external view returns (uint256) {
+        return
+            IArbitratorsHub(_iAS.arbitratorsHub()).arbitrationOfCV(
+                _cvID,
+                _courtID
+            );
     }
 
     function balanceOfCourt(
@@ -236,7 +279,7 @@ contract APIGet {
     function lengthOfPubs() external view returns (uint) {
         return Bindings.tokensLength(_iAS.pubsHub());
     }
-    
+
     function lengthOfLikes() external view returns (uint) {
         return Bindings.tokensLength(_iAS.pubsDatasHub());
     }
@@ -248,15 +291,15 @@ contract APIGet {
     function likesOfPub(uint _pubID) external view returns (uint[] memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).indexerOf(_pubID);
     }
+
     function answersOfPub(uint _pubID) external view returns (uint[] memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).answersOfPub(_pubID);
     }
 
-     function datasOfLike(
+    function datasOfLike(
         uint _likeID
     ) external view returns (DataTypes.LikeData memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).dataOf(_likeID);
-        
     }
 
     function pubsOfMission(

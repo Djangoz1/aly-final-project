@@ -16,16 +16,10 @@ export const Layout = ({ children, banniere }) => {
   const dispatch = useAuthDispatch();
 
   useEffect(() => {
-    if (address) {
+    if (address && !cv) {
       doAuthCV(dispatch, address);
     }
   }, [address]);
-
-  useEffect(() => {
-    if (cv) {
-      doAuthMission(dispatch, cv);
-    }
-  }, [cv]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

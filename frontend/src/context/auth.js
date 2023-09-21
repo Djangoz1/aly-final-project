@@ -1,13 +1,11 @@
 "use client";
 
+import { ADDRESSES } from "constants/web3";
 import { createContext, useContext, useReducer } from "react";
+import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
+import { stateCV } from "utils/ui-tools/state-tools";
 
-import {
-  _getterCV,
-  _getterFactoryCV,
-  _getterAccessControl,
-  _getterMissionsHub,
-} from "utils/ui-tools/web3-tools";
+import { _apiGet } from "utils/ui-tools/web3-tools";
 
 // Mise en place du reducer auth
 const reducer = (currentState, newState) => {
@@ -23,45 +21,25 @@ const initialState = {
   missions: [],
   missionId: null,
   cv: null,
+  metadatas: null,
+  datas: null,
   error: null,
 };
 
-
-// *::::::::::::::: MANAGE STATE  :::::::::::::::*
-export const doAuthMission = async (dispatch, address) => {
-  dispatch({ status: "pending" });
-  if (!address) return;
-  try {
-    let missions = await _getterMissionsHub("getIndexer", [address]);
-    dispatch({ missions, status: "idle", error: null });
-  } catch (error) {
-    dispatch({ status: "error", error: { mission: error } });
-  }
-};
-
-export const doAuthMissionId = async (dispatch, missions, missionId) => {
-  dispatch({ status: "pending" });
-  try {
-    if (missions.includes(missionId)) {
-      dispatch({ missionId: parseInt(missionId), status: "idle", error: null });
-    } else {
-      throw new Error("Mission not found");
-    }
-  } catch (error) {
-    dispatch({ status: "error", missionId: null, error: { mission: { error } } });
-  }
-};
-
-// *:::::::::::: -- ::::::::::::* //
-// *:::::::::::: CV ::::::::::::* //
-// *:::::::::::: -- ::::::::::::* //
-
 export const doAuthCV = async (dispatch, address) => {
   dispatch({ status: "pending" });
-  let cv = await _getterAccessControl("getCVByAddress", [address]);
-  console.log("cv", cv);
-  if (!cv?.error) {
-    dispatch({ cv, status: "idle", error: null });
+
+  let cvID = parseInt(await _apiGet("cvOf", [address]));
+  let state = await stateCV(cvID);
+
+  if (!state?.error) {
+    dispatch({
+      cv: cvID,
+      metadatas: state?.metadatas,
+      datas: state?.datas,
+      status: "idle",
+      error: null,
+    });
   } else {
     dispatch({ status: "error", error: "Error : Get CV" });
   }

@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Lato&family=Montserrat:wght@500&family=Open+Sans:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap");
 body {
   width: 100vw;
   overflow-x: hidden;
@@ -17,6 +16,14 @@ body {
   border: 1px solid rgb(4, 185, 235);
 }
 
+.font1 {
+  font-family: "Lato", sans-serif;
+}
+
+.font2 {
+  font-family: "Exo", sans-serif;
+}
+
 .text-shadow {
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
@@ -26,17 +33,28 @@ body {
 }
 
 .page {
-  background: #000000; /* fallback for old browsers */
+  /* background: #000000; 
   background: -webkit-linear-gradient(
     to top,
     #434343,
     #000000
-  ); /* Chrome 10-25, Safari 5.1-6 */
+  ); 
   background: linear-gradient(
     to top,
     #434343,
     #000000
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  );  */
+  /* border-radius: 25px; */
+  /* background: linear-gradient(145deg, #153518, #193f1d);
+  box-shadow: 17px 17px 32px #143317, -17px -17px 32px #1a431f; */
+  background: #1c1c1c;
+  box-shadow: 20px 20px 60px #181818, -20px -20px 60px #202020;
+}
+
+.mission-bg {
+  border-radius: 50px;
+  background: #1c1c1c;
+  box-shadow: 20px 20px 60px #181818, -20px -20px 60px #202020;
 }
 
 .gradient-01 {
@@ -99,6 +117,10 @@ body {
   position: absolute;
   background: #7aebfb;
   filter: blur(190px);
+}
+
+.text-gradient {
+  text-shadow: 1px 1px 2px black;
 }
 
 .glassmorphism {

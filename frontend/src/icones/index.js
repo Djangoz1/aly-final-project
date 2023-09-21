@@ -1,17 +1,29 @@
 import React from "react";
 
+export const icfy = {
+  eye: {
+    close: "ant-design:eye-invisible-outlined",
+    open: "ic:outline-remove-red-eye",
+  },
+};
+
 export const icfyHANDSHAKE = "ic:round-handshake";
+export const icfyARROWD = "ic:twotone-keyboard-arrow-down";
 
 export const icfyINSTA = "skill-icons:instagram";
 export const icfyFB = "devicon:facebook";
 export const icfyTWITTER = "skill-icons:twitter";
 export const icfyLINKEDIN = "devicon:linkedin";
 export const icfyGITHUB = "line-md:github-loop";
+export const icfyGITHUB2 = "skill-icons:github-dark";
 
 export const icfyHOME = "line-md:home-twotone";
 export const icfyMAIL = "line-md:email-twotone";
 export const icfyROCKET = "bi:rocket-takeoff";
 export const icfyCHAT = "fluent:calendar-chat-20-regular";
+export const icfyBUBBLE = "system-uicons:speech-bubble";
+export const icfyLOCK = "radix-icons:lock-closed";
+export const icfyUNLOCK = "radix-icons:lock-open-2";
 
 export const icfyRETURN = "ph:key-return-duotone";
 export const icfyIMG = "line-md:image-twotone";

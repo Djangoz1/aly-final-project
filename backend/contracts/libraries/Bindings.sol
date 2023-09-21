@@ -29,6 +29,13 @@ library Bindings {
         return IERC721(_ercAddr).ownerOf(_tokenID);
     }
 
+    function balanceOf(
+        address _owner,
+        address _ercAddr
+    ) internal view returns (uint) {
+        return IERC721(_ercAddr).balanceOf(_owner);
+    }
+
     function tokenURI(
         uint _tokenID,
         address _ercAddr
@@ -38,6 +45,13 @@ library Bindings {
 
     function tokensLength(address _ercAddr) internal view returns (uint) {
         return IContract(_ercAddr).tokensLength();
+    }
+
+    function indexerOf(
+        uint _tokenID,
+        address _ercAddr
+    ) internal view returns (uint[] memory) {
+        return IContract(_ercAddr).indexerOf(_tokenID);
     }
 
     // Ajoutez votre code ici

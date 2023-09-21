@@ -169,7 +169,7 @@ let _testInitSystemsContracts = async (addressSystem) => {
 
 const _testInitArbitrator = async (contracts, courtID, account) => {
   let arbitratorsHub = contracts.escrows.arbitratorsHub;
-  let featuresHub = contracts.works.featuresHub;
+
   let apiPost = contracts.systems.apiPost;
   let apiGet = contracts.systems.apiGet;
 
@@ -180,6 +180,7 @@ const _testInitArbitrator = async (contracts, courtID, account) => {
     { courtID: courtID },
     account
   );
+
   await apiPost.validFeature(newFeature);
   let _courtLength = await apiGet.lengthOfCourt(courtID);
 
@@ -337,12 +338,9 @@ const _testInitMission = async (contracts, tokenURI, account) => {
 // *:::::::::::::: ------- ::::::::::::::* //
 
 const _testInitFeature = async (contracts, datas, workerAccount, account) => {
-  let missionsHub = contracts.works.missionsHub;
   let featuresHub = contracts.works.featuresHub;
   let apiPost = contracts.systems.apiPost;
   let apiGet = contracts.systems.apiGet;
-  let balancesHub = contracts.systems.balancesHub;
-
   let missionID = await _testInitMission(contracts, "missionURI");
   const cvWorker = await apiGet.cvOf(workerAccount.address);
   let newFeature;

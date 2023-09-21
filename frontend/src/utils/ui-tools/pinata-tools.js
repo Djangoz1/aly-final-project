@@ -1,8 +1,8 @@
-import {
-  _getterFeaturesHub,
-  _getterMissionsHub,
-  _getterPubsHub,
-} from "./web3-tools";
+// import {
+//   _getterFeaturesHub,
+//   _getterMissionsHub,
+//   _getterPubsHub,
+// } from "./web3-tools";
 
 const axios = require("axios");
 require("dotenv").config();
@@ -55,159 +55,159 @@ export const createImageCIDOnPinata = async (file, pinataMetadata) => {
   }
 };
 
-export const createPubOnPinata = async (datas) => {
-  try {
-    const attributes = [
-      {
-        id: parseInt(await _getterPubsHub("getTokensLength")) + 1,
-      },
-    ];
-    const pinataMetadata = {
-      name: "Work3 - Publication" + attributes?.[0].id,
-    };
-    const pinataOptions = {
-      cidVersion: 0,
-    };
-    let imageCID;
-    if (datas.image) {
-      imageCID = await createImageCIDOnPinata(datas.image, pinataMetadata);
-    }
+// export const createPubOnPinata = async (datas) => {
+//   try {
+//     const attributes = [
+//       {
+//         id: parseInt(await _getterPubsHub("getTokensLength")) + 1,
+//       },
+//     ];
+//     const pinataMetadata = {
+//       name: "Work3 - Publication" + attributes?.[0].id,
+//     };
+//     const pinataOptions = {
+//       cidVersion: 0,
+//     };
+//     let imageCID;
+//     if (datas.image) {
+//       imageCID = await createImageCIDOnPinata(datas.image, pinataMetadata);
+//     }
 
-    const jsonData = {
-      image: imageCID,
-      title: datas.title,
-      name: `Publication # ${attributes?.[0].id}`,
-      description: datas.description,
-      attributes: attributes,
-    };
-    console.log("jsoonb", jsonData);
+//     const jsonData = {
+//       image: imageCID,
+//       title: datas.title,
+//       name: `Publication # ${attributes?.[0].id}`,
+//       description: datas.description,
+//       attributes: attributes,
+//     };
+//     console.log("jsoonb", jsonData);
 
-    const formData = new FormData();
-    formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
-    formData.append("pinataOptions", JSON.stringify(pinataOptions));
-    formData.append("pinataContent", JSON.stringify(jsonData));
-    const response = await axios.post(
-      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          pinata_api_key: "f77b863f0d06b51f0c63",
-          pinata_secret_api_key: `be5170c1049d407a0bdbd0a8b8a077c88aa5927aaade281ee9fe390e5cd1389d`,
-        },
-      }
-    );
+//     const formData = new FormData();
+//     formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
+//     formData.append("pinataOptions", JSON.stringify(pinataOptions));
+//     formData.append("pinataContent", JSON.stringify(jsonData));
+//     const response = await axios.post(
+//       "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+//       formData,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           pinata_api_key: "f77b863f0d06b51f0c63",
+//           pinata_secret_api_key: `be5170c1049d407a0bdbd0a8b8a077c88aa5927aaade281ee9fe390e5cd1389d`,
+//         },
+//       }
+//     );
 
-    return response.data.IpfsHash;
-  } catch (error) {
-    console.error(
-      "Erreur lors de la création du fichier sur Pinata:",
-      error.response.data
-    );
-  }
-};
+//     return response.data.IpfsHash;
+//   } catch (error) {
+//     console.error(
+//       "Erreur lors de la création du fichier sur Pinata:",
+//       error.response.data
+//     );
+//   }
+// };
 
-export const createMissionOnPinata = async (datas) => {
-  try {
-    const attributes = [
-      {
-        id: parseInt(await _getterMissionsHub("getTokensLength")) + 1,
-        referenceMission: datas?.reference,
-      },
-    ];
-    const pinataMetadata = {
-      name: "Work3 - Mission" + attributes?.[0].id,
-    };
-    const pinataOptions = {
-      cidVersion: 0,
-    };
-    let imageCID;
-    if (datas.image) {
-      imageCID = await createImageCIDOnPinata(datas.image, pinataMetadata);
-    }
+// export const createMissionOnPinata = async (datas) => {
+//   try {
+//     const attributes = [
+//       {
+//         id: parseInt(await _getterMissionsHub("getTokensLength")) + 1,
+//         referenceMission: datas?.reference,
+//       },
+//     ];
+//     const pinataMetadata = {
+//       name: "Work3 - Mission" + attributes?.[0].id,
+//     };
+//     const pinataOptions = {
+//       cidVersion: 0,
+//     };
+//     let imageCID;
+//     if (datas.image) {
+//       imageCID = await createImageCIDOnPinata(datas.image, pinataMetadata);
+//     }
 
-    const jsonData = {
-      image: imageCID,
-      url: datas.url,
-      name: `Mission # ${attributes?.[0].id}`,
-      description: datas.title,
-      attributes: attributes,
-    };
+//     const jsonData = {
+//       image: imageCID,
+//       url: datas.url,
+//       name: `Mission # ${attributes?.[0].id}`,
+//       description: datas.title,
+//       attributes: attributes,
+//     };
 
-    const formData = new FormData();
-    formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
-    formData.append("pinataOptions", JSON.stringify(pinataOptions));
-    formData.append("pinataContent", JSON.stringify(jsonData));
-    const response = await axios.post(
-      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          pinata_api_key: "f77b863f0d06b51f0c63",
-          pinata_secret_api_key: `be5170c1049d407a0bdbd0a8b8a077c88aa5927aaade281ee9fe390e5cd1389d`,
-        },
-      }
-    );
+//     const formData = new FormData();
+//     formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
+//     formData.append("pinataOptions", JSON.stringify(pinataOptions));
+//     formData.append("pinataContent", JSON.stringify(jsonData));
+//     const response = await axios.post(
+//       "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+//       formData,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           pinata_api_key: "f77b863f0d06b51f0c63",
+//           pinata_secret_api_key: `be5170c1049d407a0bdbd0a8b8a077c88aa5927aaade281ee9fe390e5cd1389d`,
+//         },
+//       }
+//     );
 
-    return response.data.IpfsHash;
-  } catch (error) {
-    console.error(
-      "Erreur lors de la création du fichier sur Pinata:",
-      error.response.data
-    );
-  }
-};
-export const createFeatureOnPinata = async (datas) => {
-  try {
-    const attributes = [
-      {
-        id: parseInt(await _getterFeaturesHub("getTokensLength")) + 1,
-        devLanguage: datas?.devLanguage,
-        domain: datas?.domain,
-      },
-    ];
-    const pinataMetadata = {
-      name: "Work3 - Feature" + attributes?.[0].id,
-    };
-    const pinataOptions = {
-      cidVersion: 0,
-    };
-    let imageCID;
-    if (datas.image && datas.image !== "") {
-      imageCID = await createImageCIDOnPinata(datas.image, pinataMetadata);
-    }
+//     return response.data.IpfsHash;
+//   } catch (error) {
+//     console.error(
+//       "Erreur lors de la création du fichier sur Pinata:",
+//       error.response.data
+//     );
+//   }
+// };
+// export const createFeatureOnPinata = async (datas) => {
+//   try {
+//     const attributes = [
+//       {
+//         id: parseInt(await _getterFeaturesHub("getTokensLength")) + 1,
+//         devLanguage: datas?.devLanguage,
+//         domain: datas?.domain,
+//       },
+//     ];
+//     const pinataMetadata = {
+//       name: "Work3 - Feature" + attributes?.[0].id,
+//     };
+//     const pinataOptions = {
+//       cidVersion: 0,
+//     };
+//     let imageCID;
+//     if (datas.image && datas.image !== "") {
+//       imageCID = await createImageCIDOnPinata(datas.image, pinataMetadata);
+//     }
 
-    const jsonData = {
-      image: imageCID,
-      url: datas.url,
-      title: datas.title,
-      name: `Feature # ${attributes?.[0].id}`,
-      description: datas.description,
-      attributes: attributes,
-    };
+//     const jsonData = {
+//       image: imageCID,
+//       url: datas.url,
+//       title: datas.title,
+//       name: `Feature # ${attributes?.[0].id}`,
+//       description: datas.description,
+//       attributes: attributes,
+//     };
 
-    const formData = new FormData();
-    formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
-    formData.append("pinataOptions", JSON.stringify(pinataOptions));
-    formData.append("pinataContent", JSON.stringify(jsonData));
-    const response = await axios.post(
-      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          pinata_api_key: "f77b863f0d06b51f0c63",
-          pinata_secret_api_key: `be5170c1049d407a0bdbd0a8b8a077c88aa5927aaade281ee9fe390e5cd1389d`,
-        },
-      }
-    );
+//     const formData = new FormData();
+//     formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
+//     formData.append("pinataOptions", JSON.stringify(pinataOptions));
+//     formData.append("pinataContent", JSON.stringify(jsonData));
+//     const response = await axios.post(
+//       "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+//       formData,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           pinata_api_key: "f77b863f0d06b51f0c63",
+//           pinata_secret_api_key: `be5170c1049d407a0bdbd0a8b8a077c88aa5927aaade281ee9fe390e5cd1389d`,
+//         },
+//       }
+//     );
 
-    return response.data.IpfsHash;
-  } catch (error) {
-    console.error(
-      "Erreur lors de la création du fichier sur Pinata:",
-      error.response.data
-    );
-  }
-};
+//     return response.data.IpfsHash;
+//   } catch (error) {
+//     console.error(
+//       "Erreur lors de la création du fichier sur Pinata:",
+//       error.response.data
+//     );
+//   }
+// };

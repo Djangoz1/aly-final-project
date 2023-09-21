@@ -23,6 +23,9 @@ contract CollectWorkInteraction is Ownable {
      */
     mapping(uint => DataTypes.FeatureInteractionData) datas;
 
+    // missionID to featureID
+    mapping(uint => uint[]) indexerMissions;
+
     IAddressSystem private _iAS;
 
     modifier onlyProxy() {
@@ -54,6 +57,11 @@ contract CollectWorkInteraction is Ownable {
         require(datas[_featureID].missionID == 0, "Data already set");
         uint missionID = _featureData(_featureID).missionID;
         datas[_featureID].missionID = missionID;
+        indexerMissions[missionID].push(_featureID);
+    }
+
+    function indexerOf(uint _missionID) external returns (uint[] memory) {
+        return indexerMissions[_missionID];
     }
 
     function inviteWorker(
