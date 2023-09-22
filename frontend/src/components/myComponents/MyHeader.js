@@ -3,15 +3,17 @@ import { ImagePin } from "components/Image/ImagePin";
 
 import { useAuthState } from "context/auth";
 import { icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MyBigBtn } from "./MyBigBtn";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import { MyModal } from "components/modal/MyModal";
 import { EditProfile } from "components/modal/works/EditProfile";
 import { styles } from "styles/style";
+import { useRouter } from "next/router";
 
 export const MyHeader = ({
+  path,
   img,
   ownerID,
   name,
@@ -22,8 +24,6 @@ export const MyHeader = ({
   menus,
 }) => {
   let cvID = ownerID;
-
-  const currentUrl = window ? window?.location?.pathname : null;
 
   let { cv } = useAuthState();
 
@@ -97,10 +97,9 @@ export const MyHeader = ({
               key={uuidv4()}
               className={`font2 ${
                 menu?.style || ""
-              } font-light text-xs transition-all py-5 px-5 ${
-                currentUrl === menu?.link
-                  ? "border-b-2 border border-t-0 border-x-0 border-secondary bg-black/40 text-white"
-                  : "opacity-60"
+              } font-light text-xs transition-all hover:text-white py-5 px-5 ${
+                path === menu.link &&
+                "border-b-2 border border-t-0 border-x-0 border-secondary bg-black/40 text-white"
               }`}
               href={menu?.link}
             >

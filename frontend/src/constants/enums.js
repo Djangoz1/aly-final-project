@@ -1,5 +1,8 @@
 import {
+  icfy,
+  icfyAI,
   icfyC,
+  icfyGAMING,
   icfyGITHUB,
   icfyHTML,
   icfyJAVA,
@@ -13,14 +16,88 @@ import {
   icfyTS,
 } from "icones";
 
-export const ENUMS_FEATURE_STATUS = [
-  "Process",
-  "Improve",
-  "Validated",
-  "Contest",
-];
 export const ENUMS_FEATURE_TYPE = ["New Feature", "Bug", "Improvement"];
 
+export const ENUMS = {
+  courts: [
+    { badge: icfyGITHUB, court: "Centralized" },
+    { badge: icfyGITHUB, court: "Kleros" },
+    { badge: icfyREACT, court: "React" },
+    { badge: icfyPYTHON, court: "Python" },
+    { badge: icfyGITHUB, court: "NodeJS" },
+    { badge: icfySOL, court: "Solidity" },
+    { badge: icfyJAVA, court: "Java" },
+    { badge: icfyC, court: "C++" },
+    { badge: icfy.technos.csharp, court: "CSharp" },
+    { badge: icfyGITHUB, court: "Go" },
+    { badge: icfyRUST, court: "Rust" },
+    { badge: icfyGITHUB, court: "Ruby" },
+    { badge: icfyPHP, court: "PHP" },
+    { badge: icfyGITHUB, court: "Swift" },
+    { badge: icfyGITHUB, court: "Kotlin" },
+    { badge: icfy.technos.dart, court: "Dart" },
+    { badge: icfyGITHUB, court: "Scala" },
+    { badge: icfyGITHUB, court: "Haskell" },
+    { badge: icfyGITHUB, court: "Lua" },
+    { badge: icfyJS, court: "JavaScript" },
+    { badge: icfyTS, court: "TypeScript" },
+    { badge: icfyGITHUB, court: "CoffeScript" },
+    { badge: icfyGITHUB, court: "Shell" },
+    { badge: icfySQL, court: "SQL" },
+    { badge: icfyHTML, court: "HTML" },
+  ],
+  domain: [
+    {
+      name: "frontend",
+      color: "magenta",
+      icon: icfy.domain.frontend,
+    },
+    {
+      name: "backend",
+      color: "magenta",
+      icon: icfy.domain.backend,
+    },
+    {
+      name: "web3",
+      color: "magenta",
+
+      icon: icfy.domain.blockchain,
+    },
+    {
+      name: "gaming",
+      color: "magenta",
+      icon: icfy.domain.gaming,
+    },
+    {
+      name: "ai",
+      color: "magenta",
+      icon: icfy.domain.ai,
+    },
+    {
+      name: "designer",
+      color: "magenta",
+      icon: icfy.domain.designer,
+    },
+  ],
+  experience: [
+    {
+      name: "junior",
+      color: "magenta",
+      icon: icfy.domain.frontend,
+    },
+    {
+      name: "middle",
+      color: "magenta",
+      icon: icfy.domain.backend,
+    },
+    {
+      name: "senior",
+      color: "magenta",
+      icon: icfy.domain.blockchain,
+    },
+  ],
+  feature: {},
+};
 export const ENUMS_COURTS = [
   { badge: icfyGITHUB, court: "Centralized" },
   { badge: icfyGITHUB, court: "Kleros" },

@@ -1,10 +1,10 @@
 import React from "react";
 
-import { MySelects } from "components/myComponents/myForm/MySelects";
+import { MySelects } from "components/myComponents/form/MySelects";
 
 import { MyModal } from "components/modal/MyModal";
 import { ProfileAvatar } from "components/profile/ProfileAvatar";
-import { MyInputsFile } from "components/myComponents/myForm/MyInputsFile";
+import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { useAuthState } from "context/auth";
 
 export const CreatePub = () => {

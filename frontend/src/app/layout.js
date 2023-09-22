@@ -2,6 +2,8 @@ import { AuthProvider } from "context/auth";
 import "../styles/global.css";
 
 import { AccountProvider } from "context/account";
+import { MissionProvider } from "context/hub/mission";
+import { CVProvider } from "context/hub/cv";
 
 export default function RootLayout({ children }) {
   return (
@@ -26,7 +28,11 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AccountProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <CVProvider>
+              <MissionProvider>{children}</MissionProvider>
+            </CVProvider>
+          </AuthProvider>
         </AccountProvider>
       </body>
     </html>

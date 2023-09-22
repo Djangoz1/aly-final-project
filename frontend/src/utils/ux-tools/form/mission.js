@@ -1,25 +1,20 @@
-import { MyCheckboxes } from "components/myComponents/form/MyCheckboxes";
-import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
+import { CVName } from "components/inputs/inputsCV/CVName";
 import { MyInputs } from "components/myComponents/form/MyInputs";
+import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelects } from "components/myComponents/form/MySelects";
-import { MyTextArea } from "components/myComponents/form/MyTextArea";
-import { ENUMS_COURTS } from "constants/enums";
 import { DEV_DOMAIN } from "constants/languages";
-import { MENUS_CREATE_FEATURE } from "constants/menus";
+import { MENUS_CREATE_MISSION } from "constants/menus";
 
-const { CVName } = require("components/inputs/inputsCV/CVName");
-const { MyInputsFile } = require("components/myComponents/form/MyInputsFile");
-
-export let _form_create_feature = ({ metadatas, datas, handleChange }) => {
+export let _form_create_mission = ({ metadatas, datas, handleChange }) => {
   return [
-    _form_create_feature_intro({ metadatas }),
-    _form_create_feature_info({ metadatas, datas, handleChange }),
-    _form_create_feature_blockchain({ metadatas, datas, handleChange }),
-    _form_create_feature_resume({ metadatas, datas, handleChange }),
+    _form_create_mission_intro({ metadatas }),
+    _form_create_mission_info({ metadatas }),
+    _form_create_mission_blockchain({ metadatas }),
+    _form_create_mission_resume({ metadatas }),
   ];
 };
 
-export let _form_create_feature_intro = ({
+export let _form_create_mission_intro = ({
   metadatas,
   datas,
   handleChange,
@@ -97,19 +92,18 @@ export let _form_create_feature_intro = ({
   };
 };
 
-export let _form_create_feature_info = ({ metadatas, datas, handleChange }) => {
-  let menu = MENUS_CREATE_FEATURE[1];
-
+export let _form_create_mission_info = ({ metadatas, datas, handleChange }) => {
+  let menu = MENUS_CREATE_MISSION[1];
   return {
     title: `${menu.i} ${menu.title}`,
 
     description: (
       <>
-        Attention ! Ces informations ne sont pas stockés dans la blockchain et
-        n'ont pas d'incidence sur le protocole.
+        ⚠️ Attention !
         <br />
-        Elles n'ont qu'un but purement informatif afin d'attirer des
-        freelancers.
+        <br />
+        Aucune de ces informations n'ont une incidence sur le protocole. Elles
+        ne servent qu'à un but purement informative.
       </>
     ),
     components: [
@@ -117,7 +111,7 @@ export let _form_create_feature_info = ({ metadatas, datas, handleChange }) => {
         inputs={[
           {
             label: "Titre",
-            placeholder: "Intitulé de la feature",
+            placeholder: "Intitulé de la mission",
           },
         ]}
       />,
@@ -127,42 +121,47 @@ export let _form_create_feature_info = ({ metadatas, datas, handleChange }) => {
             label: "Domaine",
             target: "name",
             arr: DEV_DOMAIN,
-            placeholder: "Quel domaine concerne la tâche ?",
+            placeholder: "Quel domaine concerne la mission ?",
           },
         ]}
       />,
-      <MyInputsFile inputs={[{ label: "Image" }]} />,
-
-      <MyTextArea
-        label={"Description"}
-        placeholder={"Write your description"}
-      />,
+      <MyInputsFile inputs={[{ label: "Image" }, { label: "Bannière" }]} />,
+      <div className="flex hover:text-white flex-col">
+        <label className="text-light font-light text-xs mb-1 uppercase ">
+          Description
+        </label>
+        <textarea
+          className="textarea font2 font-light  textarea-bordered  max-h-[25vh] h-[25vh]"
+          placeholder="Write your description ..."
+        ></textarea>
+      </div>,
     ],
   };
 };
 
-export let _form_create_feature_blockchain = ({
+export let _form_create_mission_blockchain = ({
   metadatas,
   datas,
   handleChange,
 }) => {
-  let menu = MENUS_CREATE_FEATURE[2];
-
+  let menu = MENUS_CREATE_MISSION[2];
   return {
     title: `${menu.i} ${menu.title}`,
 
     description: (
       <>
-        Attention toutes les informations suivantes auront une incidence sur le
-        protocole. Veuillez bien vérifier toutes les données avant de confirmer
-        afin d'éviter toutes erreurs
+        Je suis disponible 24/7 pour répondre à vos questions et vous aider à
+        résoudre tout problème qui pourrait survenir lors de votre recherche de
+        freelance. N'hésitez pas à me poser des questions ou à demander de
+        l'aide à tout moment. Je suis là pour vous guider dans votre quête du
+        freelance idéal.
       </>
     ),
     components: [
       <MySelects
         selects={[
           {
-            label: "Mission*",
+            label: "Mission Ref*",
             arr: [
               "Mission 1",
               "Mission 2",
@@ -171,103 +170,32 @@ export let _form_create_feature_blockchain = ({
               "Mission 5",
               "Mission 6",
             ],
-            placeholder: "Pour quelle mission ?",
+            placeholder: "Liaison à une ancienne mission",
           },
           {
-            label: "Specification *",
-            target: "court",
-            arr: ENUMS_COURTS,
-            placeholder: "Quelle technologie est requise pour la tâche ?",
+            label: "Launchpad*",
+            arr: [
+              "Launchpad 1",
+              "Launchpad 2",
+              "Launchpad 3",
+              "Launchpad 4",
+              "Launchpad 5",
+              "Launchpad 6",
+            ],
+            placeholder: "Est-elle financé par un launchpad ?",
           },
         ]}
-      />,
-      <MyCheckboxes
-        label={
-          "Autorisez vous un freelancer à signer directement selon l'expérience ?"
-        }
-        checkboxes={[
-          { title: "Non" },
-          { title: "plus d'1 " },
-          { title: "plus de 5 " },
-          { title: "plus de 10 " },
-          { title: "plus de 3 " },
-        ]}
-      />,
-      <MyInputs
-        inputs={[
-          {
-            label: "Salaire",
-            placeholder: "0.3 eth",
-          },
-          {
-            label: "Worker",
-            placeholder: "Username du freelancer",
-          },
-          {
-            label: "Temps estimé",
-            placeholder: "10 jours",
-          },
-        ]}
-      />,
-      <MyFormInfo
-        title={
-          <>
-            <div className="text-white text-sm  flex items-center ">
-              <input
-                type="checkbox"
-                className="toggle toggle-sm toggle-success mr-2"
-                checked
-              />
-              Seulement sur invitation
-            </div>
-          </>
-        }
-        description={
-          <>
-            <br />
-            <span className="text-white ">⚠️ Attention !</span>
-            <p>
-              <br />
-              Souhaitez vous ouvrir les postulations pour ce poste
-              <br />
-              <br />
-              <span className="text-white ">Si vous acceptez, </span>
-              vous serez en capacité d'ouvrir ce poste à la candidature et vous
-              pourez ensuite signé celui que vous souhaiterez.
-              <br />
-              <span className="text-white ">Si vous refusez, </span>
-              vous ne pourrais pas recevoir les candidatures et vous devrez
-              d'abord proposer ce poste à un freelancer qui choisiras d'accepter
-              ou non .
-              <br />
-              <br />
-              Veuillez choisir correctement la
-              <span className="text-white "> spécification </span>
-              car celle-ci seras déterminante en cas de
-              <span className="text-white "> litiges</span>.
-              <br />
-              <br />
-              En cas de litige, le protocole enverras le dossier directement à
-              la
-              <span className="text-white "> court lié à la spécification</span>
-              .
-              <br />
-              La court est composé de jurys qui ont de l'expérience sur cette
-              spécification.
-            </p>
-          </>
-        }
       />,
     ],
   };
 };
 
-export let _form_create_feature_resume = ({
+export let _form_create_mission_resume = ({
   metadatas,
   datas,
   handleChange,
 }) => {
-  let menu = MENUS_CREATE_FEATURE[MENUS_CREATE_FEATURE.length - 1];
+  let menu = MENUS_CREATE_MISSION[MENUS_CREATE_MISSION.length - 1];
   return {
     title: `${menu.i} ${menu.title}`,
     description: (

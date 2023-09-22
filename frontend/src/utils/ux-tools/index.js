@@ -1,3 +1,5 @@
+import { calcTimestamp } from "helpers";
+
 export let fromTimestamp = (timestamp) => {
   // Créez une instance de Date à partir du timestamp
   var maDate = new Date(timestamp);
@@ -21,4 +23,18 @@ export let fromTimestamp = (timestamp) => {
     jour;
 
   return dateFormatee;
+};
+
+export let timestampToCounter = (timestamp, days, style) => {
+  let datas = calcTimestamp(timestamp, days);
+  return (
+    <>
+      <span className={`${style} mx-1`}>{datas.days}</span>
+      {" days"}
+      <span className={`${style} mx-1`}>{datas.hours}</span>
+      {" h"}
+      <span className={`${style} mx-1`}>{datas.minutes}</span>
+      {" min"}
+    </>
+  );
 };

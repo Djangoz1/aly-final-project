@@ -21,46 +21,27 @@ import { CreateMission } from "components/modal/works/CreateMission";
 import { CreatePub } from "components/Pub/CreatePub";
 import { DEV_DOMAIN } from "constants/languages";
 import { fromTimestamp } from "utils/ux-tools";
+import { useCVState } from "context/hub/cv";
 
-export const ProfileHeader = ({ _state }) => {
-  let { cv, metadatas, datas } = useAuthState();
+export const HeaderProfile = ({ path }) => {
+  let { cvID, datas, metadatas } = useCVState();
 
-  let [isState, setIsState] = useState({
-    datas: null,
-    metadatas: null,
-  });
-
-  useEffect(() => {
-    if (isState?.datas !== null && isState?.metadatas !== null) return;
-    if (_state) {
-      setIsState({
-        datas: _state?.datas,
-        metadatas: _state?.metadatas,
-      });
-    } else {
-      setIsState({
-        datas: datas,
-        metadatas: metadatas,
-      });
-    }
-  }, [_state, datas, metadatas]);
   return (
     <MyHeader
-      img={isState?.metadatas?.image}
-      ownerID={cv}
-      name={isState?.metadatas?.username}
-      desc1={isState?.metadatas?.description}
+      path={path ? `/profile/${cvID}/${path}` : `/profile/${cvID}`}
+      img={metadatas?.image}
+      ownerID={cvID}
+      name={metadatas?.username}
+      desc1={metadatas?.description}
       desc2={
         <>
-          {isState?.datas?.missions > 0 && "Enterprise"}
-          {isState?.datas?.missions > 0 &&
-            isState?.datas?.proposals > 0 &&
-            " & "}
-          {isState?.datas?.proposals > 0 && "Worker"}
+          {datas?.missions > 0 && "Enterprise"}
+          {datas?.missions > 0 && datas?.proposals > 0 && " & "}
+          {datas?.proposals > 0 && "Worker"}
           <p className="mt-2 text-xs font-light text-white/30 ">
             Depuis le
             <span className="text-white/70 ml-2">
-              {fromTimestamp(isState?.metadatas?.attributes?.[0]?.createdAt)}
+              {fromTimestamp(metadatas?.attributes?.[0]?.createdAt)}
             </span>
           </p>
         </>
@@ -68,35 +49,33 @@ export const ProfileHeader = ({ _state }) => {
       stats={[
         {
           title: "Amount",
-          value: `${isState?.datas?.amount.toFixed(4) || 0} $`,
+          value: `${datas?.amount.toFixed(4) || 0} $`,
           icon: icfyETHER,
           theme: `${themes.launchpads} `,
         },
         {
           title: "Missions",
-          value: isState?.datas?.missions,
+          value: datas?.missions,
           icon: icfyMISSION,
           theme: `${themes.missions} `,
         },
         {
           title: "Domain",
-          value: DEV_DOMAIN[isState?.metadatas?.attributes?.[0]?.domain]?.name,
-          icon: DEV_DOMAIN[isState?.metadatas?.attributes?.[0]?.domain]?.icon,
+          value: DEV_DOMAIN[metadatas?.attributes?.[0]?.domain]?.name,
+          icon: DEV_DOMAIN[metadatas?.attributes?.[0]?.domain]?.icon,
           theme: `${themes.proposals} `,
         },
         {
           title: "Visibilité",
           value: (
             <span>
-              {isState?.metadatas?.attributes?.[0]?.visibility === true
+              {metadatas?.attributes?.[0]?.visibility === true
                 ? "Disponible"
                 : "Indisponible"}
             </span>
           ),
           icon: icfy.eye[
-            isState?.metadatas?.attributes?.[0]?.visibility === true
-              ? "open"
-              : "close"
+            metadatas?.attributes?.[0]?.visibility === true ? "open" : "close"
           ],
           theme: `${themes.pubs} `,
         },
@@ -104,11 +83,11 @@ export const ProfileHeader = ({ _state }) => {
       menus={[
         {
           title: "Overview",
-          link: "/profile",
+          link: `/profile/${cvID}`,
         },
         {
-          title: "Mission",
-          link: "/",
+          title: "Missions",
+          link: `/profile/${cvID}/missions`,
         },
         {
           title: "Arbitrage",
@@ -120,7 +99,7 @@ export const ProfileHeader = ({ _state }) => {
         },
         {
           title: "Pubs",
-          link: "/profile/pubs",
+          link: `/profile/${cvID}/pubs`,
         },
         {
           style: "ml-auto",
@@ -132,9 +111,9 @@ export const ProfileHeader = ({ _state }) => {
         },
       ]}
       details={[
-        { title: "Follower(s)", value: isState?.datas?.followers },
-        { title: "Follow(s)", value: isState?.datas?.follows },
-        { title: "Post(s)", value: isState?.datas?.pubs },
+        { title: "Follower(s)", value: datas?.followers },
+        { title: "Follow(s)", value: datas?.follows },
+        { title: "Post(s)", value: datas?.pubs },
       ]}
     />
   );

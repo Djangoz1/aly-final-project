@@ -34,11 +34,12 @@ export const Drawer = ({ setter, isOpen }) => {
     doAuthCV(dispatch, address);
   };
 
+  console.log(cv);
   const links = [
     { path: "/", icon: icfyHOME, title: "Home" },
     { path: "/community", icon: icfyMAIL, title: "Community" },
     { path: "/community/launchpad", icon: icfyROCKET, title: "Launchpad" },
-    { path: `/profile`, icon: icfyCV, title: "Profile" },
+    { path: `/profile/${cv}`, icon: icfyCV, title: "Profile" },
     { path: `/profile/mission`, icon: icfyMISSION, title: "Mission" },
     { path: `/settings`, icon: icfySETTINGS, title: "Settings" },
     { path: `/about`, icon: icfyINFO, title: "About" },

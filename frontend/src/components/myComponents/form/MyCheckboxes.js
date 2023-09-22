@@ -2,7 +2,7 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 export const MyCheckboxes = ({ label, checkboxes }) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-left">
       <label className="text-light font-light text-xs mb-1 uppercase ">
         {label}
       </label>
@@ -13,6 +13,7 @@ export const MyCheckboxes = ({ label, checkboxes }) => {
             className="flex hover:text-white items-center text-xs mr-4"
           >
             <input className="checkbox checkbox-xs mr-1" />
+
             {el?.title}
           </div>
         ))}

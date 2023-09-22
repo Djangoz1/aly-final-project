@@ -110,6 +110,7 @@ const createURIPub = async ({ id, title, description }) => {
       url: "/community/pub/" + id,
       image: result.IpfsHash,
       name: "Publication #" + id,
+      attributes: moock.attributes,
     };
 
     const json = await pinata.pinJSONToIPFS(body, options);

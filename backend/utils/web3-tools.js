@@ -19,7 +19,6 @@ let _createCV = async (name, account, addressSystem) => {
   let apiPost = await getContractAt("APIPost", _addrP);
 
   let id = parseInt(await apiGet.lengthOfCVs()) + 1;
-  console.log("wshhh");
   let result = await createURICV({
     id,
     name,
@@ -127,16 +126,14 @@ let _createFeature = async ({
     throw new Error("Error Feature: URI ID");
   }
 
-  let counter = 0;
   if (accounts?.length > 0) {
-    for (let index = 0; index < accounts.length; index++) {
-      const _account = accounts[index];
-      let cvID = await apiGet.cvOf(_account.address);
-      await apiPost.connect(account).inviteWorker(cvID, featureID);
-      counter++;
-    }
+    const _account = accounts[0];
+    let cvID = await apiGet.cvOf(_account.address);
+    await apiPost.connect(account).inviteWorker(cvID, featureID);
+    await apiPost.connect(_account).acceptJob(featureID);
+
+    console.log(cvID, " is worker");
   }
-  console.log(counter, " worker invited");
 
   return { id: featureID, missionID: _missionID };
 };

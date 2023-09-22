@@ -15,10 +15,28 @@ export const stateCV = async (cvID) => {
   } else if (cvID && cvID > 0) {
     return {
       cvID: cvID,
+
       metadatas: await fetchCV(cvID),
       datas: await fetchStatsOfCV(cvID),
     };
   }
+};
+
+export const stateDetailsCV = async (cvID) => {
+  let _missions = await _apiGet("indexerOfToken", [
+    cvID,
+    ADDRESSES["missionsHub"],
+  ]);
+  let missions = [];
+  for (let index = 0; index < _missions?.length; index++) {
+    let missionID = _missions[index];
+    let mission = await stateMission(missionID);
+    missions.push(mission);
+  }
+
+  return {
+    missions: missions,
+  };
 };
 
 export const stateMission = async (missionID) => {

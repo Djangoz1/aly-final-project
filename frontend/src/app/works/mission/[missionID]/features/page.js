@@ -10,16 +10,24 @@ import {
 import { LayoutMission } from "sections/Missions/LayoutMission";
 import { useMissionState } from "context/hub/mission";
 
-const Mission = ({ params }) => {
+const Page = ({ params }) => {
   const missionID = params.missionID;
 
   let state = useMissionState();
 
   return (
-    <LayoutMission id={missionID}>
-      <div className="w-full flex"></div>
+    <LayoutMission path={`/features`} id={missionID}>
+      <div className="w-full flex">
+        <MyTable
+          state={state}
+          list={_table_features(state)}
+          head={HEAD_table_features}
+        />
+
+        {/* <MySideList list={isState?.list} badges={isState?.mission?.badges} /> */}
+      </div>
     </LayoutMission>
   );
 };
 
-export default Mission;
+export default Page;

@@ -1,64 +1,53 @@
-# Lien 
-
-<a href='https://sepolia.etherscan.io/'> Etherscan sepolia</a>
-
-## Hardhat
-$Rappel$ 
-- **Pour copier le dossier :**
-```jsx 
-cp -r /boilerplate/hardhat <nouveau-dossier>
-
+```bash
+cd backend
+npm install
 ```
 
-
-```jsx
-npm install ethers  @nomiclabs/hardhat-etherscan @nomicfoundation/hardhat-toolbox @openzeppelin/contracts dotenv
+```bash
+cd frontend
+npm install
 ```
 
+# Blockchain
 
-```jsx
-npx hardhat 
+## Test
+
+```bash
+cd backend
+npx hardhat test
 ```
 
-```jsx
-npx hardhat node --hostname 127.0.0.1
-```
-```jsx
-npx hardhat compile
-```
+Tout les getter pour un user sont sur les contrats :
+`/backend/contracts/system/APIGet.sol`
+Tout les setter pour un user sont sur les contrats :
+`/backend/contracts/system/APIPost.sol`
 
-```jsx
-npx hardhat run scripts/deploy.js --network localhost
-// ou
-npx hardhat run scripts/deploy.js --network sepolia
-// ou
-npx hardhat run scripts/deploy.js --network goerli
-```
+**1 - Déployer les contrats**
 
-Pour vérifier le contrat sur etherscan  (avoir acces au code ):
-```jsx
-npx hardhat verify --network <address du contrat> <param constructeur>
+```bash
+cd backend
+npx hardhat node
+npm run fuzzing
+# Attendre le déploiement des contrats
 ```
 
-## Test 
+**1 - Lancer l'app**
 
-*Pour lancer le coverage :*
-```shell
-npx hardhat coverage
+```bash
+yarn dev
+# npm run dev
 ```
 
+Il faut avoir l'extension metamask d'installer
 
+- Clicker sur connect wallet
+- Se connecter sur le réseau localhost
 
+Page qui fonctionne
 
-
-### Configuration
-
-> hardhat-config.json
-
-```jsx
-module.exports = {
-  solidity: "0.8.4",
-  paths: { artifacts: "./src/artifacts" },
-  networks: { hardhat: { chainId: 1337 } },
-};
-```
+- `/`
+- `/profile/${id}`
+- `/profile/${id}/missions`
+- `/profile/${id}/pubs`
+- `/works/mission/${id}`
+- `/works/mission/${id}/features`

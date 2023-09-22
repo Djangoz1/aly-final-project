@@ -2,7 +2,7 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 export const MySelects = ({ selects, styles }) => {
   return (
-    <div className={`flex w-fit ${styles}`}>
+    <div className={`flex w-fit text-left ${styles}`}>
       {selects?.map((el) => (
         <div key={uuidv4()} className="flex hover:text-white flex-col mr-10">
           <label className="text-light font-light text-xs mb-1 uppercase ">

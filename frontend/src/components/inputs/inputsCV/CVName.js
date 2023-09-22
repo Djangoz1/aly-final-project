@@ -1,3 +1,5 @@
+"use client";
+
 import { ADDRESSES } from "constants/web3";
 import { useAuthState } from "context/auth";
 import Link from "next/link";
@@ -13,20 +15,19 @@ export const CVName = ({ styles, metadata, cvID }) => {
     if (metadata) {
       setIsName(metadata?.username);
       return;
-    }
-    if (cvID && cvID > 0) {
+    } else if (cvID && cvID > 0) {
       let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
       let data = await fetchJSONByCID(uri);
       setIsName(data?.username);
     }
   };
-
+  console.log(metadata);
   useEffect(() => {
     if (!isName) state();
   }, [cv, metadata, cvID]);
 
   return (
-    <Link href={`/profile/cv/${cvID || cv}`} className={styles}>
+    <Link href={`/profile/${metadata?.cvID || cvID || cv}`} className={styles}>
       {isName || "No name"}
     </Link>
   );

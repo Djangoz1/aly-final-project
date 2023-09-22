@@ -7,10 +7,10 @@ export let fetchMissionsOfCV = async (cvID, stop) => {
   if (cvID && cvID > 0) {
     let _missions = await _apiGet("missionsOfCV", [cvID]);
     let result = [];
-    let stopper = stop || _missions.length;
+    let stopper = stop || _missions?.length;
 
     for (let index = 0; index < stopper; index++) {
-      let _id = parseInt(_missions[index]);
+      let _id = parseInt(_missions?.[index]);
       let datas = await fetchMission(_id);
 
       result.push(datas);

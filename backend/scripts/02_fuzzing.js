@@ -107,7 +107,6 @@ async function main() {
     missionID: _missionID,
     specification: 15,
     title: "Dev frontend",
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
   });
   _missionID = feature.missionID;

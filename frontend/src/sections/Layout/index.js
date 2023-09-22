@@ -9,6 +9,7 @@ import {
 } from "context/auth";
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { MissionProvider } from "context/hub/mission";
 
 export const Layout = ({ children, banniere }) => {
   const { address } = useAccount();

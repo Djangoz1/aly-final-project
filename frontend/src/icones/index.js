@@ -5,6 +5,50 @@ export const icfy = {
     close: "ant-design:eye-invisible-outlined",
     open: "ic:outline-remove-red-eye",
   },
+  ux: {
+    dots: { horizontal: "zondicons:dots-horizontal-triple" },
+  },
+  code: {
+    tool: "fluent:virtual-network-toolbox-20-filled",
+    casual: "fluent:virtual-network-20-filled",
+  },
+  domain: {
+    gaming: "pepicons-print:controller-circle-filled",
+    ai: "vscode-icons:file-type-ai2",
+    designer: "line-md:pencil-twotone",
+    frontend: "ic:twotone-web",
+    backend: "uil:server",
+    blockchain: "eos-icons:blockchain",
+  },
+
+  technos: {
+    dart: "logos:dart",
+    csharp: "devicon:csharp",
+  },
+  msg: {
+    casual: "line-md:email",
+    opened: "line-md:email-opened",
+  },
+
+  hand: {
+    check: "mdi:business-outline",
+  },
+  bank: {
+    check: "mdi:bank-check",
+  },
+  court: {
+    justice: "mdi:bank-check",
+    hammer: "mdi:court-hammer",
+  },
+  person: {
+    check: "solar:user-check-broken",
+    uncheck: "bi:person-x",
+    edit: "mdi:person-edit",
+    clock: "mdi:person-clock-outline",
+  },
+  tools: {
+    casual: "fluent-mdl2:developer-tools",
+  },
 };
 
 export const icfyHANDSHAKE = "ic:round-handshake";

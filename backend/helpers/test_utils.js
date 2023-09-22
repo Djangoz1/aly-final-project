@@ -52,6 +52,7 @@ const PUB_DATAS_URI_EXEMPLE = {
   description:
     "This is a part where content value stored. I can write everything I want to share at the community or missions community or private community.",
   image: "img/pub.jpeg",
+  attributes: [{ createdAt: Date.now(), tags: [] }],
 };
 
 // *::::::::::::: ------- :::::::::::::* //
@@ -73,11 +74,11 @@ const MISSION_DATAS_URI_EXEMPLE = {
     evaluation: [],
     experience: 0,
     disponibilite: 0,
-
+    createdAt: Date.now(),
     twitter: null,
     linkedin: null,
     github: null,
-    domain: "Blockchain enterprise",
+    domain: 4,
   },
   // you can provide a link for more information about the mission like current website
 };
