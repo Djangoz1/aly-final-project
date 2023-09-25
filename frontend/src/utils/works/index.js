@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import { _apiGet, _apiGetAt } from "utils/ui-tools/web3-tools";
 
-export let fetchMissionsOfCV = async (cvID, stop) => {
+export let fetchMissionsOfCV = async (cvID, withMeta, stop) => {
   if (cvID && cvID > 0) {
     let _missions = await _apiGet("missionsOfCV", [cvID]);
     let result = [];
@@ -12,8 +12,12 @@ export let fetchMissionsOfCV = async (cvID, stop) => {
     for (let index = 0; index < stopper; index++) {
       let _id = parseInt(_missions?.[index]);
       let datas = await fetchMission(_id);
-
-      result.push(datas);
+      if (withMeta) {
+        let metadatas = await fetchJSONByCID(datas?.uri);
+        result.push({ datas, metadatas });
+      } else {
+        result.push(datas);
+      }
     }
     return result;
   }
@@ -35,7 +39,7 @@ export let fetchMission = async (missionID) => {
       missionID,
       ADDRESSES["missionsHub"],
     ]);
-    datas.owner = await _apiGet("cvOf", [owner]);
+    datas.owner = parseInt(await _apiGet("cvOf", [owner]));
     datas.pubs = await _apiGet("pubsOfMission", [missionID]);
 
     return datas;

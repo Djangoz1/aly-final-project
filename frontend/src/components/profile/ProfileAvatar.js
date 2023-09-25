@@ -26,7 +26,7 @@ export const ProfileAvatar = ({ cvID, component, metadatas }) => {
     <div className="flex items-end">
       <div className="avatar h-fit">
         <ImagePin
-          style={"rounded-full   border-zinc-800 border border-3 w-16"}
+          style={"mask mask-squircle border-zinc-800 border border-3 w-16"}
           CID={isMetadatas?.image}
         />
       </div>

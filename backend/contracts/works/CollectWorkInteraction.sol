@@ -26,6 +26,9 @@ contract CollectWorkInteraction is Ownable {
     // missionID to featureID
     mapping(uint => uint[]) indexerMissions;
 
+    // cv worker return featuresIDs[]
+    mapping(uint => uint[]) cvsToJobs;
+
     IAddressSystem private _iAS;
 
     modifier onlyProxy() {
@@ -57,11 +60,16 @@ contract CollectWorkInteraction is Ownable {
         require(datas[_featureID].missionID == 0, "Data already set");
         uint missionID = _featureData(_featureID).missionID;
         datas[_featureID].missionID = missionID;
+
         indexerMissions[missionID].push(_featureID);
     }
 
     function indexerOf(uint _missionID) external returns (uint[] memory) {
         return indexerMissions[_missionID];
+    }
+
+    function jobsOf(uint _cvID) external view returns (uint[] memory) {
+        return cvsToJobs[_cvID];
     }
 
     function inviteWorker(
@@ -72,6 +80,7 @@ contract CollectWorkInteraction is Ownable {
         require(_cvID != _cvWorkerID, "Can't assign yourself");
         DataTypes.FeatureData memory featureData = _featureData(_featureID);
         featureData.cvWorker = _cvWorkerID;
+
         _setFeature(_featureID, featureData);
     }
 
@@ -84,6 +93,7 @@ contract CollectWorkInteraction is Ownable {
         datas[_featureID].signedWorker = _cvID;
         datas[_featureID].workerAcceptJob = true;
         featureData.startedAt = block.timestamp;
+        cvsToJobs[_cvID].push(_featureID);
         _setFeature(_featureID, featureData);
     }
 
@@ -133,6 +143,7 @@ contract CollectWorkInteraction is Ownable {
         datas[_featureID].workerAcceptJob = true;
         uint[] memory empty;
         datas[_featureID].workerDemand = empty;
+        cvsToJobs[_cvWorkerID].push(_featureID);
     }
 
     function improveFeature(

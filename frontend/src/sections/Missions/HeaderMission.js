@@ -1,13 +1,25 @@
-import { CreatePub } from "components/Pub/CreatePub";
+import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { CreateFeature } from "components/modal/works/CreateFeature";
+import { CreateFeature } from "sections/Features/form/CreateFeature";
 import { MyHeader } from "components/myComponents/MyHeader";
+import { ENUMS } from "constants/enums";
+import { MENUS, MENUS_ID } from "constants/menus";
 import { STATUS } from "constants/status";
+import { useMissionState } from "context/hub/mission";
 import { icfyETHER, icfyGAMING, icfyLOCK, icfySTAR } from "icones";
 import React from "react";
 import { themes } from "styles/style";
+import { fromTimestamp } from "utils/ux-tools";
 
-export const HeaderMission = ({ path, owner, metadatas, datas }) => {
+export const HeaderMission = ({ path, owner }) => {
+  let state = useMissionState();
+  let datas = state?.mission?.datas;
+  let metadatas = state?.mission?.metadatas;
+  let domain = ENUMS.domain[metadatas?.attributes?.[0]?.domain];
+  let attributes = metadatas?.attributes?.[0];
+
+  let menus = MENUS_ID(datas?.id).mission;
+
   return (
     <MyHeader
       path={
@@ -15,50 +27,11 @@ export const HeaderMission = ({ path, owner, metadatas, datas }) => {
           ? `/works/mission/${datas?.id}${path && path}`
           : `/works/mission/${datas?.id}`
       }
-      menus={[
-        {
-          title: "Overview",
-          link: `/works/mission/${datas?.id}`,
-        },
-        {
-          title: "Features",
-          link: `/works/mission/${datas?.id}/features`,
-        },
-        {
-          title: "Budget",
-          link: "/profile",
-        },
-        {
-          title: "Pubs",
-          link: "/profile",
-        },
-        {
-          style: "ml-auto",
-          component: <CreatePub />,
-        },
-        {
-          style: "mx-4",
-          component: <CreateFeature />,
-        },
-        {
-          style: "join",
-          component: (
-            <>
-              <input
-                placeholder="Worker name"
-                className="input input-xs join-item"
-              />
-              <button className="join-item btn text-white btn-xs btn-success">
-                Invite Worker
-              </button>
-            </>
-          ),
-        },
-      ]}
+      menus={menus}
       img={metadatas?.image}
       name={metadatas?.title}
-      desc2={metadatas?.attributes?.[0]?.domain}
-      desc1={<CVName metadata={owner} />}
+      desc1={<p>Créer le {fromTimestamp(attributes?.createdAt)}</p>}
+      desc2={<CVName metadata={owner} />}
       stats={[
         {
           title: "Amount",
@@ -68,8 +41,8 @@ export const HeaderMission = ({ path, owner, metadatas, datas }) => {
         },
         {
           title: "Domain",
-          value: "Javascript",
-          icon: icfyGAMING,
+          value: domain?.name.toUpperCase(),
+          icon: domain?.icon,
           theme: themes.proposals,
         },
         {

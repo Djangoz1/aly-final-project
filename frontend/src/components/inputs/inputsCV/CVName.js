@@ -21,7 +21,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
       setIsName(data?.username);
     }
   };
-  console.log(metadata);
+
   useEffect(() => {
     if (!isName) state();
   }, [cv, metadata, cvID]);

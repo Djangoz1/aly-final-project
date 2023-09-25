@@ -1,11 +1,11 @@
+import { useFormState } from "context/form";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
-export const MySteps = ({ arr, pointer, styles }) => {
+export const MySteps = ({ arr, styles }) => {
+  let { pointer } = useFormState();
   return (
-    <ul
-      className={`steps steps-vertical border border-r-2  border-l-0 border-y-0   border-white/10  w-full   h-full ${styles}`}
-    >
+    <ul className={`steps steps-vertical     h-full ${styles || "w-full"}`}>
       {arr.map((el, index) => (
         <li
           key={uuidv4()}

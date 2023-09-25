@@ -4,17 +4,22 @@ import { statePub } from "utils/ui-tools/state-tools";
 
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { ImagePin } from "components/Image/ImagePin";
-import { _apiGet } from "utils/ui-tools/web3-tools";
+import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import { Icon } from "@iconify/react";
 import { icfyBUBBLE, icfyHEART, icfyMISSION } from "icones";
-import { MyModal } from "components/modal/MyModal";
+import { MyModal } from "components/myComponents/modal/MyModal";
 import { LogoIc } from "components/Logo";
+import { fromTimestamp } from "utils/ux-tools";
+import Link from "next/link";
+import { useAccount } from "wagmi";
+import { CreatePub } from "sections/Pub/form/create/CreatePub";
 
 export const Pub = ({ id, _owner }) => {
   const [isDatas, setIsDatas] = useState(null);
 
+  let { isConnected, address } = useAccount();
   const state = async () => {
     const pub = await statePub(id);
     let owner;
@@ -27,26 +32,59 @@ export const Pub = ({ id, _owner }) => {
     } else {
       owner = _owner;
     }
-    setIsDatas({ pub, owner });
+    let likers = [];
+    if (pub?.datas?.likes > 0) {
+      let likes = await _apiGet("likesOfPub", [id]);
+      for (let index = 0; index < likes?.length; index++) {
+        const likeID = likes?.[index];
+        likers.push(
+          await _apiGet("ownerOfToken", [likeID, ADDRESSES["pubsDatasHub"]])
+        );
+      }
+    }
+    setIsDatas({ pub, owner, likers });
   };
 
   useEffect(() => {
-    if (!isDatas) state();
-  }, [isDatas]);
+    if (!isDatas && id) {
+      console.log("pub", isDatas);
+      state();
+    }
+  }, [id]);
+
+  let setterLike = async (func) => {
+    if (isConnected) {
+      await _apiPost(func, [id]);
+      state();
+    }
+  };
+
   return (
-    <div className={"flex min-h-[15vh] h-fit relative items-start"}>
-      <div className="avatar mb-auto">
-        <ImagePin CID={isDatas?.owner?.image} style={"w-12 rounded-full"} />
+    <div
+      className={
+        "flex border border-t-0 border-b-1 border-white/10 hover:bg-black/20 hover:text-white border-x-0  px-4 py-5    relative items-start"
+      }
+    >
+      <div className="flex flex-col h-full  items-center ">
+        <LogoIc styles={"mb-5"} />
+        <div className="avatar">
+          <ImagePin
+            CID={isDatas?.owner?.image}
+            style={"w-16 mask mask-squircle "}
+          />
+        </div>
+        <span className="text-xs whitespace-nowrap mt-3">
+          {fromTimestamp(isDatas?.pub?.metadata?.attributes?.[0]?.createdAt)}
+        </span>
       </div>
 
-      <LogoIc styles={"absolute bottom-0 left-2"} />
-
-      <div className="flex h-fit border border-l-1 border-white/10 border-y-0 border-r-0  px-5 flex-col ml-5 ">
+      <div className="flex h-full min-h-[20vh] border border-l-1 border-white/10 border-y-0 border-r-0  px-5 flex-col ml-5 ">
         <CVName
-          styles={"text-white font-semibold text-sm"}
+          styles={"text-white mb-3 font-semibold text-sm"}
           metadata={isDatas?.owner}
           cvID={isDatas?.pub?.owner}
         />
+
         <p>{isDatas?.pub?.metadata?.description}</p>
         {isDatas?.pub?.metadata?.image && (
           <MyModal
@@ -66,24 +104,52 @@ export const Pub = ({ id, _owner }) => {
             }
           />
         )}
-        <div className="flex items-end">
-          <div className="flex mr-4 hover:text-secondary cursor-pointer">
-            <Icon icon={icfyBUBBLE} className="text-2xl mr-1" />
-            {isDatas?.pub?.answers?.length || 0}
-          </div>
-          <div className="flex mr-4 hover:text-secondary cursor-pointer ">
-            <Icon icon={icfyHEART} className=" text-2xl mr-1  " />
-            {isDatas?.pub?.likes}
-          </div>
-          <div
-            className={
-              isDatas?.pub?.metadata?.attributes?.[0]?.reference
-                ? "text-blue-600 cursor-pointer"
-                : "text-red-900"
+        <div className="flex  mt-auto items-end">
+          <CreatePub
+            btn={
+              <>
+                <Icon icon={icfyBUBBLE} className="text-2xl mr-1" />
+                {parseInt(isDatas?.pub?.datas?.answers)}
+              </>
+            }
+            styles={`flex mr-4  btn btn-ghost btn-xs py-2 h-fit w-fit hover:text-secondary cursor-pointer ${
+              !isConnected && "btn-disabled"
+            }`}
+            answerID={id}
+          />
+
+          <button
+            disabled={!isConnected}
+            className={`flex btn btn-ghost btn-xs py-2 h-fit w-fit mr-4  cursor-pointer ${
+              !isDatas?.likers?.includes(address)
+                ? "hover:text-secondary"
+                : "text-secondary hover:text-error"
+            }`}
+            onClick={() =>
+              setterLike(
+                !isDatas?.likers?.includes(address) ? "likePub" : "unlikePub"
+              )
             }
           >
-            <Icon icon={icfyMISSION} className=" text-2xl" />
-          </div>
+            <Icon icon={icfyHEART} className={`text-2xl mr-1 `} />
+            {parseInt(isDatas?.pub?.datas?.likes)}
+          </button>
+
+          {parseInt(isDatas?.pub?.datas?.missionID) > 0 ? (
+            <Link
+              className="btn btn-ghost btn-xs py-2 h-fit w-fit"
+              href={`/works/mission/${isDatas?.pub?.datas?.missionID}`}
+            >
+              <Icon
+                icon={icfyMISSION}
+                className="  text-2xl text-blue-600 cursor-pointer"
+              />
+            </Link>
+          ) : (
+            <button className="btn btn-ghost btn-xs py-2 h-fit w-fit">
+              <Icon icon={icfyMISSION} className=" text-2xl text-red-900" />
+            </button>
+          )}
         </div>
       </div>
     </div>

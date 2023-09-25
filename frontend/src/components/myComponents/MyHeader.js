@@ -1,32 +1,31 @@
 import { Icon } from "@iconify/react";
 import { ImagePin } from "components/Image/ImagePin";
 
-import { useAuthState } from "context/auth";
+import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
 import React, { useEffect, useState } from "react";
 import { MyBigBtn } from "./MyBigBtn";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
-import { MyModal } from "components/modal/MyModal";
-import { EditProfile } from "components/modal/works/EditProfile";
+import { MyModal } from "components/myComponents/modal/MyModal";
+import { EditProfile } from "sections/Profile/form/edit/EditProfile";
 import { styles } from "styles/style";
 import { useRouter } from "next/router";
+import { useAccount } from "wagmi";
+import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
+import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 export const MyHeader = ({
   path,
   img,
-  ownerID,
   name,
   desc1,
   desc2,
   stats,
   details,
   menus,
+  btn,
 }) => {
-  let cvID = ownerID;
-
-  let { cv } = useAuthState();
-
   return (
     <div className="flex flex-col w-full">
       <div
@@ -37,21 +36,17 @@ export const MyHeader = ({
         <div className="flex flex-col">
           <div className="avatar h-fit">
             <ImagePin
-              style={"rounded-full   border-zinc-800 border border-3 w-20"}
+              style={
+                "mask mask-squircle   border-zinc-800 border border-3 w-24"
+              }
               CID={img}
             />
           </div>
-          {cv == cvID && cv ? (
-            <EditProfile styles={`absolute right-3 top-3  ${styles.btn}`} />
-          ) : (
-            <button className="absolute right-3 top-3 btn btn-xs btn-outline btn-primary w-fit mx-auto mt-2 capitalize">
-              Follow
-            </button>
-          )}
+          {btn}
 
-          <div className="flex font2  items-start my-5 flex-col">
+          <div className="flex font2  items-start mt-2 mb-5 flex-col">
             <p className={"text-white  text-lg"}>{name || "No name"}</p>
-            <p className={" text-xs"}>{desc1 || "No description"}</p>
+            <div className={" text-xs"}>{desc1 || "No description"}</div>
             <div
               className={
                 " flex flex-col text-sm text-white text-left items-start"
@@ -92,7 +87,7 @@ export const MyHeader = ({
 
       <div className="flex  border border-b-1 border-t-0 border-x-0 border-white/10 w-full">
         {menus?.map((menu) =>
-          !menu?.component ? (
+          menu?.link ? (
             <Link
               key={uuidv4()}
               className={`font2 ${
@@ -106,9 +101,11 @@ export const MyHeader = ({
               {menu?.title}
             </Link>
           ) : (
-            <div className={`${menu?.style} my-auto  h-fit`}>
-              {menu?.component}
-            </div>
+            menu?.component && (
+              <div className={`${menu?.style} my-auto  h-fit`}>
+                {menu?.component}
+              </div>
+            )
           )
         )}
       </div>

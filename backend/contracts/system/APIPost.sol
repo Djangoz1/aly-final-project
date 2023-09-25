@@ -10,6 +10,7 @@ import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
 import {IBalancesHub} from "../interfaces/system/IBalancesHub.sol";
+import {IContract} from "../interfaces/system/IContract.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
 import {ICVsDatasHub} from "../interfaces/cv/ICVsDatasHub.sol";
@@ -103,6 +104,14 @@ contract APIPost is Ownable {
         (bool success, ) = _to.call{value: _value}("");
         require(success, "apiPost : Transaction failed");
         return true;
+    }
+
+    function setTokenURIOf(
+        uint _tokenID,
+        string calldata _tokenURI,
+        address _ercContract
+    ) external {
+        IContract(_ercContract).setTokenURI(msg.sender, _tokenID, _tokenURI);
     }
 
     // ************* --- ************* //

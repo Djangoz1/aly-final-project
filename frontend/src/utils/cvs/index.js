@@ -27,15 +27,15 @@ export let fetchStatsOfCV = async (cvID) => {
     let features = parseInt(
       await _apiGet("balanceOfToken", [cvID, ADDRESSES["featuresHub"]])
     );
-    let proposals = parseInt(
-      await _apiGet("balanceOfToken", [cvID, ADDRESSES["workProposalHub"]])
-    );
+
     let pubs = parseInt(
       await _apiGet("balanceOfToken", [cvID, ADDRESSES["pubsHub"]])
     );
     let launchpads = parseInt(
       await _apiGet("balanceOfToken", [cvID, ADDRESSES["launchpadHub"]])
     );
+
+    let _jobs = await _apiGet("jobsOfCV", [cvID]);
 
     let followers = parseInt(await _apiGet("lengthOfFollower", [cvID]));
     let follows = parseInt(await _apiGet("lengthOfFollowed", [cvID]));
@@ -53,7 +53,7 @@ export let fetchStatsOfCV = async (cvID) => {
     let stats = {
       missions,
       features,
-      proposals,
+      proposals: _jobs.length,
       pubs,
       launchpads,
       followers,

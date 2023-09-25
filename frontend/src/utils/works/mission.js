@@ -4,6 +4,7 @@ import { ENUMS } from "constants/enums";
 
 import { STATUS } from "constants/status";
 import { icfyETHER } from "icones";
+import Link from "next/link";
 
 export let _table_missions = (stateCV, details) => {
   let list = [];
@@ -18,7 +19,9 @@ export let _table_missions = (stateCV, details) => {
         <Icon icon={domain.icon} className="text-[30px]" />
         <div>
           <div className="font-bold text-xs whitespace-nowrap">
-            {el?.metadatas?.title}
+            <Link href={`/works/mission/${el?.datas?.id}`}>
+              {el?.metadatas?.title}
+            </Link>
           </div>
           <div className="text-[10px] opacity-50 uppercase">{domain?.name}</div>
         </div>

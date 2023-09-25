@@ -86,9 +86,17 @@ const createURIFeature = async ({ id, title, description, attributes }) => {
     return null;
   }
 };
-const createURIPub = async ({ id, title, description }) => {
+const createURIPub = async ({
+  id,
+  title,
+  description,
+  img,
+  answerID,
+  missionID,
+  owner,
+}) => {
   let moock = PUB_DATAS_URI_EXEMPLE;
-  const readableStreamForFile = fs.createReadStream(moock.image);
+
   if (!id && !title && !description) {
     throw new Error("Missing value on creation Publication URI");
   }
@@ -102,13 +110,21 @@ const createURIPub = async ({ id, title, description }) => {
   };
 
   try {
-    const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
+    let image;
+    if (img !== false) {
+      const readableStreamForFile = fs.createReadStream(moock.image);
+      const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
+      image = result.IpfsHash;
+    }
 
+    moock.attributes[0].missionID = missionID;
+    moock.attributes[0].answerID = answerID;
+    moock.attributes[0].owner = owner;
     const body = {
       title: title || moock.title,
       description: description || moock?.description,
       url: "/community/pub/" + id,
-      image: result.IpfsHash,
+      image: image,
       name: "Publication #" + id,
       attributes: moock.attributes,
     };

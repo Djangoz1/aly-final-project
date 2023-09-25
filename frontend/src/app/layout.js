@@ -4,6 +4,7 @@ import "../styles/global.css";
 import { AccountProvider } from "context/account";
 import { MissionProvider } from "context/hub/mission";
 import { CVProvider } from "context/hub/cv";
+import { FormProvider } from "context/form";
 
 export default function RootLayout({ children }) {
   return (

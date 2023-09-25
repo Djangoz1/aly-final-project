@@ -1,4 +1,4 @@
-import { ModalSetCV } from "components/modal/ModalSetCV";
+import { ModalSetCV } from "components/myComponents/modal/ModalSetCV";
 import { MyStat } from "components/myComponents/MyStat";
 import { profileStats } from "constants/stats";
 import { v4 as uuidv4 } from "uuid";

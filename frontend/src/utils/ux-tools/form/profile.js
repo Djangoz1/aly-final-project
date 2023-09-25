@@ -1,220 +1,68 @@
-import { MyCheckboxes } from "components/myComponents/form/MyCheckboxes";
-import { MyTextArea } from "components/myComponents/form/MyTextArea";
-import { ENUMS } from "constants/enums";
-import { DEV_DOMAIN } from "constants/languages";
 import { MENUS } from "constants/menus";
 
-const { Icon } = require("@iconify/react");
-const { MyFormInfo } = require("components/myComponents/form/MyFormInfo");
-const { MyInputs } = require("components/myComponents/form/MyInputs");
-const { MyInputsFile } = require("components/myComponents/form/MyInputsFile");
-const { MySelects } = require("components/myComponents/form/MySelects");
-const { icfyFB, icfyLINKEDIN, icfyGITHUB2, icfyTWITTER } = require("icones");
-
-export let _form_edit_profile = ({ metadatas, handleChange }) => {
-  return [
-    _form_edit_profile_information({ handleChange, metadatas }),
-    _form_edit_profile_social({ handleChange, metadatas }),
-    _form_edit_profile_work({ handleChange, metadatas }),
-    _form_edit_profile_blockchain({ handleChange, metadatas }),
-  ];
+export let _form_edit_profile_information = {
+  title: `${MENUS.profile.edit[0].i} ${MENUS.profile.edit[0].title}`,
+  description: (
+    <>
+      Les informations pour votre compte n'ont aucune incidence sur le protocole
+      deWork.
+      <br />
+      Veuillez remplir le maximum d'information afin d'attirer le maximums de
+      recruteurs.
+    </>
+  ),
 };
 
-export let _form_edit_profile_information = ({ handleChange, metadatas }) => {
-  return {
-    title: MENUS.profile.edit[0],
-    components: [
-      <MyInputs
-        inputs={[
-          { label: "Username", placeholder: metadatas?.username || "Vitalik" },
-          {
-            label: "Téléphone",
-            placeholder:
-              metadatas?.attributes[0]?.identity?.phone || "07 01 90 20 08",
-          },
-        ]}
-        styles={"mb-1"}
-      />,
-      <MyInputsFile
-        styles={"my-2"}
-        inputs={[{ label: "Photo de profil" }, { label: "Bannière" }]}
-      />,
-    ],
-    description: (
-      <>
-        Les informations pour votre compte n'ont aucune incidence sur le
-        protocole deWork.
-        <br />
-        Veuillez remplir le maximum d'information afin d'attirer le maximums de
-        recruteurs.
-      </>
-    ),
-  };
+export let _form_edit_profile_social = {
+  title: `${MENUS.profile.edit[1].i} ${MENUS.profile.edit[1].title}`,
+  description: (
+    <>
+      Les informations suivante n'ont aucune incidence sur le protocole deWork.
+      <br />
+      Veuillez remplir le maximum d'information afin d'attirer le maximums de
+      recruteurs.
+    </>
+  ),
 };
 
-export let _form_edit_profile_social = ({ handleChange, metadatas }) => {
-  return {
-    title: MENUS.profile.edit[1],
-    components: [
-      <MyInputs
-        // styles="flex-col"
-        inputs={[
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
-              </span>
-            ),
-            placeholder: "URL https://facebook...",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
-              </span>
-            ),
-            placeholder: "URL https://linkedin...",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
-              </span>
-            ),
-            placeholder: "URL https://github...",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
-              </span>
-            ),
-            placeholder: "URL https://twitter...",
-          },
-        ]}
-      />,
-    ],
-    description: (
-      <>
-        Les informations suivante n'ont aucune incidence sur le protocole
-        deWork.
-        <br />
-        Veuillez remplir le maximum d'information afin d'attirer le maximums de
-        recruteurs.
-      </>
-    ),
-  };
+export let _form_edit_profile_work = {
+  title: `${MENUS.profile.edit[2].i} ${MENUS.profile.edit[2].title}`,
+  description: (
+    <>
+      Les informations pour votre compte n'ont aucune incidence sur le protocole
+      deWork.
+      <br />
+      Veuillez remplir le maximum d'information afin d'attirer le maximums de
+      recruteurs.
+    </>
+  ),
 };
 
-export let _form_edit_profile_work = ({ handleChange, metadatas }) => {
-  return {
-    title: MENUS.profile.edit[2],
-    components: [
-      <MyCheckboxes
-        label={"Quel type de mission recherchez-vous ?"}
-        checkboxes={[
-          { title: "- d'1 semaine" },
-          { title: "- de 4 semaines" },
-          { title: "+ de 4 semaines" },
-          { title: "+ de 3 mois" },
-          { title: "Ouvert" },
-        ]}
-      />,
-      <MyFormInfo
-        title={
-          <>
-            <input
-              type="checkbox"
-              className="toggle toggle-sm toggle-primary "
-              checked={metadatas?.attributes[0]?.visibility}
-              onChange={() =>
-                handleChange({
-                  target: "visibility",
-                  value: !metadatas?.attributes[0]?.visibility,
-                })
-              }
-            />
-            <span className="text-xs  w-fit ml-4">
-              Visibilité de mon profil
-            </span>
-          </>
-        }
-        description={
-          <>
-            En activant la visibilité de votre profil, votre CV sera visible par
-            les recruteurs sur la plateforme. En revanche la visibilité de votre
-            profil depuis la blockchain n'est elle pas modifiable
-            <br />
-            <br />
-            Vous pourrez le modifier à tout moment.
-          </>
-        }
-      />,
-      <MySelects
-        selects={[
-          {
-            label: "Langues",
-            arr: ["Français", "Espagnol", "Italien", "Allemand", "Anglais"],
-            placeholder: "Quelle langue maitrisez-vous ?",
-          },
-          {
-            label: "Niveau",
-            arr: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
-            placeholder: "Choisir",
-          },
-        ]}
-      />,
-
-      <MyInputsFile styles={"my-4"} inputs={[{ label: "CV" }]} />,
-    ],
-    description: (
-      <>
-        Les informations pour votre compte n'ont aucune incidence sur le
-        protocole deWork.
-        <br />
-        Veuillez remplir le maximum d'information afin d'attirer le maximums de
-        recruteurs.
-      </>
-    ),
-  };
+export let _form_edit_profile_blockchain = {
+  title: `${MENUS.profile.edit[3].i} ${MENUS.profile.edit[3].title}`,
+  description: (
+    <>
+      Pour ce qui concerne votre compte, seul votre addresse est stocké sur la
+      blockchain.
+      <br />
+      Nous vous conseillons de ne changer l'addresse qu'en cas de faiblesse sur
+      votre addresse actuel. Une fois fait, toute vos actions devras être faites
+      sur la nouvelle addresse et les salaires seront versés à cette nouvelle
+      addresse.
+    </>
+  ),
 };
 
-export let _form_edit_profile_blockchain = ({ handleChange, metadatas }) => {
-  return {
-    title: MENUS.profile.edit[3],
-    components: [
-      <MyInputs
-        styles="flex-col"
-        inputs={[
-          {
-            label: <>Account address</>,
-            placeholder: "0xfea2...",
-          },
-        ]}
-      />,
-    ],
-    description: (
-      <>
-        Pour ce qui concerne votre compte, seul votre addresse est stocké sur la
-        blockchain.
-        <br />
-        Nous vous conseillons de ne changer l'addresse qu'en cas de faiblesse
-        sur votre addresse actuel. Une fois fait, toute vos actions devras être
-        faites sur la nouvelle addresse et les salaires seront versés à cette
-        nouvelle addresse.
-      </>
-    ),
-  };
-};
+export let _form_edit_profile = [
+  _form_edit_profile_information,
+  _form_edit_profile_social,
+  _form_edit_profile_work,
+  _form_edit_profile_blockchain,
+];
 
-export let _form_create_profile = ({ datas, handleChange }) => {
-  return [
-    _form_create_profile_intro,
-    _form_create_profile_info({ datas, handleChange }),
-    _form_create_profile_work({ datas, handleChange }),
-    _form_create_profile_social({ datas, handleChange }),
-  ];
-};
+// ********** ------ ********** //
+// ********** Create ********** //
+// ********** ------ ********** //
 
 export let _form_create_profile_intro = {
   title: <>Welcome ! 👋</>,
@@ -274,182 +122,35 @@ export let _form_create_profile_intro = {
   ),
 };
 
-export let _form_create_profile_info = ({ datas, handleChange }) => {
-  let menu = MENUS.profile.create[1];
-  return {
-    title: `${menu.i} ${menu.title}`,
-    description: (
-      <>
-        Veuillez compléter les informations suivantes pour une meilleur
-        expérience. <br />
-        Ces informations sont réunis dans un but purement informatif et ne
-        seront pas stocké dans la blockchain et n'auras aucune incidence sur le
-        protocole.
-      </>
-    ),
-    components: [
-      <MyCheckboxes
-        label={"Civilité"}
-        checkboxes={[{ title: "M." }, { title: "Mme." }]}
-      />,
-      <MyInputs
-        inputs={[
-          {
-            label: "Prénom",
-            placeholder: "John",
-          },
-          {
-            label: "Nom",
-            placeholder: "Doe",
-          },
-        ]}
-      />,
-      <MyInputs
-        inputs={[
-          {
-            label: "Téléphone",
-            placeholder: "07 01 10 20 02",
-          },
-          {
-            label: "Date de naissance",
-            placeholder: "jj/mm/aaaa",
-          },
-        ]}
-      />,
-      <MyTextArea label={"Bio"} placeholder={"Write your bio ..."} />,
-    ],
-  };
+export let _form_create_profile_info = {
+  title: `${MENUS.profile.create[1].i} ${MENUS.profile.create[1].title}`,
+  description: (
+    <>
+      Veuillez compléter les informations suivantes pour une meilleur
+      expérience. <br />
+      Ces informations sont réunis dans un but purement informatif et ne seront
+      pas stocké dans la blockchain et n'auras aucune incidence sur le
+      protocole.
+    </>
+  ),
 };
 
-export let _form_create_profile_work = ({ datas, handleChange }) => {
-  let menu = MENUS.profile.create[2];
-  return {
-    title: `${menu.i} ${menu.title}`,
-    description: (
-      <>
-        En anonymisant votre profil, votre CV sera visible en CVthèque mais sans
-        votre nom, prénom, numéro de téléphone et adresse e-mail. Pensez à bien
-        supprimer ces données également de votre fichier CV. En revanche ,
-        lorsque vous postulerez, vos données personnelles deviendront visibles
-        par les recruteurs.
-        <br />
-        <br />
-        Vous pourrez le modifier à tout moment.
-        <div className="flex items-center mt-4 text-white">
-          <input
-            type="checkbox"
-            className="toggle toggle-sm toggle-primary "
-            checked
-          />
-          <span className="text-xs  w-fit ml-4">Anonymiser mon profil</span>
-        </div>
-      </>
-    ),
-    components: [
-      <div className="flex flex-col ">
-        <MyInputsFile inputs={[{ label: "CV" }]} />
+export let _form_create_profile_work = {
+  title: `${MENUS.profile.create[2].i} ${MENUS.profile.create[2].title}`,
 
-        <p className="text-light text-white font-light text-xs mb-1 ">
-          Vous pouvez renseigner votre CV hors plateforme afin qu'il soit vu par
-          les recruteurs.
-        </p>
-      </div>,
-      <MyCheckboxes
-        label={"Quel type de mission recherchez-vous ?"}
-        checkboxes={[
-          { title: "- d'1 semaine" },
-          { title: "- de 4 semaines" },
-          { title: "+ de 4 semaines" },
-          { title: "+ de 3 mois" },
-          { title: "Ouvert" },
-        ]}
-      />,
-      <MySelects
-        selects={[
-          {
-            label: "Métiers recherchés",
-            target: "name",
-            arr: DEV_DOMAIN,
-            placeholder: "Quel domaine recherchez vous ?",
-          },
-          {
-            label: "Compétences",
-            target: "court",
-            arr: ENUMS.courts,
-            placeholder: "Quelles technologies maitrisez-vous ?",
-          },
-        ]}
-      />,
-      <MySelects
-        selects={[
-          {
-            label: "Langues",
-            arr: ["Français", "Espagnol", "Italien", "Allemand", "Anglais"],
-            placeholder: "Quelle langue maitrisez-vous ?",
-          },
-          {
-            label: "Niveau",
-            arr: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
-            placeholder: "Choisir",
-          },
-        ]}
-      />,
-    ],
-  };
+  description: (
+    <>
+      Veuillez compléter les informations suivantes pour une meilleur
+      expérience. <br />
+      Ces informations sont réunis dans un but purement informatif et ne seront
+      pas stocké dans la blockchain et n'auras aucune incidence sur le
+      protocole.
+    </>
+  ),
 };
-export let _form_create_profile_social = ({ datas, handleChange }) => {
-  let menu = MENUS.profile.create[2];
-  return {
-    title: `${menu.i} ${menu.title}`,
-    description: (
-      <>
-        En anonymisant votre profil, votre CV sera visible en CVthèque mais sans
-        votre nom, prénom, numéro de téléphone et adresse e-mail. Pensez à bien
-        supprimer ces données également de votre fichier CV. En revanche ,
-        lorsque vous postulerez, vos données personnelles deviendront visibles
-        par les recruteurs.
-        <br />
-        <br />
-        Vous pourrez le modifier à tout moment.
-      </>
-    ),
-    components: [
-      <MyInputs
-        inputs={[
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
-              </span>
-            ),
-            placeholder: "URL https://facebook...",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
-              </span>
-            ),
-            placeholder: "URL https://linkedin...",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
-              </span>
-            ),
-            placeholder: "URL https://github...",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
-              </span>
-            ),
-            placeholder: "URL https://twitter...",
-          },
-        ]}
-      />,
-    ],
-  };
-};
+
+export let _form_create_profile = [
+  _form_create_profile_intro,
+  _form_create_profile_info,
+  _form_create_profile_work,
+];

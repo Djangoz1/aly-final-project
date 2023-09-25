@@ -9,7 +9,6 @@ export let _table_features = (stateMission) => {
   let list = [];
   let features = stateMission.features;
   let owner = stateMission.owner;
-  console.log(stateMission);
   for (let index = 0; index < features?.length; index++) {
     const el = features[index];
 
@@ -19,28 +18,28 @@ export let _table_features = (stateMission) => {
       <div className="flex items-center space-x-3">
         <Icon icon={court.badge} className="text-[30px]" />
         <div>
-          <div className="font-bold text-sm whitespace-nowrap">
+          <div className="font-bold  whitespace-nowrap">
             {el?.metadatas?.title}
           </div>
-          <div className="text-xs opacity-50">
+          <div className=" opacity-50">
             <CVName metadata={owner} />
           </div>
         </div>
       </div>,
-      <div className="flex text-xs flex-col">
+      <div className="flex  flex-col">
         {el?.details?.signedWorker ? (
           <CVName cvID={el?.details?.signedWorker} styles={"text-white"} />
         ) : (
           <span className="text-warning">Waiting</span>
         )}
 
-        <span className="badge badge-primary text-xs mt-3 badge-sm">
+        <span className="badge badge-primary  mt-3 badge-sm">
           {court.court}
         </span>
       </div>,
 
       <span
-        className={`text-xs flex items-center ${
+        className={` flex items-center ${
           el?.details?.signedWorker
             ? status.color
             : STATUS._feature.hiring.color

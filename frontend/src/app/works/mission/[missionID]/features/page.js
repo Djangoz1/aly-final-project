@@ -9,6 +9,7 @@ import {
 
 import { LayoutMission } from "sections/Missions/LayoutMission";
 import { useMissionState } from "context/hub/mission";
+import { MENUS_EDIT } from "constants/menus";
 
 const Page = ({ params }) => {
   const missionID = params.missionID;
@@ -22,6 +23,7 @@ const Page = ({ params }) => {
           state={state}
           list={_table_features(state)}
           head={HEAD_table_features}
+          editBtns={MENUS_EDIT.feature}
         />
 
         {/* <MySideList list={isState?.list} badges={isState?.mission?.badges} /> */}

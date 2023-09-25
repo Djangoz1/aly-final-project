@@ -7,6 +7,7 @@ export const icfy = {
   },
   ux: {
     dots: { horizontal: "zondicons:dots-horizontal-triple" },
+    warning: "line-md:alert-twotone",
   },
   code: {
     tool: "fluent:virtual-network-toolbox-20-filled",
@@ -20,6 +21,9 @@ export const icfy = {
     backend: "uil:server",
     blockchain: "eos-icons:blockchain",
   },
+  work: {
+    casual: "ic:twotone-work",
+  },
 
   technos: {
     dart: "logos:dart",
@@ -28,6 +32,7 @@ export const icfy = {
   msg: {
     casual: "line-md:email",
     opened: "line-md:email-opened",
+    chat: "fluent-mdl2:chat-invite-friend",
   },
 
   hand: {
@@ -39,12 +44,15 @@ export const icfy = {
   court: {
     justice: "mdi:bank-check",
     hammer: "mdi:court-hammer",
+    vote: "fluent:vote-24-filled",
   },
   person: {
     check: "solar:user-check-broken",
     uncheck: "bi:person-x",
     edit: "mdi:person-edit",
     clock: "mdi:person-clock-outline",
+    friend: "carbon:friendship",
+    add: "fluent-mdl2:add-friend",
   },
   tools: {
     casual: "fluent-mdl2:developer-tools",

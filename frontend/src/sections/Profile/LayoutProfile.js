@@ -7,8 +7,7 @@ import { useAuthState } from "context/auth";
 import { stateCV } from "utils/ui-tools/state-tools";
 
 import { HeaderProfile } from "sections/Profile/HeaderProfile";
-import { ProfileMissions } from "../../components/profile/ProfileMissions";
-import { ProfilePubs } from "components/profile/ProfilePubs";
+
 import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 
 export const LayoutProfile = ({ params, path, children }) => {
@@ -27,7 +26,10 @@ export const LayoutProfile = ({ params, path, children }) => {
     }
   }, [_cvID, user?.cv]);
   return (
-    <Layout className="h-screen flex  w-screen bg-white/90">
+    <Layout
+      banniere={metadatas?.attributes?.[0]?.banniere}
+      className="h-screen flex  w-screen bg-white/90"
+    >
       <MySection styles={" flex flex-col  justify-between "}>
         <HeaderProfile path={path} />
 

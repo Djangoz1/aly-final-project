@@ -69,6 +69,30 @@ let _createMission = async ({
     value: `${await balancesHub.missionPrice()}`,
   });
 
+  await _createPub({
+    img: false,
+    missionID: id,
+    addressSystem,
+    account,
+    description: `Titre de la Mission : Conception d'un Site Web Élégant pour une Petite Entreprise de Café
+    Description de la Mission:
+    Nous sommes à la recherche d'un talentueux concepteur de site Web pour créer une présence en ligne exceptionnelle pour notre petite entreprise de café, 'Café Délicieux'. Notre objectif est de mettre en avant notre atmosphère chaleureuse et notre délicieux café artisanal pour attirer davantage de clients et d'amateurs de café.
+
+    Tâches Principales :
+    Conception du Site Web : Concevoir un site Web moderne et attrayant qui reflète notre identité de marque. Le site doit être convivial, accessible sur tous les appareils, et optimisé pour une expérience utilisateur exceptionnelle.
+    Galerie de Photos : Créer une galerie de photos mettant en valeur notre café, nos boissons, et notre ambiance. Les images devront être de haute qualité pour susciter l'appétit et l'intérêt des visiteurs.
+    Menu en Ligne : Intégrer un menu en ligne complet, facile à naviguer, avec des descriptions de produits, des prix et la possibilité de personnaliser les commandes.
+    Intégration des Réseaux Sociaux : Connecter le site Web à nos profils de médias sociaux pour une présence en ligne cohérente. Les boutons de partage doivent également être intégrés pour encourager la diffusion de notre contenu.
+    Formulaire de Contact : Inclure un formulaire de contact pour permettre aux clients de poser des questions, de faire des réservations ou de laisser des commentaires.
+    Blog sur le Café : Créer une section blog où nous pourrons partager des articles sur le café, des recettes, et des histoires liées à notre entreprise.
+    Conditions de la Mission :
+    Date de début : À convenir
+    Délai de livraison : [Insérer la date limite]
+    Budget : [Insérer votre budget]
+    Nous recherchons un freelance créatif et expérimenté en conception de site Web, ayant une passion pour le café et une compréhension de l'industrie alimentaire. Si vous êtes prêt à créer un site Web qui éveillera les papilles gustatives de nos clients, nous aimerions entendre parler de vous !
+    Si cette mission vous intéresse, n'hésitez pas à nous contacter avec des exemples de vos travaux antérieurs et votre proposition. Nous avons hâte de travailler avec un professionnel talentueux pour donner vie à notre vision en ligne.`,
+  });
+
   if (account.address != (await apiGet.ownerOfToken(id, _addrMH))) {
     throw new Error("Error Missions: URI ID");
   }
@@ -144,6 +168,7 @@ let _createPub = async ({
   title,
   description,
   account,
+  img,
   addressSystem,
 }) => {
   let _iAS = await getContractAt("AddressSystem", addressSystem);
@@ -155,7 +180,11 @@ let _createPub = async ({
   let result = await createURIPub({
     id,
     title,
+    img,
     description,
+    missionID,
+    answerID,
+    owner: account.address,
   });
 
   if (missionID && missionID > 0) {

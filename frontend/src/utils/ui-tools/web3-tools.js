@@ -1,5 +1,5 @@
 import { prepareWriteContract, writeContract, readContract } from "@wagmi/core";
-import { ABI_API_P, ABI_API_G } from "constants/web3";
+import { ABI_API_P, ABI_API_G, ABIs } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
 import { ADDRESSES } from "constants/web3";
@@ -12,11 +12,27 @@ export const viemClient = createPublicClient({
 
 // *::::::::::::::: GLOBAL  :::::::::::::::*
 
-export const setterCONTRACT = async (func, args) => {
+export const _apiPost = async (func, args, value) => {
   try {
     const { request } = await prepareWriteContract({
       address: ADDRESSES["apiPost"],
       abi: ABI_API_P,
+      functionName: func,
+      args: args,
+      value: value,
+    });
+    const { hash } = await writeContract(request);
+
+    return hash;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+export const _apiPostAt = async ({ targetContract, func, args }) => {
+  try {
+    const { request } = await prepareWriteContract({
+      address: ADDRESSES[targetContract],
+      abi: ABIs[targetContract],
       functionName: func,
       args: args,
     });
@@ -43,12 +59,12 @@ export const _apiGet = async (func, args) => {
     return _error.details;
   }
 };
-export const _apiGetAt = async ({ func, args, address }) => {
+export const _apiGetAt = async ({ func, args, targetContract }) => {
   try {
     const res = await readContract({
-      address: ADDRESSES[address],
+      address: ADDRESSES[targetContract],
       args: args,
-      abi: ABI_API_G,
+      abi: ABIs[targetContract],
       functionName: func,
     });
     console.log("ress", res);

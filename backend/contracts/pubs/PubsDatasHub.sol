@@ -22,6 +22,9 @@ contract PubsDatasHub is ERC721, Ownable {
      * @notice uint param is for pub ID
      * @notice return array of ID follow for each pub
      */
+
+    mapping(uint => DataTypes.PubData) pubsToDatas;
+
     mapping(uint => uint[]) internal pubsToLikes;
 
     mapping(uint => DataTypes.LikeData) internal likesToDatas;
@@ -73,6 +76,7 @@ contract PubsDatasHub is ERC721, Ownable {
 
         newDatas.indexedAt = pubsToLikes[_pubID].length;
         pubsToLikes[_pubID].push(newLikeID);
+        pubsToDatas[_pubID].likes++;
         newDatas.pubID = _pubID;
         newDatas.id = newLikeID;
         cvsToLikes[_cvID][_pubID] = newLikeID;
@@ -96,6 +100,8 @@ contract PubsDatasHub is ERC721, Ownable {
         delete pubsToLikes[prevDatas.pubID][prevDatas.indexedAt];
         likesToDatas[_likeID] = cleanDatas;
         delete cvsToLikes[_cvID][_pubID];
+        pubsToDatas[_pubID].likes--;
+
         _burn(_likeID);
     }
 
@@ -125,6 +131,17 @@ contract PubsDatasHub is ERC721, Ownable {
         return likesToDatas[_likeID];
     }
 
+    function dataOfPub(
+        uint _pubID
+    )
+        external
+        view
+        ifTokenExist((_pubID), _iAS.pubsHub())
+        returns (DataTypes.PubData memory)
+    {
+        return pubsToDatas[_pubID];
+    }
+
     function addPubMission(
         uint _newPubID,
         uint _missionID,
@@ -132,6 +149,7 @@ contract PubsDatasHub is ERC721, Ownable {
     ) external {
         require(_newPubID != 0, "Error create pub");
         missionsToPubs[_missionID].push(_newPubID);
+        pubsToDatas[_newPubID].missionID = _missionID;
     }
 
     function addPubAnswer(
@@ -141,6 +159,7 @@ contract PubsDatasHub is ERC721, Ownable {
     ) external {
         require(_newPubID != 0, "Error create pub");
         pubsToAnswers[_pubID].push(_newPubID);
+        pubsToDatas[_pubID].answers++;
     }
 
     function answersOfPub(

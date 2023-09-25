@@ -61,21 +61,13 @@ export const statePub = async (pubID) => {
   if (pubID?.pubID) {
     return pubID;
   } else if (pubID && pubID > 0) {
-    let answers = await _apiGet("answersOfPub", [pubID]);
-
-    let _likes = await _apiGet("indexerOfToken", [
-      pubID,
-      ADDRESSES["pubsDatasHub"],
-    ]);
-
     let _owner = await _apiGet("ownerOfToken", [pubID, ADDRESSES["pubsHub"]]);
 
     let uri = await _apiGet("tokenURIOf", [pubID, ADDRESSES["pubsHub"]]);
     let metadata = await fetchJSONByCID(uri);
     return {
       pubID,
-      answers,
-      likes: _likes?.length,
+      datas: await _apiGet("datasOfPub", [pubID]),
       metadata,
       owner: await _apiGet("cvOf", [_owner]),
     };
@@ -85,7 +77,6 @@ export const statePub = async (pubID) => {
 export let stateFeature = async (featureID) => {
   if (featureID?.featureID) return featureID;
   else if (featureID && featureID > 0) {
-    console.log("ntmmmmmm", "-------------");
     let datas = await _apiGet("datasOfFeature", [featureID]);
     let owner = await _apiGet("ownerOfToken", [
       featureID,

@@ -1,10 +1,9 @@
 "use client";
 import { useAuthState } from "context/auth";
 
-import { ProfileMissions } from "../../../components/profile/ProfileMissions";
 import { LayoutProfile } from "sections/Profile/LayoutProfile";
 import { ImagePin } from "components/Image/ImagePin";
-import { MyModal } from "components/modal/MyModal";
+import { MyModal } from "components/myComponents/modal/MyModal";
 import { useMissionDispatch } from "context/hub/mission";
 import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 import { useEffect } from "react";

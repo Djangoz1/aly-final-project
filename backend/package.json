@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "deploy": "hardhat run scripts/01_deploy.js --network localhost",
+    "deploy": "hardhat run scripts/00_simpleDeploy.js --network localhost",
     "fuzzing": "hardhat run scripts/02_fuzzing.js --network localhost",
     "token": "hardhat run scripts/03_token.js --network localhost"
   },

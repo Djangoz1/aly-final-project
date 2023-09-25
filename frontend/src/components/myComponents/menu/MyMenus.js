@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import {
+  doStateFormPointer,
+  useFormDispatch,
+  useFormState,
+} from "context/form";
+import React, { useEffect, useState } from "react";
+import { v4 } from "uuid";
 
 export const MyMenus = ({ menus, styles, setter }) => {
-  let [isTouch, setIsTouch] = useState(menus[0].title);
+  let dispatch = useFormDispatch();
+  let { pointer } = useFormState();
   let handleClick = (title, index) => {
-    setIsTouch(title);
-    if (setter) setter(index);
+    doStateFormPointer(dispatch, index);
   };
+
   return (
     <div className={`flex ${styles?.box}`}>
       {menus?.map((el, index) => (
         <div
           onClick={() => handleClick(el?.title, index)}
+          key={v4()}
           className={`${
-            el?.title === isTouch
+            pointer === index
               ? "bg-black/70 text-white font-bold border-y-white"
               : "border-y-white/10"
           } w-full font-light h-fit py-5 flex items-center border text-sm  border-x-0 cursor-pointer ${

@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { MissionProvider } from "context/hub/mission";
+import { ImagePin } from "components/Image/ImagePin";
 
 export const Layout = ({ children, banniere }) => {
   const { address } = useAccount();
@@ -33,8 +34,8 @@ export const Layout = ({ children, banniere }) => {
     >
       <Header setter={toggleSidebar} isOpen={sidebarOpen} />
       {banniere && (
-        <div className="absolute -z-50 opacity-80 top-0 left-0 h-[34vh] w-full">
-          {banniere}
+        <div className="h-[44vh] absolute top-0 left-0 -z-50  w-full overflow-y-hidden">
+          <ImagePin CID={banniere} style="relative opacity-80   w-full" />
         </div>
       )}
       <div

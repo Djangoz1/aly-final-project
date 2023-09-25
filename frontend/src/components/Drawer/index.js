@@ -2,7 +2,7 @@
 import { Icon } from "@iconify/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { ModalSetCV } from "components/modal/ModalSetCV";
+import { ModalSetCV } from "components/myComponents/modal/ModalSetCV";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { v4 as uuidv4 } from "uuid";
 import {

@@ -137,6 +137,11 @@ library DataTypes {
         Private
     }
 
+    struct PubData {
+        uint likes;
+        uint answers;
+        uint missionID;
+    }
     /**
      *    @param id
      *    @param pubID

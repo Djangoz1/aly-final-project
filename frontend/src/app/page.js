@@ -1,5 +1,5 @@
 "use client";
-import { CreateProfile } from "components/modal/works/CreateProfile";
+import { CreateProfile } from "sections/Profile/form/create/CreateProfile";
 // import { Header } from "sections/Layout/Header";
 // import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 // import { useEffect, useState } from "react";

@@ -2,9 +2,9 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MyTableEl } from "./MyTableEl";
 import { _table_features } from "utils/ux-tools/table/feature";
-export const MyTable = ({ head, list }) => {
+export const MyTable = ({ head, list, editBtns }) => {
   return (
-    <div className="overflow-x-auto w-full font2">
+    <div className="overflow-x-auto overflow-y-visible w-full font2">
       <table className="table ">
         {/* head */}
         <thead className="bg-black/10 text-[10px]">
@@ -23,7 +23,12 @@ export const MyTable = ({ head, list }) => {
         </thead>
         <tbody>
           {list?.map((el) => (
-            <MyTableEl key={uuidv4()} id={el?.id} arr={el?.arr} />
+            <MyTableEl
+              editBtns={editBtns}
+              key={uuidv4()}
+              id={el?.id}
+              arr={el?.arr}
+            />
           ))}
         </tbody>
         {/* foot */}

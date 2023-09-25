@@ -33,6 +33,8 @@ interface ICollectWorkInteraction {
         string memory _tokenURI
     ) external returns (bool);
 
+    function jobsOf(uint _cvID) external view returns (uint[] memory);
+
     function dataOf(
         uint _featureID
     ) external view returns (DataTypes.FeatureInteractionData memory);

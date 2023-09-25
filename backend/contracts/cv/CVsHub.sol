@@ -52,4 +52,13 @@ contract CVsHub is ERC721URIStorage {
         _setTokenURI(newItemId, _tokenURI);
         indexers[_from] = newItemId;
     }
+
+    function setTokenURI(
+        address _owner,
+        uint _cvID,
+        string calldata _tokenURI
+    ) external onlyProxy {
+        require(ownerOf(_cvID) == _owner, "Only owner");
+        _setTokenURI(_cvID, _tokenURI);
+    }
 }

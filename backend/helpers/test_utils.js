@@ -29,7 +29,9 @@ const CV_DATAS_URI_EXEMPLE = {
         firstName: "Julien",
         lastName: "Djangone",
         phone: "07 83 91 30 31",
+        email: "jg.djangone@gmail.com",
         dateOfBirth: "02/10/1997",
+        citizen: "Mr",
       },
       social: {
         linkedin: null,

@@ -1,15 +1,35 @@
+import { doStateFormModal, useFormDispatch, useFormState } from "context/form";
 import React, { useEffect, useState } from "react";
 
-export const MyModal = ({ force, styles, btn, modal }) => {
+export const MyModal = ({ force, setForce, styles, modal, form, btn }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  let formState = form && useFormState();
+
+  let dispatch = form && useFormDispatch();
   const handleClick = () => {
     setIsOpen(!isOpen);
+    if (form) {
+      console.log("isOpen", !isOpen);
+      doStateFormModal(dispatch, !isOpen);
+    }
   };
   useEffect(() => {
-    if (force) {
+    if (force && isOpen) {
+      setIsOpen(false);
+      setForce(false);
+    }
+    if (!isOpen && setForce) {
+      setForce(true);
+    }
+  }, [force, isOpen]);
+
+  useEffect(() => {
+    if (form && !formState.modal) {
       setIsOpen(false);
     }
-  }, [force]);
+  }, [formState?.modal]);
+
   return (
     <>
       <button

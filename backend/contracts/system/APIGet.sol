@@ -302,6 +302,17 @@ contract APIGet {
         return IPubsDatasHub(_iAS.pubsDatasHub()).dataOf(_likeID);
     }
 
+     function datasOfPub(
+        uint _pubID
+    )
+        external
+        view
+        
+        returns (DataTypes.PubData memory){
+
+        return IPubsDatasHub(_iAS.pubsDatasHub()).dataOfPub(_pubID);
+        }
+
     function pubsOfMission(
         uint _missionID
     ) external view returns (uint[] memory) {
@@ -314,6 +325,10 @@ contract APIGet {
 
     function missionsOfCV(uint _cvID) external view returns (uint[] memory) {
         return IMissionsHub(_iAS.missionsHub()).indexerOf(_cvID);
+    }
+
+    function jobsOfCV(uint _cvID) external view returns(uint [] memory){
+        return ICollectWorkInteraction(_iAS.collectWorkInteraction()).jobsOf(_cvID);
     }
 
     function lengthOfMissions() external view returns (uint) {

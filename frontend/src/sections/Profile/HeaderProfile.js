@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { ImagePin } from "components/Image/ImagePin";
 
-import { useAuthState } from "context/auth";
+import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import {
   icfy,
   icfyCODER,
@@ -16,22 +16,65 @@ import {
 import React, { useEffect, useState } from "react";
 
 import { MyHeader } from "components/myComponents/MyHeader";
-import { themes } from "styles/style";
-import { CreateMission } from "components/modal/works/CreateMission";
-import { CreatePub } from "components/Pub/CreatePub";
+import { styles, themes } from "styles/style";
+import { CreateMission } from "sections/Missions/form/CreateMission";
+import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { DEV_DOMAIN } from "constants/languages";
 import { fromTimestamp } from "utils/ux-tools";
-import { useCVState } from "context/hub/cv";
+import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
+import { useAccount } from "wagmi";
+import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
+import { EditProfile } from "./form/edit/EditProfile";
+import { MENUS_ID } from "constants/menus";
 
 export const HeaderProfile = ({ path }) => {
   let { cvID, datas, metadatas } = useCVState();
+  let { cv } = useAuthState();
+  let { address } = useAccount();
+  let [isFollow, setIsFollow] = useState(null);
+  let [isFollower, setIsFollower] = useState(null);
+  let dispatchCV = useCVDispatch();
+  let dispatchAuth = useAuthDispatch();
+  let checkFollow = async () => {
+    setIsFollow(await _apiGet("isFollow", [cv, cvID]));
+    setIsFollower(await _apiGet("isFollow", [cvID, cv]));
+  };
+  let setFollow = async (followFunc) => {
+    if (cv !== cvID) {
+      await _apiPost(followFunc, [cvID]);
+      doAuthCV(dispatchAuth, address);
+      doStateCV(dispatchCV, cvID);
+      checkFollow();
+    }
+  };
 
+  console.log(metadatas);
+
+  useEffect(() => {
+    if (cv > 0 && cvID > 0 && cv !== cvID) checkFollow();
+  }, [cvID]);
+  let { isConnected } = useAccount();
   return (
     <MyHeader
       path={path ? `/profile/${cvID}/${path}` : `/profile/${cvID}`}
       img={metadatas?.image}
       ownerID={cvID}
       name={metadatas?.username}
+      btn={
+        cv == cvID && cv ? (
+          <EditProfile styles={`absolute right-3 top-3  ${styles.btn}`} />
+        ) : (
+          <button
+            disabled={!isConnected}
+            onClick={() => setFollow(isFollow ? "unfollowCV" : "followCV")}
+            className={`absolute right-3 top-3 btn btn-xs btn-outline  w-fit mx-auto mt-2 capitalize ${
+              isFollow ? "btn-error" : "btn-primary"
+            }`}
+          >
+            {isFollow ? "Unfollow" : "Follow"}
+          </button>
+        )
+      }
       desc1={metadatas?.description}
       desc2={
         <>
@@ -44,6 +87,9 @@ export const HeaderProfile = ({ path }) => {
               {fromTimestamp(metadatas?.attributes?.[0]?.createdAt)}
             </span>
           </p>
+          <span className="text-xs text-white/60 my-1">
+            {isFollower && "Vous suit"}
+          </span>
         </>
       }
       stats={[
@@ -80,36 +126,7 @@ export const HeaderProfile = ({ path }) => {
           theme: `${themes.pubs} `,
         },
       ]}
-      menus={[
-        {
-          title: "Overview",
-          link: `/profile/${cvID}`,
-        },
-        {
-          title: "Missions",
-          link: `/profile/${cvID}/missions`,
-        },
-        {
-          title: "Arbitrage",
-          link: "/",
-        },
-        {
-          title: "Jobs",
-          link: "/",
-        },
-        {
-          title: "Pubs",
-          link: `/profile/${cvID}/pubs`,
-        },
-        {
-          style: "ml-auto",
-          component: <CreatePub />,
-        },
-        {
-          style: "ml-4",
-          component: <CreateMission />,
-        },
-      ]}
+      menus={MENUS_ID(cvID, cv, cvID).profile}
       details={[
         { title: "Follower(s)", value: datas?.followers },
         { title: "Follow(s)", value: datas?.follows },

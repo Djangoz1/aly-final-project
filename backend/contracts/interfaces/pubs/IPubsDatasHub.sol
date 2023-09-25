@@ -42,5 +42,9 @@ interface IPubsDatasHub {
         uint _missionID
     ) external view returns (uint[] memory);
 
+    function dataOfPub(
+        uint _pubID
+    ) external view returns (DataTypes.PubData memory);
+
     // Ajoutez votre code ici
 }
