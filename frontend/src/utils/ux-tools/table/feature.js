@@ -3,26 +3,34 @@ import { CVName } from "components/inputs/inputsCV/CVName";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { icfyETHER } from "icones";
+import Link from "next/link";
 import { timestampToCounter } from "utils/ux-tools";
 
-export let _table_features = (stateMission) => {
+export let _table_features = (features, owner) => {
   let list = [];
-  let features = stateMission.features;
-  let owner = stateMission.owner;
+
+  console.log("fea", features);
   for (let index = 0; index < features?.length; index++) {
     const el = features[index];
 
     let court = ENUMS.courts[el?.datas?.specification];
     let status = STATUS.feature[el?.datas?.status];
     let arr = [
-      <div className="flex items-center space-x-3">
-        <Icon icon={court.badge} className="text-[30px]" />
+      <Icon icon={court.badge} className="text-[30px]" />,
+      <div className="flex items-center ">
         <div>
-          <div className="font-bold  whitespace-nowrap">
+          <Link
+            href={`/works/mission/${el?.datas?.missionID}/features`}
+            className="font-bold  whitespace-nowrap hover:text-info"
+          >
             {el?.metadatas?.title}
-          </div>
+          </Link>
           <div className=" opacity-50">
-            <CVName metadata={owner} />
+            {owner ? (
+              <CVName metadata={owner} />
+            ) : (
+              <CVName cvID={el?.datas.owner} />
+            )}
           </div>
         </div>
       </div>,
@@ -68,20 +76,27 @@ export let _table_features = (stateMission) => {
             )}
           </>
         ) : (
-          <p>
-            <span className="text-white mr-2">
-              {el?.details?.workerDemand?.length}
-            </span>
-            candidate(s)
-            <br />
+          <div className="flex flex-col">
+            <p>
+              {!el?.datas?.isInviteOnly ? (
+                <>
+                  <span className="text-white mr-2">
+                    {el?.details?.workerDemand?.length}
+                  </span>
+                  candidate(s)
+                </>
+              ) : (
+                <>Must assign worker</>
+              )}
+            </p>
             <span className="text-[9px]">
               Candidacy
               {el?.datas?.isInviteOnly ? " closed" : " open"}
             </span>
-          </p>
+          </div>
         )}
       </div>,
-      <p>
+      <p className="text-right">
         <span className={`text-white mr-2`}>{el?.datas?.wadge}</span>
         ETH
       </p>,
@@ -92,6 +107,7 @@ export let _table_features = (stateMission) => {
 };
 
 export let HEAD_table_features = [
+  "",
   "Identity",
   "Work",
   "Status",

@@ -15,7 +15,6 @@ export const stateCV = async (cvID) => {
   } else if (cvID && cvID > 0) {
     return {
       cvID: cvID,
-
       metadatas: await fetchCV(cvID),
       datas: await fetchStatsOfCV(cvID),
     };

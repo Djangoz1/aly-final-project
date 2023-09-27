@@ -1,9 +1,8 @@
-import { ENUMS_COURTS } from "constants/enums";
+import { ENUMS } from "constants/enums";
 import { stateFeature } from "utils/ui-tools/state-tools";
 
 export let findBadges = async ({ features }) => {
   let _courts = [];
-
   for (let index = 0; index < features?.length; index++) {
     let id = features[index];
     const feature = await stateFeature(id);
@@ -11,13 +10,14 @@ export let findBadges = async ({ features }) => {
       _courts.push(feature?.datas?.specification);
     }
   }
+
   let _badges = [];
   for (let index = 0; index < _courts?.length; index++) {
     let courtID = _courts[index];
     let data = {
       id: courtID,
-      court: ENUMS_COURTS[courtID].court,
-      badge: ENUMS_COURTS[courtID].badge,
+      court: ENUMS.courts[courtID].court,
+      badge: ENUMS.courts[courtID].badge,
     };
 
     _badges.push(data);

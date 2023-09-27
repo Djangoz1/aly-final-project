@@ -1,7 +1,7 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { CreateFeature } from "sections/Features/form/CreateFeature";
+import { CreateFeature } from "sections/works/Features/form/create/CreateFeature";
 import { icfy } from "icones";
-import { CreateMission } from "sections/Missions/form/CreateMission";
+import { CreateMission } from "sections/works/Missions/form/create/CreateMission";
 
 export let MENUS = {
   profile: {
@@ -38,6 +38,7 @@ export let MENUS_ID = (id, owner, cvID) => {
         title: "Features",
         link: `/works/mission/${id}/features`,
       },
+
       {
         title: "Budget",
         link: "/profile",
@@ -70,7 +71,7 @@ export let MENUS_ID = (id, owner, cvID) => {
       },
       {
         title: "Jobs",
-        link: "/",
+        link: `/profile/${id}/jobs`,
       },
       {
         title: "Pubs",
@@ -118,5 +119,9 @@ export let MENUS_EDIT = {
     { icon: icfy.person.add, title: "Invite worker" },
     { icon: icfy.court.vote, title: "Postulé" },
     { icon: icfy.ux.warning, title: "Change status" },
+  ],
+  invite: [
+    { icon: icfy.person.uncheck, title: "Refuse job" },
+    { icon: icfy.person.friend, title: "Accept job" },
   ],
 };

@@ -37,6 +37,8 @@ export let fetchStatsOfCV = async (cvID) => {
 
     let _jobs = await _apiGet("jobsOfCV", [cvID]);
 
+    let invitation = await _apiGet("invitesOfCV", [cvID]);
+
     let followers = parseInt(await _apiGet("lengthOfFollower", [cvID]));
     let follows = parseInt(await _apiGet("lengthOfFollowed", [cvID]));
 
@@ -53,8 +55,9 @@ export let fetchStatsOfCV = async (cvID) => {
     let stats = {
       missions,
       features,
-      proposals: _jobs.length,
+      proposals: _jobs,
       pubs,
+      invitation,
       launchpads,
       followers,
       follows,

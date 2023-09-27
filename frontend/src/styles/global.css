@@ -32,6 +32,17 @@ body {
   font-family: "Playfair Display", serif;
 }
 
+.rbc-toolbar button {
+  font-size: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+}
+.rbc-toolbar-label {
+  font-size: 10px;
+  width: fit-content;
+  padding: 0;
+  margin: 0;
+}
 .page {
   /* background: #000000; 
   background: -webkit-linear-gradient(
@@ -161,4 +172,152 @@ body {
     rgba(255, 255, 255, 0.04) 0%,
     rgba(255, 255, 255, 0) 100%
   );
+}
+
+/* °°°°°°°° CARO STYLE °°°°°°°° */
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@200;400;500;600;800;900&family=Inter:wght@200;300&family=Raleway:wght@100;300;500;700&family=Audiowide&display=swap");
+
+@mixin sp-layout {
+  @media screen and (max-width: 750px) {
+    @content;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+.presentation {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-content: space-between;
+
+  border-radius: 20px;
+  padding: 25px;
+  margin-inline: 150px;
+
+  z-index: 1;
+}
+
+.gradient-primary {
+  font-size: 48px;
+  font-weight: 900;
+  font-family: "Audiowide", sans-serif;
+  background: -webkit-linear-gradient(
+    45deg,
+    rgb(213, 201, 247),
+    rgb(116, 94, 172) 65%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+  text-align: center;
+}
+
+h2,
+h3 {
+  font-size: 25px;
+  font-family: "Raleway", sans-serif;
+  margin: 10px;
+  line-height: 1.7;
+  color: rgb(238, 231, 255);
+  text-align: center;
+}
+
+.bold {
+  font-weight: 700;
+  position: relative;
+}
+
+.bold::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(
+    111.3deg,
+    rgb(213, 201, 247),
+    rgb(116, 94, 172) 65%
+  );
+}
+
+.cta-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 40px;
+}
+
+.cta-button {
+  background: -webkit-linear-gradient(
+    45deg,
+    rgb(171, 155, 210),
+    rgb(118, 92, 183) 65%
+  );
+  border-radius: 15px;
+  font-size: 20px;
+  font-family: "Raleway", sans-serif;
+  margin: 25px;
+  line-height: 1.7;
+  padding-inline: 20px;
+  padding-block: 10px;
+  color: #fff;
+
+  background-size: 300% 100%;
+  moz-transition: all 0.4s ease-in-out;
+  -o-transition: all 0.4s ease-in-out;
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+
+  &:hover {
+    background-position: 100% 0;
+    moz-transition: all 0.4s ease-in-out;
+    -o-transition: all 0.4s ease-in-out;
+    -webkit-transition: all 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.cta-button.project-owner {
+  background-image: linear-gradient(
+    to right,
+    #22a8bd,
+    #22bd99,
+    #22bd99,
+    #22a8bd
+  );
+  box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+}
+.cta-button.freelance {
+  background-image: linear-gradient(
+    to right,
+    #de716a,
+    #b45d77,
+    #b45d77,
+    #de716a
+  );
+  box-shadow: 0 4px 15px 0 rgba(229, 66, 10, 0.75);
 }

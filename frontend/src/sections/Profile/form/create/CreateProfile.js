@@ -35,6 +35,7 @@ export const CreateProfile = () => {
       submit={submitForm}
       side={<MySteps arr={MENUS.profile.create} />}
       arr={_form_create_profile}
+      styles={{ btn: "cta-button freelance normal-case" }}
       components={["", <FormCreateProfile1 />, <FormCreateProfile2 />]}
       btn={"Create profile"}
     />

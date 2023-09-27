@@ -11,7 +11,9 @@ import { MySideList } from "components/myComponents/MySideList";
 
 export default function Profile({ params }) {
   let user = useAuthState();
-  let { metadatas } = useCVState();
+  let { datas, metadatas } = useCVState();
+  console.log(datas);
+
   return (
     <LayoutProfile params={params}>
       <div className="w-full flex ">

@@ -7,7 +7,7 @@ import {
   _table_features,
 } from "utils/ux-tools/table/feature";
 
-import { LayoutMission } from "sections/Missions/LayoutMission";
+import { LayoutMission } from "sections/works/Missions/LayoutMission";
 import { useMissionState } from "context/hub/mission";
 import { Pub } from "components/Pub";
 import { v4 } from "uuid";

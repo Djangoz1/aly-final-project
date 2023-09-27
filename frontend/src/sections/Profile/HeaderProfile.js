@@ -17,7 +17,7 @@ import React, { useEffect, useState } from "react";
 
 import { MyHeader } from "components/myComponents/MyHeader";
 import { styles, themes } from "styles/style";
-import { CreateMission } from "sections/Missions/form/CreateMission";
+import { CreateMission } from "sections/works/Missions/form/create/CreateMission";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { DEV_DOMAIN } from "constants/languages";
 import { fromTimestamp } from "utils/ux-tools";
@@ -26,10 +26,12 @@ import { useAccount } from "wagmi";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { EditProfile } from "./form/edit/EditProfile";
 import { MENUS_ID } from "constants/menus";
+import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
 
 export const HeaderProfile = ({ path }) => {
   let { cvID, datas, metadatas } = useCVState();
   let { cv } = useAuthState();
+  let authState = useAuthState();
   let { address } = useAccount();
   let [isFollow, setIsFollow] = useState(null);
   let [isFollower, setIsFollower] = useState(null);
@@ -48,7 +50,15 @@ export const HeaderProfile = ({ path }) => {
     }
   };
 
-  console.log(metadatas);
+  let menus = MENUS_ID(cvID, cv, cvID).profile;
+
+  if (
+    metadatas?.attributes?.[0]?.visibility === true &&
+    cv != cvID &&
+    authState?.datas?.missions > 1
+  ) {
+    menus.push({ style: "ml-auto", component: <EditWorker /> });
+  }
 
   useEffect(() => {
     if (cv > 0 && cvID > 0 && cv !== cvID) checkFollow();
@@ -126,7 +136,7 @@ export const HeaderProfile = ({ path }) => {
           theme: `${themes.pubs} `,
         },
       ]}
-      menus={MENUS_ID(cvID, cv, cvID).profile}
+      menus={menus}
       details={[
         { title: "Follower(s)", value: datas?.followers },
         { title: "Follow(s)", value: datas?.follows },

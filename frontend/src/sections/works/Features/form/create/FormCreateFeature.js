@@ -5,7 +5,7 @@ import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
 import { MyToggle } from "components/myComponents/form/MyToggle";
-import { ENUMS_COURTS } from "constants/enums";
+import { ENUMS } from "constants/enums";
 import { DEV_DOMAIN } from "constants/languages";
 import { ADDRESSES } from "constants/web3";
 import { useAuthState } from "context/auth";
@@ -78,7 +78,7 @@ export const FormCreateFeature2 = () => {
             label: "Specification",
             target: "specification",
             target1: "court",
-            arr: ENUMS_COURTS,
+            arr: ENUMS.courts,
           },
         ]}
       />

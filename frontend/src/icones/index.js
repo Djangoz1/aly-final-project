@@ -8,6 +8,10 @@ export const icfy = {
   ux: {
     dots: { horizontal: "zondicons:dots-horizontal-triple" },
     warning: "line-md:alert-twotone",
+    garbage: "mdi:garbage-can-empty",
+    checkList: "line-md:check-list-3-twotone",
+    check: "line-md:clipboard-check-twotone",
+    calendar: "line-md:calendar",
   },
   code: {
     tool: "fluent:virtual-network-toolbox-20-filled",
@@ -28,6 +32,16 @@ export const icfy = {
   technos: {
     dart: "logos:dart",
     csharp: "devicon:csharp",
+    lua: "logos:lua",
+    coffeScript: "logos:coffeescript",
+    nodeJS: "devicon:nodejs-wordmark",
+    go: "skill-icons:golang",
+    ruby: "vscode-icons:file-type-ruby",
+    swift: "logos:swift",
+    kotlin: "skill-icons:kotlin-light",
+    scala: "vscode-icons:file-type-scala",
+    haskell: "vscode-icons:file-type-haskell2",
+    shell: "skill-icons:powershell-dark",
   },
   msg: {
     casual: "line-md:email",

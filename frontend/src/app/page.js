@@ -7,6 +7,7 @@ import { CreateProfile } from "sections/Profile/form/create/CreateProfile";
 // import { Hero } from "sections/Hero";
 // import { Missions } from "sections/Missions";
 import { Layout } from "sections/Layout";
+import { MySection } from "components/myComponents/MySection";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
@@ -32,7 +33,36 @@ export default function Home() {
     <>
       <Layout>
         <>
-          <CreateProfile />
+          <MySection styles={"justify-start flex flex-col"}>
+            <div className="presentation font2">
+              <h1 className="gradient-primary">
+                The social freelancing platform
+              </h1>
+
+              <h2>
+                Where <b className="bold">Block Chain</b> meets{" "}
+                <b className="bold">Social Freelancing</b>
+              </h2>
+
+              <h3>
+                Be at the heart of the revolution -{" "}
+                <b className="bold">Platform name</b> is a place where every
+                innovative idea <b className="bold">finds its developers</b>,
+                every talent can <b className="bold">join any project</b> and be
+                valued, and where investors{" "}
+                <b className="bold">shape the future</b> and get involved at
+                each step.
+              </h3>
+
+              <div className="cta-container">
+                <CreateProfile />
+
+                <button className="cta-button project-owner">
+                  Launch my project
+                </button>
+              </div>
+            </div>
+          </MySection>
           {/* <Hero />
 
           <div className="w-[90%] h-screen flex flex-col justify-evenly mx-auto">

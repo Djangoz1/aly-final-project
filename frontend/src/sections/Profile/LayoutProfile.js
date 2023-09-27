@@ -9,6 +9,7 @@ import { stateCV } from "utils/ui-tools/state-tools";
 import { HeaderProfile } from "sections/Profile/HeaderProfile";
 
 import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
+import { useAccount } from "wagmi";
 
 export const LayoutProfile = ({ params, path, children }) => {
   let user = useAuthState();
@@ -17,6 +18,7 @@ export const LayoutProfile = ({ params, path, children }) => {
 
   let dispatch = useCVDispatch();
   let { cvID, datas, metadatas } = useCVState();
+  let { address } = useAccount();
 
   useEffect(() => {
     if (user?.cv === _cvID && !user?.datas) {
@@ -24,7 +26,8 @@ export const LayoutProfile = ({ params, path, children }) => {
     } else {
       doStateCV(dispatch, _cvID);
     }
-  }, [_cvID, user?.cv]);
+  }, [_cvID, user?.cv, address]);
+
   return (
     <Layout
       banniere={metadatas?.attributes?.[0]?.banniere}
@@ -32,7 +35,6 @@ export const LayoutProfile = ({ params, path, children }) => {
     >
       <MySection styles={" flex flex-col  justify-between "}>
         <HeaderProfile path={path} />
-
         <div className="flex w-full  border-b-1 border-t-0 border border-white/10 border-x-0 ">
           {children}
         </div>

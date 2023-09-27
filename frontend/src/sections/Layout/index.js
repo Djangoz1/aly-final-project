@@ -18,7 +18,7 @@ export const Layout = ({ children, banniere }) => {
   const dispatch = useAuthDispatch();
 
   useEffect(() => {
-    if (address && !cv) {
+    if (address) {
       doAuthCV(dispatch, address);
     }
   }, [address]);

@@ -38,7 +38,6 @@ export const doStateCV = async (dispatch, cvID) => {
       cvID: cvID,
       datas: req?.datas,
       metadatas: req?.metadatas,
-
       status: "idle",
       error: null,
     });
