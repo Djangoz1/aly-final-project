@@ -6,12 +6,16 @@ export const icfy = {
     open: "ic:outline-remove-red-eye",
   },
   ux: {
+    mediation: "material-symbols:mediation",
+    experiment: "ant-design:experiment-twotone",
     dots: { horizontal: "zondicons:dots-horizontal-triple" },
     warning: "line-md:alert-twotone",
     garbage: "mdi:garbage-can-empty",
     checkList: "line-md:check-list-3-twotone",
+    star: "line-md:star-twotone",
     check: "line-md:clipboard-check-twotone",
     calendar: "line-md:calendar",
+    enter: "iconamoon:enter-thin",
   },
   code: {
     tool: "fluent:virtual-network-toolbox-20-filled",
@@ -54,6 +58,7 @@ export const icfy = {
   },
   bank: {
     check: "mdi:bank-check",
+    bag: "healthicons:money-bag-outline",
   },
   court: {
     justice: "mdi:bank-check",
@@ -61,6 +66,7 @@ export const icfy = {
     vote: "fluent:vote-24-filled",
   },
   person: {
+    team: "ant-design:team-outlined",
     check: "solar:user-check-broken",
     uncheck: "bi:person-x",
     edit: "mdi:person-edit",

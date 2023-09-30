@@ -42,7 +42,6 @@ export const MyHeader = ({
               CID={img}
             />
           </div>
-          {btn}
 
           <div className="flex font2 relative items-start mt-2 mb-5 flex-col">
             <p className={"text-white  text-lg"}>{name || "No name"}</p>
@@ -54,6 +53,7 @@ export const MyHeader = ({
             >
               {desc2}
             </div>
+            {btn}
           </div>
           <div className="flex w-full">
             {!stats?.component

@@ -19,11 +19,10 @@ import {
 
 import { useAccount } from "wagmi";
 import Link from "next/link";
+import { BtnAuth } from "components/btn/BtnAuth";
 
 export const Drawer = ({ setter, isOpen }) => {
   const { cv, metadatas } = useAuthState();
-
-  const currentUrl = window?.location?.pathname || null;
 
   const { address, isConnected } = useAccount();
   const dispatch = useAuthDispatch();
@@ -46,17 +45,26 @@ export const Drawer = ({ setter, isOpen }) => {
     <div className="  w-fit">
       {/* <input id="my-drawer" type="checkbox" className="drawer-toggle" /> */}
       <div className=" ">
-        {isConnected ? (
+        {/* {isConnected ? (
           <label
             // htmlFor="my-drawer"
             onClick={setter}
-            className="btn bg-zinc-900 "
+            className="btn gradient-button border-none"
           >
             <Icon icon={icfyHAMBURGER} className="text-[30px] text-white" />
           </label>
         ) : (
-          <ConnectButton />
-        )}
+          <BtnAuth />
+          )} */}
+        <BtnAuth
+          drawerBtn={
+            <Icon
+              onClick={setter}
+              icon={icfyHAMBURGER}
+              className="text-2xl text-white"
+            />
+          }
+        />
       </div>
       {/* {isOpen && ( */}
       <div
@@ -64,7 +72,7 @@ export const Drawer = ({ setter, isOpen }) => {
           isOpen ? "w-[18vw]" : "w-[6vw]"
         } h-screen top-0  left-0  fixed`}
       >
-        <ul className="menu  p-2 w-full relative  h-full page text-base-content">
+        <ul className="menu  p-2 w-full relative  h-full  text-base-content">
           {links?.map((el) => (
             <Link
               key={uuidv4()}
@@ -76,13 +84,17 @@ export const Drawer = ({ setter, isOpen }) => {
               <Icon
                 icon={el?.icon}
                 className={`${
-                  currentUrl === el?.path ? "text-secondary" : "text-white/60"
+                  window?.location?.pathname === el?.path
+                    ? "text-secondary"
+                    : "text-white/60"
                 } text-2xl`}
               />
               {isOpen && (
                 <span
                   className={`${
-                    currentUrl === el?.path ? "text-secondary" : "text-white/60"
+                    window?.location?.pathname === el?.path
+                      ? "text-secondary"
+                      : "text-white/60"
                   } text-xs `}
                 >
                   {el?.title}
@@ -90,25 +102,6 @@ export const Drawer = ({ setter, isOpen }) => {
               )}
             </Link>
           ))}
-          {isOpen && (
-            <div className="stats shadow">
-              <div className="stat">
-                <div className="stat-title">User :</div>
-                <div className="stat-value">
-                  {cv ? (
-                    <CVName metadata={metadatas} />
-                  ) : (
-                    <button className="btn" onClick={createCV}>
-                      Create a CV
-                    </button>
-                  )}
-                </div>
-
-                <ConnectButton />
-                <div className="stat-desc text-[7px]">{address}</div>
-              </div>
-            </div>
-          )}
         </ul>
       </div>
       {/* )} */}

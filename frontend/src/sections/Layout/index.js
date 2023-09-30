@@ -29,7 +29,7 @@ export const Layout = ({ children, banniere }) => {
     sidebarOpen ? setSidebarOpen(false) : setSidebarOpen(true);
   return (
     <div
-      className={`page   min-h-screen relative z-50  h-fit box-border overflow-x-hidden transition-all flex-col flex ml-auto`}
+      className={`min-h-screen relative z-50  h-fit box-border overflow-x-hidden transition-all flex-col flex ml-auto`}
       style={{ width: sidebarOpen ? "82vw" : "94vw" }}
     >
       <Header setter={toggleSidebar} isOpen={sidebarOpen} />

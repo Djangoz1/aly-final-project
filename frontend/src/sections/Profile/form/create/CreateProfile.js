@@ -14,6 +14,8 @@ import { FormCreateProfile1, FormCreateProfile2 } from "./FormCreateProfile1";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { doAuthCV, useAuthDispatch } from "context/auth";
 import { createURICv } from "utils/ui-tools/pinata-tools";
+import { Icon } from "@iconify/react";
+import { icfyCV } from "icones";
 
 export const CreateProfile = () => {
   let { address, isConnected } = useAccount();
@@ -35,9 +37,14 @@ export const CreateProfile = () => {
       submit={submitForm}
       side={<MySteps arr={MENUS.profile.create} />}
       arr={_form_create_profile}
-      styles={{ btn: "cta-button freelance normal-case" }}
+      styles={{ btn: "cta-button project-owner border-none" }}
       components={["", <FormCreateProfile1 />, <FormCreateProfile2 />]}
-      btn={"Create profile"}
+      btn={
+        <>
+          <Icon icon={icfyCV} />
+          Create profile
+        </>
+      }
     />
   );
 };

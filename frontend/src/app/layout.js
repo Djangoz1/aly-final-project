@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         ></link>
       </head>
-      <body>
+      <body className="page">
         <AccountProvider>
           <AuthProvider>
             <CVProvider>

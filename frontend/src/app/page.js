@@ -12,7 +12,8 @@ import { styles } from "styles/style";
 import { Icon } from "@iconify/react";
 import { LogoIc } from "components/Logo";
 import { LinearGradient } from "react-text-gradients";
-import { Hg } from "components/text/HeroGradient";
+import { Hg, Hg1 } from "components/text/HeroGradient";
+import { icfy, icfyROCKET } from "icones";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
@@ -38,9 +39,9 @@ export default function Home() {
     <>
       <Layout>
         <>
-          <MySection styles={"justify-start flex flex-col"}>
-            <div className="w-full flex">
-              <div className="w-fit  mr-10">
+          <MySection styles={"justify-start font2 flex flex-col"}>
+            <div className="w-full  mb-[10vh] flex">
+              <div className="w-full  mr-10">
                 <LinearGradient
                   className="text-xs font2 uppercase"
                   gradient={[
@@ -60,34 +61,144 @@ export default function Home() {
                   <Hg>Freelancing</Hg>
                 </h2>
                 <div className=" mt-5 ml-auto">
-                  <CreateProfile />
-
-                  <button className="cta-button ml-10 project-owner">
-                    Launch my project
+                  <button className="cta-button btn border-none mr-10 freelance">
+                    <Icon icon={icfy.work.casual} className={""} />
+                    Launch project
                   </button>
+                  <CreateProfile />
                 </div>
-
-                {/* <div className="presentation font2">
-                  <h1 className="gradient-primary">
-                    The social freelancing platform
-                  </h1>
-
-                  <h3>
-                    Be at the heart of the revolution -{" "}
-                    <b className={"bold"}>deWork</b> is a place where every
-                    innovative idea{" "}
-                    <b className={"bold"}>finds its developers</b>, every talent
-                    can <b className={"bold"}>join any project</b> and be
-                    valued, and where investors{" "}
-                    <b className={"bold"}>shape the future</b> and get involved
-                    at each step.
-                  </h3>
-                </div> */}
               </div>
               <img
                 src="/hero.avif"
-                className="h-fit w-[800px]  mask mask-hexagon rounded-lg"
+                className="h-fit w-[600px]  mask mask-hexagon rounded-lg"
               />
+            </div>
+
+            <div
+              className="presentation  my-[10vh] "
+              id="freelance-presentation"
+            >
+              <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
+                Contribute to <Hg>innovative</Hg> and <Hg>challenging</Hg>{" "}
+                projects
+              </h2>
+
+              <ul className="m-0 p-0">
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.person.team} className="icons" />
+                    <Hg style={"font-light"}>Collaborative Project Building</Hg>
+                  </div>
+                  <div className="subtitle">
+                    Join projects where your opinion matters and become an
+                    integral part of a team
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.ux.experiment} className="icons" />
+                    <Hg style={"font-light"}>
+                      Exciting and Innovative Projects
+                    </Hg>
+                  </div>
+                  <div className="subtitle">
+                    Discover a variety of new interesting and cutting-edge
+                    projects
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.ux.mediation} className="icons" />
+                    <Hg style={"font-light"}>Efficient Mediation System</Hg>
+                  </div>
+                  <div className="subtitle">
+                    Count on our reliable mediation system, ensuring effective
+                    conflict resolution and seamless communication
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.eye.open} className="icons" />
+                    <Hg style={"font-light"}>Enhanced Visibility</Hg>
+                  </div>
+                  <div className="subtitle">
+                    Increase your professional visibility and connect with a
+                    wider range of clients and opportunities
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfyROCKET} className="icons" />
+                    <Hg style={"font-light"}>Simplified Onboarding</Hg>
+                  </div>
+                  <div className="subtitle">
+                    Getting started is a breeze, thanks to our user-friendly and
+                    straightforward onboarding process
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div
+              className="presentation  my-[10vh] "
+              id="project-owner-presentation"
+            >
+              <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
+                Empowering the <Hg1>next</Hg1> generation of{" "}
+                <Hg1>Innovators</Hg1>
+              </h2>
+
+              <ul className="m-0 p-0">
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.ux.star} className="icons" />
+                    <Hg1 style={"font-light"}>Launch your Dreams</Hg1>
+                  </div>
+                  <div className="subtitle">
+                    We're here to support community innitiative for help to
+                    launch your projects into the stratosphere.
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.bank.bag} className="icons" />
+                    <Hg1 style={"font-light"}>Community Funding</Hg1>
+                  </div>
+                  <div className="subtitle">
+                    Discover a variety of new interesting and cutting-edge
+                    projects
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.domain.blockchain} className="icons" />
+                    <Hg1 style={"font-light"}>Decentralization</Hg1>
+                  </div>
+                  <div className="subtitle">
+                    Count on our reliable mediation system, ensuring effective
+                    conflict resolution and seamless communication
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfy.eye.open} className="icons" />
+                    <Hg1 style={"font-light"}>Enhanced Visibility</Hg1>
+                  </div>
+                  <div className="subtitle">
+                    Increase your professional visibility and connect with a
+                    wider range of clients and opportunities
+                  </div>
+                </li>
+                <li>
+                  <div className="title">
+                    <Icon icon={icfyROCKET} className="icons" />
+                    <Hg1 style={"font-light"}>Simplified Onboarding</Hg1>
+                  </div>
+                  <div className="subtitle">
+                    Getting started is a breeze, thanks to our user-friendly and
+                    straightforward onboarding process
+                  </div>
+                </li>
+              </ul>
             </div>
           </MySection>
 
