@@ -29,7 +29,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
   return (
     <Link
       href={`/profile/${metadata?.cvID || cvID || cv}`}
-      className={styles + " hover:text-info"}
+      className={styles + " w-fit hover:text-info"}
     >
       {isName || "No name"}
     </Link>

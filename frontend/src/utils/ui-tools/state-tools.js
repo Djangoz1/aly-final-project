@@ -4,10 +4,11 @@ import { fetchCV, fetchStatsOfCV } from "utils/cvs";
 import { fetchPubsOfCV } from "utils/pubs";
 import { fetchMission, fetchMissionsOfCV, fetchWorksOfCV } from "utils/works";
 import { fetchJSONByCID } from "./pinata-tools";
-import { _apiGet } from "./web3-tools";
+import { _apiGet, _apiGetAt } from "./web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { findBadges } from "utils/works/tools";
 import { ethers } from "ethers";
+import { _api } from "@iconify/react";
 
 export const stateCV = async (cvID) => {
   if (cvID?.cvID) {
@@ -91,5 +92,49 @@ export let stateFeature = async (featureID) => {
     let details = await _apiGet("datasOfWork", [featureID]);
 
     return { featureID, datas, metadatas, details };
+  }
+};
+
+export const stateLaunchpad = async (launchpadID) => {
+  if (launchpadID > 0) {
+    const datas = await _apiGet("datasOfLaunchpad", [launchpadID]);
+    let metadatas = await fetchJSONByCID(datas.tokenURI);
+    let tokenURI = await _apiGet("tokenURIOf", [
+      launchpadID,
+      ADDRESSES["launchpadsDatasHub"],
+    ]);
+
+    let _metadatas = await fetchJSONByCID(tokenURI);
+    metadatas.attributes[0].bio = _metadatas?.description;
+    metadatas.attributes[0].banniere = _metadatas?.attributes?.[0]?.banniere;
+    metadatas.attributes[0].facebook = _metadatas?.attributes?.[0]?.facebook;
+    metadatas.attributes[0].linkedin = _metadatas?.attributes?.[0]?.linkedin;
+    metadatas.attributes[0].twitter = _metadatas?.attributes?.[0]?.twitter;
+    metadatas.attributes[0].github = _metadatas?.attributes?.[0]?.github;
+    metadatas.image = _metadatas?.image;
+
+    datas.tiersDatas = [];
+    let tokenPrice = 0;
+
+    datas.address = await _apiGet("addressOfLaunchpad", [launchpadID]);
+    datas.status = await _apiGet("statusOfLaunchpad", [launchpadID]);
+    let _owner = await _apiGet("ownerOfToken", [
+      launchpadID,
+      ADDRESSES["launchpadHub"],
+    ]);
+    let cvOwner = await _apiGet("cvOf", [_owner]);
+    let owner = await fetchCV(cvOwner);
+
+    datas.amountRaised = 0;
+    for (let i = 0; i < datas?.numberOfTier; i++) {
+      let tierDatas = await _apiGet("tierOfLaunchpad", [launchpadID, i]);
+      datas.tiersDatas.push(tierDatas);
+      tokenPrice += parseFloat(tierDatas.tokenPrice);
+      datas.amountRaised += parseInt(tierDatas.amountRaised);
+    }
+    datas.tokenPrice = ethers.utils.formatEther(
+      `${tokenPrice / datas?.numberOfTier}`
+    );
+    return { datas, metadatas, owner };
   }
 };

@@ -17,24 +17,21 @@ import {ILaunchpadsDatasHub} from "../interfaces/launchpads/ILaunchpadsDatasHub.
 import {ILaunchpadHub} from "../interfaces/launchpads/ILaunchpadHub.sol";
 
 contract Launchpad is Ownable {
-    ILaunchpadsDatasHub cLD;
-    ILaunchpadsInvestorsHub cLI;
+    ILaunchpadsDatasHub private cLD;
+    ILaunchpadsInvestorsHub private cLI;
     IAddressSystem private _iAS;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tierID;
     using SafeMath for uint256;
-    using DataTypes for DataTypes.LaunchpadData;
-    using DataTypes for DataTypes.TierData;
 
-    uint256 public id;
-    uint256 public pubID;
+    uint internal _id;
 
     bool private _royaltiesTaken;
 
     IERC20 private iERC20;
 
-    DataTypes.LaunchpadStatus status;
+    DataTypes.LaunchpadStatus public status;
 
     modifier onlyStatus(DataTypes.LaunchpadStatus _status) {
         require(status == _status, "Wrong status step expected");
@@ -53,58 +50,26 @@ contract Launchpad is Ownable {
         // ! Decoment after test
 
         // require(
-        //     block.timestamp > cLD.datasOf(id).saleStart,
+        //     block.timestamp > cLD.datasOf(datas_(.s).id,aleStart,
         //     "Sale not started"
         // );
         // ! @@@@@@
 
-        require(
-            block.timestamp < cLD.datasOf(id).saleEnd,
-            "Sale already ended"
-        );
+        require(block.timestamp < _datas().saleEnd, "Sale already ended");
         _;
     }
 
     constructor(
         address _addressSystem,
         address _owner,
-        uint256 _id,
-        DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tierDatas,
-        uint _pubID
+        uint256 id_,
+        address _tokenAddress
     ) {
-        
+        transferOwnership(_owner);
         _iAS = IAddressSystem(_addressSystem);
-        cLD = ILaunchpadsDatasHub(_iAS.launchpadsDatasHub());
-        cLI = ILaunchpadsInvestorsHub(_iAS.launchpadsInvestorsHub());
-        _datas.maxCap = 0;
-        _datas.minCap = 0;
-        uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
-        uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
-        uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
-        require(_tierDatas.length > 0, "Must have at least one tier");
-        for (uint256 index = 0; index < _tierDatas.length; index++) {
-            DataTypes.TierData memory _tierData = _tierDatas[index];
-            _maxTierCaps[index] = _tierData.maxTierCap;
-            _minTierCaps[index] = _tierData.minTierCap;
-            _tokenPrice[index] = _tierData.tokenPrice;
-            _datas.maxCap = _datas.maxCap.add(_tierData.maxTierCap);
-            _datas.minCap = _datas.minCap.add(_tierData.minTierCap);
-        }
-        _datas.numberOfTier = uint8(_tierDatas.length);
-        cLD.setLaunchpadData(_id, _owner, _datas);
-        cLD._setTiers(
-            _tierDatas.length,
-            _owner,
-            _id,
-            _maxTierCaps,
-            _minTierCaps,
-            _tokenPrice
-        );
-        id = _id;
-        pubID = _pubID;
-
-        iERC20 = IERC20(_datas.tokenAddress);
+        require(msg.sender == _iAS.launchpadsHub());
+        iERC20 = IERC20(_tokenAddress);
+        _id = id_;
     }
 
     /**
@@ -172,21 +137,21 @@ contract Launchpad is Ownable {
         return _tierID.current();
     }
 
-    function dataOfs() external view returns (DataTypes.LaunchpadData memory) {
-        return cLD.datasOf(id);
+    function _datas() internal view returns (DataTypes.LaunchpadData memory) {
+        return cLD.datasOf(_id);
     }
 
     function tierOfs(
         uint _tierID
     ) external view returns (DataTypes.TierData memory) {
-        DataTypes.LaunchpadData memory _lData = cLD.datasOf(id);
-        require(_lData.numberOfTier > _tierID, "ID tier out of range");
-        return cLD.tierOf(id, _tierID);
+        DataTypes.LaunchpadData memory _lData = _datas();
+        require(_lData.numberOfTier > _tierID, "tierID out of range");
+        return cLD.tierOf(_id, _tierID);
     }
 
     function setTimer(uint _saleEnd, uint _saleStart) external onlyOwner {
-        cLD._setStartTime(id, _saleStart);
-        cLD._setEndTime(id, _saleEnd);
+        cLD._setStartTime(_id, _saleStart);
+        cLD._setEndTime(_id, _saleEnd);
     }
 
     function getTokenSupply() external view returns (uint) {
@@ -204,15 +169,15 @@ contract Launchpad is Ownable {
 
     function _setTierID() private onlyProcess {
         uint tierID_ = _tierID.current().add(1);
-        DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
+        DataTypes.TierData memory _tierData = cLD.tierOf(
+            _id,
+            _tierID.current()
+        );
         require(
             _tierData.minTierCap <= _tierData.amountRaised,
-            "Must have minimum cap to set tier ID"
+            "Must have minimum cap to set tierID"
         );
-        require(
-            cLD.datasOf(id).numberOfTier >= tierID_,
-            "Tier ID out of range"
-        );
+        require(_datas().numberOfTier >= tierID_, "out of range");
         _tierID.increment();
     }
 
@@ -232,7 +197,7 @@ contract Launchpad is Ownable {
         cLD._setTiers(
             _tierIDs,
             msg.sender,
-            id,
+            _id,
             _maxTierCaps,
             _minTierCaps,
             _amountPerToken
@@ -255,28 +220,28 @@ contract Launchpad is Ownable {
         Bindings.cvOf(msg.sender, _iAS.cvsHub());
         // ! faire un test has registred
         require(msg.value > 0, "Value must be more than 0");
-        bool inRange = cLD._checkTierBalance(id, _tierID.current());
+        bool inRange = cLD._checkTierBalance(_id, _tierID.current());
         if (!inRange) {
             _setTierID();
         }
         bool success = cLD._checkAmount(
-            id,
+            _id,
             msg.sender,
             _tierID.current(),
             msg.value
         );
         require(success, "Error on _checkAmount");
         success = cLI._investOnLaunchpad(
-            id,
+            _id,
             _tierID.current(),
             msg.sender,
             msg.value
         );
         require(success, "Error on invest on launchpad");
 
-        cLD._addAmountRaised(id, _tierID.current(), msg.value);
+        cLD._addAmountRaised(_id, _tierID.current(), msg.value);
 
-        inRange = cLD._checkTierBalance(id, _tierID.current());
+        inRange = cLD._checkTierBalance(_id, _tierID.current());
         if (!inRange) {
             _setTierID();
         }

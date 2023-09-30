@@ -20,7 +20,7 @@ export const LogoIc = ({ styles }) => {
   return (
     <Icon
       icon={icfyHANDSHAKE}
-      className={`text-white rotate-90 text-[30px]  ${styles || ""}`}
+      className={`text-white rotate-[45deg] text-[30px]  ${styles || ""}`}
     />
   );
 };

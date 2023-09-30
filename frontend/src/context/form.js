@@ -24,6 +24,7 @@ const initialState = {
   pointer: 0,
   disabled: true,
   checked: [],
+  superChecked: [],
 };
 
 export const doStateFormDisabled = (dispatch, disabled) => {
@@ -61,18 +62,52 @@ export const doStateFormRefresh = (dispatch) => {
     pointer: 0,
     disabled: true,
     checked: [],
+    superChecked: [],
   });
 };
 
-export const doStateFormChecked = ({ dispatch, pointer, form, checked }) => {
+export const doStateFormChecked = ({
+  dispatch,
+  pointer,
+  form,
+  checked,
+  superChecked,
+}) => {
   let disabled = false;
+  let _checked = checked;
 
-  for (let index = 0; index < checked?.[pointer]?.length; index++) {
-    let value = form[checked[pointer][index]];
-    if (value === null) {
-      disabled = true;
+  function isFunction(param) {
+    return typeof param === "function";
+  }
+
+  if (
+    superChecked !== null &&
+    superChecked !== undefined &&
+    isFunction(superChecked)
+  ) {
+    if (superChecked?.(form)?.[pointer]?.length > 0) {
+      _checked = superChecked?.(form, pointer);
     }
   }
+
+  console.log("checked", _checked);
+
+  for (let index = 0; index < _checked?.[pointer]?.length; index++) {
+    let value = _checked?.[pointer]?.[index];
+    if (superChecked && value?.bool !== undefined) {
+      disabled = value.bool === false ? true : false;
+
+      if (value?.bool === false) {
+        break;
+      }
+    } else {
+      let value = form[_checked[pointer][index]];
+      if (value === null) {
+        disabled = true;
+      }
+    }
+  }
+
   dispatch({ status: "success", disabled });
 };
 
@@ -85,6 +120,7 @@ export const doInitStateForm = async (dispatch, form) => {
       form: form?.form,
       placeholders: form?.placeholders,
       checked: form?.checked,
+      superChecked: form?.superChecked,
       pointer: 0,
     });
   } else {

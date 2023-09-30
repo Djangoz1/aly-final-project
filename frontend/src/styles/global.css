@@ -202,15 +202,22 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.htg {
+  border-width: 2px;
+  border-style: solid;
+  border-left: 0px;
+  border-right: 0px;
+
+  overflow: hidden;
+  border-image: linear-gradient(to right, orange, red);
+  border-image-slice: 1;
+}
+
 .presentation {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   align-content: space-between;
-
-  border-radius: 20px;
-  padding: 25px;
-  margin-inline: 150px;
 
   z-index: 1;
 }
@@ -218,7 +225,7 @@ body {
 .gradient-primary {
   font-size: 48px;
   font-weight: 900;
-  font-family: "Audiowide", sans-serif;
+  /* font-family: "Audiowide", sans-serif; */
   background: -webkit-linear-gradient(
     45deg,
     rgb(213, 201, 247),
@@ -227,17 +234,15 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0;
-  text-align: center;
 }
 
 h2,
 h3 {
   font-size: 25px;
-  font-family: "Raleway", sans-serif;
-  margin: 10px;
+  /* font-family: "Raleway", sans-serif; */
+
   line-height: 1.7;
   color: rgb(238, 231, 255);
-  text-align: center;
 }
 
 .bold {
@@ -274,31 +279,38 @@ h3 {
     rgb(118, 92, 183) 65%
   );
   border-radius: 15px;
-  font-size: 20px;
-  font-family: "Raleway", sans-serif;
-  margin: 25px;
+  font-size: 15px;
+
   line-height: 1.7;
   padding-inline: 20px;
   padding-block: 10px;
   color: #fff;
 
   background-size: 300% 100%;
-  moz-transition: all 0.4s ease-in-out;
+  /* moz-transition: all 0.4s ease-in-out; */
   -o-transition: all 0.4s ease-in-out;
   -webkit-transition: all 0.4s ease-in-out;
   transition: all 0.4s ease-in-out;
 
-  &:hover {
+  /* &:hover {
     background-position: 100% 0;
     moz-transition: all 0.4s ease-in-out;
     -o-transition: all 0.4s ease-in-out;
     -webkit-transition: all 0.4s ease-in-out;
     transition: all 0.4s ease-in-out;
-  }
+  } */
+}
 
-  &:focus {
-    outline: none;
-  }
+.cta-button:hover {
+  background-position: 100% 0;
+  moz-transition: all 0.4s ease-in-out;
+  -o-transition: all 0.4s ease-in-out;
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+
+.cta-button:focus {
+  outline: none;
 }
 
 .cta-button.project-owner {

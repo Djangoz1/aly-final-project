@@ -30,8 +30,9 @@ export const ProfileAvatar = ({ cvID, component, metadatas }) => {
           CID={isMetadatas?.image}
         />
       </div>
-      <div className="flex flex-col ml-3">
+      <div className=" ml-3">
         <CVName metadata={isMetadatas} styles={"text-white"} />
+        <br />
         <span className="font-light text-xs">CV #{cvID}</span>
         {component}
       </div>

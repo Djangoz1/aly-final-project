@@ -8,6 +8,11 @@ import { CreateProfile } from "sections/Profile/form/create/CreateProfile";
 // import { Missions } from "sections/Missions";
 import { Layout } from "sections/Layout";
 import { MySection } from "components/myComponents/MySection";
+import { styles } from "styles/style";
+import { Icon } from "@iconify/react";
+import { LogoIc } from "components/Logo";
+import { LinearGradient } from "react-text-gradients";
+import { Hg } from "components/text/HeroGradient";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
@@ -34,35 +39,64 @@ export default function Home() {
       <Layout>
         <>
           <MySection styles={"justify-start flex flex-col"}>
-            <div className="presentation font2">
-              <h1 className="gradient-primary">
-                The social freelancing platform
-              </h1>
+            <div className="w-full flex">
+              <div className="w-fit  mr-10">
+                <LinearGradient
+                  className="text-xs font2 uppercase"
+                  gradient={[
+                    "to right",
+                    "rgba(201,78,21,0.92), rgba(201,21,103,1)",
+                  ]}
+                >
+                  Boost your startups from scratch
+                </LinearGradient>
+                <h2 className={styles.hero}>
+                  Where
+                  <br />
+                  <Hg>Blockchain</Hg>
+                  <br />
+                  meets Social
+                  <br />
+                  <Hg>Freelancing</Hg>
+                </h2>
+                <div className=" mt-5 ml-auto">
+                  <CreateProfile />
 
-              <h2>
-                Where <b className="bold">Block Chain</b> meets{" "}
-                <b className="bold">Social Freelancing</b>
-              </h2>
+                  <button className="cta-button ml-10 project-owner">
+                    Launch my project
+                  </button>
+                </div>
 
-              <h3>
-                Be at the heart of the revolution -{" "}
-                <b className="bold">Platform name</b> is a place where every
-                innovative idea <b className="bold">finds its developers</b>,
-                every talent can <b className="bold">join any project</b> and be
-                valued, and where investors{" "}
-                <b className="bold">shape the future</b> and get involved at
-                each step.
-              </h3>
+                {/* <div className="presentation font2">
+                  <h1 className="gradient-primary">
+                    The social freelancing platform
+                  </h1>
 
-              <div className="cta-container">
-                <CreateProfile />
-
-                <button className="cta-button project-owner">
-                  Launch my project
-                </button>
+                  <h3>
+                    Be at the heart of the revolution -{" "}
+                    <b className={"bold"}>deWork</b> is a place where every
+                    innovative idea{" "}
+                    <b className={"bold"}>finds its developers</b>, every talent
+                    can <b className={"bold"}>join any project</b> and be
+                    valued, and where investors{" "}
+                    <b className={"bold"}>shape the future</b> and get involved
+                    at each step.
+                  </h3>
+                </div> */}
               </div>
+              <img
+                src="/hero.avif"
+                className="h-fit w-[800px]  mask mask-hexagon rounded-lg"
+              />
             </div>
           </MySection>
+
+          <LogoIc
+            styles={
+              "absolute text-[600px] top-1/2 left-1/2 -z-10 opacity-[0.6%] -translate-y-1/2 -translate-x-1/2"
+            }
+          />
+
           {/* <Hero />
 
           <div className="w-[90%] h-screen flex flex-col justify-evenly mx-auto">

@@ -3,6 +3,8 @@ export const inputStyle =
 
 export const styles = {
   btn: "btn btn-xs capitalize btn-outline btn-white",
+  bborder: " border border-info font-normal my-3 border-1 rounded",
+  hero: "uppercase text-[54px] font-light font2 whitespace-nowrap w-full text-left leading-tight",
 };
 
 export const themes = {

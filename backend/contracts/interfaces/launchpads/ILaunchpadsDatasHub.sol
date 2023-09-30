@@ -31,6 +31,12 @@ interface ILaunchpadsDatasHub {
         DataTypes.LaunchpadData calldata _data
     ) external;
 
+    function setTokenURI(
+        address _sender,
+        uint _launchpadID,
+        string memory _tokenURI
+    ) external;
+
     function _addAmountRaised(
         uint _launchpadID,
         uint _tierID,

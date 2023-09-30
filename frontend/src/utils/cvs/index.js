@@ -42,7 +42,10 @@ export let fetchStatsOfCV = async (cvID) => {
     let followers = parseInt(await _apiGet("lengthOfFollower", [cvID]));
     let follows = parseInt(await _apiGet("lengthOfFollowed", [cvID]));
 
-    let _missions = features > 0 ? await _apiGet("missionsOfCV", [cvID]) : null;
+    let _missions =
+      features > 0
+        ? await _apiGet("indexerOfToken", [cvID, ADDRESSES["missionsHub"]])
+        : null;
     let amount = 0;
     for (let index = 0; index < _missions?.length; index++) {
       const _id = _missions[index];

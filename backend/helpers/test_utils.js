@@ -19,12 +19,13 @@ const CV_DATAS_URI_EXEMPLE = {
   title: "Work3 CV",
   username: "Django",
   description: "CEO of deWork 🫅🏽",
+  banniere: "img/banniere.png",
   image: "img/profile.jpeg",
   attributes: [
     {
       visibility: true,
-      cvImg: "stringURI",
-      banniere: "",
+      cvImg: null,
+      banniere: null,
       identity: {
         firstName: "Julien",
         lastName: "Djangone",
@@ -54,7 +55,7 @@ const PUB_DATAS_URI_EXEMPLE = {
   description:
     "This is a part where content value stored. I can write everything I want to share at the community or missions community or private community.",
   image: "img/pub.jpeg",
-  attributes: [{ createdAt: Date.now(), tags: [] }],
+  attributes: { createdAt: Date.now(), tags: [] },
 };
 
 // *::::::::::::: ------- :::::::::::::* //
@@ -71,6 +72,7 @@ const MISSION_DATAS_URI_EXEMPLE = {
   // Other mission id
 
   attributes: {
+    banniere: "img/banniere.png",
     reference: null,
     facebook: null,
     evaluation: [],
@@ -123,16 +125,58 @@ const WORKER_PROPOSAL_DATAS_EXEMPLE = {
 // *::::::::::::: --------- :::::::::::::* //
 
 const LAUNCHPAD_DATAS_EXEMPLE = {
+  id: 0,
   tokenAddress: ZERO_ADDRESS,
   numberOfTier: 3,
   maxCap: 1000000000,
   minCap: 10000000,
   minInvest: 300,
   maxInvest: ethers.parseEther("3"),
-  saleStart: new Date().getTime(),
-  saleEnd: new Date().getTime() + 1,
+  saleStart: new Date().getTime() + 1000,
+  saleEnd: new Date().getTime() + 4000,
   lockedTime: 100000,
   totalUser: 0,
+  tokenURI: "tokenURI",
+  datasURI: "datasURI",
+};
+
+// *::::::::::::: ------- :::::::::::::* //
+// *::::::::::::: MISSION :::::::::::::* //
+// *::::::::::::: ------- :::::::::::::* //
+
+const LAUNCHPAD_DATAS_URI_EXEMPLE = {
+  title: "Last block",
+  description: `🚀 Explorez l'Univers des Tokens ERC-20
+
+Notre launchpad vous ouvre les portes de l'univers passionnant des tokens ERC-20, les pierres précieuses du monde crypto ! 🌟 Pour participer à nos opportunités de financement et d'investissement, voici ce que vous devez savoir :
+
+Tokens ERC-20 💎
+
+Notre launchpad prend en charge exclusivement les tokens ERC-20, qui sont parmi les plus répandus et les plus fiables de l'écosystème blockchain.
+Les projets hébergés sur notre plateforme utilisent principalement des tokens ERC-20 pour leurs campagnes de financement.
+L'Étape Cruciale : L'Allowance 📈
+
+Avant de commencer à investir dans les projets de notre launchpad, vous devez confier une "allowance" au contrat du launchpad.
+L'allowance est une autorisation que vous accordez pour que le contrat du launchpad puisse gérer vos tokens ERC-20 lors de votre participation aux campagnes.
+Cette étape est essentielle pour garantir un processus de financement en toute sécurité.
+Soyez Prêt à Investir 💰
+
+Une fois que vous avez configuré l'allowance, vous êtes prêt à explorer les projets passionnants sur notre plateforme.
+Investissez dans les campagnes qui vous intéressent en utilisant vos tokens ERC-20, en toute confiance, grâce à notre mécanisme sécurisé.
+Nous vous invitons à vous plonger dans le monde des tokens ERC-20 sur notre launchpad et à découvrir les opportunités d'investissement les plus prometteuses. Assurez-vous de bien gérer votre allowance pour participer en toute sécurité à nos campagnes passionnantes ! 🌐🔒`,
+  image: "img/logo.png",
+  banniere: "img/banniere.png",
+
+  attributes: {
+    domain: 2,
+    createdAt: Date.now(),
+    bio: null,
+    twitter: null,
+    linkedin: null,
+    github: null,
+    facebook: null,
+  },
+  // you can provide a link for more information about the mission like current website
 };
 
 const TIER_DATAS_EXEMPLE = {
@@ -155,4 +199,5 @@ module.exports = {
   FEATURE_DATAS_URI_EXEMPLE,
   TIER_DATAS_EXEMPLE,
   LAUNCHPAD_DATAS_EXEMPLE,
+  LAUNCHPAD_DATAS_URI_EXEMPLE,
 };

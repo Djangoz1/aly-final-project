@@ -1,49 +1,90 @@
 "use client";
-import { MyTabs } from "components/myComponents/MyTabs";
+
 import { sectionCommunity } from "constants/text";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Layout } from "sections/Layout";
 import { useRouter } from "next/navigation";
-import { Icon } from "@iconify/react";
-import { icfySEARCH } from "icones";
+
 import { MySection } from "components/myComponents/MySection";
-import Link from "next/link";
-import { ListLaunchpad } from "sections/Launchpad/ListLaunchpad";
+
+import { styles } from "styles/style";
+import { Scene } from "spline/Scene";
+
+import { spline } from "constants/spline";
+import { CreateLaunchpad } from "sections/Launchpad/form/CreateLaunchpad";
+import { HeroLaunchpad } from "sections/Launchpad/HeroLaunchpad";
+import { ADDRESSES } from "constants/web3";
+import { _apiGet } from "utils/ui-tools/web3-tools";
+import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
+import { MyAsset } from "components/myComponents/MyAsset";
+import { useAuthState } from "context/auth";
+import { v4 } from "uuid";
+import { ethers } from "ethers";
+import { fromTimestamp } from "utils/ux-tools";
+import { stateLaunchpad } from "utils/ui-tools/state-tools";
 
 const LaunchpadPage = () => {
-  const [isTabs, setIsTabs] = useState(sectionCommunity[1]);
-  const router = useRouter();
-  const handleClick = (status) => {
-    router.push(status.link);
-    setIsTabs(status);
+  let [isList, setIsList] = useState(null);
+
+  let { metadatas, cv } = useAuthState();
+  let fetchLaunchpads = async () => {
+    let length = parseInt(
+      await _apiGet("tokensLengthOf", [ADDRESSES["launchpadHub"]])
+    );
+    let arr = [];
+    for (let index = 1; index <= length; index++) {
+      let launchpad = await stateLaunchpad(index);
+      arr.push(launchpad);
+    }
+    setIsList(arr);
   };
+
+  useEffect(() => {
+    if (!isList) {
+      fetchLaunchpads();
+    }
+  }, [cv]);
+
   return (
     <Layout>
-      <MySection styles={"flex-col "}>
-        <div className="flex justify-between items-center mb-4 w-full ">
-          <MyTabs arr={sectionCommunity} setter={handleClick} value={isTabs} />
-          <div class="relative flex items-center  w-1/2">
-            <span class="absolute">
-              <Icon icon={icfySEARCH} className="text-2xl ml-2" />
-            </span>
+      <MySection styles={"flex font2 flex-col "}>
+        <HeroLaunchpad />
+        {isList?.map((el) => (
+          <MyAsset
+            key={v4()}
+            url={`/launchpad/${el?.datas?.id}`}
+            banniere={el?.metadatas?.attributes?.[0]?.banniere}
+            image={el?.metadatas?.image}
+            title={el?.metadatas?.title}
+            description={el?.metadatas?.description}
+            details={[
+              {
+                title: "Fundraising goal",
+                value: (
+                  <>
+                    {ethers.utils.formatEther(`${el?.datas?.maxCap}`)}
+                    <span className="text-white/40 ml-1">ETH</span>
+                  </>
+                ),
+              },
+              {
+                title: "Token price",
+                value: (
+                  <>
+                    ~ {el?.datas?.tokenPrice}
+                    <span className="text-white/40 ml-1">ETH</span>
+                  </>
+                ),
+              },
 
-            <input
-              type="text"
-              placeholder="Search launchpad with name, symbol or address"
-              className="block w-full text-xs py-2 text-gray-700  placeholder-white-400/70  bg-white border border-gray-200 rounded-lg pl-11 pr-5 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col w-full">
-          <Link
-            href={"/community/launchpad/create"}
-            className="btn-xs w-1/6 items-center ml-auto mb-5 btn btn-primary"
-          >
-            Create
-          </Link>
-          <ListLaunchpad />
-        </div>
+              {
+                value: "Token sale start",
+                title: <>{fromTimestamp(parseInt(el?.datas?.saleStart))}</>,
+              },
+            ]}
+          />
+        ))}
       </MySection>
     </Layout>
   );

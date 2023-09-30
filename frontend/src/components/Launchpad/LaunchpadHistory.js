@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import React from "react";
 
 export const LaunchpadHistory = () => {

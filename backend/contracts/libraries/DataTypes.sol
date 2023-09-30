@@ -295,6 +295,7 @@ library DataTypes {
     }
 
     struct LaunchpadData {
+        uint id;
         address tokenAddress;
         uint8 numberOfTier;
         uint256 maxCap;
@@ -305,6 +306,7 @@ library DataTypes {
         uint256 saleEnd;
         uint256 lockedTime;
         uint256 totalUser;
+        string tokenURI;
     }
 
     struct TierData {

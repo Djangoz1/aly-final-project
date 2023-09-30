@@ -17,6 +17,21 @@ export let MENUS = {
       { i: "👨‍💻", title: "Work" },
     ],
   },
+  launchpad: {
+    edit: [
+      { i: "👤", title: "Information personnelle" },
+      { i: "🫂", title: "Social" },
+      { i: "👨‍💻", title: "Work" },
+      { i: "🔌", title: "Blockchain" },
+    ],
+    create: [
+      { i: "ℹ️", title: "Introduction" },
+      { i: "🗂️", title: "Information personnelle" },
+      { i: "💰", title: "Token" },
+      { i: "🔌", title: "Blockchain" },
+      { i: "🤖", title: "L'IA Aly" },
+    ],
+  },
   feature: {
     create: [
       { i: "ℹ️", title: "Introduction" },
@@ -35,8 +50,8 @@ export let MENUS_ID = (id, owner, cvID) => {
         link: `/works/mission/${id}`,
       },
       {
-        title: "Features",
-        link: `/works/mission/${id}/features`,
+        title: "Agenda",
+        link: `/works/mission/${id}/agenda`,
       },
 
       {

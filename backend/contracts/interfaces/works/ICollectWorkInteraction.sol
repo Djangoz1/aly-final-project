@@ -12,6 +12,8 @@ interface ICollectWorkInteraction {
         uint _featureID
     ) external;
 
+    function invitesOf(uint _cvID) external view returns (uint[] memory);
+
     function acceptJob(uint _cvID, uint _featureID) external;
 
     function declineJob(uint _cvID, uint _featureID) external;

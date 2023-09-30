@@ -5,7 +5,10 @@ import { _apiGet, _apiGetAt } from "utils/ui-tools/web3-tools";
 
 export let fetchMissionsOfCV = async (cvID, withMeta, stop) => {
   if (cvID && cvID > 0) {
-    let _missions = await _apiGet("missionsOfCV", [cvID]);
+    let _missions = await _apiGet("indexerOfToken", [
+      cvID,
+      ADDRESSES["missionsHub"],
+    ]);
     let result = [];
     let stopper = stop || _missions?.length;
 

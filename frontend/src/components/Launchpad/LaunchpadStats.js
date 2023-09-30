@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { Timer } from "components/Timer";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { MyStat } from "components/myComponents/MyStat";
 import { launchpadStats } from "constants/stats";
 import { calcTimeRemaining } from "helpers";

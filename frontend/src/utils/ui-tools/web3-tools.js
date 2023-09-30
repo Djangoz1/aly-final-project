@@ -13,6 +13,9 @@ export const viemClient = createPublicClient({
 // *::::::::::::::: GLOBAL  :::::::::::::::*
 
 export const _apiPost = async (func, args, value) => {
+  console.log("func ", func);
+  console.log("args ", args);
+  console.log("value ", value);
   try {
     const { request } = await prepareWriteContract({
       address: ADDRESSES["apiPost"],
@@ -59,10 +62,10 @@ export const _apiGet = async (func, args) => {
     return _error.details;
   }
 };
-export const _apiGetAt = async ({ func, args, targetContract }) => {
+export const _apiGetAt = async ({ func, args, targetContract, address }) => {
   try {
     const res = await readContract({
-      address: ADDRESSES[targetContract],
+      address: address || ADDRESSES[targetContract],
       args: args,
       abi: ABIs[targetContract],
       functionName: func,

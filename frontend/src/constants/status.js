@@ -16,4 +16,11 @@ export const STATUS = {
     { status: "Close", icon: icfy.bank.check, color: "text-info" },
     { status: "Contest", icon: icfy.court.justice, color: "text-warning" },
   ],
+
+  launchpad: [
+    { status: "Waiting", icon: icfy.code.casual, color: "text-success" },
+    { status: "Init", icon: icfy.bank.check, color: "text-info" },
+    { status: "Paused", icon: icfy.court.justice, color: "text-warning" },
+    { status: "Closed", icon: icfy.court.justice, color: "text-warning" },
+  ],
 };

@@ -8,9 +8,8 @@ interface ILaunchpadHub {
 
     function mint(
         uint _cvID,
-        DataTypes.LaunchpadData calldata _datas,
-        DataTypes.TierData[] calldata _tierDatas,
-        uint _pubID
+        DataTypes.LaunchpadData memory _datas,
+        DataTypes.TierData[] memory _tierDatas
     ) external returns (uint);
 
     function owner() external view returns (address);

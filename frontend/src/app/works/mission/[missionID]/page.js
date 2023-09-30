@@ -13,7 +13,7 @@ import {
   useMissionDispatch,
   useMissionState,
 } from "context/hub/mission";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { icfy } from "icones";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
@@ -41,8 +41,13 @@ const Mission = ({ params }) => {
   };
   return (
     <LayoutMission id={missionID}>
-      <div className="w-full  flex">
-        <MyCard styles={"w-full text-xs mr-12"}>
+      <div className="w-full mt-5  flex">
+        <MyCard
+          head={{ title: "Jobs", icon: icfy.work.casual }}
+          styles={
+            "w-full max-h-[60vh] overflow-y-scroll hidden-scrollbar pb-5 text-xs mr-12"
+          }
+        >
           <MyTable
             list={_table_features(state.features, state.owner)}
             head={HEAD_table_features}
@@ -51,12 +56,6 @@ const Mission = ({ params }) => {
         </MyCard>
         <div className="flex flex-col ml-auto">
           <BoardCard />
-          <MyCard styles={"w-[30vw] text-xs mt-4"}>
-            <h6 className="text-white flex items-center text-lg mb-3">
-              <Icon icon={icfy.ux.calendar} className="  mr-2" /> Programme
-            </h6>
-            <MyCalendar />
-          </MyCard>
         </div>
       </div>
     </LayoutMission>

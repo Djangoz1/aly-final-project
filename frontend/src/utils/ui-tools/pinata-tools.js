@@ -64,7 +64,7 @@ export let createURI = async ({ id, title, images, metadatas }) => {
 
   for (let index = 0; index < images?.length; index++) {
     const element = images[index];
-    if (element.image.size > 0) {
+    if (element?.image?.size > 0) {
       let uri = await createImageCIDOnPinata(element.image, {
         name: "Work3 - Img " + title + "#" + id,
       });
@@ -85,7 +85,6 @@ export let createURI = async ({ id, title, images, metadatas }) => {
   metadatas.name = pinataMetadata.name;
   metadatas.attributes[0].createdAt = Date.now();
 
-  console.log("URI", metadatas);
   const formData = new FormData();
   formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
   formData.append("pinataOptions", JSON.stringify(pinataOptions));
@@ -210,4 +209,60 @@ export let createURIFeature = async (form) => {
     },
   });
   return uri;
+};
+
+export let createURILaunchpad = async (form) => {
+  let id =
+    form?.id ||
+    parseInt(await _apiGet("tokensLengthOf", [ADDRESSES["launchpadHub"]])) + 1;
+
+  let metadatas = {
+    title: form?.title,
+    description: form?.description,
+    attributes: [
+      {
+        domain: form?.domain,
+      },
+    ],
+  };
+
+  let launchpadURI = await createURI({
+    id,
+    title: "Launchpad Datas",
+    metadatas,
+  });
+
+  let images = [];
+
+  if (form?.image) {
+    images.push({ image: form?.image, target: "image" });
+  }
+  if (form?.banniere) {
+    images.push({
+      image: form?.banniere,
+      target: "banniere",
+      attributes: true,
+    });
+  }
+
+  metadatas = {
+    title: `Profile ${form?.title}`,
+    description: form?.bio,
+    attributes: [
+      {
+        facebook: form?.facebook,
+        github: form?.github,
+        linkedin: form?.linkedin,
+        twitter: form?.twitter,
+      },
+    ],
+  };
+  let tokenURI = await createURI({
+    id,
+    title: "Launchpad Profile",
+    metadatas: metadatas,
+    images,
+  });
+
+  return { launchpadURI, tokenURI };
 };

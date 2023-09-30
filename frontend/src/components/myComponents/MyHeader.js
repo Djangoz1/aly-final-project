@@ -33,7 +33,7 @@ export const MyHeader = ({
           "flex relative flex-col w-full pb-5  justify-center text-center border border-b-1 border-white/10 border-x-0 border-t-0 "
         }
       >
-        <div className="flex flex-col">
+        <div className="flex relative flex-col">
           <div className="avatar h-fit">
             <ImagePin
               style={
@@ -44,7 +44,7 @@ export const MyHeader = ({
           </div>
           {btn}
 
-          <div className="flex font2  items-start mt-2 mb-5 flex-col">
+          <div className="flex font2 relative items-start mt-2 mb-5 flex-col">
             <p className={"text-white  text-lg"}>{name || "No name"}</p>
             <div className={" text-xs"}>{desc1 || "No description"}</div>
             <div
@@ -56,15 +56,17 @@ export const MyHeader = ({
             </div>
           </div>
           <div className="flex w-full">
-            {stats?.map((el) => (
-              <MyBigBtn
-                key={uuidv4()}
-                title={el?.title}
-                value={el?.value}
-                icon={el?.icon}
-                style={`${el?.theme} mr-4`}
-              />
-            ))}
+            {!stats?.component
+              ? stats?.map((el) => (
+                  <MyBigBtn
+                    key={uuidv4()}
+                    title={el?.title}
+                    value={el?.value}
+                    icon={el?.icon}
+                    style={`${el?.theme} mr-4`}
+                  />
+                ))
+              : stats?.component}
           </div>
           {/* <ProfileBtns stats={[0, 0, 0, 0]} /> */}
           <div className="flex w-full items-center mt-3">

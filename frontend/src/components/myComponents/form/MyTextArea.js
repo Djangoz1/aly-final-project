@@ -34,7 +34,7 @@ export const MyTextArea = ({ label, target, styles }) => {
       className={`flex flex-col text-left ${form?.[target] && "text-white"}`}
     >
       <label className="text-light font-light text-xs mb-1 uppercase ">
-        {label} {label && checked?.[pointer]?.includes(target) && " *"}
+        {label || target} {checked?.[pointer]?.includes(target) && " *"}
       </label>
       <textarea
         onChange={(e) => setter(e.target.value)}

@@ -8,7 +8,7 @@ import { _createFeature, _setFeature } from "utils/ui-tools/mission-tools";
 import { useAuthState } from "context/auth";
 import { _setterMISSION } from "utils/ui-tools/web3-tools";
 import { AlertInfo } from "components/alert/AlertInfo";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 
 export const InputDescription = ({ getter, datas, setDatas }) => {
   const { missionId, missions } = useAuthState();

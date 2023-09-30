@@ -1,4 +1,4 @@
-import { MyInputs } from "components/myComponents/form/MyInputs";
+import { MyInput } from "components/myComponents/form/MyInput";
 import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
@@ -9,10 +9,7 @@ let margin = "mb-4";
 export const FormCreateMission1 = () => {
   return (
     <div>
-      <MyInputs
-        styles={margin}
-        inputs={[{ label: "Titre", target: "title" }]}
-      />
+      <MyInput styles={margin} target={"title"} />
       <MySelects
         styles={margin}
         selects={[

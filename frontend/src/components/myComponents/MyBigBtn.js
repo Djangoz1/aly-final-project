@@ -11,9 +11,9 @@ export const MyBigBtn = ({ title, value, icon, style }) => {
         <p className="text-white font1 text-shadow text-[24px]">
           {value || "0"}
         </p>
-        <p className="text-white font1 text-shadow text-lg">
-          {title || "Lorem ipsium"}
-        </p>
+        {title && (
+          <p className="text-white font1 text-shadow text-lg">{title}</p>
+        )}
       </div>
       <Icon icon={icon} className="text-white text-[50px]" />
     </div>

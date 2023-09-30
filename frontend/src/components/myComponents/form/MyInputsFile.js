@@ -20,7 +20,7 @@ export const MyInputsFile = ({ inputs, styles }) => {
           }`}
         >
           <label className="text-light font-light text-xs mb-1 uppercase ">
-            {el?.label}
+            {el?.label || el?.target}
           </label>
           <input
             type="file"

@@ -14,8 +14,9 @@ import { MENUS_EDIT } from "constants/menus";
 export default function Page({ params }) {
   let user = useAuthState();
 
-  let state,
-    { cvID } = useCVState();
+  let { cvID } = useCVState();
+
+  let state = useCVState();
   let [isDetails, setIsDetails] = useState(null);
   let details = async () => {
     setIsDetails(await stateDetailsCV(cvID));

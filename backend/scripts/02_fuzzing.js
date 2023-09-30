@@ -16,6 +16,7 @@ const {
   _createMission,
   _createFeature,
   _createPub,
+  _createLaunchpad,
 } = require("../utils/web3-tools");
 
 async function main() {
@@ -38,6 +39,7 @@ async function main() {
 
   let cv = await _createCV("Django", this.owner, addressSystem.target);
   console.log("cv#", cv, "created");
+
   cv = await _createCV("Testor1", this.addr1, addressSystem.target);
   console.log("cv#", cv, "created");
   cv = await _createCV("Testor2", this.addr2, addressSystem.target);
@@ -51,17 +53,14 @@ async function main() {
   cv = await _createCV("Testor6", this.addr6, addressSystem.target);
   console.log("cv#", cv, "created");
 
+  let launchpad = await _createLaunchpad({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+
+  console.log("launchpad#", launchpad, "created");
+
   let pub = await _createPub({
-    account: this.owner,
-    addressSystem: addressSystem.target,
-  });
-  console.log("pub#", pub, "created");
-  pub = await _createPub({
-    account: this.owner,
-    addressSystem: addressSystem.target,
-  });
-  console.log("pub#", pub, "created");
-  pub = await _createPub({
     account: this.owner,
     addressSystem: addressSystem.target,
   });
@@ -125,20 +124,6 @@ async function main() {
     accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
     specification: 5,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-
-  feature = await _createFeature({
-    account: this.addr2,
-    addressSystem: addressSystem.target,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-
-  feature = await _createFeature({
-    account: this.addr3,
-    addressSystem: addressSystem.target,
   });
   _missionID = feature.missionID;
   console.log("mission#", _missionID, "feature#", feature?.id);

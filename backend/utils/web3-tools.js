@@ -1,30 +1,34 @@
-const { getContractAt } = require("../helpers/test_init");
+const { getContractAt, _testInitToken } = require("../helpers/test_init");
 const {
   FEATURE_DATAS_EXEMPLE,
   CV_DATAS_URI_EXEMPLE,
+  LAUNCHPAD_DATAS_EXEMPLE,
+  TIER_DATAS_EXEMPLE,
 } = require("../helpers/test_utils");
 const {
   createURICV,
   createURIMission,
   createURIFeature,
   createURIPub,
+  createURILaunchpad,
 } = require("./pinata");
 
 let _createCV = async (name, account, addressSystem) => {
   let _iAS = await getContractAt("AddressSystem", addressSystem);
   let _addrG = await _iAS.apiGet();
   let _addrP = await _iAS.apiPost();
+  let _addrCVH = await _iAS.cvsHub();
 
   let apiGet = await getContractAt("APIGet", _addrG);
   let apiPost = await getContractAt("APIPost", _addrP);
 
-  let id = parseInt(await apiGet.lengthOfCVs()) + 1;
-  let result = await createURICV({
+  let id = parseInt(await apiGet.tokensLengthOf(_addrCVH)) + 1;
+  let tokenURI = await createURICV({
     id,
     name,
   });
 
-  await apiPost.connect(account).createCV(result.IpfsHash);
+  await apiPost.connect(account).createCV(tokenURI);
 
   let _id = await apiGet.cvOf(account.address);
   if (id != _id) {
@@ -57,7 +61,7 @@ let _createMission = async ({
 
   let id = parseInt(await apiGet.tokensLengthOf(_addrMH)) + 1;
 
-  let result = await createURIMission({
+  let uri = await createURIMission({
     id,
     title,
     description,
@@ -65,7 +69,7 @@ let _createMission = async ({
     social,
   });
 
-  await apiPost.connect(account).createMission(result.IpfsHash, {
+  await apiPost.connect(account).createMission(uri, {
     value: `${await balancesHub.missionPrice()}`,
   });
 
@@ -126,7 +130,7 @@ let _createFeature = async ({
 
   let featureID = parseInt(await apiGet.tokensLengthOf(_addrFH)) + 1;
   let moock = FEATURE_DATAS_EXEMPLE;
-  let result = await createURIFeature({
+  let uri = await createURIFeature({
     id: featureID,
     title,
     description,
@@ -139,7 +143,7 @@ let _createFeature = async ({
       _missionID,
       estimatedDays || moock?.estimatedDays,
       isInviteOnly || moock?.isInviteOnly,
-      result.IpfsHash,
+      uri,
       specification || moock?.specification,
       {
         value: `${wadge || (await balancesHub.missionPrice())}`,
@@ -162,6 +166,59 @@ let _createFeature = async ({
   return { id: featureID, missionID: _missionID };
 };
 
+let _createLaunchpad = async ({
+  account,
+  addressSystem,
+  launchpadDatas,
+  metadatas,
+  tiersDatas,
+}) => {
+  let _iAS = await getContractAt("AddressSystem", addressSystem);
+  let balancesHub = await getContractAt(
+    "BalancesHub",
+    await _iAS.balancesHub()
+  );
+  let apiGet = await getContractAt("APIGet", await _iAS.apiGet());
+  let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
+  let _addrLH = await _iAS.launchpadsHub();
+  let moock = LAUNCHPAD_DATAS_EXEMPLE;
+  let id = parseInt(await apiGet.tokensLengthOf(_addrLH)) + 1;
+
+  let { launchpadURI, tokenURI } = await createURILaunchpad({ id, metadatas });
+  const token = await _testInitToken(account, "Django", "DJN", 3000000000);
+
+  let _launchpadDatas = {
+    id,
+    tokenURI: launchpadURI,
+    tokenAddress: token.target || moock.tokenAddress,
+    numberOfTier: launchpadDatas?.numberOfTier || moock.numberOfTier,
+    maxCap: launchpadDatas?.maxCap || moock.maxCap,
+    minCap: launchpadDatas?.minCap || moock.minCap,
+    minInvest: launchpadDatas?.minInvest || moock.minInvest,
+    maxInvest: launchpadDatas?.maxInvest || moock.maxInvest,
+    saleStart: launchpadDatas?.saleStart || moock.saleStart,
+    saleEnd: launchpadDatas?.saleEnd || moock.saleEnd,
+    lockedTime: launchpadDatas?.lockedTime || moock.lockedTime,
+    totalUser: launchpadDatas?.totalUser || moock.totalUser,
+  };
+
+  let _tierDatas = tiersDatas || [
+    TIER_DATAS_EXEMPLE,
+    TIER_DATAS_EXEMPLE,
+    TIER_DATAS_EXEMPLE,
+  ];
+
+  await apiPost
+    .connect(account)
+    .createLaunchpad(_launchpadDatas, _tierDatas, tokenURI, {
+      value: await balancesHub.launchpadPrice(),
+    });
+  if (account.address != (await apiGet.ownerOfToken(id, _addrLH))) {
+    throw new Error("Error Launchpad: URI ID");
+  }
+  return id;
+};
+
 let _createPub = async ({
   missionID,
   answerID,
@@ -177,7 +234,7 @@ let _createPub = async ({
   let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
 
   let id = parseInt(await apiGet.tokensLengthOf(_addrPH)) + 1;
-  let result = await createURIPub({
+  let uri = await createURIPub({
     id,
     title,
     img,
@@ -188,11 +245,11 @@ let _createPub = async ({
   });
 
   if (missionID && missionID > 0) {
-    await apiPost.connect(account).createPubMission(missionID, result.IpfsHash);
+    await apiPost.connect(account).createPubMission(missionID, uri);
   } else if (answerID && answerID > 0) {
-    await apiPost.connect(account).createPubAnswer(answerID, result.IpfsHash);
+    await apiPost.connect(account).createPubAnswer(answerID, uri);
   } else {
-    await apiPost.connect(account).createPub(result.IpfsHash);
+    await apiPost.connect(account).createPub(uri);
   }
 
   if (account.address != (await apiGet.ownerOfToken(id, _addrPH))) {
@@ -201,4 +258,10 @@ let _createPub = async ({
   return id;
 };
 
-module.exports = { _createCV, _createMission, _createFeature, _createPub };
+module.exports = {
+  _createCV,
+  _createMission,
+  _createFeature,
+  _createPub,
+  _createLaunchpad,
+};

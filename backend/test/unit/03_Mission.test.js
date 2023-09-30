@@ -47,7 +47,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("Should get 0 token", async () => {
-      expect(await apiGet.lengthOfMissions()).to.equal(0);
+      expect(await apiGet.tokensLengthOf(contract.target)).to.equal(0);
     });
 
     describe("NOT WORK", () => {
@@ -91,7 +91,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createMission("tokenURI", {
           value: missionPrice,
         });
-        expect(await apiGet.lengthOfMissions()).to.be.equal(1);
+        expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
       });
 
       it("Should get token URI", async () => {

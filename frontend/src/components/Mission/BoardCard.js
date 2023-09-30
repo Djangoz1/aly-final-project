@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { MyTable } from "components/myComponents/table/MyTable";
 import { ProfileAvatar } from "components/profile/ProfileAvatar";
 import { ENUMS } from "constants/enums";
@@ -102,10 +102,10 @@ export const BoardCard = () => {
   let menus = ["Owner", "Jobs proposition", "Technologies"];
 
   return (
-    <MyCard styles={"w-[30vw] h-[50vh] overflow-y-scroll"} icon={icfy.msg.chat}>
-      <h6 className="text-white text-lg items-center mb-3 flex">
-        <Icon icon={icfy.ux.checkList} className="text-xl mr-2" /> Board
-      </h6>
+    <MyCard
+      styles={"w-[30vw] h-[50vh] overflow-y-scrol hide-scrolbar "}
+      head={{ title: "Board", icon: icfy.ux.checkList }}
+    >
       <div className="flex w-full rounded-full bg-white/10 mb-5">
         {menus.map((el, i) => (
           <button

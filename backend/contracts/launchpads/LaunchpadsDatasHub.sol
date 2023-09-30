@@ -22,14 +22,24 @@ contract LaunchpadsDatasHub is Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tierIDs;
 
-    mapping(uint => DataTypes.LaunchpadData) public launchpadDatas;
-    mapping(uint => mapping(uint => DataTypes.TierData)) tierDetails;
+    mapping(uint => DataTypes.LaunchpadData) internal launchpadDatas;
+    mapping(uint => mapping(uint => DataTypes.TierData)) internal tierDetails;
 
-    modifier onlyOwnerOf(address _addr, uint _id) {
-        ILaunchpad launchpad = ILaunchpad(_iLH.addressOf(_id));
+    mapping(uint => bytes) internal _tokensURI;
+
+    modifier onlyFromContract(uint _id) {
         require(
-            launchpad.owner() == _addr,
-            "Only owner of launchpad can call this function"
+            _iAS.apiPost() == msg.sender || address(_iLH) == msg.sender,
+            // _iLH.addressOf(_id) == msg.sender,
+            "Only contracts can call this function"
+        );
+        _;
+    }
+
+    modifier onlyOwnerOf(address _sender, uint _launchpadID) {
+        require(
+            ILaunchpad(_iLH.addressOf(_launchpadID)).owner() == _sender,
+            "Not the owner"
         );
         _;
     }
@@ -61,6 +71,24 @@ contract LaunchpadsDatasHub is Ownable {
         return tierDetails[_launchpadID][_tierID];
     }
 
+    function setTokenURI(
+        address _sender,
+        uint _launchpadID,
+        string memory tokenURI_
+    )
+        external
+        onlyOwnerOf(_sender, _launchpadID)
+        onlyFromContract(_launchpadID)
+    {
+        _tokensURI[_launchpadID] = bytes(tokenURI_);
+    }
+
+    function tokenURI(
+        uint _launchpadID
+    ) external view returns (string memory _tokenURI) {
+        return string(_tokensURI[_launchpadID]);
+    }
+
     /**
      * @notice owner can change start time while session is not started
      * @param _saleStart new start time
@@ -68,7 +96,7 @@ contract LaunchpadsDatasHub is Ownable {
     function _setStartTime(
         uint256 _id,
         uint256 _saleStart
-    ) external onlyOwnerOf(msg.sender, _id) {
+    ) external onlyFromContract(_id) {
         require(
             launchpadDatas[_id].saleStart > block.timestamp,
             "Sale already started"
@@ -88,7 +116,7 @@ contract LaunchpadsDatasHub is Ownable {
     function _setEndTime(
         uint256 _id,
         uint256 _saleEnd
-    ) external onlyOwnerOf(msg.sender, _id) {
+    ) external onlyFromContract(_id) {
         require(_saleEnd > block.timestamp, "Sale end can't be in the past");
         require(
             launchpadDatas[_id].saleStart < _saleEnd,
@@ -101,7 +129,7 @@ contract LaunchpadsDatasHub is Ownable {
         uint _launchpadID,
         address _ownerOf,
         DataTypes.LaunchpadData calldata _data
-    ) external {
+    ) external onlyFromContract(_launchpadID) {
         if (launchpadDatas[_launchpadID].tokenAddress != address(0)) {
             require(
                 launchpadDatas[_launchpadID].saleEnd < block.timestamp,
@@ -121,19 +149,24 @@ contract LaunchpadsDatasHub is Ownable {
         uint _launchpadID,
         uint _tierID,
         uint _amount
-    ) external {
+    ) external onlyFromContract(_launchpadID) {
         tierDetails[_launchpadID][_tierID].amountRaised = tierDetails[
             _launchpadID
         ][_tierID].amountRaised.add(_amount);
     }
 
-    function _incrementLaunchpadUser(uint _launchpadID) external {
+    function _incrementLaunchpadUser(
+        uint _launchpadID
+    ) external onlyFromContract(_launchpadID) {
         launchpadDatas[_launchpadID].totalUser = launchpadDatas[_launchpadID]
             .totalUser
             .add(1);
     }
 
-    function _incrementTierUser(uint _launchpadID, uint _tierID) external {
+    function _incrementTierUser(
+        uint _launchpadID,
+        uint _tierID
+    ) external onlyFromContract(_launchpadID) {
         tierDetails[_launchpadID][_tierID].users = tierDetails[_launchpadID][
             _tierID
         ].users.add(1);
@@ -153,7 +186,7 @@ contract LaunchpadsDatasHub is Ownable {
         uint256[] calldata _maxTierCaps,
         uint256[] calldata _minTierCaps,
         uint256[] calldata _tokenPrice
-    ) public {
+    ) public onlyFromContract(_id) {
         require(
             launchpadDatas[_id].saleStart > block.timestamp,
             "Sale already started"

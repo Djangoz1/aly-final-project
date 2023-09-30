@@ -13,7 +13,26 @@ const {
   FEATURE_DATAS_URI_EXEMPLE,
   PUB_DATAS_URI_EXEMPLE,
   CV_DATAS_URI_EXEMPLE,
+  LAUNCHPAD_DATAS_URI_EXEMPLE,
 } = require("../helpers/test_utils");
+
+const createImageCIDOnPinata = async (image, pinataMetadata) => {
+  const readableStreamForFile = fs.createReadStream(image);
+
+  const options = {
+    pinataMetadata,
+    pinataOptions: {
+      cidVersion: 0,
+    },
+  };
+
+  try {
+    const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
+    return result.IpfsHash;
+  } catch (error) {
+    console.log({ error });
+  }
+};
 
 const createURIWorkerProposal = async ({ id, title, description, url }) => {
   const readableStreamForFile = fs.createReadStream("img/contract.png");
@@ -46,49 +65,39 @@ const createURIWorkerProposal = async ({ id, title, description, url }) => {
 
     return json;
   } catch (err) {
-    console.log("ERROR", err);
+    console.error("ERROR", err);
     return null;
   }
 };
 
-const createURIFeature = async ({ id, title, description, attributes }) => {
-  const readableStreamForFile = fs.createReadStream("img/contract.png");
+const createURIFeature = async ({
+  id,
+  title,
+  description,
+  attributes,
+  image,
+}) => {
   let moock = FEATURE_DATAS_URI_EXEMPLE;
-  if (!id && !title && !description) {
-    throw new Error("Missing value on creation feature URI");
-    return;
-  }
-  const options = {
-    pinataMetadata: {
-      name: `Work3 - Feature${id}`,
-    },
-    pinataOptions: {
-      cidVersion: 0,
-    },
-  };
 
   try {
-    const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
-
-    const body = {
+    let images = [];
+    if (image) {
+      images.push({ img: image });
+    }
+    const metadatas = {
       title: title || moock?.title,
       description: description || moock?.description,
-      url: `profile/feature/${id}`,
-      image: result.IpfsHash || moock?.image,
-      name: "Feature #" + id,
       attributes: [attributes || moock?.attributes],
     };
-
-    const json = await pinata.pinJSONToIPFS(body, options);
-    return json;
+    let uri = await createURI({ id, title: "Feature", images, metadatas });
+    return uri;
   } catch (err) {
-    console.log("ERROR", err);
+    console.error("ERROR", err);
     return null;
   }
 };
 const createURIPub = async ({
   id,
-  title,
   description,
   img,
   answerID,
@@ -97,129 +106,183 @@ const createURIPub = async ({
 }) => {
   let moock = PUB_DATAS_URI_EXEMPLE;
 
-  if (!id && !title && !description) {
-    throw new Error("Missing value on creation Publication URI");
-  }
-  const options = {
-    pinataMetadata: {
-      name: `Work3 - Publication${id}`,
-    },
-    pinataOptions: {
-      cidVersion: 0,
-    },
+  let metadatas = {
+    description: description || moock.description,
+    attributes: [moock.attributes],
   };
+  let images = [];
+  metadatas.attributes[0].missionID = missionID;
+  metadatas.attributes[0].answerID = answerID;
+  metadatas.attributes[0].owner = owner;
+
+  if (img) {
+    images.push({ img, target: "image" });
+  }
 
   try {
-    let image;
-    if (img !== false) {
-      const readableStreamForFile = fs.createReadStream(moock.image);
-      const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
-      image = result.IpfsHash;
-    }
-
-    moock.attributes[0].missionID = missionID;
-    moock.attributes[0].answerID = answerID;
-    moock.attributes[0].owner = owner;
-    const body = {
-      title: title || moock.title,
-      description: description || moock?.description,
-      url: "/community/pub/" + id,
-      image: image,
-      name: "Publication #" + id,
-      attributes: moock.attributes,
-    };
-
-    const json = await pinata.pinJSONToIPFS(body, options);
-    return json;
+    let uri = await createURI({ id, title: "Pub", images, metadatas });
+    return uri;
   } catch (err) {
-    console.log("ERROR", err);
+    console.error("ERROR", err);
     return null;
   }
+};
+
+let createURI = async ({ id, title, images, metadatas, moock }) => {
+  const pinataMetadata = {
+    name: "Work3 - " + title + "#" + id,
+  };
+  const pinataOptions = {
+    cidVersion: 0,
+  };
+
+  for (let index = 0; index < images?.length; index++) {
+    const element = images[index];
+
+    if (element?.img) {
+      let uri = await createImageCIDOnPinata(element?.img, {
+        name: "Work3 - Img " + element?.target + title + "#" + id,
+      });
+      let target = "image";
+
+      if (element?.target) {
+        target = element.target;
+      }
+      if (element?.attributes) {
+        metadatas.attributes[0][target] = uri;
+      } else {
+        metadatas[target] = uri;
+      }
+    }
+  }
+
+  const _options = {
+    pinataMetadata,
+    pinataOptions,
+  };
+
+  metadatas.name = pinataMetadata.name;
+  metadatas.attributes[0].createdAt = Date.now();
+  const json = await pinata.pinJSONToIPFS(metadatas, _options);
+
+  return json.IpfsHash;
+};
+
+const createURILaunchpad = async ({ id, metadatas }) => {
+  let moock = LAUNCHPAD_DATAS_URI_EXEMPLE;
+  let _metadatas = {
+    title: metadatas?.title || moock?.title,
+    description: metadatas?.description || moock?.description,
+    attributes: [
+      {
+        domain: metadatas?.domain || moock?.attributes?.domain,
+      },
+    ],
+  };
+
+  let launchpadURI = await createURI({
+    id,
+    title: "Launchpad Datas",
+    metadatas: _metadatas,
+    moock,
+  });
+  let images = [
+    { img: metadatas?.image || moock?.image, target: "image" },
+    {
+      img: metadatas?.banniere || moock?.banniere,
+      target: "banniere",
+      attributes: true,
+    },
+  ];
+
+  _metadatas = {
+    title: `Profile ${metadatas?.title || moock?.title}`,
+    description: metadatas?.bio || null,
+    attributes: [
+      {
+        facebook: metadatas?.facebook || null,
+        github: metadatas?.github || null,
+        linkedin: metadatas?.linkedin || null,
+        twitter: metadatas?.twitter || null,
+      },
+    ],
+  };
+  let tokenURI = await createURI({
+    id,
+    title: "Launchpad Profile",
+    metadatas: _metadatas,
+    images,
+    moock,
+  });
+
+  return { launchpadURI, tokenURI };
 };
 
 let createURICV = async ({ id, name, description, attributes, image }) => {
   let moock = CV_DATAS_URI_EXEMPLE;
 
-  let cv = fs.createReadStream(attributes?.[0]?.cvImg || moock.cv);
-  const readableStreamForFile = fs.createReadStream(image || moock.image);
-  if (!id && !title && !description) {
-    throw new Error("Missing value on creation CV URI");
-  }
+  let _metadatas = {
+    username: name || moock?.username,
+    description: description || moock?.description,
+    attributes: attributes || moock?.attributes,
+  };
 
-  const options = {
-    pinataMetadata: {
-      name: `Work3 - #cv${id}`,
-    },
-    pinataOptions: {
-      cidVersion: 0,
-    },
-  };
-  const _options = {
-    pinataMetadata: {
-      name: `Work3 - #cv img${id}`,
-    },
-    pinataOptions: {
-      cidVersion: 0,
-    },
-  };
+  let images = [];
+
+  images.push({
+    img: attributes?.[0]?.cvImg || moock.cv,
+    target: "cvImg",
+    attributes: true,
+  });
+  images.push({
+    img: attributes?.[0]?.banniere || moock.banniere,
+    target: "banniere",
+    attributes: true,
+  });
+  images.push({ img: image || moock?.image, target: "image" });
 
   try {
-    const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
-    const cvResult = await pinata.pinFileToIPFS(cv, _options);
-    let _attributes = attributes || moock.attributes;
-    _attributes[0].cvImg = cvResult.IpfsHash;
-    const body = {
-      title: "Work3",
-      username: name || moock.username,
-      description: description || moock.description,
-      url: `/profile/cv/${id}`,
-      attributes: _attributes,
-      image: result.IpfsHash,
-      name: "CV #" + id,
-    };
-
-    const json = await pinata.pinJSONToIPFS(body, options);
-
-    return json;
+    let uri = await createURI({
+      id,
+      title: "CV",
+      metadatas: _metadatas,
+      images,
+    });
+    return uri;
   } catch (err) {
-    console.log("ERROR", err);
+    console.error("ERROR", err);
     return null;
   }
 };
 
-const createURIMission = async ({ id, title, description, attributes }) => {
+const createURIMission = async ({
+  id,
+  title,
+  description,
+  attributes,
+  image,
+}) => {
   let moock = MISSION_DATAS_URI_EXEMPLE;
-  const readableStreamForFile = fs.createReadStream(moock.image);
 
-  if (!id && !title && !description) {
-    throw new Error("Missing value on creation Mission URI");
-    return;
-  }
-  const options = {
-    pinataMetadata: {
-      name: `Work3 - Mission${id}`,
+  let images = [
+    { img: image || moock?.image },
+    {
+      img: attributes?.banniere || moock.attributes.banniere,
+      target: "banniere",
+      attributes: true,
     },
-    pinataOptions: {
-      cidVersion: 0,
-    },
+  ];
+  const metadatas = {
+    title: title || moock.title,
+    description: description || moock.description,
+    attributes: attributes || [moock.attributes],
   };
 
   try {
-    const result = await pinata.pinFileToIPFS(readableStreamForFile, options);
-
-    const body = {
-      title: title || moock.title,
-      description: description || moock.description,
-      url: `/profile/mission/${id}`,
-      attributes: attributes || [moock.attributes],
-      image: result.IpfsHash || moock.image,
-      name: "Mission #" + id,
-    };
-
-    const json = await pinata.pinJSONToIPFS(body, options);
-    return json;
+    let uri = await createURI({ id, title: "Mission", images, metadatas });
+    return uri;
   } catch (err) {
-    console.log("ERROR", err);
+    console.error("ERROR", err);
     return null;
   }
 };
@@ -230,4 +293,5 @@ module.exports = {
   createURIPub,
   createURIMission,
   createURICV,
+  createURILaunchpad,
 };

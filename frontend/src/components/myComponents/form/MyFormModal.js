@@ -58,14 +58,14 @@ let Child = ({ components, side, arr, submit, editer }) => {
   let dispatch = useFormDispatch();
 
   let [isLoading, setIsLoading] = useState(null);
-  let { form, pointer, disabled, checked } = useFormState();
+  let { form, pointer, disabled, checked, superChecked } = useFormState();
   let { isConnected } = useAccount();
 
   useEffect(() => {
     if (!isConnected) doStateFormDisabled(dispatch, true);
     if (pointer === 0 && isConnected) doStateFormDisabled(dispatch, false);
 
-    doStateFormChecked({ dispatch, pointer, form, checked });
+    doStateFormChecked({ dispatch, pointer, form, checked, superChecked });
   }, [isConnected, pointer]);
 
   let handleSubmit = async () => {
@@ -76,6 +76,8 @@ let Child = ({ components, side, arr, submit, editer }) => {
       doStateFormModal(dispatch, false);
     }
   };
+
+  console.log("disabled", disabled);
   return (
     <div className="flex min-h-fit h-[75vh] overflow-y-scroll ">
       {side && (
@@ -111,7 +113,7 @@ let Child = ({ components, side, arr, submit, editer }) => {
         )}
         {isConnected && components[pointer]}
         <div className="mt-auto ml-auto">
-          {!editer && pointer > 0 && (
+          {!isLoading && !editer && pointer > 0 && (
             <button
               onClick={() => doStateFormPointer(dispatch, pointer - 1)}
               className="btn btn-xs btn-outline btn-error mr-3"

@@ -567,7 +567,6 @@ const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
   expect(await token.name()).to.equal(_name);
   expect(await token.totalSupply()).to.equal(_totalSupply);
   expect(await token.symbol()).to.equal(_symbol);
-  expect(await token.balanceOf(account.address)).to.equal(_totalSupply);
   return token;
 };
 

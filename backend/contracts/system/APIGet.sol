@@ -92,10 +92,6 @@ contract APIGet {
         return Bindings.cvOf(_for, _iAS.cvsHub());
     }
 
-    function lengthOfCVs() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.cvsHub());
-    }
-
     function followerOf(uint _cvID, uint _index) external view returns (uint) {
         return ICVsDatasHub(_iAS.cvsDatasHub()).followerOf(_cvID, _index);
     }
@@ -124,10 +120,6 @@ contract APIGet {
         DataTypes.CourtIDs _courtID
     ) external view returns (uint) {
         return IArbitratorsHub(_iAS.arbitratorsHub()).lengthOfCourt(_courtID);
-    }
-
-    function lengthOfArbitrators() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.arbitratorsHub());
     }
 
     function arbitrationOfCV(
@@ -237,10 +229,6 @@ contract APIGet {
         return ILaunchpadHub(_iAS.launchpadsHub()).launchpadsOfCV(_cvID);
     }
 
-    function lengthOfLaunchpads() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.launchpadsHub());
-    }
-
     function datasOfLaunchpad(
         uint _launchpadID
     ) external view returns (DataTypes.LaunchpadData memory) {
@@ -261,6 +249,15 @@ contract APIGet {
             );
     }
 
+    function statusOfLaunchpad(
+        uint _launchpadID
+    ) external view returns (DataTypes.LaunchpadStatus) {
+        return
+            ILaunchpad(
+                ILaunchpadHub(_iAS.launchpadsHub()).addressOf(_launchpadID)
+            ).status();
+    }
+
     function datasOfInvestor(
         uint _launchpadID,
         address _investor
@@ -276,22 +273,6 @@ contract APIGet {
     // *********** PUBS *********** //
     // *********** ---- *********** //
 
-    function lengthOfPubs() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.pubsHub());
-    }
-
-    function lengthOfLikes() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.pubsDatasHub());
-    }
-
-    function pubsOfCV(uint _cvID) external view returns (uint[] memory) {
-        return IPubsHub(_iAS.pubsHub()).indexerOf(_cvID);
-    }
-
-    function likesOfPub(uint _pubID) external view returns (uint[] memory) {
-        return IPubsDatasHub(_iAS.pubsDatasHub()).indexerOf(_pubID);
-    }
-
     function answersOfPub(uint _pubID) external view returns (uint[] memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).answersOfPub(_pubID);
     }
@@ -302,16 +283,11 @@ contract APIGet {
         return IPubsDatasHub(_iAS.pubsDatasHub()).dataOf(_likeID);
     }
 
-     function datasOfPub(
+    function datasOfPub(
         uint _pubID
-    )
-        external
-        view
-        
-        returns (DataTypes.PubData memory){
-
+    ) external view returns (DataTypes.PubData memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).dataOfPub(_pubID);
-        }
+    }
 
     function pubsOfMission(
         uint _missionID
@@ -323,30 +299,24 @@ contract APIGet {
     // *********** WORKS *********** //
     // *********** ---- *********** //
 
-    function missionsOfCV(uint _cvID) external view returns (uint[] memory) {
-        return IMissionsHub(_iAS.missionsHub()).indexerOf(_cvID);
+    function jobsOfCV(uint _cvID) external view returns (uint[] memory) {
+        return
+            ICollectWorkInteraction(_iAS.collectWorkInteraction()).jobsOf(
+                _cvID
+            );
     }
 
-    function jobsOfCV(uint _cvID) external view returns(uint [] memory){
-        return ICollectWorkInteraction(_iAS.collectWorkInteraction()).jobsOf(_cvID);
-    }
-
-    function lengthOfMissions() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.missionsHub());
+    function invitesOfCV(uint _cvID) external view returns (uint[] memory) {
+        return
+            ICollectWorkInteraction(_iAS.collectWorkInteraction()).invitesOf(
+                _cvID
+            );
     }
 
     function datasOfMission(
         uint _missionID
     ) external view returns (DataTypes.MissionData memory) {
         return IMissionsHub(_iAS.missionsHub()).dataOf(_missionID);
-    }
-
-    function lengthOfFeatures() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.featuresHub());
-    }
-
-    function featuresOfCV(uint _cvID) external view returns (uint[] memory) {
-        return IFeaturesHub(_iAS.featuresHub()).indexerOf(_cvID);
     }
 
     function datasOfFeature(

@@ -49,14 +49,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   describe("Enterprise", () => {
     it("Should have 0 token", async () => {
-      expect(await apiGet.lengthOfFeatures()).to.equal(0);
+      expect(await apiGet.tokensLengthOf(contract.target)).to.equal(0);
     });
 
     it("Should create feature", async () => {
       await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
         value: "10000000",
       });
-      expect(await apiGet.lengthOfFeatures()).to.equal(1);
+      expect(await apiGet.tokensLengthOf(contract.target)).to.equal(1);
       expect(await contract.ownerOf(1)).to.equal(this.owner.address);
     });
     it("Should get feature", async () => {
@@ -138,7 +138,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await apiPost.createFeature(missionID, 1000, true, "tokenURI", 3, {
           value: "10000000",
         });
-        expect(await apiGet.lengthOfFeatures()).to.equal(1);
+        expect(await apiGet.tokensLengthOf(contract.target)).to.equal(1);
       });
 
       it("Should give ownership of feature to owner", async () => {

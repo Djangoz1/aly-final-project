@@ -22,7 +22,7 @@ export const LayoutForm = ({ stateInit, children }) => {
 const Child = ({ stateInit, children }) => {
   let { form, status, modal, checked, pointer } = useFormState();
   let dispatch = useFormDispatch();
-
+  console.log(stateInit?.superChecked?.function);
   useEffect(() => {
     if (modal) {
       doInitStateForm(dispatch, stateInit);
@@ -31,6 +31,7 @@ const Child = ({ stateInit, children }) => {
         pointer,
         form: stateInit?.form,
         checked: stateInit?.checked,
+        superChecked: stateInit?.superChecked,
       });
     } else {
       doStateFormRefresh(dispatch);

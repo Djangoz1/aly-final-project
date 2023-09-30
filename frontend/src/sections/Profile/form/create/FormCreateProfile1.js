@@ -1,7 +1,8 @@
 import { Icon } from "@iconify/react";
 import { MyCheckboxes } from "components/myComponents/form/MyCheckboxes";
 import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
-import { MyInputs } from "components/myComponents/form/MyInputs";
+import { MyInput } from "components/myComponents/form/MyInput";
+
 import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
@@ -17,9 +18,8 @@ import {
 import { icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
 import React, { useEffect } from "react";
 
+let margin = "my-4";
 export const FormCreateProfile1 = React.memo(() => {
-  let margin = "my-4";
-
   let dispatch = useFormDispatch();
 
   useEffect(() => {
@@ -36,29 +36,22 @@ export const FormCreateProfile1 = React.memo(() => {
           { title: "Mme.", value: "Mme" },
         ]}
       />
-
-      <MyInputs
-        styles={margin}
-        inputs={[
-          { target: "firstName", label: "Prénom" },
-          { target: "lastName", label: "Nom" },
-        ]}
-      />
-      <MyInputs
-        styles={margin}
-        inputs={[
-          { label: "Username", target: "username" },
-          { label: "Email", target: "email", type: "email" },
-        ]}
-      />
-
-      <MyInputs
-        styles={margin}
-        inputs={[
-          { label: "Téléphone", target: "phone", type: "phone" },
-          { label: "Date de naissance", target: "dateOfBirth", type: "date" },
-        ]}
-      />
+      <div className={"flex " + margin}>
+        <MyInput target={"firstName"} label={"Prénom"} />
+        <MyInput target={"lastName"} label={"Nom"} />
+      </div>
+      <div className={"flex " + margin}>
+        <MyInput target={"username"} />
+        <MyInput target={"email"} type={"mail"} />
+      </div>
+      <div className={"flex " + margin}>
+        <MyInput target={"phone"} type={"phone"} />
+        <MyInput
+          target={"dateOfBirth"}
+          label={"Date de naissance"}
+          type={"date"}
+        />
+      </div>
 
       <MyInputsFile
         styles={margin}
@@ -166,142 +159,41 @@ export const FormCreateProfile2 = () => {
           },
         ]}
       />
-      <MyInputs
-        styles={margin}
-        inputs={[
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
-              </span>
-            ),
-            target: "facebook",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
-              </span>
-            ),
-            target: "linkedin",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
-              </span>
-            ),
-            target: "github",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
-              </span>
-            ),
-            target: "twitter",
-          },
-        ]}
-      />
-    </div>
-  );
-};
-export const FormCreateProfile3 = () => {
-  let margin = "my-4";
 
-  return (
-    <div className="">
-      <div className={"flex flex-col mb-4"}>
-        <MyInputsFile inputs={[{ label: "CV", target: "cvImg" }]} />
-
-        <p className="text-light text-white font-light text-xs mb-1 ">
-          Vous pouvez renseigner votre CV hors plateforme afin qu'il soit vu par
-          les recruteurs.
-        </p>
+      <div className={"flex " + margin}>
+        <MyInput
+          label={
+            <span className="flex items-center">
+              <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
+            </span>
+          }
+          target={"facebook"}
+        />
+        <MyInput
+          label={
+            <span className="flex items-center">
+              <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
+            </span>
+          }
+          target={"linkedin"}
+        />
+        <MyInput
+          label={
+            <span className="flex items-center">
+              <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
+            </span>
+          }
+          target={"github"}
+        />
+        <MyInput
+          label={
+            <span className="flex items-center">
+              <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
+            </span>
+          }
+          target={"twitter"}
+        />
       </div>
-      <MyCheckboxes
-        target={"expercience"}
-        label={"Quel type de mission recherchez-vous ?"}
-        checkboxes={[
-          { title: "- d'1 semaine" },
-          { title: "- de 4 semaines" },
-          { title: "+ de 4 semaines" },
-          { title: "+ de 3 mois" },
-          { title: "Ouvert" },
-        ]}
-      />
-      <MySelects
-        styles={margin}
-        selects={[
-          {
-            label: "Métiers recherchés",
-            target: "domain",
-            target1: "name",
-            arr: DEV_DOMAIN,
-            placeholder: "Quel domaine recherchez vous ?",
-          },
-          {
-            label: "Compétences",
-            target: "skills",
-            target1: "court",
-            arr: ENUMS.courts,
-            placeholder: "Quelles technologies maitrisez-vous ?",
-          },
-        ]}
-      />
-      <MySelects
-        selects={[
-          {
-            target: "languages",
-            label: "Langues",
-            arr: ["Français", "Espagnol", "Italien", "Allemand", "Anglais"],
-            placeholder: "Quelle langue maitrisez-vous ?",
-          },
-          {
-            target: "domain",
-            label: "Niveau",
-            arr: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
-            placeholder: "Choisir",
-          },
-        ]}
-      />
-      <MyInputs
-        styles={margin}
-        inputs={[
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
-              </span>
-            ),
-            target: "facebook",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
-              </span>
-            ),
-            target: "linkedin",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
-              </span>
-            ),
-            target: "github",
-          },
-          {
-            label: (
-              <span className="flex items-center">
-                <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
-              </span>
-            ),
-            target: "twitter",
-          },
-        ]}
-      />
     </div>
   );
 };

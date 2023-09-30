@@ -17,13 +17,11 @@ import {
   icfySETTINGS,
 } from "icones";
 
-import { _createContractCv, _getName } from "utils/ui-tools/auth-tools";
-
 import { useAccount } from "wagmi";
 import Link from "next/link";
 
 export const Drawer = ({ setter, isOpen }) => {
-  const { cv } = useAuthState();
+  const { cv, metadatas } = useAuthState();
 
   const currentUrl = window?.location?.pathname || null;
 
@@ -34,7 +32,6 @@ export const Drawer = ({ setter, isOpen }) => {
     doAuthCV(dispatch, address);
   };
 
-  console.log(cv);
   const links = [
     { path: "/", icon: icfyHOME, title: "Home" },
     { path: "/community", icon: icfyMAIL, title: "Community" },
@@ -99,7 +96,7 @@ export const Drawer = ({ setter, isOpen }) => {
                 <div className="stat-title">User :</div>
                 <div className="stat-value">
                   {cv ? (
-                    <CVName />
+                    <CVName metadata={metadatas} />
                   ) : (
                     <button className="btn" onClick={createCV}>
                       Create a CV

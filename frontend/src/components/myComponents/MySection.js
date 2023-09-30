@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 export const MySection = ({ children, styles }) => {
   return (
     <div
-      className={`w-[90%] h-full min-h-[90vh] relative  flex mx-auto ${
+      className={`w-[90%] max-w-[1200px] h-full min-h-[90vh] relative  flex mx-auto ${
         styles || "items-center"
       }`}
     >

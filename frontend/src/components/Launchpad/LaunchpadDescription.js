@@ -1,4 +1,4 @@
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import React from "react";
 
 export const LaunchpadDescription = ({ datas }) => {

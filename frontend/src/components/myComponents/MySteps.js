@@ -10,7 +10,7 @@ export const MySteps = ({ arr, styles }) => {
         <li
           key={uuidv4()}
           data-content={el?.i}
-          className={`step px-5 border border-y-1 m-0 text-xs   w-full border-x-0 ${
+          className={`step px-5 border border-y-1 m-0 text-xs  text-left whitespace-nowrap w-full border-x-0 ${
             index === pointer ? "border-primary/70" : "border-white/10"
           } ${
             index <= pointer

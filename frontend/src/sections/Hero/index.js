@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { MyBottomSection, MySection } from "components/myComponents/MySection";
 import { rocket } from "constants/spline";
 import { icfySEARCH } from "icones";

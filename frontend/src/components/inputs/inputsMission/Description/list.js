@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { DEV_DOMAIN, DEV_LANGUAGES } from "constants/languages";
 import { icfyCODE } from "icones";
 import { useState } from "react";

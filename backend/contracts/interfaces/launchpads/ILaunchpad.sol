@@ -8,6 +8,8 @@ interface ILaunchpad {
 
     function owner() external view returns (address);
 
+    function status() external view returns (DataTypes.LaunchpadStatus);
+
     /**
      * @notice check if contract have allowance to transfered that amount
      * check if owner have enough funds

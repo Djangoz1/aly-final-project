@@ -1,11 +1,6 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { MyInputs } from "components/myComponents/form/MyInputs";
-import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
-import { MySelects } from "components/myComponents/form/MySelects";
-import { DEV_DOMAIN } from "constants/languages";
-import { MENUS_CREATE_MISSION } from "constants/menus";
-import { icfyETHER } from "icones";
+
 import { _apiPostAt } from "utils/ui-tools/web3-tools";
 let MENUS = [
   { i: "ℹ️", title: "Introduction" },

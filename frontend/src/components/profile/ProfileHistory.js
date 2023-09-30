@@ -1,4 +1,4 @@
-import { MyCard } from "components/myComponents/MyCard";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { MyPagination } from "components/myComponents/MyPagination";
 import { MyTitle } from "components/myComponents/MyTitle";
 import React from "react";

@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { v4 } from "uuid";
+import { MyModal } from "components/myComponents/modal/MyModal";
+import { ImagePin } from "components/Image/ImagePin";
 
 export default function Page({ params }) {
   let { cv } = useAuthState();
@@ -26,11 +28,26 @@ export default function Page({ params }) {
 
   return (
     <LayoutProfile params={params} path={"pubs"}>
-      <div className="w-full border-r-2 max-h-[80vh]  overflow-y-scroll hide-scrollbar border border-white/10 border-y-0 border-l-0">
+      <MyModal
+        btn={
+          <ImagePin
+            style={" w-[30vw]"}
+            CID={metadatas?.attributes?.[0]?.cvImg}
+          />
+        }
+        styles={{ btn: "btn-ghost h-fit mx-auto my-auto " }}
+        modal={
+          <ImagePin
+            style={"mx-auto  w-[80vw]"}
+            CID={metadatas?.attributes?.[0]?.cvImg}
+          />
+        }
+      />
+      {/* <div className="w-full border-r-2 max-h-[80vh]  overflow-y-scroll hide-scrollbar border border-white/10 border-y-0 border-l-0">
         {isPubs?.map((pubID, index) => (
           <Pub id={pubID} key={v4()} _owner={metadatas} />
         ))}
-      </div>
+      </div> */}
     </LayoutProfile>
   );
 }

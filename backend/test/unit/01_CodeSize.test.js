@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 const { codeSize, _testInitAll } = require("../../helpers/test_init");
 
-describe(`TEST CODE SIZE`, () => {
+describe.only(`TEST CODE SIZE`, () => {
   let contracts;
 
   beforeEach(async () => {

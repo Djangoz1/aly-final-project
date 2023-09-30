@@ -21,6 +21,7 @@ import {IPubsHub} from "../interfaces/pubs/IPubsHub.sol";
 import {IPubsDatasHub} from "../interfaces/pubs/IPubsDatasHub.sol";
 import {IMissionsHub} from "../interfaces/works/IMissionsHub.sol";
 import {ILaunchpadHub} from "../interfaces/launchpads/ILaunchpadHub.sol";
+import {ILaunchpadsDatasHub} from "../interfaces/launchpads/ILaunchpadsDatasHub.sol";
 import {ILaunchpad} from "../interfaces/launchpads/ILaunchpad.sol";
 import {IFeaturesHub} from "../interfaces/works/IFeaturesHub.sol";
 import {ICollectWorkInteraction} from "../interfaces/works/ICollectWorkInteraction.sol";
@@ -612,21 +613,22 @@ contract APIPost is Ownable {
     function createLaunchpad(
         DataTypes.LaunchpadData memory _datas,
         DataTypes.TierData[] memory _tierDatas,
-        string calldata _pubURI
+        string memory _tokenURI
     ) external payable {
-        require(bytes(_pubURI).length > 0, "Must have pub URI");
         uint price = IBalancesHub(_iAS.balancesHub()).launchpadPrice();
         require(msg.value == price, "Launchpad price : Invalid value");
         uint cvID = _cvOf(msg.sender);
-        uint pubID = _createPub(cvID, _pubURI);
         uint newID = ILaunchpadHub(_iAS.launchpadsHub()).mint(
             cvID,
             _datas,
-            _tierDatas,
-            pubID
+            _tierDatas
         );
-
         require(newID > 0, "Invalid launchpad ID");
+        ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).setTokenURI(
+            msg.sender,
+            newID,
+            _tokenURI
+        );
     }
 
     function lockTokens(uint _launchpadID, uint _tokens) external {

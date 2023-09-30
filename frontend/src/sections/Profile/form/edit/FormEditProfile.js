@@ -1,7 +1,8 @@
 import { Icon } from "@iconify/react";
 import { MyCheckboxes } from "components/myComponents/form/MyCheckboxes";
 import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
-import { MyInputs } from "components/myComponents/form/MyInputs";
+import { MyInput } from "components/myComponents/form/MyInput";
+
 import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
@@ -14,13 +15,10 @@ let margin = "mb-4";
 export const FormEditProfile1 = () => {
   return (
     <div className="">
-      <MyInputs
-        inputs={[
-          { label: "Username", target: "username" },
-          { label: "Téléphone", target: "phone" },
-        ]}
-        styles={margin}
-      />
+      <div className={"flex " + margin}>
+        <MyInput target={"username"} />
+        <MyInput target={"phone"} />
+      </div>
 
       <MyInputsFile
         styles={margin}
@@ -38,43 +36,40 @@ export const FormEditProfile1 = () => {
 
 export const FormEditProfile2 = () => {
   return (
-    <MyInputs
-      styles={margin}
-      inputs={[
-        {
-          label: (
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
-            </span>
-          ),
-          target: "facebook",
-        },
-        {
-          label: (
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
-            </span>
-          ),
-          target: "linkedin",
-        },
-        {
-          label: (
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
-            </span>
-          ),
-          target: "github",
-        },
-        {
-          label: (
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
-            </span>
-          ),
-          target: "twitter",
-        },
-      ]}
-    />
+    <div className={"flex " + margin}>
+      <MyInput
+        target={"facebook"}
+        label={
+          <span className="flex items-center">
+            <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
+          </span>
+        }
+      />
+      <MyInput
+        target={"linkedin"}
+        label={
+          <span className="flex items-center">
+            <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
+          </span>
+        }
+      />
+      <MyInput
+        target={"github"}
+        label={
+          <span className="flex items-center">
+            <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
+          </span>
+        }
+      />
+      <MyInput
+        target={"twitter"}
+        label={
+          <span className="flex items-center">
+            <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
+          </span>
+        }
+      />
+    </div>
   );
 };
 
@@ -97,23 +92,18 @@ export const FormEditProfile3 = () => {
           </>
         }
       />
-      <MySelects
+      {/* <MySelects
         styles={margin}
         selects={[
           {
             target: "languages",
+            target1: "langue",
             label: "Langues",
             arr: ["Français", "Espagnol", "Italien", "Allemand", "Anglais"],
             placeholder: "Quelle langue maitrisez-vous ?",
           },
-          {
-            target: "languages",
-            label: "Niveau",
-            arr: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
-            placeholder: "Choisir",
-          },
         ]}
-      />
+      /> */}
       <MyInputsFile
         styles={margin}
         inputs={[{ label: "CV", target: "cvImg" }]}
@@ -124,14 +114,5 @@ export const FormEditProfile3 = () => {
 
 // Blockchain
 export const FormEditProfile4 = () => {
-  return (
-    <MyInputs
-      inputs={[
-        {
-          label: <>Account address</>,
-          target: "address",
-        },
-      ]}
-    />
-  );
+  return <MyInput label={"Account address"} target={"address"} />;
 };

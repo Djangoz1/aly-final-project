@@ -18,6 +18,9 @@ contract CollectWorkInteraction is Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
 
+    mapping(uint => mapping(uint => bool)) featureToInvites;
+    mapping(uint => uint[]) cvsToInvites;
+
     /**
      * @notice key uint is feature ID
      */
@@ -64,12 +67,16 @@ contract CollectWorkInteraction is Ownable {
         indexerMissions[missionID].push(_featureID);
     }
 
-    function indexerOf(uint _missionID) external returns (uint[] memory) {
+    function indexerOf(uint _missionID) external view returns (uint[] memory) {
         return indexerMissions[_missionID];
     }
 
     function jobsOf(uint _cvID) external view returns (uint[] memory) {
         return cvsToJobs[_cvID];
+    }
+
+    function invitesOf(uint _cvID) external view returns (uint[] memory) {
+        return cvsToInvites[_cvID];
     }
 
     function inviteWorker(
@@ -78,22 +85,37 @@ contract CollectWorkInteraction is Ownable {
         uint _featureID
     ) external onlyProxy onlyFeatureOpen(_featureID) {
         require(_cvID != _cvWorkerID, "Can't assign yourself");
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
-        featureData.cvWorker = _cvWorkerID;
-
-        _setFeature(_featureID, featureData);
+        require(_featureData(_featureID).startedAt == 0, "Already started");
+        require(!featureToInvites[_featureID][_cvWorkerID], "Already invite");
+        require(
+            cvsToInvites[_cvWorkerID].length <= 100,
+            "Worker have exceed invitation"
+        );
+        featureToInvites[_featureID][_cvWorkerID] = true;
+        cvsToInvites[_cvWorkerID].push(_featureID);
     }
 
     function acceptJob(uint _cvID, uint _featureID) external onlyProxy {
         DataTypes.FeatureData memory featureData = _featureData(_featureID);
-        require(featureData.cvWorker == _cvID, "Not the worker");
         require(featureData.startedAt == 0, "Feature already start");
+        require(featureToInvites[_featureID][_cvID], "Not invited");
         uint[] memory empty;
         datas[_featureID].workerDemand = empty;
         datas[_featureID].signedWorker = _cvID;
         datas[_featureID].workerAcceptJob = true;
         featureData.startedAt = block.timestamp;
+        featureData.cvWorker = _cvID;
         cvsToJobs[_cvID].push(_featureID);
+        uint[] memory _newInvites;
+
+        for (uint256 index = 0; index < cvsToInvites[_cvID].length; index++) {
+            uint featureID_ = cvsToInvites[_cvID][index];
+            if (featureID_ != _featureID) {
+                _newInvites[index] = featureID_;
+            }
+        }
+        cvsToInvites[_cvID] = _newInvites;
+
         _setFeature(_featureID, featureData);
     }
 
@@ -102,6 +124,14 @@ contract CollectWorkInteraction is Ownable {
         require(featureData.cvWorker == _cvID, "Not the worker");
         require(featureData.startedAt == 0, "Feature already start");
         featureData.cvWorker = 0;
+        uint[] memory _newInvites;
+        for (uint256 index = 0; index < cvsToInvites[_cvID].length; index++) {
+            uint featureID_ = cvsToInvites[_cvID][index];
+            if (featureID_ != _featureID) {
+                _newInvites[index] = featureID_;
+            }
+        }
+        cvsToInvites[_cvID] = _newInvites;
         _setFeature(_featureID, featureData);
     }
 
@@ -113,6 +143,18 @@ contract CollectWorkInteraction is Ownable {
             datas[_featureID].workerDemand.length <= 100,
             "Max 100 demands"
         );
+        bool allowed = true;
+        for (
+            uint256 index = 0;
+            index < datas[_featureID].workerDemand.length;
+            index++
+        ) {
+            uint cvID_ = datas[_featureID].workerDemand[index];
+            if (cvID_ == _cvID) {
+                allowed = false;
+            }
+        }
+        require(allowed, "Already ask to join");
         DataTypes.FeatureData memory featureData = _featureData(_featureID);
         require(featureData.isInviteOnly == false, "Only on invitation");
         require(featureData.cvWorker == 0, "Already have worker");
