@@ -77,7 +77,6 @@ let Child = ({ components, side, arr, submit, editer }) => {
     }
   };
 
-  console.log("disabled", disabled);
   return (
     <div className="flex min-h-fit h-[75vh] overflow-y-scroll ">
       {side && (

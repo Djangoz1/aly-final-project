@@ -21,7 +21,7 @@ export const MyMenus = ({ menus, styles, setter }) => {
           key={v4()}
           className={`${
             pointer === index
-              ? "bg-black/70 text-white font-bold border-y-white"
+              ? "cta-button project-owner  font-bold border-y-0"
               : "border-y-white/10"
           } w-full font-light h-fit py-5 flex items-center border text-sm  border-x-0 cursor-pointer ${
             styles?.el

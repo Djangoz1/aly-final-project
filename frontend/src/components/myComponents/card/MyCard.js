@@ -5,7 +5,7 @@ export const MyCard = ({ head, children, icon, styles }) => {
   let [isClicked, setIsClicked] = useState(null);
   return (
     <div
-      className={`relative bg-black/40 p-4  z-0 h-fit  rounded-xl border box-border border-white/10  font2 shadow-xl ${styles}`}
+      className={`relative bg-zinc-900 py-4 px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">

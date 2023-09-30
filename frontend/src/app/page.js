@@ -14,6 +14,13 @@ import { LogoIc } from "components/Logo";
 import { LinearGradient } from "react-text-gradients";
 import { Hg, Hg1 } from "components/text/HeroGradient";
 import { icfy, icfyROCKET } from "icones";
+import { MyCard } from "components/myComponents/card/MyCard";
+import {
+  BtnGb1,
+  BtnGr1,
+  BtnGb2,
+  BtnGr2,
+} from "components/myComponents/btn/MyGradientButton";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
@@ -61,10 +68,11 @@ export default function Home() {
                   <Hg>Freelancing</Hg>
                 </h2>
                 <div className=" mt-5 ml-auto">
-                  <button className="cta-button btn border-none mr-10 freelance">
+                  <BtnGr1 style=" mr-10">
                     <Icon icon={icfy.work.casual} className={""} />
                     Launch project
-                  </button>
+                  </BtnGr1>
+
                   <CreateProfile />
                 </div>
               </div>
@@ -89,7 +97,7 @@ export default function Home() {
                     <Icon icon={icfy.person.team} className="icons" />
                     <Hg style={"font-light"}>Collaborative Project Building</Hg>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Join projects where your opinion matters and become an
                     integral part of a team
                   </div>
@@ -101,7 +109,7 @@ export default function Home() {
                       Exciting and Innovative Projects
                     </Hg>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Discover a variety of new interesting and cutting-edge
                     projects
                   </div>
@@ -111,7 +119,7 @@ export default function Home() {
                     <Icon icon={icfy.ux.mediation} className="icons" />
                     <Hg style={"font-light"}>Efficient Mediation System</Hg>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Count on our reliable mediation system, ensuring effective
                     conflict resolution and seamless communication
                   </div>
@@ -121,7 +129,7 @@ export default function Home() {
                     <Icon icon={icfy.eye.open} className="icons" />
                     <Hg style={"font-light"}>Enhanced Visibility</Hg>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Increase your professional visibility and connect with a
                     wider range of clients and opportunities
                   </div>
@@ -131,13 +139,94 @@ export default function Home() {
                     <Icon icon={icfyROCKET} className="icons" />
                     <Hg style={"font-light"}>Simplified Onboarding</Hg>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Getting started is a breeze, thanks to our user-friendly and
                     straightforward onboarding process
                   </div>
                 </li>
               </ul>
             </div>
+            <div className=" my-[10vh] font2">
+              <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
+                <Hg1>Services</Hg1>
+              </h2>
+              <div className="flex justify-evenly">
+                <MyCard styles={"w-[23%]"}>
+                  <Icon
+                    icon={icfy.work.casual}
+                    className="text-info text-[90px]"
+                  />
+                  <div className="w-full  mt-6 mb-6">
+                    <Hg1 style={"w-full  text-2xl"}>
+                      Freelance <br />
+                      Protocole
+                    </Hg1>
+                    <div className="g1 gb1 mt-3 w-full py-[1px] "></div>
+                  </div>
+                  <p className="text-xs w-3/4 text-justify">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Autem fuga quae suscipit ullam aliquam officia eligendi
+                    dolor temporibus!
+                  </p>
+                  <BtnGb2 style="mt-5 w-full btn-sm">More</BtnGb2>
+                </MyCard>
+                <MyCard styles={"w-[23%]"}>
+                  <Icon
+                    icon={icfy.court.hammer}
+                    className="text-error text-[90px]"
+                  />
+                  <div className="w-full  mt-6 mb-6">
+                    <Hg style={"w-full  text-2xl"}>
+                      Escrow <br />
+                      Protocole
+                    </Hg>
+                    <div className="g1 gr1 mt-3 w-full py-[1px] "></div>
+                  </div>
+                  <p className="text-xs w-3/4 text-justify">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Autem fuga quae suscipit ullam aliquam officia eligendi
+                    dolor temporibus!
+                  </p>
+                  <BtnGr2 style=" mt-5 w-full btn-sm  ">More</BtnGr2>
+                </MyCard>
+                <MyCard styles={"w-[23%]"}>
+                  <Icon
+                    icon={icfy.msg.chat}
+                    className="text-info text-[90px]"
+                  />
+                  <div className="w-full mt-6 mb-6">
+                    <Hg1 style={"w-full pr-10 text-2xl"}>
+                      Social <br />
+                      Protocole
+                    </Hg1>
+                    <div className="g1 gb1 mt-3 w-full py-[1px] "></div>
+                  </div>
+                  <p className="text-xs w-3/4 text-justify">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Autem fuga quae suscipit ullam aliquam officia eligendi
+                    dolor temporibus!
+                  </p>
+                  <BtnGb2 style="mt-5 w-full btn-sm">More</BtnGb2>
+                </MyCard>
+                <MyCard styles={"w-[23%]"}>
+                  <Icon icon={icfyROCKET} className="text-error text-[90px]" />
+                  <div className="w-full  mt-6 mb-6">
+                    <Hg style={"w-full  text-2xl"}>
+                      Launchpad <br />
+                      Protocole
+                    </Hg>
+                    <div className="g1 gr1 mt-3 w-full py-[1px] "></div>
+                  </div>
+                  <p className="text-xs w-3/4 text-justify">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Autem fuga quae suscipit ullam aliquam officia eligendi
+                    dolor temporibus!
+                  </p>
+                  <BtnGr2 style="mt-5 w-full btn-sm">More</BtnGr2>
+                </MyCard>
+              </div>
+            </div>
+
             <div
               className="presentation  my-[10vh] "
               id="project-owner-presentation"
@@ -153,7 +242,7 @@ export default function Home() {
                     <Icon icon={icfy.ux.star} className="icons" />
                     <Hg1 style={"font-light"}>Launch your Dreams</Hg1>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     We're here to support community innitiative for help to
                     launch your projects into the stratosphere.
                   </div>
@@ -163,7 +252,7 @@ export default function Home() {
                     <Icon icon={icfy.bank.bag} className="icons" />
                     <Hg1 style={"font-light"}>Community Funding</Hg1>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Discover a variety of new interesting and cutting-edge
                     projects
                   </div>
@@ -173,7 +262,7 @@ export default function Home() {
                     <Icon icon={icfy.domain.blockchain} className="icons" />
                     <Hg1 style={"font-light"}>Decentralization</Hg1>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Count on our reliable mediation system, ensuring effective
                     conflict resolution and seamless communication
                   </div>
@@ -183,7 +272,7 @@ export default function Home() {
                     <Icon icon={icfy.eye.open} className="icons" />
                     <Hg1 style={"font-light"}>Enhanced Visibility</Hg1>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Increase your professional visibility and connect with a
                     wider range of clients and opportunities
                   </div>
@@ -193,7 +282,7 @@ export default function Home() {
                     <Icon icon={icfyROCKET} className="icons" />
                     <Hg1 style={"font-light"}>Simplified Onboarding</Hg1>
                   </div>
-                  <div className="subtitle">
+                  <div className="subtitle hover:text-white">
                     Getting started is a breeze, thanks to our user-friendly and
                     straightforward onboarding process
                   </div>
