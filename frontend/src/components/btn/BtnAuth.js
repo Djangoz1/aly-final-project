@@ -1,6 +1,11 @@
 import { Icon } from "@iconify/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import {
+  BtnG1,
+  BtnGb1,
+  BtnGb2,
+} from "components/myComponents/btn/MyGradientButton";
 import { useAuthState } from "context/auth";
 import { icfy, icfyHAMBURGER } from "icones";
 export const BtnAuth = ({ drawerBtn }) => {
@@ -56,21 +61,31 @@ export const BtnAuth = ({ drawerBtn }) => {
                 );
               }
               return (
-                <div
-                  className="cta-button project-owner font-light border-none btn normal-case font2"
-                  style={{ display: "flex", gap: 12 }}
+                // <div
+                //   className="cta-button project-owner font-light border-none btn normal-case font2"
+                //   style={{ display: "flex", gap: 12 }}
+                // >
+                <BtnG1
+                  style={
+                    "font-light border-box normal-case pl-0 overflow-hidden"
+                  }
                 >
-                  {drawerBtn}
-
-                  <button
-                    className="font2"
-                    onClick={openAccountModal}
-                    type="button"
+                  <div className="bg-zinc-900 h-full flex items-center pl-4 pr-5 justify-between ">
+                    {drawerBtn}
+                  </div>
+                  <div
+                    className="flex items-center"
+                    // className="bg-zinc-900 h-full flex items-center px-5 justify-between  rounded-lg"
                   >
-                    <span className="font-black">{metadatas?.username}</span>
-                    {account.displayBalance ? ` ${account.displayBalance}` : ""}
-                  </button>
-                </div>
+                    <CVName metadata={metadatas} styles=" mx-4" />
+                    <div className="" onClick={openAccountModal}>
+                      {account.displayBalance
+                        ? ` ${account.displayBalance}`
+                        : ""}
+                    </div>
+                  </div>
+                </BtnG1>
+                // </div>
               );
             })()}
           </div>

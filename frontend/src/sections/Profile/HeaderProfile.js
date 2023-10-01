@@ -29,6 +29,7 @@ import { EditProfile } from "./form/edit/EditProfile";
 import { MENUS_ID } from "constants/menus";
 import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
 import { MyHeaderCard } from "components/myComponents/card/MyHeaderCard";
+import { BtnGb2, BtnGr2 } from "components/myComponents/btn/MyGradientButton";
 
 export const HeaderProfile = ({ path }) => {
   let { cvID, datas, metadatas } = useCVState();
@@ -74,21 +75,6 @@ export const HeaderProfile = ({ path }) => {
       img={metadatas?.image}
       ownerID={cvID}
       name={metadatas?.username}
-      btn={
-        cv == cvID && cv ? (
-          <EditProfile styles={` right-3 top-3  ${styles.btn}`} />
-        ) : (
-          <button
-            disabled={!isConnected}
-            onClick={() => setFollow(isFollow ? "unfollowCV" : "followCV")}
-            className={`btn btn-xs btn-outline  w-fit  mt-2 capitalize ${
-              isFollow ? "btn-error" : "btn-primary"
-            }`}
-          >
-            {isFollow ? "Unfollow" : "Follow"}
-          </button>
-        )
-      }
       desc1={metadatas?.description}
       desc2={
         <>
@@ -105,76 +91,6 @@ export const HeaderProfile = ({ path }) => {
             {isFollower && "Vous suit"}
           </span>
         </>
-      }
-      stats={
-        {
-          component: (
-            <MyHeaderCard
-              icon={icfyCV}
-              head={{
-                value: (
-                  <p className="flex items-center">
-                    {datas?.amount}{" "}
-                    <Icon icon={icfyETHER} className="text-white text-2xl" />
-                  </p>
-                ),
-                title: "Amount",
-              }}
-              arr={[
-                {
-                  title: "Visibilité",
-                  value: (
-                    <span>
-                      {metadatas?.attributes?.[0]?.visibility === true
-                        ? "Disponible"
-                        : "Indisponible"}
-                    </span>
-                  ),
-                },
-                { title: "Missions", value: <>{datas?.missions}</> },
-                {
-                  title: "Domain",
-                  value: DEV_DOMAIN[metadatas?.attributes?.[0]?.domain]?.name,
-                },
-              ]}
-            />
-          ),
-        }
-
-        //   [
-        //   {
-        //     title: "Amount",
-        //     value: `${datas?.amount.toFixed(4) || 0} $`,
-        //     icon: icfyETHER,
-        //     theme: `${themes.launchpads} `,
-        //   },
-        //   {
-        //     title: "Missions",
-        //     value: datas?.missions,
-        //     icon: icfyMISSION,
-        //     theme: `${themes.missions} `,
-        //   },
-        //   {
-        //     title: "Domain",
-        //     value: DEV_DOMAIN[metadatas?.attributes?.[0]?.domain]?.name,
-        //     icon: DEV_DOMAIN[metadatas?.attributes?.[0]?.domain]?.icon,
-        //     theme: `${themes.proposals} `,
-        //   },
-        //   {
-        //     title: "Visibilité",
-        //     value: (
-        //       <span>
-        //         {metadatas?.attributes?.[0]?.visibility === true
-        //           ? "Disponible"
-        //           : "Indisponible"}
-        //       </span>
-        //     ),
-        //     icon: icfy.eye[
-        //       metadatas?.attributes?.[0]?.visibility === true ? "open" : "close"
-        //     ],
-        //     theme: `${themes.pubs} `,
-        //   },
-        // ]
       }
       menus={menus}
       details={[

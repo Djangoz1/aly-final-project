@@ -33,9 +33,9 @@ export const LayoutProfile = ({ params, path, children }) => {
       banniere={metadatas?.attributes?.[0]?.banniere}
       className="h-screen flex  w-screen bg-white/90"
     >
-      <MySection styles={" flex flex-col  justify-between "}>
+      <MySection styles={" flex flex-col   "}>
         <HeaderProfile path={path} />
-        <div className="flex w-full  border-b-1 border-t-0 border border-white/10 border-x-0 ">
+        <div className="flex w-full  mt-[5vh] border-b-1 border-t-0 border border-white/10 border-x-0 ">
           {children}
         </div>
       </MySection>

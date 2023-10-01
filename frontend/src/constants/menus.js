@@ -2,6 +2,7 @@ import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { CreateFeature } from "sections/works/Features/form/create/CreateFeature";
 import { icfy } from "icones";
 import { CreateMission } from "sections/works/Missions/form/create/CreateMission";
+import { styles } from "styles/style";
 
 export let MENUS = {
   profile: {
@@ -64,7 +65,14 @@ export let MENUS_ID = (id, owner, cvID) => {
       },
       {
         style: "ml-auto",
-        component: <CreatePub missionID={id} btn={"Create post mission"} />,
+
+        component: (
+          <CreatePub
+            missionID={id}
+            styles={styles.gbtn + "gb1 btn-xs"}
+            btn={"Create post mission"}
+          />
+        ),
       },
       {
         style: "mx-4",
@@ -95,15 +103,14 @@ export let MENUS_ID = (id, owner, cvID) => {
       {
         style: "ml-auto",
         component: owner == cvID && (
-          <CreatePub
-            btn={"Create post"}
-            styles={"ml-5 btn btn-xs btn-primary btn-outline"}
-          />
+          <CreatePub btn={"Create post"} styles={styles.gbtn + " btn-xs"} />
         ),
       },
       {
         style: "ml-4",
-        component: owner == cvID && <CreateMission />,
+        component: owner == cvID && (
+          <CreateMission styles={styles.gbtn + "gr1  btn-xs"} />
+        ),
       },
     ],
   };

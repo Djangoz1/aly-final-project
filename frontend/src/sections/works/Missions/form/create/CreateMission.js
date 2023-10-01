@@ -25,7 +25,7 @@ import { createURI } from "utils/ui-tools/pinata-tools";
 import { useCVState } from "context/hub/cv";
 import { useAccount } from "wagmi";
 
-export const CreateMission = () => {
+export const CreateMission = ({ styles }) => {
   let [price, setPrice] = useState(null);
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
@@ -51,7 +51,6 @@ export const CreateMission = () => {
   }, [price]);
 
   let submitForm = async (form) => {
-    console.log(form);
     let id = parseInt(
       await _apiGet("tokensLengthOf", [ADDRESSES["missionsHub"]])
     );
@@ -96,6 +95,7 @@ export const CreateMission = () => {
           checked: [[], ["title", "domain", "description"]],
         }}
         btn={"Create mission"}
+        styles={{ btn: styles }}
         side={<MySteps arr={MENUS_CREATE_MISSION} />}
         arr={_form_create_mission}
         components={[
