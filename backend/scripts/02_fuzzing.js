@@ -1,5 +1,6 @@
 // import { ADDR_FACTORY_CV } from "constants/address";
 const { main: deployMain } = require("./01_deploy");
+const { deleter } = require("./04_deletePin");
 
 const hre = require("hardhat");
 const {
@@ -10,7 +11,11 @@ const {
   _testInitWorkerProposal,
   _testInitArbitrator,
 } = require("../helpers/test_init");
-const { createURICV } = require("../utils/pinata");
+const {
+  createURICV,
+  getAllPinnedFiles,
+  deleteAllPinnedFiles,
+} = require("../utils/pinata");
 const {
   _createCV,
   _createMission,
@@ -20,6 +25,7 @@ const {
 } = require("../utils/web3-tools");
 
 async function main() {
+  await deleter();
   const mainDeploy = await deployMain();
 
   let addressSystem = mainDeploy.systems.addressSystem;
@@ -36,6 +42,8 @@ async function main() {
     this.addr6,
     this.addr7,
   ] = await ethers.getSigners();
+
+  // await deleteAllPinnedFiles();
 
   let cv = await _createCV("Django", this.owner, addressSystem.target);
   console.log("cv#", cv, "created");

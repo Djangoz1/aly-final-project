@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { Hg, Hg1 } from "components/text/HeroGradient";
 import { icfyHANDSHAKE } from "icones";
 import Link from "next/link";
 import React from "react";
@@ -20,7 +21,7 @@ export const LogoIc = ({ styles }) => {
   return (
     <Icon
       icon={icfyHANDSHAKE}
-      className={`text-white rotate-[45deg] text-[30px]  ${styles || ""}`}
+      className={` text-white rotate-[45deg] text-[30px]  ${styles || ""}`}
     />
   );
 };

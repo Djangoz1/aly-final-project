@@ -27,11 +27,6 @@ export let _table_missions = (stateCV, details) => {
         </div>
       </div>,
 
-      <span className={`text-xs flex items-center ${status.color}`}>
-        <Icon className="mr-2 text-xl" icon={status.icon} />
-        {status.status}
-      </span>,
-
       <span className="text-white capitalize">
         {ENUMS.experience?.[el?.metadatas?.attributes?.[0]?.experience]?.name}
       </span>,
@@ -40,10 +35,16 @@ export let _table_missions = (stateCV, details) => {
       <span className={`text-white`}>{el?.datas?.features?.length}</span>,
       <span className={`text-white`}>{el?.datas?.pubs?.length}</span>,
 
-      <p className="text-right">
+      <div className="text-right">
         <span className={`text-white mr-2`}>{el?.datas?.amount}</span>
         ETH
-      </p>,
+        <span
+          className={` flex badge-xs  mt-2 text-[9px] badge badge-outline py-2  items-center badge-${status.color}`}
+        >
+          <Icon className="mr-2 text-xl" icon={status.icon} />
+          {status.status}
+        </span>
+      </div>,
     ];
     list.push({ arr, id: parseInt(el?.missionID) });
   }
@@ -52,8 +53,7 @@ export let _table_missions = (stateCV, details) => {
 
 export let HEAD_table_missions = [
   "Identity",
-  "Status",
-  "Temps Restants",
+  "Expérience min.",
   "Worker(s)",
   "Feature(s)",
   "Pub(s)",

@@ -32,32 +32,6 @@ export const HeaderMission = ({ path, owner }) => {
       name={metadatas?.title}
       desc1={<p>Créer le {fromTimestamp(attributes?.createdAt)}</p>}
       desc2={<CVName metadata={owner} />}
-      stats={[
-        {
-          title: "Amount",
-          value: `${datas?.amount} $`,
-          icon: icfyETHER,
-          theme: themes.pubs,
-        },
-        {
-          title: "Domain",
-          value: domain?.name.toUpperCase(),
-          icon: domain?.icon,
-          theme: themes.proposals,
-        },
-        {
-          title: "Jobs",
-          value: datas?.features?.length,
-          icon: icfyLOCK,
-          theme: themes.launchpads,
-        },
-        {
-          title: "Status",
-          value: STATUS.feature[datas?.status]?.status,
-          icon: icfySTAR,
-          theme: themes.missions,
-        },
-      ]}
       details={[
         {
           title: "Post(s)",
@@ -70,10 +44,6 @@ export const HeaderMission = ({ path, owner }) => {
         {
           title: "Worker(s)",
           value: datas?.workers,
-        },
-        {
-          title: "Job",
-          value: "En attente",
         },
       ]}
     />

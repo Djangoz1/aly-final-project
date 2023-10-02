@@ -1,11 +1,28 @@
 import { MENUS } from "constants/menus";
 
+export let MENU_LAUNCHPAD = {
+  edit: [
+    { i: "👤", title: "Token" },
+    { i: "🫂", title: "Social" },
+    { i: "👨‍💻", title: "Work" },
+    { i: "🔌", title: "Blockchain" },
+  ],
+
+  create: [
+    { i: "ℹ️", title: "Introduction" },
+    { i: "🗂️", title: "Information personnelle" },
+    { i: "💰", title: "Token" },
+    { i: "🔌", title: "Blockchain" },
+    { i: "🤖", title: "L'IA Aly" },
+  ],
+};
+
 // ********** ------ ********** //
 // ********** Create ********** //
 // ********** ------ ********** //
 
 export let _form_create_launchpad_intro = {
-  title: `${MENUS.launchpad.edit[0].i} ${MENUS.launchpad.edit[0].title}`,
+  title: `${MENU_LAUNCHPAD.create[0].i} ${MENU_LAUNCHPAD.create[0].title}`,
   description: (
     <>
       <h6 className=" font-semibold">🚀 Créez Votre Propre Launchpad !</h6>
@@ -43,7 +60,7 @@ export let _form_create_launchpad_intro = {
 };
 
 export let _form_create_profile_info = {
-  title: `${MENUS.launchpad.create[1].i} ${MENUS.launchpad.create[1].title}`,
+  title: `${MENU_LAUNCHPAD.create[1].i} ${MENU_LAUNCHPAD.create[1].title}`,
   description: (
     <>
       Veuillez compléter les informations suivantes pour une meilleur
@@ -56,7 +73,7 @@ export let _form_create_profile_info = {
 };
 
 export let _form_create_launchpad_token = {
-  title: `${MENUS.launchpad.create[2].i} ${MENUS.launchpad.create[2].title}`,
+  title: `${MENU_LAUNCHPAD.create[2].i} ${MENU_LAUNCHPAD.create[2].title}`,
 
   description: (
     <>
@@ -108,7 +125,7 @@ export let _form_create_launchpad_token = {
   ),
 };
 export let _form_create_launchpad_blockchain = {
-  title: `${MENUS.launchpad.create[2].i} ${MENUS.launchpad.create[2].title}`,
+  title: `${MENU_LAUNCHPAD.create[2].i} ${MENU_LAUNCHPAD.create[2].title}`,
 
   description: (
     <>
@@ -130,7 +147,7 @@ export let _form_create_launchpad_blockchain = {
   ),
 };
 export let _form_create_launchpad_resume = {
-  title: `${MENUS.launchpad.create[3].i} ${MENUS.launchpad.create[3].title}`,
+  title: `${MENU_LAUNCHPAD.create[3].i} ${MENU_LAUNCHPAD.create[3].title}`,
 
   description: (
     <>
@@ -159,3 +176,54 @@ export let _form_create_launchpad = [
   _form_create_launchpad_blockchain,
   _form_create_launchpad_resume,
 ];
+
+export let _form_edit_launchpad_lock_token = {
+  title: `${MENU_LAUNCHPAD.edit[0].i} ${MENU_LAUNCHPAD.create[0].title}`,
+
+  description: (
+    <>
+      <h6 className="text-white font-semibold">
+        🚀 Explorez l'Univers des Tokens ERC-20
+      </h6>
+      <br />
+      Notre launchpad vous ouvre les portes de l'univers passionnant des tokens
+      ERC-20, les pierres précieuses du monde crypto !
+      <br />
+      <br />
+      🌟 Pour participer à nos opportunités de financement et d'investissement,
+      voici ce que vous devez savoir :
+      <br />
+      <br />
+      <h6 className="text-white font-semibold">Tokens ERC-20 💎</h6>
+      <br />
+      Notre launchpad prend en charge exclusivement les tokens ERC-20, qui sont
+      parmi les plus répandus et les plus fiables de l'écosystème blockchain.
+      Les projets hébergés sur notre plateforme utilisent principalement des
+      tokens ERC-20 pour leurs campagnes de financement.
+      <br />
+      <br />
+      <h6 className="text-white font-semibold">
+        L'Étape Cruciale : L'Allowance 📈
+      </h6>
+      <br />
+      Avant de commencer à investir dans les projets de notre launchpad, vous
+      devez confier une "allowance" au contrat du launchpad. L'allowance est une
+      autorisation que vous accordez pour que le contrat du launchpad puisse
+      gérer vos tokens ERC-20 lors de votre participation aux campagnes. Cette
+      étape est essentielle pour garantir un processus de financement en toute
+      sécurité.
+      <br />
+      <br />
+      <h6 className="text-white font-semibold">Soyez Prêt à Investir 💰</h6>
+      <br />
+      Une fois que vous avez configuré l'allowance, le protocole aura le
+      nécessaire pour mener à bien le contrat. Les chercheurs de projets
+      pourront investir une fois la date de début atteinte
+      <br />
+      <br />
+      Il faut pour cela deux transaction. L'une pour le protocole ERC20 qui
+      donneras l'allowance au contrat et une pour avertir le contrat de son
+      allowance🌐🔒
+    </>
+  ),
+};

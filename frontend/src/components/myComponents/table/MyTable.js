@@ -14,7 +14,7 @@ export const MyTable = ({ head, list, editBtns }) => {
               <th></th>
               <th>
                 <label>
-                  <input type="checkbox" className="checkbox" />
+                  <input type="checkbox" className="checkbox checkbox-xs" />
                 </label>
               </th>
               {head?.map((el) => (

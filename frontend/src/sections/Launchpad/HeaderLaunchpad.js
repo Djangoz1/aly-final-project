@@ -29,42 +29,19 @@ export const HeaderLaunchpad = ({ path }) => {
   let domain = ENUMS.domain[metadatas?.attributes?.[0]?.domain];
   let attributes = metadatas?.attributes?.[0];
 
-  let menus = MENUS_ID(datas?.id).mission;
+  let menus = MENUS_ID(datas?.id).launchpad;
 
   return (
     <MyHeader
       path={
         path
-          ? `/works/mission/${datas?.id}${path && path}`
-          : `/works/mission/${datas?.id}`
+          ? `/launchpad/${datas?.id}${path && path}`
+          : `/launchpad/${datas?.id}`
       }
       menus={menus}
       img={metadatas?.image}
       name={metadatas?.title}
       desc1={<p>Créer le {fromTimestamp(attributes?.createdAt)}</p>}
-      desc2={<CVName metadata={owner} />}
-      stats={{
-        component: (
-          <MyHeaderCard
-            icon={icfyROCKET}
-            head={{
-              value: <MyCountdown timestamp={parseInt(datas?.saleEnd)} />,
-              title: "Started At",
-            }}
-            arr={[
-              {
-                title: "Current balance",
-                value: <>{datas?.amountRaised} ETH</>,
-              },
-              { title: "Token price", value: <>{datas?.tokenPrice} ETH</> },
-              {
-                title: "Locked time",
-                value: <>{parseInt(datas?.lockedtime || 0n)} ETH</>,
-              },
-            ]}
-          />
-        ),
-      }}
       details={[
         {
           title: "Post(s)",

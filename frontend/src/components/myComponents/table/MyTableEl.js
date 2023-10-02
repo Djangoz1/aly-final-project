@@ -18,7 +18,7 @@ export const MyTableEl = ({ id, arr, index, editBtns, btns }) => {
         <th className="text-[9px]"># {id}</th>
         <td className="">
           <label>
-            <input type="checkbox" className="checkbox" />
+            <input type="checkbox" className="checkbox checkbox-xs" />
           </label>
         </td>
         {arr?.map((el) => (
@@ -29,7 +29,9 @@ export const MyTableEl = ({ id, arr, index, editBtns, btns }) => {
           <div className="flex  justify-between items-center relative w-full h-full">
             {!btns ? (
               <>
-                <button className="btn btn-ghost btn-xs">details</button>
+                <button className="btn btn-ghost btn-xs text-[9px]">
+                  details
+                </button>
 
                 <MyModal
                   btn={

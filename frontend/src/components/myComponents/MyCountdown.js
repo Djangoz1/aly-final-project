@@ -1,3 +1,4 @@
+import { Hg } from "components/text/HeroGradient";
 import React, { useEffect, useState } from "react";
 
 export const MyCountdown = ({ timestamp }) => {
@@ -42,29 +43,29 @@ export const MyCountdown = ({ timestamp }) => {
   return (
     <>
       <div className="grid grid-flow-col text-xs gap-5 text-center auto-cols-max">
-        <div className="flex flex-col">
-          <span className="countdown font-mono text-xl">
+        <div className="flex flex-col items-center">
+          <span className="text-white countdown font-mono text-xl">
             <span style={{ "--value": timeLeft.days }}></span>
           </span>
-          days
+          <Hg>days</Hg>
         </div>
-        <div className="flex flex-col">
-          <span className="countdown font-mono text-xl">
+        <div className="flex flex-col items-center">
+          <span className="text-white countdown font-mono text-xl">
             <span style={{ "--value": timeLeft.hours }}></span>
           </span>
-          hours
+          <Hg>hours</Hg>
         </div>
-        <div className="flex flex-col">
-          <span className="countdown font-mono text-xl">
+        <div className="flex flex-col items-center">
+          <span className="text-white countdown font-mono text-xl">
             <span style={{ "--value": timeLeft.minutes }}></span>
           </span>
-          min
+          <Hg>min</Hg>
         </div>
-        <div className="flex flex-col">
-          <span className="countdown font-mono text-xl">
+        <div className="flex flex-col items-center">
+          <span className="text-white countdown font-mono text-xl">
             <span style={{ "--value": timeLeft.seconds }}></span>
           </span>
-          sec
+          <Hg>sec</Hg>
         </div>
       </div>
     </>

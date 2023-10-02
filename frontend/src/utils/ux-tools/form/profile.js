@@ -1,7 +1,19 @@
 import { MENUS } from "constants/menus";
-
+let menu = {
+  edit: [
+    { i: "👤", title: "Information personnelle" },
+    { i: "🫂", title: "Social" },
+    { i: "👨‍💻", title: "Work" },
+    { i: "🔌", title: "Blockchain" },
+  ],
+  create: [
+    { i: "ℹ️", title: "Introduction" },
+    { i: "🗂️", title: "Information personnelle" },
+    { i: "👨‍💻", title: "Work" },
+  ],
+};
 export let _form_edit_profile_information = {
-  title: `${MENUS.profile.edit[0].i} ${MENUS.profile.edit[0].title}`,
+  title: `${menu.edit[0].i} ${menu.edit[0].title}`,
   description: (
     <>
       Les informations pour votre compte n'ont aucune incidence sur le protocole
@@ -14,7 +26,7 @@ export let _form_edit_profile_information = {
 };
 
 export let _form_edit_profile_social = {
-  title: `${MENUS.profile.edit[1].i} ${MENUS.profile.edit[1].title}`,
+  title: `${menu.edit[1].i} ${menu.edit[1].title}`,
   description: (
     <>
       Les informations suivante n'ont aucune incidence sur le protocole deWork.
@@ -26,7 +38,7 @@ export let _form_edit_profile_social = {
 };
 
 export let _form_edit_profile_work = {
-  title: `${MENUS.profile.edit[2].i} ${MENUS.profile.edit[2].title}`,
+  title: `${menu.edit[2].i} ${menu.edit[2].title}`,
   description: (
     <>
       Les informations pour votre compte n'ont aucune incidence sur le protocole
@@ -39,7 +51,7 @@ export let _form_edit_profile_work = {
 };
 
 export let _form_edit_profile_blockchain = {
-  title: `${MENUS.profile.edit[3].i} ${MENUS.profile.edit[3].title}`,
+  title: `${menu.edit[3].i} ${menu.edit[3].title}`,
   description: (
     <>
       Pour ce qui concerne votre compte, seul votre addresse est stocké sur la
@@ -123,7 +135,7 @@ export let _form_create_profile_intro = {
 };
 
 export let _form_create_profile_info = {
-  title: `${MENUS.profile.create[1].i} ${MENUS.profile.create[1].title}`,
+  title: `${menu.create[1].i} ${menu.create[1].title}`,
   description: (
     <>
       Veuillez compléter les informations suivantes pour une meilleur
@@ -136,7 +148,7 @@ export let _form_create_profile_info = {
 };
 
 export let _form_create_profile_work = {
-  title: `${MENUS.profile.create[2].i} ${MENUS.profile.create[2].title}`,
+  title: `${menu.create[2].i} ${menu.create[2].title}`,
 
   description: (
     <>

@@ -78,14 +78,14 @@ let Child = ({ components, side, arr, submit, editer }) => {
   };
 
   return (
-    <div className="flex min-h-fit h-[75vh] overflow-y-scroll ">
+    <div className="flex min-h-fit h-[75vh] overflow-y-scroll hide-scrollbar ">
       {side && (
-        <div className=" mr-8 border-y-0 border-l-0 border-r-1 border border-white/10 h-full min-h-[75vh] bg-black/10 flex-flex-col p-0 w-1/5 ">
+        <div className=" mr-8 border-y-0 border-l-0 border-r-1  h-full min-h-[75vh] flex-flex-col p-0 w-1/5 ">
           {side}
         </div>
       )}
 
-      <div className="w-full relative flex flex-col min-h-[75vh] h-full">
+      <div className="w-full relative flex flex-col  h-full">
         {(arr?.[pointer]?.description || !isConnected) && (
           <MyFormInfo
             title={

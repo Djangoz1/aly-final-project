@@ -49,33 +49,32 @@ export const ENUMS = {
   domain: [
     {
       name: "frontend",
-      color: "magenta",
+      color: "warning",
       icon: icfy.domain.frontend,
     },
     {
       name: "backend",
-      color: "magenta",
+      color: "info",
       icon: icfy.domain.backend,
     },
     {
       name: "web3",
-      color: "magenta",
-
+      color: "warning",
       icon: icfy.domain.blockchain,
     },
     {
       name: "gaming",
-      color: "magenta",
+      color: "secondary",
       icon: icfy.domain.gaming,
     },
     {
       name: "ai",
-      color: "magenta",
+      color: "success",
       icon: icfy.domain.ai,
     },
     {
       name: "designer",
-      color: "magenta",
+      color: "error",
       icon: icfy.domain.designer,
     },
   ],

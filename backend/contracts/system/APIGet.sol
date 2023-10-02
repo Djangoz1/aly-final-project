@@ -260,12 +260,12 @@ contract APIGet {
 
     function datasOfInvestor(
         uint _launchpadID,
-        address _investor
+        uint _cvID
     ) external view returns (DataTypes.InvestorData memory) {
         return
             ILaunchpadsInvestorsHub(_iAS.launchpadsInvestorsHub()).datasOf(
                 _launchpadID,
-                _investor
+                _cvID
             );
     }
 

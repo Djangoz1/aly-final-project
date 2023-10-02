@@ -208,38 +208,33 @@ contract Launchpad is Ownable {
     // *::::::::: USER BINDINGS :::::::::* //
     // *::::::::: ------------- :::::::::* //
 
-    function buyTokens()
-        external
-        payable
-        onlyStatus(DataTypes.LaunchpadStatus.Init)
-        onlyProcess
-    {
+    function buyTokens(
+        uint _cvSender,
+        uint _value
+    ) external onlyStatus(DataTypes.LaunchpadStatus.Init) onlyProcess {
         // whenNotPaused
 
-        // ! faire un test has registred
-        Bindings.cvOf(msg.sender, _iAS.cvsHub());
-        // ! faire un test has registred
-        require(msg.value > 0, "Value must be more than 0");
+        require(_value > 0, "Value must be more than 0");
         bool inRange = cLD._checkTierBalance(_id, _tierID.current());
         if (!inRange) {
             _setTierID();
         }
         bool success = cLD._checkAmount(
             _id,
-            msg.sender,
+            _cvSender,
             _tierID.current(),
-            msg.value
+            _value
         );
         require(success, "Error on _checkAmount");
         success = cLI._investOnLaunchpad(
             _id,
             _tierID.current(),
-            msg.sender,
-            msg.value
+            _cvSender,
+            _value
         );
         require(success, "Error on invest on launchpad");
 
-        cLD._addAmountRaised(_id, _tierID.current(), msg.value);
+        cLD._addAmountRaised(_id, _tierID.current(), _value);
 
         inRange = cLD._checkTierBalance(_id, _tierID.current());
         if (!inRange) {

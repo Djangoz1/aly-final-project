@@ -104,6 +104,17 @@ export const stateLaunchpad = async (launchpadID) => {
       ADDRESSES["launchpadsDatasHub"],
     ]);
 
+    datas.tokenName = await _apiGetAt({
+      func: "name",
+      targetContract: "erc20",
+      address: datas?.tokenAddress,
+    });
+    datas.tokenSymbol = await _apiGetAt({
+      func: "symbol",
+      targetContract: "erc20",
+      address: datas?.tokenAddress,
+    });
+
     let _metadatas = await fetchJSONByCID(tokenURI);
     metadatas.attributes[0].bio = _metadatas?.description;
     metadatas.attributes[0].banniere = _metadatas?.attributes?.[0]?.banniere;
@@ -122,6 +133,24 @@ export const stateLaunchpad = async (launchpadID) => {
       launchpadID,
       ADDRESSES["launchpadHub"],
     ]);
+    datas.allowance = parseInt(
+      await _apiGetAt({
+        func: "allowance",
+        targetContract: "erc20",
+        args: [_owner, datas.address],
+        address: datas?.tokenAddress,
+      })
+    );
+
+    datas.balanceOwner = parseInt(
+      await _apiGetAt({
+        func: "balanceOf",
+        targetContract: "erc20",
+        args: [_owner],
+        address: datas?.tokenAddress,
+      })
+    );
+
     let cvOwner = await _apiGet("cvOf", [_owner]);
     let owner = await fetchCV(cvOwner);
 

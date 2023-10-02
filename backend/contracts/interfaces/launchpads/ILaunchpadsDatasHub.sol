@@ -67,13 +67,13 @@ interface ILaunchpadsDatasHub {
      * @notice check if amount raised on tier is still on range
      * @notice value must be < maxTierCap && > minInvest  && balance of sender < maxInvest
      * @param _launchpadID id of invested launchpad
-     * @param _from sender of value
+     * @param _cvID sender of value
      * @param _tierID is ID of current ID
      * @param _value is msg.value of sender
      */
     function _checkAmount(
         uint _launchpadID,
-        address _from,
+        uint _cvID,
         uint _tierID,
         uint _value
     ) external view returns (bool);

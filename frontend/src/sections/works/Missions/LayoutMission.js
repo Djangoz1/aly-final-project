@@ -24,7 +24,7 @@ export const LayoutMission = ({ path, children, id }) => {
 
   return (
     <Layout className="h-screen flex  w-screen bg-white/90">
-      <MySection styles={" flex flex-col  justify-between "}>
+      <MySection styles={" flex flex-col  justify-start "}>
         <HeaderMission
           path={path}
           owner={owner}

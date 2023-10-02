@@ -57,5 +57,5 @@ interface ILaunchpad {
     // *::::::::: USER BINDINGS :::::::::* //
     // *::::::::: ------------- :::::::::* //
 
-    function buyTokens() external payable;
+    function buyTokens(uint _cvSender, uint _value) external;
 }

@@ -3,8 +3,41 @@ import { CreateFeature } from "sections/works/Features/form/create/CreateFeature
 import { icfy } from "icones";
 import { CreateMission } from "sections/works/Missions/form/create/CreateMission";
 import { styles } from "styles/style";
+import { EditTokenLaunchpad } from "sections/Launchpad/form/EditLockToken";
 
-export let MENUS = {
+export const MENUS_CREATE_FEATURE = [
+  { i: "ℹ️", title: "Introduction" },
+  { i: "🗂️", title: "Informations" },
+  { i: "🔌", title: "Blockchain" },
+  { i: "🤖", title: "L'IA Aly" },
+];
+
+export let MENUS_CREATE_MISSION = [
+  { i: "ℹ️", title: "Introduction" },
+  { i: "🗂️", title: "Informations" },
+  { i: "🔌", title: "Blockchain" },
+  { i: "🤖", title: "L'IA Aly" },
+];
+
+export const MENUS_EDIT = {
+  mission: [
+    { icon: icfy.code.casual, title: "Create Feature" },
+    { icon: icfy.msg.chat, title: "Publish" },
+    { icon: icfy.work.casual, title: "View profile" },
+    { icon: icfy.person.friend, title: "Follow mission" },
+  ],
+  feature: [
+    { icon: icfy.person.add, title: "Invite worker" },
+    { icon: icfy.court.vote, title: "Postulé" },
+    { icon: icfy.ux.warning, title: "Change status" },
+  ],
+  invite: [
+    { icon: icfy.person.uncheck, title: "Refuse job" },
+    { icon: icfy.person.friend, title: "Accept job" },
+  ],
+};
+
+export const MENUS = {
   profile: {
     edit: [
       { i: "👤", title: "Information personnelle" },
@@ -18,21 +51,21 @@ export let MENUS = {
       { i: "👨‍💻", title: "Work" },
     ],
   },
-  launchpad: {
-    edit: [
-      { i: "👤", title: "Information personnelle" },
-      { i: "🫂", title: "Social" },
-      { i: "👨‍💻", title: "Work" },
-      { i: "🔌", title: "Blockchain" },
-    ],
-    create: [
-      { i: "ℹ️", title: "Introduction" },
-      { i: "🗂️", title: "Information personnelle" },
-      { i: "💰", title: "Token" },
-      { i: "🔌", title: "Blockchain" },
-      { i: "🤖", title: "L'IA Aly" },
-    ],
-  },
+  // launchpad: {
+  //   edit: [
+  //     { i: "👤", title: "Information personnelle" },
+  //     { i: "🫂", title: "Social" },
+  //     { i: "👨‍💻", title: "Work" },
+  //     { i: "🔌", title: "Blockchain" },
+  //   ],
+  //   create: [
+  //     { i: "ℹ️", title: "Introduction" },
+  //     { i: "🗂️", title: "Information personnelle" },
+  //     { i: "💰", title: "Token" },
+  //     { i: "🔌", title: "Blockchain" },
+  //     { i: "🤖", title: "L'IA Aly" },
+  //   ],
+  // },
   feature: {
     create: [
       { i: "ℹ️", title: "Introduction" },
@@ -79,6 +112,17 @@ export let MENUS_ID = (id, owner, cvID) => {
         component: cvID == owner && <CreateFeature />,
       },
     ],
+    launchpad: [
+      {
+        title: "Overview",
+        link: `/launchpad/${id}`,
+      },
+
+      {
+        style: "ml-auto",
+        component: <EditTokenLaunchpad btn={"Lock token"} />,
+      },
+    ],
     profile: [
       {
         title: "Overview",
@@ -97,8 +141,8 @@ export let MENUS_ID = (id, owner, cvID) => {
         link: `/profile/${id}/jobs`,
       },
       {
-        title: "Pubs",
-        link: `/profile/${id}/pubs`,
+        title: "CV",
+        link: `/profile/${id}/cv`,
       },
       {
         style: "ml-auto",
@@ -114,36 +158,4 @@ export let MENUS_ID = (id, owner, cvID) => {
       },
     ],
   };
-};
-
-export const MENUS_CREATE_FEATURE = [
-  { i: "ℹ️", title: "Introduction" },
-  { i: "🗂️", title: "Informations" },
-  { i: "🔌", title: "Blockchain" },
-  { i: "🤖", title: "L'IA Aly" },
-];
-
-export let MENUS_CREATE_MISSION = [
-  { i: "ℹ️", title: "Introduction" },
-  { i: "🗂️", title: "Informations" },
-  { i: "🔌", title: "Blockchain" },
-  { i: "🤖", title: "L'IA Aly" },
-];
-
-export let MENUS_EDIT = {
-  mission: [
-    { icon: icfy.code.casual, title: "Create Feature" },
-    { icon: icfy.msg.chat, title: "Publish" },
-    { icon: icfy.work.casual, title: "View profile" },
-    { icon: icfy.person.friend, title: "Follow mission" },
-  ],
-  feature: [
-    { icon: icfy.person.add, title: "Invite worker" },
-    { icon: icfy.court.vote, title: "Postulé" },
-    { icon: icfy.ux.warning, title: "Change status" },
-  ],
-  invite: [
-    { icon: icfy.person.uncheck, title: "Refuse job" },
-    { icon: icfy.person.friend, title: "Accept job" },
-  ],
 };

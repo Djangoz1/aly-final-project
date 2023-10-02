@@ -57,7 +57,7 @@ contract LaunchpadHub is Ownable {
         return _tokenIDs.current();
     }
 
-    function launchpadsOfCV(uint _cvID) external view returns (uint[] memory) {
+    function indexerOf(uint _cvID) external view returns (uint[] memory) {
         return indexer[_cvID];
     }
 

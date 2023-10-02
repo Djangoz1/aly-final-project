@@ -1,13 +1,13 @@
 import React from "react";
+import { styles } from "styles/style";
 
 export const BtnG1 = ({ children, setter, style, disabled }) => {
   return (
     <button
       onClick={() => (setter ? setter() : null)}
       disabled={disabled}
-
       className={
-        "rounded-2xl btn border-none font2 font-normal freelance " +
+        styles.gbtn +
         (disabled ? " text-white/40 opacity-80 p-0 " : " text-white g1 ") +
         style
       }
@@ -21,10 +21,10 @@ export const BtnGr1 = ({ children, setter, style, disabled }) => {
   return (
     <button
       onClick={() => setter() || null}
-       disabled={disabled}
+      disabled={disabled}
       className={
-        "rounded-2xl btn border-none font2 font-normal freelance " +
-        (disabled ? " text-white/40 opacity-80 p-0 " : " text-white g1 gr1 ") +
+        styles.gbtn +
+        (disabled ? " text-white/40 opacity-80 p-0 " : " text-white  gr2 ") +
         style
       }
     >
@@ -34,9 +34,9 @@ export const BtnGr1 = ({ children, setter, style, disabled }) => {
 };
 
 export const BtnGb2 = ({ children, setter, style, disabled }) => {
-   let padding = ' p-[2px]'
-  if(disabled){
-    padding = 'p-0'
+  let padding = " p-[2px]";
+  if (disabled) {
+    padding = "p-0";
   }
   return (
     <BtnGb1 disabled={disabled} setter={setter} style={style + padding}>
@@ -47,16 +47,12 @@ export const BtnGb2 = ({ children, setter, style, disabled }) => {
   );
 };
 export const BtnGr2 = ({ children, setter, style, disabled }) => {
-  let padding = ' p-[2px]'
-  if(disabled){
-    padding = 'p-0'
+  let padding = " p-[2px]";
+  if (disabled) {
+    padding = "p-0";
   }
   return (
-    <BtnGr1
-      disabled={disabled}
-      setter={setter}
-      style={style + padding}
-    >
+    <BtnGr1 disabled={disabled} setter={setter} style={style + padding}>
       <div className="w-full bg-zinc-900   flex items-center justify-center rounded-2xl h-full">
         {children}
       </div>
@@ -70,8 +66,8 @@ export const BtnGb1 = ({ children, setter, style, disabled }) => {
       onClick={() => (setter ? setter() : null)}
       disabled={disabled}
       className={
-        "rounded-2xl btn border-none font2 font-normal freelance " +
-        (disabled ? " text-white/40 opacity-80 p-0 " : " text-white g1 gb1 ") +
+        styles.gbtn +
+        (disabled ? " text-white/40 opacity-80 p-0 " : " text-white g1 gb2 ") +
         style
       }
     >

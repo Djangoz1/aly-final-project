@@ -31,9 +31,10 @@ export let fetchStatsOfCV = async (cvID) => {
     let pubs = parseInt(
       await _apiGet("balanceOfToken", [cvID, ADDRESSES["pubsHub"]])
     );
-    let launchpads = parseInt(
-      await _apiGet("balanceOfToken", [cvID, ADDRESSES["launchpadHub"]])
-    );
+    let launchpads = await _apiGet("indexerOfToken", [
+      cvID,
+      ADDRESSES["launchpadHub"],
+    ]);
 
     let _jobs = await _apiGet("jobsOfCV", [cvID]);
 

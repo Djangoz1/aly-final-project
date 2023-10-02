@@ -232,13 +232,13 @@ contract LaunchpadsDatasHub is Ownable {
      * @notice check if amount raised on tier is still on range
      * @notice value must be < maxTierCap && > minInvest  && balance of sender < maxInvest
      * @param _launchpadID id of invested launchpad
-     * @param _from sender of value
+     * @param _cvID sender of value
      * @param _tierID is ID of current ID
      * @param _value is msg.value of sender
      */
     function _checkAmount(
         uint _launchpadID,
-        address _from,
+        uint _cvID,
         uint _tierID,
         uint _value
     ) external view returns (bool) {
@@ -259,7 +259,7 @@ contract LaunchpadsDatasHub is Ownable {
         );
         uint256 _balanceOf = ILaunchpadsInvestorsHub(
             _iAS.launchpadsInvestorsHub()
-        ).datasOf(_launchpadID, _from).investedAmount;
+        ).datasOf(_launchpadID, _cvID).investedAmount;
         require(
             _balanceOf.add(_value) <= launchpadDatas[_launchpadID].maxInvest,
             "Maximum investments out of range"

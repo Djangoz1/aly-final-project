@@ -27,7 +27,7 @@ export default function Page({ params }) {
   }, [cvID, datas?.pubs]);
 
   return (
-    <LayoutProfile params={params} path={"pubs"}>
+    <LayoutProfile params={params} path={"cv"}>
       <MyModal
         btn={
           <ImagePin

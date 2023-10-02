@@ -47,7 +47,11 @@ export default function Home() {
       <Layout>
         <>
           <MySection styles={"justify-start font2 flex flex-col"}>
-            <div className="w-full  mb-[10vh] flex">
+            <div className="w-full relative mb-[10vh] flex">
+              <div className="blob1 w-[400px] h-[500px] rotate-90 absolute top-0 right-0"></div>
+              <div className="blob2 w-[400px] h-[300px] rotate-90 absolute top-0 left-2/4"></div>
+              <div className="blobi absolute w-[600px] h-[600px] right-10 -top-1/3 "></div>
+
               <div className="w-full  mr-10">
                 <LinearGradient
                   className="text-xs font2 uppercase"
@@ -76,10 +80,10 @@ export default function Home() {
                   <CreateProfile />
                 </div>
               </div>
-              <img
-                src="/hero.avif"
+              {/* <img
+                src="/hero.jpeg"
                 className="h-fit w-[600px]  mask mask-hexagon rounded-lg"
-              />
+              /> */}
             </div>
 
             <div

@@ -5,9 +5,12 @@ import {
   BtnG1,
   BtnGb1,
   BtnGb2,
+  BtnGr1,
+  BtnGr2,
 } from "components/myComponents/btn/MyGradientButton";
 import { useAuthState } from "context/auth";
 import { icfy, icfyHAMBURGER } from "icones";
+import { styles } from "styles/style";
 export const BtnAuth = ({ drawerBtn }) => {
   const { metadatas } = useAuthState();
   return (
@@ -43,14 +46,13 @@ export const BtnAuth = ({ drawerBtn }) => {
             {(() => {
               if (!connected) {
                 return (
-                  <button
-                    className="btn gradient-button border-none font2"
-                    onClick={openConnectModal}
-                    type="button"
+                  <BtnGr1
+                    setter={openConnectModal}
+                    style={"   z-10 relative btn-sm "}
                   >
-                    <Icon icon={icfy.ux.enter} className="text-lg" /> Connect
+                    <Icon icon={icfy.ux.enter} className="text-lg " /> Connect
                     Wallet
-                  </button>
+                  </BtnGr1>
                 );
               }
               if (chain.unsupported) {
@@ -65,9 +67,9 @@ export const BtnAuth = ({ drawerBtn }) => {
                 //   className="cta-button project-owner font-light border-none btn normal-case font2"
                 //   style={{ display: "flex", gap: 12 }}
                 // >
-                <BtnG1
+                <BtnGb1
                   style={
-                    "font-light border-box normal-case pl-0 overflow-hidden"
+                    "font-light relative z-10 btn-sm border-box normal-case pl-0 overflow-hidden"
                   }
                 >
                   <div className="bg-zinc-900 h-full flex items-center pl-4 pr-5 justify-between ">
@@ -84,7 +86,7 @@ export const BtnAuth = ({ drawerBtn }) => {
                         : ""}
                     </div>
                   </div>
-                </BtnG1>
+                </BtnGb1>
                 // </div>
               );
             })()}

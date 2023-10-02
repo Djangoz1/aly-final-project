@@ -18,7 +18,7 @@ import { CreatePub } from "sections/Pub/form/create/CreatePub";
 
 export const Pub = ({ id, styles, _owner, modal }) => {
   const [isDatas, setIsDatas] = useState(null);
-
+  let [isClicked, setIsClicked] = useState(null);
   let { isConnected, address } = useAccount();
   const state = async () => {
     const pub = await statePub(id);
@@ -75,11 +75,10 @@ export const Pub = ({ id, styles, _owner, modal }) => {
             style={`w-${styles?.img || "12"} mask mask-squircle `}
           />
         </div>
-        {modal && (
-          <span className={`text-xs whitespace-nowrap  mt-3`}>
-            {fromTimestamp(isDatas?.pub?.metadata?.attributes?.[0]?.createdAt)}
-          </span>
-        )}
+
+        <span className={`text-xs whitespace-nowrap  mt-3`}>
+          {fromTimestamp(isDatas?.pub?.metadata?.attributes?.[0]?.createdAt)}
+        </span>
       </div>
 
       <div className="flex h-max  border border-l-1 border-white/10 border-y-0 border-r-0  px-5 flex-col ml-5 ">
@@ -90,7 +89,10 @@ export const Pub = ({ id, styles, _owner, modal }) => {
         />
 
         <p
-          className={`text-[${styles?.size}] line-clamp-${styles?.clamp} whitespace-pre-line text-justify`}
+          className={`text-[${styles?.size}] line-clamp-${
+            isClicked ? "none" : styles?.clamp
+          } cursor-pointer whitespace-pre-line text-justify`}
+          onClick={() => setIsClicked(!isClicked)}
         >
           {isDatas?.pub?.metadata?.description}
         </p>

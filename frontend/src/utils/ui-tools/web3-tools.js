@@ -31,13 +31,20 @@ export const _apiPost = async (func, args, value) => {
     console.log("error", error);
   }
 };
-export const _apiPostAt = async ({ targetContract, func, args }) => {
+export const _apiPostAt = async ({
+  targetContract,
+  func,
+  args,
+  address,
+  value,
+}) => {
   try {
     const { request } = await prepareWriteContract({
-      address: ADDRESSES[targetContract],
+      address: address || ADDRESSES[targetContract],
       abi: ABIs[targetContract],
       functionName: func,
       args: args,
+      value,
     });
     const { hash } = await writeContract(request);
 

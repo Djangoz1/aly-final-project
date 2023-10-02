@@ -5,7 +5,7 @@ const key = process.env.PINATA_KEY;
 const secret = process.env.PINATA_SECRET;
 const pinataSDK = require("@pinata/sdk");
 const pinata = new pinataSDK(key, secret);
-
+const axios = require("axios");
 const fs = require("fs");
 const { getContractAt } = require("../helpers/test_init");
 const {
@@ -15,6 +15,92 @@ const {
   CV_DATAS_URI_EXEMPLE,
   LAUNCHPAD_DATAS_URI_EXEMPLE,
 } = require("../helpers/test_utils");
+
+const getAllPinnedFiles = async () => {
+  let allPinnedFiles = [];
+  let page = 1;
+
+  // while (page !== 50) {
+  try {
+    const response = await axios.get(
+      `https://api.pinata.cloud/data/pinList?pageLimit=10&page=${page}`,
+      {
+        headers: {
+          pinata_api_key: key,
+          pinata_secret_api_key: secret,
+        },
+      }
+    );
+
+    const { rows } = response.data;
+    // if (rows.length === 0) {
+    //   break; // Aucun résultat supplémentaire, donc nous avons récupéré tous les fichiers
+    // }
+
+    allPinnedFiles = allPinnedFiles.concat(rows);
+    console.log(
+      rows.length +
+        " add on queue deleter on " +
+        allPinnedFiles.length +
+        " total"
+    );
+    page++;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des fichiers épinglés :",
+      error.message
+    );
+    throw error;
+  }
+  // }
+
+  return allPinnedFiles;
+};
+
+const deletePinnedFile = async (fileHash) => {
+  try {
+    await axios.delete(`https://api.pinata.cloud/pinning/unpin/${fileHash}`, {
+      headers: {
+        pinata_api_key: key,
+        pinata_secret_api_key: secret,
+      },
+    });
+    console.log(
+      `Fichier épinglé avec le hash ${fileHash} supprimé avec succès.`
+    );
+  } catch (error) {
+    console.error(
+      `Erreur lors de la suppression du fichier épinglé avec le hash ${fileHash} :`,
+      error.message
+    );
+  }
+};
+
+const deleteAllPinnedFiles = async () => {
+  try {
+    const pinnedFiles = await getAllPinnedFiles();
+
+    if (pinnedFiles.length === 0) {
+      console.log("Aucun fichier épinglé trouvé.");
+      return;
+    }
+
+    console.log(
+      `Suppression de ${pinnedFiles.length} fichiers épinglés en cours...`
+    );
+
+    for (const file of pinnedFiles) {
+      await deletePinnedFile(file.ipfs_pin_hash);
+    }
+
+    console.log("Tous les fichiers épinglés ont été supprimés.");
+  } catch (error) {
+    console.error(
+      "Une erreur est survenue lors de la suppression des fichiers épinglés :",
+      error.message
+    );
+  }
+};
 
 const createImageCIDOnPinata = async (image, pinataMetadata) => {
   const readableStreamForFile = fs.createReadStream(image);
@@ -291,7 +377,10 @@ module.exports = {
   createURIWorkerProposal,
   createURIFeature,
   createURIPub,
+  getAllPinnedFiles,
   createURIMission,
   createURICV,
   createURILaunchpad,
+  deletePinnedFile,
+  deleteAllPinnedFiles,
 };

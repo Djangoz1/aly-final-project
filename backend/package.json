@@ -2,6 +2,7 @@
   "scripts": {
     "deploy": "hardhat run scripts/00_simpleDeploy.js --network localhost",
     "fuzzing": "hardhat run scripts/02_fuzzing.js --network localhost",
+    "delete": "hardhat run scripts/04_deletePin.js --network localhost",
     "token": "hardhat run scripts/03_token.js --network localhost"
   },
   "devDependencies": {

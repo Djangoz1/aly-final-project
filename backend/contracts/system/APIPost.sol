@@ -641,6 +641,15 @@ contract APIPost is Ownable {
         _iL.lockTokens(_cvOf(msg.sender), _tokens);
     }
 
+    function buyTokens(uint _launchpadID) external payable {
+        address launchpad = ILaunchpadHub(_iAS.launchpadsHub()).addressOf(
+            _launchpadID
+        );
+        ILaunchpad _iL = ILaunchpad(launchpad);
+        require(msg.value > 0, "Value must be more than 0");
+        _iL.buyTokens(_cvOf(msg.sender), msg.value);
+    }
+
     function _cvOf(address _for) internal view returns (uint) {
         return Bindings.cvOf(_for, _cvsHub);
     }

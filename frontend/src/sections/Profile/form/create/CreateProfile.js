@@ -16,6 +16,7 @@ import { doAuthCV, useAuthDispatch } from "context/auth";
 import { createURICv } from "utils/ui-tools/pinata-tools";
 import { Icon } from "@iconify/react";
 import { icfyCV } from "icones";
+import { styles } from "styles/style";
 
 export const CreateProfile = () => {
   let { address, isConnected } = useAccount();
@@ -37,7 +38,7 @@ export const CreateProfile = () => {
       submit={submitForm}
       side={<MySteps arr={MENUS.profile.create} />}
       arr={_form_create_profile}
-      styles={{ btn: "cta-button project-owner border-none" }}
+      styles={{ btn: styles.gbtn + " uppercase gb2 border-none" }}
       components={["", <FormCreateProfile1 />, <FormCreateProfile2 />]}
       btn={
         <>

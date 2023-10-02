@@ -15,6 +15,7 @@ export const icfy = {
     star: "line-md:star-twotone",
     check: "line-md:clipboard-check-twotone",
     calendar: "line-md:calendar",
+    plus: "line-md:plus",
     enter: "iconamoon:enter-thin",
   },
   code: {

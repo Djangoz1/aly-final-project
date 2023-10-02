@@ -7,6 +7,7 @@ import { Hg } from "components/text/HeroGradient";
 import { LinearGradient } from "react-text-gradients";
 import { Icon } from "@iconify/react";
 import { icfy } from "icones";
+import { BtnGr1 } from "components/myComponents/btn/MyGradientButton";
 
 export const HeroLaunchpad = () => {
   return (
@@ -28,19 +29,24 @@ export const HeroLaunchpad = () => {
           Only available for ERC20 token
         </div>
         <div className="mt-5">
-          <button className="cta-button btn border-none mr-4  freelance">
+          <BtnGr1 style=" mr-4">
             <>
               <Icon icon={icfy.ux.checkList} className={""} />
               View all
             </>
-          </button>
+          </BtnGr1>
           <CreateLaunchpad />
         </div>
       </div>
-      <div className="flex flex-col w-2/4">
-        <div className="cta-button project-owner h-fit py-10 overflow-hidden mask mask-hexagon  ">
-          <div className=" w-fit mx-auto py-10">
-            <Scene url={spline.rocket} />
+      <div className="flex flex-col  overflow-visible relative w-fit">
+        <div className=" w-fit mx-auto   z-10 py-10">
+          <div className="blob2 w-[600px] h-[500px] -mt-5  relative top-0   z-10 right-0">
+            <div className="mask mask-hexagon flex flex-col items-center justify-center  g1 gr1 ">
+              <Scene
+                url={spline.rocket}
+                styles={"z-100 relative p-10  flex justify-center mx-auto"}
+              />
+            </div>
           </div>
         </div>
       </div>

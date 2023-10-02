@@ -27,7 +27,7 @@ export const MyHeader = ({
   btn,
 }) => {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col mb-8 w-full">
       <div
         className={
           "flex relative flex-col w-full pb-5  justify-center text-center border border-b-1 border-white/10 border-x-0 border-t-0 "

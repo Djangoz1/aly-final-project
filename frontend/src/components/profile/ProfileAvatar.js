@@ -31,7 +31,7 @@ export const ProfileAvatar = ({ cvID, component, metadatas }) => {
         />
       </div>
       <div className=" ml-3">
-        <CVName metadata={isMetadatas} styles={"text-white"} />
+        <CVName metadata={isMetadatas} styles={"text-xs"} />
         <br />
         <span className="font-light text-xs">CV #{cvID}</span>
         {component}

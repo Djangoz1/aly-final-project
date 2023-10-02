@@ -1,10 +1,11 @@
 import React from "react";
 import { LinearGradient } from "react-text-gradients";
 
-export const Hg = ({ children, style }) => {
+export const Hg = ({ children, style, style1 }) => {
   return (
     <LinearGradient
       className={style || "font-normal"}
+      style={style1}
       gradient={["to right", "rgba(201,78,21,1), rgba(201,21,103,1)"]}
     >
       {children}

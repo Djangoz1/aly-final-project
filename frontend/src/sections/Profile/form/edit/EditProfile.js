@@ -51,10 +51,10 @@ export const EditProfile = ({ styles }) => {
       side={
         <MyMenus
           styles={{
-            box: "flex-col w-full bg-black/10 mr-10 h-full",
+            box: "flex-col w-full  mr-10 h-full",
             el: "px-5 text-left",
           }}
-          menus={MENUS.profile.edit}
+          menus={MENUS.profile?.edit}
         />
       }
       components={[

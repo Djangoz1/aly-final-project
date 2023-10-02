@@ -10,7 +10,7 @@ import {
 import { LayoutMission } from "sections/works/Missions/LayoutMission";
 
 import { _apiPost } from "utils/ui-tools/web3-tools";
-import { MyCard } from "components/myComponents/card/MyCard";
+import { MyCard, MyCard1 } from "components/myComponents/card/MyCard";
 import { MyCalendar } from "components/myComponents/MyCalendar";
 import { icfy } from "icones";
 
@@ -19,12 +19,13 @@ const Page = ({ params }) => {
 
   return (
     <LayoutMission path={`/agenda`} id={missionID}>
-      <MyCard
+      <MyCard1
+        color={2}
         head={{ title: "Agenda", icon: icfy.ux.calendar }}
         styles={"w-full text-xs mt-4"}
       >
         <MyCalendar />
-      </MyCard>
+      </MyCard1>
     </LayoutMission>
   );
 };

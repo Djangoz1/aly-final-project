@@ -23,6 +23,7 @@ import { v4 } from "uuid";
 import { ethers } from "ethers";
 import { fromTimestamp } from "utils/ux-tools";
 import { stateLaunchpad } from "utils/ui-tools/state-tools";
+import { LaunchpadCard } from "components/Launchpad/LaunchpadCard";
 
 const LaunchpadPage = () => {
   let [isList, setIsList] = useState(null);
@@ -34,8 +35,7 @@ const LaunchpadPage = () => {
     );
     let arr = [];
     for (let index = 1; index <= length; index++) {
-      let launchpad = await stateLaunchpad(index);
-      arr.push(launchpad);
+      arr.push(index);
     }
     setIsList(arr);
   };
@@ -51,39 +51,40 @@ const LaunchpadPage = () => {
       <MySection styles={"flex font2 flex-col "}>
         <HeroLaunchpad />
         {isList?.map((el) => (
-          <MyAsset
-            key={v4()}
-            url={`/launchpad/${el?.datas?.id}`}
-            banniere={el?.metadatas?.attributes?.[0]?.banniere}
-            image={el?.metadatas?.image}
-            title={el?.metadatas?.title}
-            description={el?.metadatas?.description}
-            details={[
-              {
-                title: "Fundraising goal",
-                value: (
-                  <>
-                    {ethers.utils.formatEther(`${el?.datas?.maxCap}`)}
-                    <span className="text-white/40 ml-1">ETH</span>
-                  </>
-                ),
-              },
-              {
-                title: "Token price",
-                value: (
-                  <>
-                    ~ {el?.datas?.tokenPrice}
-                    <span className="text-white/40 ml-1">ETH</span>
-                  </>
-                ),
-              },
+          <LaunchpadCard id={el} key={v4()} />
+          // <MyAsset
+          //   key={v4()}
+          //   url={`/launchpad/${el?.datas?.id}`}
+          //   banniere={el?.metadatas?.attributes?.[0]?.banniere}
+          //   image={el?.metadatas?.image}
+          //   title={el?.metadatas?.title}
+          //   description={el?.metadatas?.description}
+          //   details={[
+          //     {
+          //       title: "Fundraising goal",
+          //       value: (
+          //         <>
+          //           {ethers.utils.formatEther(`${el?.datas?.maxCap}`)}
+          //           <span className="text-white/40 ml-1">ETH</span>
+          //         </>
+          //       ),
+          //     },
+          //     {
+          //       title: "Token price",
+          //       value: (
+          //         <>
+          //           ~ {el?.datas?.tokenPrice}
+          //           <span className="text-white/40 ml-1">ETH</span>
+          //         </>
+          //       ),
+          //     },
 
-              {
-                value: "Token sale start",
-                title: <>{fromTimestamp(parseInt(el?.datas?.saleStart))}</>,
-              },
-            ]}
-          />
+          //     {
+          //       value: "Token sale start",
+          //       title: <>{fromTimestamp(parseInt(el?.datas?.saleStart))}</>,
+          //     },
+          //   ]}
+          // />
         ))}
       </MySection>
     </Layout>
