@@ -38,6 +38,7 @@ export const Layout = ({ children, banniere }) => {
           <ImagePin CID={banniere} style="relative opacity-80   w-full" />
         </div>
       )}
+
       <div
         className={`  flex flex-col  box-border mb-[8vh]  justify-center relative`}
       >

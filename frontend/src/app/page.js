@@ -45,6 +45,12 @@ export default function Home() {
   return (
     <>
       <Layout>
+        <div className="bg-animation">
+          <div id="stars"></div>
+          <div id="stars2"></div>
+          <div id="stars3"></div>
+        </div>
+
         <>
           <MySection styles={"justify-start font2 flex flex-col"}>
             <div className="w-full relative mb-[10vh] flex">

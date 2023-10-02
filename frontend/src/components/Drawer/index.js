@@ -70,7 +70,7 @@ export const Drawer = ({ setter, isOpen }) => {
       <div
         className={`${
           isOpen ? "w-[18vw]" : "w-[6vw]"
-        } h-screen top-0  left-0  fixed`}
+        } h-screen top-0  left-0 z-10  fixed`}
       >
         <ul className="menu  p-2 w-full relative  h-full  text-base-content">
           {links?.map((el) => (

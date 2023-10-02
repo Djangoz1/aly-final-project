@@ -1,5 +1,6 @@
 import { AuthProvider } from "context/auth";
 import "../styles/global.css";
+import "../styles/star-background.css";
 
 import { AccountProvider } from "context/account";
 import { MissionProvider } from "context/hub/mission";

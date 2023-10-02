@@ -48,6 +48,12 @@ const LaunchpadPage = () => {
 
   return (
     <Layout>
+      <div className="bg-animation">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+      </div>
+
       <MySection styles={"flex font2 flex-col "}>
         <HeroLaunchpad />
         {isList?.map((el) => (
