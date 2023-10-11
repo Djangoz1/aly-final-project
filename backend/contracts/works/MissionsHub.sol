@@ -110,7 +110,10 @@ contract MissionsHub is ERC721URIStorage, Ownable {
      */
 
     function indexerOf(uint _cvID) external view returns (uint[] memory) {
-        require(indexers[_cvID].length > 0, "No missions index found");
+        require(
+            _cvID > 0 && _cvID <= Bindings.tokensLength(_iAS.cvsHub()),
+            "MissionsHub : Invalid cv ID"
+        );
         return indexers[_cvID];
     }
 

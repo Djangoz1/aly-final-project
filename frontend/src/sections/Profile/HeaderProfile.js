@@ -28,7 +28,7 @@ import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { EditProfile } from "./form/edit/EditProfile";
 import { MENUS_ID } from "constants/menus";
 import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
-import { MyHeaderCard } from "components/myComponents/card/MyHeaderCard";
+import { MyHeaderCard } from "components/myComponents/card/MyCardList";
 import { BtnGb2, BtnGr2 } from "components/myComponents/btn/MyGradientButton";
 
 export const HeaderProfile = ({ path }) => {

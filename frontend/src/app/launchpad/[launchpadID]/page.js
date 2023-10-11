@@ -5,7 +5,7 @@ import { MyTable } from "components/myComponents/table/MyTable";
 import {
   HEAD_table_features,
   _table_features,
-} from "utils/ux-tools/table/feature";
+} from "utils/states/tables/feature";
 
 import { LayoutMission } from "sections/works/Missions/LayoutMission";
 import {
@@ -18,7 +18,7 @@ import {
   MyCard1,
   MyCardList,
 } from "components/myComponents/card/MyCard";
-import { icfy, icfyCOIN, icfyETHER, icfyROCKET } from "icones";
+import { icfy, icfyETHER, icfyROCKET } from "icones";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 import { CVName } from "components/inputs/inputsCV/CVName";
@@ -38,7 +38,16 @@ import { Hg } from "components/text/HeroGradient";
 import { STATUS } from "constants/status";
 import { ethers } from "ethers";
 import { ProfileAvatar } from "components/profile/ProfileAvatar";
-
+import useSpline from "@splinetool/r3f-spline";
+import { OrthographicCamera } from "@react-three/drei";
+import { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import Spline from "@splinetool/react-spline";
+import { FormProvider, useFormState } from "context/form";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { LayoutForm } from "sections/Form/LayoutForm";
+import { MyFormModal } from "components/myComponents/form/MyFormModal";
 export default function PageLaunchpad({ params }) {
   const launchpadID = params.launchpadID;
   let { address } = useAccount();
@@ -53,8 +62,19 @@ export default function PageLaunchpad({ params }) {
 
 let Page = () => {
   let state = useLaunchpadState();
-  console.log(state);
 
+  let submitInvest = async (form) => {
+    console.log("form", form);
+    let value = ethers.utils.parseEther(form?.value)._hex;
+    let hash = await _apiPost(
+      "buyTokens",
+      [parseInt(state.launchpadID)],
+      value
+    );
+    console.log(hash);
+  };
+
+  let tier = state?.datas?.tiersDatas?.[state?.datas?.currentTier];
   return (
     <div className="flex">
       <div className="w-3/4 mr-12">
@@ -66,12 +86,16 @@ let Page = () => {
                 <div className="flex items-center">
                   <span className="text-white  text-xs flex flex-col items-center mr-3">
                     <Icon icon={icfyETHER} className="text-4xl text-white" />{" "}
-                    <Hg>Balance</Hg>
+                    <Hg>Price</Hg>
                   </span>
                   <div className="flex flex-col">
                     <span className="text-2xl text-white items-center flex ">
-                      {state?.datas?.amountRaised}
-                      <Hg style="text-lg ml-2">ETH</Hg>
+                      {ethers.utils.formatEther(`${tier?.tokenPrice || 0}`)}
+                      <Hg style="text-lg ml-2">ETH</Hg>{" "}
+                      <span className="text-xs ml-2 text-white/20">
+                        {" "}
+                        per Tokens
+                      </span>
                     </span>
                     <div
                       className={`badge badge-sm badge-outline py-2 px-4 badge-${
@@ -106,7 +130,7 @@ let Page = () => {
         <MyCard1
           color={2}
           head={{
-            icon: icfyCOIN,
+            icon: icfy.bank.coin,
             title: (
               <div className="flex flex-col">
                 <div className="flex items-center">
@@ -135,9 +159,23 @@ let Page = () => {
               <h6 className="text-xs w-full border-t-1 mt-4 pt-2 border border-x-0 border-b-0 border-white/10  text-white/40">
                 Balance owner
               </h6>
-              <p className="text-lg">{state?.datas?.balanceOwner}</p>
+              <p className="text-lg">
+                {state?.datas?.balanceOwner}
+                <span className="text-xs  ml-2">Tokens</span>
+              </p>
+              <h6 className="text-xs w-full mt-2  text-white/40">
+                Balance contract
+              </h6>
+
+              <p className="text-lg">
+                {state?.datas?.amountRaised}
+                <span className="text-xs ml-2">ETH</span>
+              </p>
+              <span className="mt-2 text-white/40 text-[8px]">
+                {state?.datas?.tokenAddress}
+              </span>
             </div>,
-            <div className="flex flex-col">
+            <div className="flex flex-col w-full">
               <h6 className="text-xs text-white/40">Tokens pool</h6>
               <p className="text-lg">{state?.datas?.allowance}</p>
               <h6 className="text-xs text-white/40">Tokens price</h6>
@@ -148,9 +186,51 @@ let Page = () => {
               <p className="text-lg flex  items-center">
                 {parseInt(state?.datas?.lockedTime)} day(s)
               </p>
-              <span className="mt-2 text-white/40 text-[8px]">
-                {state?.datas?.tokenAddress}
-              </span>
+
+              <MyFormModal
+                submit={submitInvest}
+                components={[
+                  <MyInput
+                    min={ethers.utils.formatEther(state?.datas?.minInvest || 0)}
+                    max={ethers.utils.formatEther(state?.datas?.maxInvest || 0)}
+                    step={0.1}
+                    type={"number"}
+                    target={"value"}
+                  />,
+                ]}
+                styles={{
+                  modal: "w-[30vw] h-fit",
+                  btn: "ml-auto gb2 mt-2 w-fit btn-xs",
+                }}
+                arr={[
+                  {
+                    title: (
+                      <span className={"flex"}>
+                        <Icon icon={icfyROCKET} className="text-error mr-4" />{" "}
+                        Invest on launchpad
+                      </span>
+                    ),
+                    description: (
+                      <>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        In harum beatae earum, placeat repellendus sequi
+                        reprehenderit libero necessitatibus magni voluptate sint
+                        aut! Labore aut sint suscipit fugit reiciendis. Aliquam,
+                        explicabo!
+                      </>
+                    ),
+                  },
+                ]}
+                stateInit={{
+                  form: {
+                    value: null,
+                  },
+                  placeholders: {
+                    value: "300 ETH",
+                  },
+                }}
+                btn={"Participate"}
+              />
             </div>,
           ]}
         ></MyCard1>
@@ -178,30 +258,6 @@ let Page = () => {
           ]}
         />
       </div>
-
-      {/* stats=
-      {{
-        component: (
-          <MyHeaderCard
-            icon={icfyROCKET}
-            head={{
-              value: <MyCountdown timestamp={parseInt(datas?.saleEnd)} />,
-              title: "Started At",
-            }}
-            arr={[
-              {
-                title: "Current balance",
-                value: <>{datas?.amountRaised} ETH</>,
-              },
-              { title: "Token price", value: <>{datas?.tokenPrice} ETH</> },
-              {
-                title: "Locked time",
-                value: <>{parseInt(datas?.lockedtime || 0n)} ETH</>,
-              },
-            ]}
-          />
-        ),
-      }} */}
     </div>
   );
 };

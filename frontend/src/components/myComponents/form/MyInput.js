@@ -60,7 +60,7 @@ export let MyInput = ({
   }, [max]);
 
   return (
-    <div className="flex flex-col mr-5">
+    <div className="flex flex-col w-fit mr-5">
       <label
         className={`font-light text-left text-xs mb-1 uppercase 
            ${form?.[target]?.length > 1 && "text-white"}
@@ -94,6 +94,18 @@ export let MyInput = ({
             : ""
         }
       />
+      <div className="flex items-center justify-between">
+        {min && (
+          <span className="text-[8px] mt-1 flex flex-col">
+            Min <span className="truncate w-12">{min}</span>
+          </span>
+        )}
+        {max && (
+          <span className="text-[8px] text-light ml-auto mt-1 flex  text-right items-end flex-col">
+            Max <span className="truncate w-12">{max}</span>
+          </span>
+        )}
+      </div>
     </div>
   );
 };

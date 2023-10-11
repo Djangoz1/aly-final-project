@@ -48,6 +48,11 @@ export const ENUMS = {
   ],
   domain: [
     {
+      name: "enterprise",
+      color: "info",
+      icon: icfy.domain.enterprise,
+    },
+    {
       name: "frontend",
       color: "warning",
       icon: icfy.domain.frontend,

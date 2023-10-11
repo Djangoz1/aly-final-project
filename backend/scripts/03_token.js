@@ -18,7 +18,12 @@ async function main() {
     this.addr6,
     this.addr7,
   ] = await ethers.getSigners();
-  const token = await _testInitToken(this.owner, "Django", "DJN", 3000000000);
+  const token = await _testInitToken(
+    this.owner,
+    "Django",
+    "DJN",
+    30000000000000000000n
+  );
   console.log("Token ERC20 create on", token.target);
 }
 

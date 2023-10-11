@@ -1,225 +1,151 @@
 "use client";
 
-import { MyTable } from "components/myComponents/table/MyTable";
+import React, { useEffect, useRef, useState } from "react";
+
+import { useAuthState } from "context/auth";
+import { useToolsState } from "context/tools";
 
 import {
-  HEAD_table_features,
-  _table_features,
-  _table_invites,
-} from "utils/ux-tools/table/feature";
+  stateCV,
+  stateDetailsCV,
+  stateFeature,
+  stateMission,
+} from "utils/ui-tools/state-tools";
 
-import { LayoutMission } from "sections/works/Missions/LayoutMission";
-import {
-  doStateMission,
-  useMissionDispatch,
-  useMissionState,
-} from "context/hub/mission";
-import {
-  MyCard,
-  MyCard1,
-  MyCardList,
-} from "components/myComponents/card/MyCard";
-import { icfy, icfyETHER } from "icones";
-import { useEffect, useState } from "react";
-import { v4 } from "uuid";
-import { CVName } from "components/inputs/inputsCV/CVName";
 import { Icon } from "@iconify/react";
-import Link from "next/link";
-import { _apiPost } from "utils/ui-tools/web3-tools";
-import { doStateCV } from "context/hub/cv";
+import { icfyETHER } from "icones";
 
-import { MyCalendar } from "components/myComponents/MyCalendar";
-import { MENUS_EDIT } from "constants/menus";
-import { doAuthCV, useAuthDispatch } from "context/auth";
-import { useAccount } from "wagmi";
-import { ENUMS } from "constants/enums";
-import { Hg, Hg1 } from "components/text/HeroGradient";
+import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { _table_features } from "utils/states/tables/feature";
+import { _table_invites } from "utils/works/feature";
 import { STATUS } from "constants/status";
-import { ProfileAvatar } from "components/profile/ProfileAvatar";
-import { fromTimestamp } from "utils/ux-tools";
 
-const Mission = ({ params }) => {
+import { AgendasMission } from "sections/works/Missions/state/AgendasMission";
+import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
+import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
+import { MissionPubs } from "sections/works/Missions/state/MissionPubs";
+import { Viewport } from "components/myComponents/layout/MyViewport";
+
+function App({ params }) {
+  const { cv } = useAuthState();
+
+  const tools = useToolsState();
+
+  let [isState, setIsState] = useState(null);
+
   const missionID = params.missionID;
-  let { address } = useAccount();
-  const { features, mission, owner } = useMissionState();
 
-  let state = useMissionState();
-  let dispatch = useMissionDispatch();
-  let dispatchAuth = useAuthDispatch();
-  MENUS_EDIT.feature[1].setter = async (id) => {
-    await _apiPost("askToJoin", [id]);
-    await doStateMission(dispatch, missionID);
-    await doAuthCV(dispatchAuth, address);
+  let fetch = async () => {
+    let mission = await stateMission(missionID);
+    let owner = await stateCV(mission?.datas?.owner);
+    owner.details = await stateDetailsCV(mission?.datas?.cvOwner);
+    let features = [];
+
+    for (let index = 0; index < mission?.datas?.features?.length; index++) {
+      const featureID = mission?.datas?.features[index];
+      let feature = await stateFeature(featureID);
+      features.push(feature);
+    }
+
+    let _state = {
+      mission,
+      owner,
+      features,
+    };
+    setIsState(_state);
   };
+  useEffect(() => {
+    if (!isState) {
+      fetch();
+      console.log("Anormal !!!! fetch is datas page", isState);
+    }
+  }, [missionID]);
 
-  console.log(state);
   return (
-    <LayoutMission id={missionID}>
-      <div className="w-full  flex">
-        <div className="w-3/4 mr-12">
-          <MyCard1
-            color={2}
-            menus={["Description", "Features", "Job Invites"]}
-            head={{
-              component: (
-                <div className="flex items-center">
-                  <span className="text-white  text-xs flex flex-col items-center mr-3">
-                    <Icon icon={icfyETHER} className="text-4xl text-white" />{" "}
-                    <Hg>Balance</Hg>
-                  </span>
-                  <div className="flex flex-col">
-                    <span className="text-2xl text-white items-center flex ">
-                      {state?.mission?.datas?.amount}
-                      <Hg style="text-lg ml-2">ETH</Hg>
-                    </span>
-                    <div
-                      className={`badge badge-sm badge-outline py-2 px-4 badge-${
-                        STATUS.mission[state?.mission?.datas?.status]?.color
-                      }`}
-                    >
-                      <Icon
-                        icon={
-                          STATUS.mission[state?.mission?.datas?.status]?.icon
-                        }
-                        className="mr-4 text-sm"
-                      />
-                      {STATUS.mission[state?.mission?.datas?.status]?.status}
-                    </div>
-                  </div>
-                </div>
-              ),
-            }}
-            components={[
-              <p className="text-xs  text-justify whitespace-break-spaces">
-                {state?.mission?.metadatas?.description}
-              </p>,
-              <MyTable
-                list={_table_features(state.features, state.owner)}
-                head={HEAD_table_features}
-                editBtns={MENUS_EDIT.feature}
-              />,
-              <MyTable
-                list={_table_invites(state.features)}
-                head={["Job", "Worker"]}
-              />,
-            ]}
-          />
-        </div>
+    <MyLayoutApp
+      id={missionID}
+      url={`/works/mission/${missionID}`}
+      side={
+        <div className="flex flex-col  ml-auto w-full  justify-end">
+          <div className="flex  ml-auto  mb-5 w-1/2  flex-col">
+            {tools?.state?.followers && (
+              <div className="flex text-xs justify-between">
+                <p className="c2 ">Followers</p>
+                <span>{tools?.state?.followers?.length}</span>
+              </div>
+            )}
+            {tools?.state?.pubs && (
+              <div className="flex text-xs justify-between">
+                <p className="c2 ">Posts</p>
+                <span>{tools?.state?.pubs?.length}</span>
+              </div>
+            )}
+            <div className="flex text-xs justify-between">
+              <p className="c2 ">Features</p>
+              <span>{tools?.state?.mission?.datas?.features?.length}</span>
+            </div>
+            <div className="flex text-xs justify-between">
+              <p className="c2 ">Work slot</p>
+              <span>
+                {tools?.state?.mission?.datas?.features?.length -
+                  tools?.state?.mission?.datas?.workers}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-end mb-1">
+            <Icon icon={icfyETHER} className="text-white c2 text-[34px]" />
+            <p className="text-xl">
+              <span>{tools?.state?.mission?.datas?.amount}</span>
+              <span className="text-white c2 text-lg ml-3">ETH</span>
+            </p>
+          </div>
 
-        <div className="flex w-1/4 flex-col ml-auto">
-          <MyCard1
-            color={2}
-            styles={" h-fit mb-5"}
-            head={{ title: "Board", icon: icfy.ux.checkList }}
-            menus={["Owner", "Features"]}
-            components={[
-              <div className="flex flex-col">
-                <ProfileAvatar
-                  component={
-                    <p className="text-[10px] ">
-                      {owner?.attributes?.[0]?.identity?.email}
-                    </p>
-                  }
-                  metadatas={owner}
-                  cvID={mission?.datas?.owner}
-                />
-              </div>,
-              <div className="flex h-[35vh]  overflow-y-scroll hide-scrollbar flex-wrap font2 mb-5 w-fit mx-auto">
-                {features?.map((el) => (
-                  <div
-                    className="relative w-fit flex mr-5 mt-8  flex-col"
-                    key={v4()}
-                  >
-                    <CVName cvID={el?.datas?.cvWorker} styles={"text-xs"} />
+          <div
+            className={
+              "flex items-center p-3 mt-3 ml-auto badge badge-outline badge-xs text-xs badge-" +
+              STATUS?.mission[tools?.state?.mission?.datas?.status]?.color
+            }
+          >
+            <Icon
+              icon={STATUS?.mission[tools?.state?.mission?.datas?.status]?.icon}
+              className="text-lg mr-4"
+            />
+            {STATUS?.mission[tools?.state?.mission?.datas?.status]?.status}
+          </div>
 
-                    <p className="text-[8px]">
-                      {fromTimestamp(parseInt(el?.datas?.startedAt))}
-                    </p>
-                    <Icon
-                      className={
-                        " text-[6px] btn btn-ghost absolute top-0 w-fit right-0 btn-xs"
-                      }
-                      icon={icfy.ux.plus}
-                    />
-                    <div className="gr1 g1 py-[1px] w-12 mb-3 rounded-2xl" />
-                    <div className="text-xs text-justify line-clamp-4 whitespace-break-spaces">
-                      {el?.metadatas?.description}
-                    </div>
-                  </div>
-                ))}
-              </div>,
-            ]}
-          />
-          <MyCardList
-            color={2}
-            styles={"mb-5"}
-            head={{ title: "Information", icon: icfy.work.casual }}
-            arr={[
-              {
-                value: (
-                  <span className="flex items-center">
-                    {state?.mission?.datas?.amount}
-                    <Icon icon={icfyETHER} />
-                  </span>
-                ),
-                title: "Amount",
-              },
-              {
-                value: <>{state?.features?.length}</>,
-                title: "Features",
-              },
-              {
-                value: <>{state?.features?.length}</>,
-                title: "Status",
-              },
-              {
-                value: (
-                  <>
-                    {state?.features?.length - state?.mission?.datas?.workers}
-                  </>
-                ),
-                title: "Jobs available",
-              },
-              {
-                value: (
-                  <div className="flex ">
-                    {state?.mission?.badges?.map((el) => (
-                      <Icon
-                        className="mr-2 text-xl"
-                        icon={el?.badge}
-                        key={v4()}
-                      />
-                    ))}
-                  </div>
-                ),
-                title: "Technologies",
-              },
-              {
-                value: (
-                  <div className="flex justify-end items-center uppercase">
-                    <Icon
-                      className="mr-2 text-xl"
-                      icon={
-                        ENUMS.domain[
-                          state?.mission?.metadatas?.attributes?.[0]?.domain
-                        ]?.icon
-                      }
-                    />
-                    {
-                      ENUMS.domain[
-                        state?.mission?.metadatas?.attributes?.[0]?.domain
-                      ]?.name
-                    }
-                  </div>
-                ),
-                title: "Domain",
-              },
-            ]}
-          />
+          <div className="flex items-end mt-4 ml-auto">
+            {tools?.state?.mission?.badges?.map((el) => (
+              <Icon
+                icon={el?.badge}
+                className="text-white c2 text-[24px] ml-4"
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </LayoutMission>
+      }
+      subMenus={[
+        { title: "Profile", tag: "profile" },
+        { title: "Agendas", tag: "agendas" },
+        { title: "Features", tag: "features" },
+        { title: "Pubs", tag: "pubs" },
+      ]}
+      target={""}
+      initState={isState}
+    >
+      <Viewport id={"profile"} index={0}>
+        <MissionProfile />
+      </Viewport>
+      <Viewport id={"agendas"} index={1}>
+        <AgendasMission />
+      </Viewport>
+      <Viewport id={"features"} index={2}>
+        <MissionFeatures />
+      </Viewport>
+      <Viewport id={"pubs"} index={3}>
+        <MissionPubs />
+      </Viewport>
+    </MyLayoutApp>
   );
-};
+}
 
-export default Mission;
+export default App;

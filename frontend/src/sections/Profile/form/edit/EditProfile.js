@@ -18,27 +18,35 @@ import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 import { _apiPost, _apiPostAt } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { createURICv } from "utils/ui-tools/pinata-tools";
+import {
+  doIndexTools,
+  doReloadTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
+import { MyForm } from "components/myComponents/form/MyForm";
 
 export const EditProfile = ({ styles }) => {
   let { address, isConnected } = useAccount();
   let { metadatas, datas, cv } = useAuthState();
+  let { state } = useToolsState();
 
-  let { cvID } = useCVState();
-  let dispatch = useCVDispatch();
+  let dispatch = useToolsDispatch();
   let dispatchAuth = useAuthDispatch();
 
   let submitForm = async (form) => {
-    if (isConnected && cv == cvID) {
+    if (isConnected && cv) {
       let tokenURI = await createURICv(form);
       await _apiPost("setTokenURIOf", [cv, tokenURI, ADDRESSES["cvsHub"]]);
       await doAuthCV(dispatchAuth, address);
-      await doStateCV(dispatch, cvID);
+      doReloadTools(dispatch);
     }
   };
 
-  let moock = toMockProfile({ address, metadatas, cvID });
+  let moock = toMockProfile({ address, metadatas, cvID: cv });
+
   return (
-    <MyFormModal
+    <MyForm
       stateInit={{
         form: moock,
         placeholders: moock,
@@ -51,8 +59,8 @@ export const EditProfile = ({ styles }) => {
       side={
         <MyMenus
           styles={{
-            box: "flex-col w-full  mr-10 h-full",
-            el: "px-5 text-left",
+            box: "flex-row w-full",
+            el: "px-2 ",
           }}
           menus={MENUS.profile?.edit}
         />

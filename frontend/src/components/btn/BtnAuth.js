@@ -8,6 +8,7 @@ import {
   BtnGr1,
   BtnGr2,
 } from "components/myComponents/btn/MyGradientButton";
+import { Avatar } from "components/profile/ProfileAvatar";
 import { useAuthState } from "context/auth";
 import { icfy, icfyHAMBURGER } from "icones";
 import { styles } from "styles/style";
@@ -34,6 +35,7 @@ export const BtnAuth = ({ drawerBtn }) => {
           (!authenticationStatus || authenticationStatus === "authenticated");
         return (
           <div
+            className="w-full"
             {...(!ready && {
               "aria-hidden": true,
               style: {
@@ -46,13 +48,13 @@ export const BtnAuth = ({ drawerBtn }) => {
             {(() => {
               if (!connected) {
                 return (
-                  <BtnGr1
-                    setter={openConnectModal}
-                    style={"   z-10 relative btn-sm "}
+                  <button
+                    onClick={openConnectModal}
+                    className="c1 whiteglass-text py-2  hover:text-success transition-all flex items-center"
                   >
-                    <Icon icon={icfy.ux.enter} className="text-lg " /> Connect
+                    <Icon icon={icfy.ux.enter} className="mr-3" /> Connect
                     Wallet
-                  </BtnGr1>
+                  </button>
                 );
               }
               if (chain.unsupported) {
@@ -67,26 +69,27 @@ export const BtnAuth = ({ drawerBtn }) => {
                 //   className="cta-button project-owner font-light border-none btn normal-case font2"
                 //   style={{ display: "flex", gap: 12 }}
                 // >
-                <BtnGb1
-                  style={
-                    "font-light relative z-10 btn-sm border-box normal-case pl-0 overflow-hidden"
+                <div
+                  className={
+                    "py-1 whiteglass-text  w-full flex c1 shadow relative mt-3 z-10 border  border-white/5 h-fit rounded-lg   normal-case "
                   }
                 >
-                  <div className="bg-zinc-900 h-full flex items-center pl-4 pr-5 justify-between ">
-                    {drawerBtn}
-                  </div>
+                  <Avatar
+                    CID={metadatas?.image}
+                    style={"w-12 ml-2 mr-4 rounded-full"}
+                  />
                   <div
-                    className="flex items-center"
-                    // className="bg-zinc-900 h-full flex items-center px-5 justify-between  rounded-lg"
+                    className="flex flex-col text-xs justify-center items-start"
+                    // className="backdrop-blur  h-full flex items-center px-5 justify-between  rounded-lg"
                   >
-                    <CVName metadata={metadatas} styles=" mx-4" />
+                    <CVName metadata={metadatas} styles=" " />
                     <div className="" onClick={openAccountModal}>
                       {account.displayBalance
                         ? ` ${account.displayBalance}`
                         : ""}
                     </div>
                   </div>
-                </BtnGb1>
+                </div>
                 // </div>
               );
             })()}

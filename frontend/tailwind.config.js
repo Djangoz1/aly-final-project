@@ -8,6 +8,11 @@ module.exports = {
   content: ["./src/**/*.{html,js}", "./app/**/x*.{html,js}"],
   theme: {
     extend: {
+      boxShadow: {
+        // whiteblur: "0 0 20px rgba(255, 255, 255, 0.7)",
+        // whiteglass: "0 0 20px rgba(255, 255, 255, 0.5)",
+      },
+
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

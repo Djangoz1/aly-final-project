@@ -18,6 +18,7 @@ export const stateCV = async (cvID) => {
       cvID: cvID,
       metadatas: await fetchCV(cvID),
       datas: await fetchStatsOfCV(cvID),
+      details: null,
     };
   }
 };
@@ -27,15 +28,32 @@ export const stateDetailsCV = async (cvID) => {
     cvID,
     ADDRESSES["missionsHub"],
   ]);
+
+  let _jobs = await _apiGet("jobsOfCV", [cvID]);
   let missions = [];
+  let badges = [];
+  let _wadge = 0;
   for (let index = 0; index < _missions?.length; index++) {
     let missionID = _missions[index];
     let mission = await stateMission(missionID);
+
     missions.push(mission);
   }
+  for (let index = 0; index < _jobs?.length; index++) {
+    const featureID = _jobs[index];
+    let feature = await stateFeature(featureID);
+    _wadge += parseFloat(feature?.datas?.wadge);
+
+    !badges.includes(feature?.datas?.specification) &&
+      badges.push(feature?.datas?.specification);
+  }
+
+  let wadge = _jobs?.length > 0 ? _wadge / _jobs.length : 0;
 
   return {
-    missions: missions,
+    missions,
+    badges,
+    wadge,
   };
 };
 
@@ -89,6 +107,7 @@ export let stateFeature = async (featureID) => {
       ADDRESSES["featuresHub"],
     ]);
     let metadatas = await fetchJSONByCID(uri);
+
     let details = await _apiGet("datasOfWork", [featureID]);
 
     return { featureID, datas, metadatas, details };
@@ -103,6 +122,10 @@ export const stateLaunchpad = async (launchpadID) => {
       launchpadID,
       ADDRESSES["launchpadsDatasHub"],
     ]);
+    // Faire un checker
+    datas.currentTier = parseInt(
+      await _apiGet("currentTierIDOf", [launchpadID])
+    );
 
     datas.tokenName = await _apiGetAt({
       func: "name",
@@ -164,6 +187,24 @@ export const stateLaunchpad = async (launchpadID) => {
     datas.tokenPrice = ethers.utils.formatEther(
       `${tokenPrice / datas?.numberOfTier}`
     );
-    return { datas, metadatas, owner };
+    return { launchpadID, datas, metadatas, owner };
   }
+};
+
+export const stateTools = async ({ id, url, pointer, target, state, arr }) => {
+  return {
+    id,
+    url,
+    pointer,
+    target,
+    state: null,
+    arr: null,
+  };
+};
+
+export const findObjectByID = async ({ id, target, targetID, arr }) => {
+  let result = arr?.filter((el) =>
+    targetID ? el?.[target]?.[targetID] == id : el?.[target] == id
+  );
+  return result;
 };

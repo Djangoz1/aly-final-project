@@ -15,19 +15,24 @@ import {
   useFormDispatch,
   useFormState,
 } from "context/form";
+import { useInView } from "framer-motion";
 import { icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 let margin = "my-4";
-export const FormCreateProfile1 = React.memo(() => {
+export const FormCreateProfile1 = () => {
   let dispatch = useFormDispatch();
 
-  useEffect(() => {
-    doStateFormDisabled(dispatch, true);
-  }, []);
+  let ref = useRef(null);
+  let isInView = useInView(ref);
+  // useEffect(() => {
+  //   if (isInView) {
+  //     doStateFormDisabled(dispatch, true);
+  //   }
+  // }, [isInView]);
 
   return (
-    <div className="w-full">
+    <div className="w-full " ref={ref}>
       <MyCheckboxes
         label={"Civilité"}
         target={"citizen"}
@@ -61,7 +66,7 @@ export const FormCreateProfile1 = React.memo(() => {
       <MyTextArea target={"description"} label={"Bio"} />
     </div>
   );
-});
+};
 
 export const FormCreateProfile2 = () => {
   let margin = "my-4";
@@ -96,7 +101,7 @@ export const FormCreateProfile2 = () => {
                   type="checkbox"
                   className="toggle toggle-sm toggle-primary "
                   onChange={handleChange}
-                  checked={form["visibility"]}
+                  checked={form?.["visibility"]}
                 />
                 <span className="text-xs  w-fit ml-4">
                   Anonymiser mon profil

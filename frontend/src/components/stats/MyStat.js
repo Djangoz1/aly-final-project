@@ -6,7 +6,7 @@ export const MyStat = ({ values, style }) => {
   return (
     <div
       className={`stat flex ${
-        !style?.box ? `${style} bg-zinc-900` : style?.box
+        !style?.box ? `${style} backdrop-blur ` : style?.box
       }`}
     >
       <div className=" w-fit">

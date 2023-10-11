@@ -21,7 +21,7 @@ import { useLaunchpadState } from "context/hub/launchpad";
 import { ethers } from "ethers";
 import { MyCountdown } from "components/myComponents/MyCountdown";
 import { Icon } from "@iconify/react";
-import { MyHeaderCard } from "components/myComponents/card/MyHeaderCard";
+import { MyHeaderCard } from "components/myComponents/card/MyCardList";
 
 export const HeaderLaunchpad = ({ path }) => {
   let { metadatas, datas, owner } = useLaunchpadState();

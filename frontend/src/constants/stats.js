@@ -4,7 +4,7 @@ import { calcTimeRemaining } from "helpers";
 import {
   icfyCHAT,
   icfyCODER,
-  icfyCOIN,
+  icfy.bank.coin,
   icfyCV,
   icfyETH,
   icfyETHER,
@@ -108,7 +108,7 @@ export const profileStats = (infos) => {
         title: "Amount",
         value: infos?.amountDispersed,
 
-        icon: icfyCOIN,
+        icon: icfy.bank.coin,
         desc: "Value dispersed",
       },
     },

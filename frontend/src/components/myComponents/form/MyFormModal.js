@@ -12,6 +12,8 @@ import {
   useFormState,
 } from "context/form";
 import { LayoutForm } from "sections/Form/LayoutForm";
+import { styles as _styles } from "styles/style";
+
 import { useAccount } from "wagmi";
 import { Icon } from "@iconify/react";
 import { icfy } from "icones";
@@ -32,8 +34,8 @@ export const MyFormModal = ({
         btn={btn}
         form={true}
         styles={{
-          btn: `btn w-fit h-fit  ${
-            styles?.btn || "btn-xs btn-primary btn-outline"
+          btn: ` w-fit h-fit ${_styles.gbtn}  ${
+            styles?.btn || " w-fit gb2 cursor-pointer btn-xs"
           }`,
           modal: `overflow-y-auto ${
             styles?.modal || "w-[80vw]  min-h-[80vh] max-h-[90vh]"
@@ -78,14 +80,18 @@ let Child = ({ components, side, arr, submit, editer }) => {
   };
 
   return (
-    <div className="flex min-h-fit h-[75vh] overflow-y-scroll hide-scrollbar ">
+    <div className="flex min-h-fit h-fit overflow-y-scroll hide-scrollbar ">
       {side && (
         <div className=" mr-8 border-y-0 border-l-0 border-r-1  h-full min-h-[75vh] flex-flex-col p-0 w-1/5 ">
           {side}
         </div>
       )}
 
-      <div className="w-full relative flex flex-col  h-full">
+      <div
+        className={`w-full relative flex flex-col  h-full ${
+          side ? "min-h-[75vh]" : null
+        }`}
+      >
         {(arr?.[pointer]?.description || !isConnected) && (
           <MyFormInfo
             title={
@@ -111,6 +117,7 @@ let Child = ({ components, side, arr, submit, editer }) => {
           />
         )}
         {isConnected && components[pointer]}
+        <div className="h-full mb-5"></div>
         <div className="mt-auto ml-auto">
           {!isLoading && !editer && pointer > 0 && (
             <button

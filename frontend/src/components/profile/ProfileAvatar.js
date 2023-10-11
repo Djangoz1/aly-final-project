@@ -25,10 +25,7 @@ export const ProfileAvatar = ({ cvID, component, metadatas }) => {
   return (
     <div className="flex items-end">
       <div className="avatar h-fit">
-        <ImagePin
-          style={"mask mask-squircle border-zinc-800 border border-3 w-16"}
-          CID={isMetadatas?.image}
-        />
+        <Avatar CID={isMetadatas?.image} />
       </div>
       <div className=" ml-3">
         <CVName metadata={isMetadatas} styles={"text-xs"} />
@@ -37,5 +34,16 @@ export const ProfileAvatar = ({ cvID, component, metadatas }) => {
         {component}
       </div>
     </div>
+  );
+};
+
+export const Avatar = ({ CID, style }) => {
+  return (
+    <ImagePin
+      style={`mask mask-squircle border-zinc-800 border border-3 ${
+        style || "w-16"
+      }`}
+      CID={CID}
+    />
   );
 };

@@ -40,7 +40,7 @@ export const BtnGb2 = ({ children, setter, style, disabled }) => {
   }
   return (
     <BtnGb1 disabled={disabled} setter={setter} style={style + padding}>
-      <div className="w-full bg-zinc-900   flex items-center justify-center rounded-2xl h-full">
+      <div className="w-full backdrop-blur    flex items-center justify-center rounded-lg h-full">
         {children}
       </div>
     </BtnGb1>
@@ -53,7 +53,7 @@ export const BtnGr2 = ({ children, setter, style, disabled }) => {
   }
   return (
     <BtnGr1 disabled={disabled} setter={setter} style={style + padding}>
-      <div className="w-full bg-zinc-900   flex items-center justify-center rounded-2xl h-full">
+      <div className="w-full backdrop-blur    flex items-center justify-center rounded-lg h-full">
         {children}
       </div>
     </BtnGr1>

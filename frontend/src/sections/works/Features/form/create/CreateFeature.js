@@ -24,6 +24,7 @@ import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { icfy } from "icones";
+import { MyFormCreate } from "components/myComponents/form/MyForm";
 
 export const CreateFeature = () => {
   let { datas, metadatas, cv } = useAuthState();
@@ -61,7 +62,8 @@ export const CreateFeature = () => {
 
   moock_create_feature.missionID = missionID;
   return (
-    <MyFormModal
+    <MyFormCreate
+      title={"Create Feature"}
       side={<MySteps arr={MENUS_CREATE_FEATURE} />}
       stateInit={{
         form: moock_create_feature,
@@ -76,7 +78,43 @@ export const CreateFeature = () => {
       arr={datas?.missions > 0 && form}
       components={
         datas?.missions > 0
-          ? ["", <FormCreateFeature1 />, <FormCreateFeature2 />]
+          ? [
+              {
+                component:
+                  datas?.missions > 0 ? (
+                    <> </>
+                  ) : (
+                    <MyFormInfo
+                      title={
+                        <>
+                          <Icon
+                            icon={icfy.ux.warning}
+                            className="text-warning mr-2 text-2xl"
+                          />
+                          Ooops ... Please create mission first
+                        </>
+                      }
+                      description={
+                        <>
+                          Protocole of deWork require a mission if you wan't
+                          create a feature.{" "}
+                          {cv && (
+                            <Link
+                              className="text-info text-sm underline"
+                              href={`/profile/${cv}/missions`}
+                            >
+                              Create mission
+                            </Link>
+                          )}
+                        </>
+                      }
+                    />
+                  ),
+                label: "Information",
+              },
+              { component: <FormCreateFeature1 />, label: "Blockchain" },
+              { component: <FormCreateFeature2 />, label: "Lorem" },
+            ]
           : [
               <MyFormInfo
                 title={

@@ -1,9 +1,9 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { CreateFeature } from "sections/works/Features/form/create/CreateFeature";
 import { icfy } from "icones";
-import { CreateMission } from "sections/works/Missions/form/create/CreateMission";
 import { styles } from "styles/style";
 import { EditTokenLaunchpad } from "sections/Launchpad/form/EditLockToken";
+import Link from "next/link";
 
 export const MENUS_CREATE_FEATURE = [
   { i: "ℹ️", title: "Introduction" },
@@ -80,36 +80,24 @@ export let MENUS_ID = (id, owner, cvID) => {
   return {
     mission: [
       {
+        url: "/works/mission/" + id + "/test",
         title: "Overview",
-        link: `/works/mission/${id}`,
       },
       {
+        url: "/works/mission/" + id + "/features/test",
+        title: "Features",
+      },
+      {
+        url: "/works/mission/" + id + "/agenda/test",
         title: "Agenda",
-        link: `/works/mission/${id}/agenda`,
-      },
-
-      {
-        title: "Budget",
-        link: "/profile",
       },
       {
+        url: "/works/mission/" + id + "/",
+        title: "Disputes",
+      },
+      {
+        url: "/works/mission/" + id + "/pubs/test",
         title: "Pubs",
-        link: `/works/mission/${id}/pubs`,
-      },
-      {
-        style: "ml-auto",
-
-        component: (
-          <CreatePub
-            missionID={id}
-            styles={styles.gbtn + "gb1 btn-xs"}
-            btn={"Create post mission"}
-          />
-        ),
-      },
-      {
-        style: "mx-4",
-        component: cvID == owner && <CreateFeature />,
       },
     ],
     launchpad: [
@@ -153,7 +141,7 @@ export let MENUS_ID = (id, owner, cvID) => {
       {
         style: "ml-4",
         component: owner == cvID && (
-          <CreateMission styles={styles.gbtn + "gr1  btn-xs"} />
+          <Link className={styles.gbtn + "gr1  btn-xs"}>Create mission</Link>
         ),
       },
     ],

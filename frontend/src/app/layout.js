@@ -6,6 +6,8 @@ import { AccountProvider } from "context/account";
 import { MissionProvider } from "context/hub/mission";
 import { CVProvider } from "context/hub/cv";
 import { FormProvider } from "context/form";
+import { LayoutTools } from "sections/Layout/LayoutTools";
+import { ToolsProvider } from "context/tools";
 
 export default function RootLayout({ children }) {
   return (
@@ -28,12 +30,26 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         ></link>
       </head>
-      <body className="page">
+
+      {/* <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+      <script src="https://threejs.org/examples/js/libs/stats.min.js"></script> */}
+
+      <body className="bg-neutral-900 min-h-100vh">
         <AccountProvider>
           <AuthProvider>
-            <CVProvider>
-              <MissionProvider>{children}</MissionProvider>
-            </CVProvider>
+            <ToolsProvider>
+              <CVProvider>
+                <MissionProvider>
+                  {/* <div className="bg-animation">
+                    <div id="stars"></div>
+                    <div id="stars2"></div>
+                    <div id="stars3"></div>
+                  </div> */}
+                  {children}
+                </MissionProvider>
+              </CVProvider>
+            </ToolsProvider>
           </AuthProvider>
         </AccountProvider>
       </body>

@@ -22,3 +22,13 @@ export const Hg1 = ({ children, style }) => {
     </LinearGradient>
   );
 };
+export const Hg0 = ({ children, style }) => {
+  return (
+    <LinearGradient
+      className={style || "font-light"}
+      gradient={["to right", "rgba(188,191,192,0.92), rgba(360,360,360,0.92)"]}
+    >
+      {children}
+    </LinearGradient>
+  );
+};

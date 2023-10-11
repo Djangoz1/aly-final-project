@@ -65,7 +65,7 @@ export const _apiGet = async (func, args) => {
     return res;
   } catch (error) {
     let _error = { error };
-    console.log("error", { error }.error);
+    console.log("error", { _error });
     return _error.details;
   }
 };

@@ -7,7 +7,7 @@ export const MyCard = ({ head, children, icon, styles }) => {
   let [isClicked, setIsClicked] = useState(null);
   return (
     <div
-      className={`relative bg-zinc-900 py-4 px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
+      className={`relative backdrop-blur  py-4 px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">
@@ -27,12 +27,18 @@ export const MyCard1 = ({
   components,
   color,
   menus,
+  setterMenu,
   styles,
   btn,
 }) => {
-  let colors = ["", "gb1", "gr1"];
-  let _colors = ["gb2", "gb2", "gr2"];
+  let colors = ["", "gb2", "gr2"];
+  let _colors = ["gb2", "bg2", "gr2"];
   let [isClicked, setIsClicked] = useState(0);
+
+  let handleChangeMenu = (index) => {
+    setIsClicked(index);
+    setterMenu && setterMenu(index);
+  };
 
   let title = [
     <Hg style={"flex text-lg items-center"}>{head?.title}</Hg>,
@@ -41,7 +47,7 @@ export const MyCard1 = ({
   ];
   return (
     <div
-      className={`${styles} rounded-lg shadow-inner font2 bg-zinc-900 flex justify-between  right-0  py-5 px-5`}
+      className={`${styles} box-border rounded-lg shadow-inner font2 backdrop-blur  flex justify-between  right-0  py-5 px-5`}
     >
       <div className="flex flex-col relative w-full  items-start">
         <div className="flex  items-center w-full">
@@ -49,19 +55,15 @@ export const MyCard1 = ({
           {head?.component} {title[color || 0]}
         </div>
 
-        <div
-          className={`g1 py-[1px] rounded-full mt-3 mb-2 w-full ${_colors[color]} transition-all `}
-        ></div>
-
         {menus && (
-          <div className="flex w-fit rounded-full bg-white/10 mb-5">
+          <div className="flex w-fit rounded-full bg-white/10 ">
             {menus.map((el, i) => (
               <button
                 key={v4()}
-                onClick={() => setIsClicked(i)}
+                onClick={() => handleChangeMenu(i)}
                 className={`px-5 whitespace-nowrap btn rounded-full font2 normal-case  btn-xs ${
                   i === isClicked
-                    ? ` g1 border-none text-white ${_colors[color]}`
+                    ? `  border-none c1 text-white ${_colors[color]}`
                     : "btn-ghost"
                 }`}
               >
@@ -70,10 +72,15 @@ export const MyCard1 = ({
             ))}
           </div>
         )}
-        <div className="flex  flex-wrap justify-between w-full  items-end">
-          {!menus ? children : components[isClicked]}
-          {btn && <div className="ml-auto mt-2">{btn}</div>}
-        </div>
+        <div
+          className={`g1 py-[1px] rounded-full mt-3 mb-2 w-full ${colors[color]} transition-all `}
+        ></div>
+        {(children || components) && (
+          <div className="flex  flex-wrap overflow-y-scroll hide-scrollbar  justify-between w-full  items-end">
+            {!menus ? children : components?.[isClicked]}
+            {btn && <div className="ml-auto mt-2">{btn}</div>}
+          </div>
+        )}
       </div>
     </div>
   );

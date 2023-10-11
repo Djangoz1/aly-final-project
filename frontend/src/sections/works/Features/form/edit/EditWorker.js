@@ -52,7 +52,7 @@ export const EditWorker = ({ answerID, missionID, styles }) => {
       for (let index = 0; index < mission?.datas?.features?.length; index++) {
         const featureID = mission?.datas?.features[index];
         let feature = await stateFeature(featureID);
-        console.log(feature);
+
         if (parseInt(feature.details.signedWorker) === 0) {
           arr.push({
             title: feature?.metadatas?.title,

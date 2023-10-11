@@ -1,5 +1,4 @@
 "use client";
-import { CreateProfile } from "sections/Profile/form/create/CreateProfile";
 // import { Header } from "sections/Layout/Header";
 // import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 // import { useEffect, useState } from "react";
@@ -21,6 +20,12 @@ import {
   BtnGb2,
   BtnGr2,
 } from "components/myComponents/btn/MyGradientButton";
+import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+import { Scene } from "spline/Scene";
+import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { Viewport } from "components/myComponents/layout/MyViewport";
+import { Particle } from "components/myComponents/MyParticles";
+import Link from "next/link";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
@@ -42,23 +47,97 @@ export default function Home() {
   //   }
   // }, [cv]);
 
+  // particlesJS("particles-js", {
+  //   particles: {
+  //     number: { value: 80, density: { enable: false, value_area: 800 } },
+  //     color: { value: "#ffffff" },
+  //     shape: {
+  //       type: "circle",
+  //       stroke: { width: 0, color: "#000000" },
+  //       polygon: { nb_sides: 5 },
+  //       image: { src: "img/github.svg", width: 100, height: 100 },
+  //     },
+  //     opacity: {
+  //       value: 0.5,
+  //       random: false,
+  //       anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false },
+  //     },
+  //     size: {
+  //       value: 3,
+  //       random: true,
+  //       anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
+  //     },
+  //     line_linked: {
+  //       enable: true,
+  //       distance: 150,
+  //       color: "#ffffff",
+  //       opacity: 0.4,
+  //       width: 1,
+  //     },
+  //     move: {
+  //       enable: true,
+  //       speed: 6,
+  //       direction: "none",
+  //       random: false,
+  //       straight: false,
+  //       out_mode: "out",
+  //       bounce: false,
+  //       attract: { enable: false, rotateX: 600, rotateY: 1200 },
+  //     },
+  //   },
+  //   interactivity: {
+  //     detect_on: "canvas",
+  //     events: {
+  //       onhover: { enable: true, mode: "repulse" },
+  //       onclick: { enable: true, mode: "push" },
+  //       resize: true,
+  //     },
+  //     modes: {
+  //       grab: { distance: 400, line_linked: { opacity: 1 } },
+  //       bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+  //       repulse: { distance: 200, duration: 0.4 },
+  //       push: { particles_nb: 4 },
+  //       remove: { particles_nb: 2 },
+  //     },
+  //   },
+  //   retina_detect: true,
+  // });
+  // var count_particles, stats, update;
+  // stats = new Stats();
+  // stats.setMode(0);
+  // stats.domElement.style.position = "absolute";
+  // stats.domElement.style.left = "0px";
+  // stats.domElement.style.top = "0px";
+  // document.body.appendChild(stats.domElement);
+  // count_particles = document.querySelector(".js-count-particles");
+  // update = function () {
+  //   stats.begin();
+  //   stats.end();
+  //   if (
+  //     window.pJSDom[0].pJS.particles &&
+  //     window.pJSDom[0].pJS.particles.array
+  //   ) {
+  //     count_particles.innerText = window.pJSDom[0].pJS.particles.array.length;
+  //   }
+  //   requestAnimationFrame(update);
+  // };
+  // requestAnimationFrame(update);
+
   return (
     <>
-      <Layout>
-        <div className="bg-animation">
-          <div id="stars"></div>
-          <div id="stars2"></div>
-          <div id="stars3"></div>
-        </div>
+      {/* <div className="bg-animation">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+      </div> */}
 
+      <MyLayoutApp>
         <>
-          <MySection styles={"justify-start font2 flex flex-col"}>
-            <div className="w-full relative mb-[10vh] flex">
-              <div className="blob1 w-[400px] h-[500px] rotate-90 absolute top-0 right-0"></div>
-              <div className="blob2 w-[400px] h-[300px] rotate-90 absolute top-0 left-2/4"></div>
-              <div className="blobi absolute w-[600px] h-[600px] right-10 -top-1/3 "></div>
+          <Particle style={"fixed z-0"} />
 
-              <div className="w-full  mr-10">
+          <Viewport full={true} id={"hero"} index={0}>
+            <div className="w-full h-full items-end relative  flex">
+              <div className="w-full flex flex-col   justify-end  ">
                 <LinearGradient
                   className="text-xs font2 uppercase"
                   gradient={[
@@ -68,7 +147,7 @@ export default function Home() {
                 >
                   Boost your startups from scratch
                 </LinearGradient>
-                <h2 className={styles.hero}>
+                <p className={"w-full " + styles.hero}>
                   Where
                   <br />
                   <Hg>Blockchain</Hg>
@@ -76,27 +155,22 @@ export default function Home() {
                   meets Social
                   <br />
                   <Hg>Freelancing</Hg>
-                </h2>
-                <div className=" mt-5 ml-auto">
-                  <BtnGr1 style=" mr-10">
-                    <Icon icon={icfy.work.casual} className={""} />
-                    Launch project
-                  </BtnGr1>
-
-                  <CreateProfile />
-                </div>
+                </p>
               </div>
               {/* <img
                 src="/hero.jpeg"
                 className="h-fit w-[600px]  mask mask-hexagon rounded-lg"
               /> */}
             </div>
+          </Viewport>
+          {/* <Particle style={"absolute top-0 left-0 z-100"} /> */}
 
+          <Viewport full={true} id={"presentation1"} index={1}>
             <div
-              className="presentation  my-[10vh] "
+              className="presentation   my-auto flex flex-col justify-center "
               id="freelance-presentation"
             >
-              <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
+              <h2 className={`text-center font-light text-[34px]`}>
                 Contribute to <Hg>innovative</Hg> and <Hg>challenging</Hg>{" "}
                 projects
               </h2>
@@ -156,92 +230,85 @@ export default function Home() {
                 </li>
               </ul>
             </div>
+          </Viewport>
+          <Viewport full={true} id={"presentation2"} index={2}>
             <div className=" my-[10vh] font2">
               <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
                 <Hg1>Services</Hg1>
               </h2>
               <div className="flex justify-evenly">
-                <MyCard styles={"w-[23%]"}>
-                  <Icon
-                    icon={icfy.work.casual}
-                    className="text-info text-[90px]"
-                  />
-                  <div className="w-full  mt-6 mb-6">
-                    <Hg1 style={"w-full  text-2xl"}>
-                      Freelance <br />
-                      Protocole
-                    </Hg1>
-                    <div className="g1 gb1 mt-3 w-full py-[1px] "></div>
-                  </div>
-                  <p className="text-xs w-3/4 text-justify">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Autem fuga quae suscipit ullam aliquam officia eligendi
-                    dolor temporibus!
-                  </p>
-                  <BtnGb2 style="mt-5 w-full btn-sm">More</BtnGb2>
-                </MyCard>
-                <MyCard styles={"w-[23%]"}>
-                  <Icon
-                    icon={icfy.court.hammer}
-                    className="text-error text-[90px]"
-                  />
-                  <div className="w-full  mt-6 mb-6">
-                    <Hg style={"w-full  text-2xl"}>
-                      Escrow <br />
-                      Protocole
-                    </Hg>
-                    <div className="g1 gr1 mt-3 w-full py-[1px] "></div>
-                  </div>
-                  <p className="text-xs w-3/4 text-justify">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Autem fuga quae suscipit ullam aliquam officia eligendi
-                    dolor temporibus!
-                  </p>
-                  <BtnGr2 style=" mt-5 w-full btn-sm  ">More</BtnGr2>
-                </MyCard>
-                <MyCard styles={"w-[23%]"}>
-                  <Icon
-                    icon={icfy.msg.chat}
-                    className="text-info text-[90px]"
-                  />
-                  <div className="w-full mt-6 mb-6">
-                    <Hg1 style={"w-full pr-10 text-2xl"}>
-                      Social <br />
-                      Protocole
-                    </Hg1>
-                    <div className="g1 gb1 mt-3 w-full py-[1px] "></div>
-                  </div>
-                  <p className="text-xs w-3/4 text-justify">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Autem fuga quae suscipit ullam aliquam officia eligendi
-                    dolor temporibus!
-                  </p>
-                  <BtnGb2 style="mt-5 w-full btn-sm">More</BtnGb2>
-                </MyCard>
-                <MyCard styles={"w-[23%]"}>
-                  <Icon icon={icfyROCKET} className="text-error text-[90px]" />
-                  <div className="w-full  mt-6 mb-6">
-                    <Hg style={"w-full  text-2xl"}>
-                      Launchpad <br />
-                      Protocole
-                    </Hg>
-                    <div className="g1 gr1 mt-3 w-full py-[1px] "></div>
-                  </div>
-                  <p className="text-xs w-3/4 text-justify">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Autem fuga quae suscipit ullam aliquam officia eligendi
-                    dolor temporibus!
-                  </p>
-                  <BtnGr2 style="mt-5 w-full btn-sm">More</BtnGr2>
-                </MyCard>
+                <MyCardInfo
+                  styles={"w-[23%]"}
+                  color={1}
+                  header={{
+                    icon: icfy.work.casual,
+                    title: "Freelance Protocole",
+                  }}
+                  btn={{
+                    component: (
+                      <Link
+                        className="btn btn-xs c2 btn-outline"
+                        href={"/create/mission"}
+                      >
+                        Create Mission
+                      </Link>
+                    ),
+                  }}
+                />
+                <MyCardInfo
+                  styles={"w-[23%]"}
+                  color={2}
+                  header={{
+                    icon: icfy.court.hammer,
+                    title: "Escrow Protocole",
+                  }}
+                />
+                <MyCardInfo
+                  styles={"w-[23%]"}
+                  color={1}
+                  btn={{
+                    component: (
+                      <Link
+                        className="btn btn-xs c2 btn-outline"
+                        href={"/create/profile"}
+                      >
+                        Create Profile
+                      </Link>
+                    ),
+                  }}
+                  header={{
+                    icon: icfy.msg.chat,
+                    title: "Social Protocole",
+                  }}
+                />
+                <MyCardInfo
+                  styles={"w-[23%]"}
+                  color={2}
+                  header={{
+                    icon: icfyROCKET,
+                    title: "Launchpad Protocole",
+                  }}
+                  btn={{
+                    component: (
+                      <Link
+                        className="btn btn-xs c2 btn-outline"
+                        href={"/create/launchpad"}
+                      >
+                        Create Launchpad
+                      </Link>
+                    ),
+                  }}
+                />
               </div>
             </div>
+          </Viewport>
 
+          <Viewport full={true} id={"presentation3"} index={3}>
             <div
               className="presentation  my-[10vh] "
               id="project-owner-presentation"
             >
-              <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
+              <h2 className={`text-center font-light text-[34px]`}>
                 Empowering the <Hg1>next</Hg1> generation of{" "}
                 <Hg1>Innovators</Hg1>
               </h2>
@@ -299,7 +366,7 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-          </MySection>
+          </Viewport>
 
           <LogoIc
             styles={
@@ -317,7 +384,7 @@ export default function Home() {
           </div>
           <Missions /> */}
         </>
-      </Layout>
+      </MyLayoutApp>
     </>
   );
 }

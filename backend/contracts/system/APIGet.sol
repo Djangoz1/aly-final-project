@@ -238,6 +238,13 @@ contract APIGet {
             );
     }
 
+    function currentTierIDOf(uint _launchpadID) external view returns (uint) {
+        return
+            ILaunchpad(
+                ILaunchpadHub(_iAS.launchpadsHub()).addressOf(_launchpadID)
+            ).getCurrentTierID();
+    }
+
     function tierOfLaunchpad(
         uint _launchpadID,
         uint _tierID

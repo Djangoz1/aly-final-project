@@ -6,6 +6,7 @@ export const icfy = {
     open: "ic:outline-remove-red-eye",
   },
   ux: {
+    key: "iconoir:key-alt-back",
     mediation: "material-symbols:mediation",
     experiment: "ant-design:experiment-twotone",
     dots: { horizontal: "zondicons:dots-horizontal-triple" },
@@ -14,6 +15,7 @@ export const icfy = {
     checkList: "line-md:check-list-3-twotone",
     star: "line-md:star-twotone",
     check: "line-md:clipboard-check-twotone",
+    flag: "iconamoon:flag-duotone",
     calendar: "line-md:calendar",
     plus: "line-md:plus",
     enter: "iconamoon:enter-thin",
@@ -23,6 +25,7 @@ export const icfy = {
     casual: "fluent:virtual-network-20-filled",
   },
   domain: {
+    enterprise: "icon-park-twotone:user-business",
     gaming: "pepicons-print:controller-circle-filled",
     ai: "vscode-icons:file-type-ai2",
     designer: "line-md:pencil-twotone",
@@ -60,10 +63,12 @@ export const icfy = {
   bank: {
     check: "mdi:bank-check",
     bag: "healthicons:money-bag-outline",
+    coin: "ph:coins-light",
   },
   court: {
     justice: "mdi:bank-check",
     hammer: "mdi:court-hammer",
+    injustice: "game-icons:injustice",
     vote: "fluent:vote-24-filled",
   },
   person: {
@@ -105,7 +110,7 @@ export const icfyINFO = "mdi:information-outline";
 export const icfyCV = "pepicons-pop:cv";
 export const icfyETHER = "mdi:ethereum";
 export const icfyETH = "iconoir:ethereum-rotate-out";
-export const icfyCOIN = "ph:coins-light";
+
 export const icfyCODE = "ant-design:code-outlined";
 export const icfySTAR = "line-md:star-twotone";
 export const icfyTIME = "svg-spinners:clock";

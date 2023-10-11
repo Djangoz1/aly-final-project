@@ -8,8 +8,10 @@ import {
   useFormDispatch,
   useFormState,
 } from "context/form";
-import React, { useEffect } from "react";
+import { useInView } from "framer-motion";
+import React, { useEffect, useRef } from "react";
 import { Layout } from "sections/Layout";
+import { useAccount } from "wagmi";
 
 export const LayoutForm = ({ stateInit, children }) => {
   return (
@@ -22,9 +24,11 @@ export const LayoutForm = ({ stateInit, children }) => {
 const Child = ({ stateInit, children }) => {
   let { form, status, modal, checked, pointer } = useFormState();
   let dispatch = useFormDispatch();
-  console.log(stateInit?.superChecked?.function);
+  let { isConnected } = useAccount();
+  let ref = useRef(null);
+  let isInView = useInView(ref);
   useEffect(() => {
-    if (modal) {
+    if (isInView && isConnected && stateInit?.form?.target !== form?.target) {
       doInitStateForm(dispatch, stateInit);
       doStateFormChecked({
         dispatch,
@@ -33,10 +37,12 @@ const Child = ({ stateInit, children }) => {
         checked: stateInit?.checked,
         superChecked: stateInit?.superChecked,
       });
-    } else {
-      doStateFormRefresh(dispatch);
-      doStateFormDisabled(dispatch, true);
+      console.log("Anormal ! Init layout form ...", stateInit);
     }
-  }, [stateInit, modal]);
-  return <>{children}</>;
+  }, [stateInit, isConnected, isInView, modal]);
+  return (
+    <div ref={ref} className="w-full h-full">
+      {children}
+    </div>
+  );
 };

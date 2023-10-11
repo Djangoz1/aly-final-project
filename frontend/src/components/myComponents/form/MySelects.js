@@ -46,7 +46,6 @@ export const MySelects = ({ selects, styles }) => {
             {el?.arr?.map((op, i) => (
               <option value={`${i}`} key={uuidv4()}>
                 {op?.[el?.target1] || op}
-                {console.log(op?.el?.value)}
               </option>
             ))}
           </select>

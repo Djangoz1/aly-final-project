@@ -18,7 +18,7 @@ export const MyCheckboxes = ({ label, target, checkboxes }) => {
   return (
     <div className="flex flex-col text-left">
       <label className="text-light font-light text-xs mb-1 uppercase ">
-        {label} {checked?.[pointer].includes(target) && " *"}
+        {label} {checked?.[pointer]?.includes(target) && " *"}
       </label>
       <div className=" flex">
         {checkboxes?.map((el, i) => (

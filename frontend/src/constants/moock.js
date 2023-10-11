@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 
 export let moock_create_profile = {
   id: null,
+  target: "create profile",
   address: null,
   username: null,
   description: null, // bio
@@ -68,9 +69,10 @@ export let moock_edit_profile = {
 };
 
 export let toMockProfile = ({ address, metadatas, cvID }) => {
-  let attributes = metadatas.attributes?.[0];
+  let attributes = metadatas?.attributes?.[0];
   let identity = attributes?.identity;
   let moock = {
+    target: "Profile",
     id: cvID,
     address: address,
     username: metadatas?.username,
@@ -92,7 +94,7 @@ export let toMockProfile = ({ address, metadatas, cvID }) => {
     skills: attributes?.skills,
     domain: attributes?.domain,
     languages: attributes?.languages,
-    createdAt: attributes.createdAt,
+    createdAt: attributes?.createdAt,
   };
 
   return moock;

@@ -1,6 +1,5 @@
 "use client";
 
-import { sectionCommunity } from "constants/text";
 import React, { useEffect, useState } from "react";
 
 import { Layout } from "sections/Layout";
@@ -12,7 +11,7 @@ import { styles } from "styles/style";
 import { Scene } from "spline/Scene";
 
 import { spline } from "constants/spline";
-import { CreateLaunchpad } from "sections/Launchpad/form/CreateLaunchpad";
+
 import { HeroLaunchpad } from "sections/Launchpad/HeroLaunchpad";
 import { ADDRESSES } from "constants/web3";
 import { _apiGet } from "utils/ui-tools/web3-tools";
@@ -23,7 +22,11 @@ import { v4 } from "uuid";
 import { ethers } from "ethers";
 import { fromTimestamp } from "utils/ux-tools";
 import { stateLaunchpad } from "utils/ui-tools/state-tools";
-import { LaunchpadCard } from "components/Launchpad/LaunchpadCard";
+import { Hg, Hg1 } from "components/text/HeroGradient";
+import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+import { icfy, icfyROCKET } from "icones";
+import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { Viewport } from "components/myComponents/layout/MyViewport";
 
 const LaunchpadPage = () => {
   let [isList, setIsList] = useState(null);
@@ -47,53 +50,67 @@ const LaunchpadPage = () => {
   }, [cv]);
 
   return (
-    <Layout>
-      <div className="bg-animation">
-        <div id="stars"></div>
-        <div id="stars2"></div>
-        <div id="stars3"></div>
-      </div>
-
-      <MySection styles={"flex font2 flex-col "}>
-        <HeroLaunchpad />
-        {isList?.map((el) => (
-          <LaunchpadCard id={el} key={v4()} />
-          // <MyAsset
-          //   key={v4()}
-          //   url={`/launchpad/${el?.datas?.id}`}
-          //   banniere={el?.metadatas?.attributes?.[0]?.banniere}
-          //   image={el?.metadatas?.image}
-          //   title={el?.metadatas?.title}
-          //   description={el?.metadatas?.description}
-          //   details={[
-          //     {
-          //       title: "Fundraising goal",
-          //       value: (
-          //         <>
-          //           {ethers.utils.formatEther(`${el?.datas?.maxCap}`)}
-          //           <span className="text-white/40 ml-1">ETH</span>
-          //         </>
-          //       ),
-          //     },
-          //     {
-          //       title: "Token price",
-          //       value: (
-          //         <>
-          //           ~ {el?.datas?.tokenPrice}
-          //           <span className="text-white/40 ml-1">ETH</span>
-          //         </>
-          //       ),
-          //     },
-
-          //     {
-          //       value: "Token sale start",
-          //       title: <>{fromTimestamp(parseInt(el?.datas?.saleStart))}</>,
-          //     },
-          //   ]}
-          // />
-        ))}
-      </MySection>
-    </Layout>
+    <>
+      <MyLayoutApp styles={"flex font2 flex-col "}>
+        <Viewport particles={true} full={true} id={"hero"} index={0}>
+          <HeroLaunchpad />
+        </Viewport>
+        <Viewport id={"services"} full={true} index={1}>
+          <div className="  my-auto font2">
+            <h2
+              className={`text-center font-light text-white/20 text-[34px] mb-[6vh]`}
+            >
+              <Hg style={"font-light"}>Owner</Hg> |{" "}
+              <Hg1 style={"font-light "}>Investor</Hg1>
+            </h2>
+            <div className="flex justify-evenly">
+              <MyCardInfo
+                styles={"w-[23%]"}
+                color={2}
+                header={{
+                  icon: icfy.ux.flag,
+                  title: "Launch Project",
+                }}
+                btn={{
+                  component: (
+                    <Link
+                      className="btn btn-xs btn-outline c2"
+                      href="/create/launchpad"
+                    >
+                      Create Launchpad
+                    </Link>
+                  ),
+                }}
+              />
+              <MyCardInfo
+                styles={"w-[23%]"}
+                color={2}
+                header={{
+                  icon: icfy.ux.mediation,
+                  title: "Manage Launchpad",
+                }}
+              />
+              <MyCardInfo
+                styles={"w-[23%]"}
+                color={1}
+                header={{
+                  icon: icfy.bank.coin,
+                  title: "Standard ERC20",
+                }}
+              />
+              <MyCardInfo
+                styles={"w-[23%]"}
+                color={1}
+                header={{
+                  icon: icfy.bank.bag,
+                  title: "Invest on Launchpad",
+                }}
+              />
+            </div>
+          </div>
+        </Viewport>
+      </MyLayoutApp>
+    </>
   );
 };
 

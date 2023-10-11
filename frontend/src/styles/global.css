@@ -9,6 +9,14 @@ body {
   height: fit-content;
 }
 
+.logo:hover {
+  color: rgba(11, 129, 167, 0.92);
+}
+
+.logo:hover .logoD {
+  border-color: rgba(11, 129, 167, 0.92);
+}
+
 .debug * {
   border: 1px solid red;
 }
@@ -43,6 +51,61 @@ body {
   padding: 0;
   margin: 0;
 }
+
+.c1 {
+  color: #202361;
+}
+.bg1 {
+  background-color: #202361;
+}
+
+.c2 {
+  color: #a8e061;
+}
+
+.bg2 {
+  background-color: #a8e061;
+}
+
+.c3 {
+  color: #e5e5f8;
+}
+
+.whiteglass {
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.507
+  ); /* Fond blanc vitreux semi-transparent */
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backdrop-filter: blur(
+    40px
+  ); /* Appliquer un flou au contenu derrière l'élément */
+  /* box-shadow: 0 0 20px rgba(255, 255, 255, 0.7); Ombre blanche avec flou */
+}
+.blackglass {
+  background: rgba(0, 0, 0, 0.2); /* Couleur sombre avec une opacité de 80% */
+  backdrop-filter: blur(
+    10px
+  ); /* Appliquer un léger flou (ajustez la valeur selon vos préférences) */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* /* Appliquer un flou au contenu derrière l'élément */
+  /* box-shadow: 0 0 20px rgba(255, 255, 255, 0.7); Ombre blanche avec flou */
+}
+
+.whiteglass-text {
+  z-index: 100;
+  position: relative;
+  backdrop-filter: none; /* Annuler le filtre sur le texte */
+}
+
 .page {
   /*   
   background: linear-gradient(
@@ -60,9 +123,9 @@ body {
     rgb(12, 10, 18),
     rgba(21, 18, 30, 1),
     rgba(21, 18, 30, 1),
-    rgb(33, 27, 49),
-    rgb(51, 42, 74),
-    rgb(60, 49, 86)
+    rgb(17, 14, 25),
+    rgb(8, 7, 11),
+    rgb(21, 16, 33)
   );
 }
 
@@ -444,10 +507,10 @@ h3 {
     to left,
     #22a8bd12,
     #22bd993f,
-    #22bd9960,
-    #22bd9996,
-    #22bd99,
-    #22bd9956,
+    #22bd9924,
+    #22bd992b,
+    #22bd993a,
+    #22bd990c,
     #22a8bd1a
   );
   /* box-shadow: 0 4px 4px 0 rgba(49, 196, 191, 0.275); */
@@ -562,13 +625,13 @@ h3 {
 
 .presentation li .subtitle {
   font-size: 16px;
-  margin-bottom: 30px;
   margin-top: 5px;
 }
 
 .presentation li {
   text-align: left;
   font-size: 20px;
+  margin-top: 30px;
   line-height: 1.7;
   font-weight: 100;
 }
