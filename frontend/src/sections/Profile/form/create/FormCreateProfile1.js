@@ -159,7 +159,7 @@ export const FormCreateProfile2 = () => {
           {
             target: "domain",
             label: "Niveau",
-            arr: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
+            arr: ENUMS.languagesLevel,
             placeholder: "Choisir",
           },
         ]}

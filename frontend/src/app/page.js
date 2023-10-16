@@ -139,7 +139,7 @@ export default function Home() {
             <div className="w-full h-full items-end relative  flex">
               <div className="w-full flex flex-col   justify-end  ">
                 <LinearGradient
-                  className="text-xs font2 uppercase"
+                  className="w-fit text-xs font2 uppercase"
                   gradient={[
                     "to right",
                     "rgba(201,78,21,0.92), rgba(201,21,103,1)",
@@ -147,7 +147,7 @@ export default function Home() {
                 >
                   Boost your startups from scratch
                 </LinearGradient>
-                <p className={"w-full " + styles.hero}>
+                <div className={"w-full " + styles.hero}>
                   Where
                   <br />
                   <Hg>Blockchain</Hg>
@@ -155,8 +155,15 @@ export default function Home() {
                   meets Social
                   <br />
                   <Hg>Freelancing</Hg>
+                </div>
+                <p className="w-1/3 text-white/40 text-justify text-sm">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem
+                  autem iste fugiat atque rerum error in sequi harum. Magni
+                  velit praesentium doloremque libero aspernatur dolores eos
+                  temporibus voluptatibus, officia molestiae!
                 </p>
               </div>
+
               {/* <img
                 src="/hero.jpeg"
                 className="h-fit w-[600px]  mask mask-hexagon rounded-lg"
@@ -232,10 +239,15 @@ export default function Home() {
             </div>
           </Viewport>
           <Viewport full={true} id={"presentation2"} index={2}>
-            <div className=" my-[10vh] font2">
-              <h2 className={`text-center font-light text-[34px] mb-[6vh]`}>
-                <Hg1>Services</Hg1>
-              </h2>
+            <div className="  font2">
+              <h6 className={` font-light  text-[45px]  `}>Our Services</h6>
+              <p className="text-white/40 w-1/3 text-xs mb-[6vh]">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa
+                fugiat aperiam similique voluptatum illo exercitationem
+                explicabo distinctio sint ratione, recusandae voluptates officia
+                natus adipisci ab soluta in unde dolor earum!
+              </p>
+
               <div className="flex justify-evenly">
                 <MyCardInfo
                   styles={"w-[23%]"}
@@ -247,7 +259,7 @@ export default function Home() {
                   btn={{
                     component: (
                       <Link
-                        className="btn btn-xs c2 btn-outline"
+                        className="btn ml-auto btn-xs btn-outline"
                         href={"/create/mission"}
                       >
                         Create Mission
@@ -264,12 +276,12 @@ export default function Home() {
                   }}
                 />
                 <MyCardInfo
-                  styles={"w-[23%]"}
+                  styles={" w-[23%]"}
                   color={1}
                   btn={{
                     component: (
                       <Link
-                        className="btn btn-xs c2 btn-outline"
+                        className="btn ml-auto btn-xs btn-outline"
                         href={"/create/profile"}
                       >
                         Create Profile
@@ -291,7 +303,7 @@ export default function Home() {
                   btn={{
                     component: (
                       <Link
-                        className="btn btn-xs c2 btn-outline"
+                        className="btn ml-auto btn-xs btn-outline"
                         href={"/create/launchpad"}
                       >
                         Create Launchpad

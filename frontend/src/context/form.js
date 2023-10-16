@@ -90,8 +90,6 @@ export const doStateFormChecked = ({
     }
   }
 
-  console.log("checked", _checked);
-
   for (let index = 0; index < _checked?.[pointer]?.length; index++) {
     let value = _checked?.[pointer]?.[index];
     if (superChecked && value?.bool !== undefined) {

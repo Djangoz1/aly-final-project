@@ -47,7 +47,7 @@ export const AssetJob = ({ feature, style, noBtn, featureID }) => {
       <div className="absolute w-full top-0 py-1" ref={ref} />
       <div className="absolute w-full bottom-0 py-1" ref={ref1} />
       <MyCardInfo
-        styles={"w-full "}
+        styles={"w-full h-full " + style}
         key={v4()}
         color={1}
         header={{

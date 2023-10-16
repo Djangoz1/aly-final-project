@@ -27,6 +27,7 @@ import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
 import { icfy, icfyROCKET } from "icones";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { Viewport } from "components/myComponents/layout/MyViewport";
+import Link from "next/link";
 
 const LaunchpadPage = () => {
   let [isList, setIsList] = useState(null);

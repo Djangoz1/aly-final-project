@@ -11,6 +11,14 @@ export const STATUS = {
     { icon: icfy.court.justice, status: "Contest", color: "error" },
   ],
 
+  dispute: [
+    { status: "Initial", icon: icfy.code.tool, color: "success" },
+    { status: "Reclaimed", icon: icfy.code.tool, color: "success" },
+    { status: "Disputed", icon: icfy.code.tool, color: "success" },
+    { status: "Tally", icon: icfy.code.tool, color: "success" },
+    { status: "Resolved", icon: icfy.code.tool, color: "success" },
+  ],
+
   mission: [
     { status: "Process", icon: icfy.code.casual, color: "success" },
     { status: "Close", icon: icfy.bank.check, color: "info" },

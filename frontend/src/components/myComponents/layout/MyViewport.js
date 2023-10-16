@@ -46,7 +46,7 @@ function useParallax(value, distance) {
   return useTransform(value, [0, 1], [-distance, distance]);
 }
 
-export function Viewport({ index, particles, img, full, children, id }) {
+export function Viewport({ index, side, particles, img, full, children, id }) {
   const ref = useRef(null);
 
   const ref1 = useRef(null);
@@ -80,11 +80,12 @@ export function Viewport({ index, particles, img, full, children, id }) {
           <div className="absolute top-0 left-0">
             <ImagePin
               CID={img}
-              styleImg={"opacity-80 w-screen h-screen "}
+              styleImg={"brightness-75 w-screen h-screen "}
               style={" w-screen h-screen fixed top-0 left-0"}
             />
           </div>
         )}
+
         <div
           className={` flex flex-col relative  mt-[10vh] max-w-[1200px] mx-auto h-[80vh] ${
             full ? " w-[90vw]  " : "   w-[65vw]"
@@ -97,6 +98,11 @@ export function Viewport({ index, particles, img, full, children, id }) {
         <motion.span className="position  absolute bottom-10 right-10">
           #00<span className="c2 ">{`${id}`}</span>
         </motion.span>
+        {side && (
+          <div className="w-[15vw] h-[92vh] border border-white/10 border-l-0  bottom-0 left-0  absolute  z-10">
+            {side}
+          </div>
+        )}
       </section>
       {particles && particles === true && <Particle />}
     </>

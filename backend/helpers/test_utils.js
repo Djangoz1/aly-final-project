@@ -104,7 +104,7 @@ const FEATURE_DATAS_URI_EXEMPLE = {
   description:
     "This is a part where content value stored. I can write everything I want to describe my feature. Once a worker join this feature, I must follow instruction of this content. In the end, if a litigation arrived between owner(me) and worker, this content will be shared on Kleros Court",
   image: "https://picsum.photos/id/100/200",
-  attributes: { domain: "web3" },
+  attributes: { domain: 2 },
 };
 
 // *::::::::::::: ------------- :::::::::::::* //

@@ -173,7 +173,7 @@ const createURIFeature = async ({
     const metadatas = {
       title: title || moock?.title,
       description: description || moock?.description,
-      attributes: [attributes || moock?.attributes],
+      attributes: attributes?.domain ? attributes : [moock?.attributes],
     };
     let uri = await createURI({ id, title: "Feature", images, metadatas });
     return uri;

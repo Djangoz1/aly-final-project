@@ -3,6 +3,7 @@ import { AssetProfile } from "components/assets/AssetProfile";
 import { MissionName } from "components/inputs/inputsMission/MissionName";
 import { MyCard1 } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { ENUMS } from "constants/enums";
 import { doIndexTools, useToolsDispatch, useToolsState } from "context/tools";
 import { useInView } from "framer-motion";
@@ -18,28 +19,20 @@ export const CVMissions = () => {
   let { state, index } = useToolsState();
 
   let dispatch = useToolsDispatch();
-  console.log("missions state ", state?.owner?.details?.missions);
-  // useEffect(() => {
-  //     if (isInView && !state?.features && state?.datas?.features?.length > 0) {
 
-  //     }
-  // }, [isInView])
+  let handleClick = (i) => {
+    doIndexTools(dispatch, i);
+  };
   return (
     <>
       <div className="flex flex-col" ref={ref}>
-        <div className="tabs tabs-boxed backdrop-blur  mb-1">
-          {state?.owner?.details?.missions?.map((el, i) => (
-            <button
-              onClick={() => doIndexTools(dispatch, i)}
-              key={v4()}
-              className={`  tab mr-5 btn-xs ${
-                index === i ? "bg1 text-white" : " "
-              }`}
-            >
-              {el?.metadatas?.title}
-            </button>
-          ))}
-        </div>
+        <MyMenusTabs
+          setter={handleClick}
+          value={index}
+          arr={state?.owner?.details?.missions?.map(
+            (el) => el?.metadatas?.title
+          )}
+        />
 
         <div className="flex ">
           <MyCardInfo

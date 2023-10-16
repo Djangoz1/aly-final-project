@@ -84,7 +84,10 @@ export let createURI = async ({ id, title, images, metadatas }) => {
 
   metadatas.name = pinataMetadata.name;
   metadatas.attributes[0].createdAt = Date.now();
-
+  console.log("metadatas create uri ", metadatas);
+  console.log("metadatas create azeuri ", pinataMetadata);
+  console.log("metadatas create uridqsd ", pinataGateway);
+  console.log("metadatas create uriqsdqs ", pinataOptions);
   const formData = new FormData();
   formData.append("pinataMetadata", JSON.stringify(pinataMetadata));
   formData.append("pinataOptions", JSON.stringify(pinataOptions));
@@ -100,6 +103,7 @@ export let createURI = async ({ id, title, images, metadatas }) => {
       },
     }
   );
+  console.log("respone", response);
 
   return response.data.IpfsHash;
 };
@@ -172,12 +176,15 @@ export let createURIPub = async (form) => {
     images,
     metadatas: {
       description: form.description,
+      title: form?.title,
       attributes: [
         {
-          owner: form.owner,
-          missionID: form.missionID,
-          answerID: form.answerID,
-          tags: form.tags,
+          owner: form?.owner,
+          missionID: form?.missionID,
+          answerID: form?.answerID,
+          language: form?.language,
+          tags: form?.tags,
+          code: form?.code,
         },
       ],
     },

@@ -135,14 +135,14 @@ export const MyCountdown = ({ count, timestamp, size, range }) => {
   );
 };
 
-export const MyCounter = ({ startDate, endDate }) => {
+export const MyCounter = ({ startDate, size, endDate }) => {
   const [isEnd, setEnd] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining());
   const tools = useToolsState();
   // Fonction pour calculer le temps restant entre la date de début et la date de fin
   function calculateTimeRemaining() {
     const currentTime = new Date().getTime();
-    const endTime = isEnd?.getTime();
+    const endTime = endDate;
     const timeLeft = endTime - currentTime;
 
     if (timeLeft <= 0) {

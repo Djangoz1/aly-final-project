@@ -26,9 +26,13 @@ const Child = ({ stateInit, children }) => {
   let dispatch = useFormDispatch();
   let { isConnected } = useAccount();
   let ref = useRef(null);
-  let isInView = useInView(ref);
+
   useEffect(() => {
-    if (isInView && isConnected && stateInit?.form?.target !== form?.target) {
+    if (
+      (modal || stateInit?.allowed) &&
+      isConnected &&
+      stateInit?.form?.target !== form?.target
+    ) {
       doInitStateForm(dispatch, stateInit);
       doStateFormChecked({
         dispatch,
@@ -39,10 +43,6 @@ const Child = ({ stateInit, children }) => {
       });
       console.log("Anormal ! Init layout form ...", stateInit);
     }
-  }, [stateInit, isConnected, isInView, modal]);
-  return (
-    <div ref={ref} className="w-full h-full">
-      {children}
-    </div>
-  );
+  }, [stateInit, isConnected, modal]);
+  return <>{children}</>;
 };

@@ -26,7 +26,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
   };
 
   useEffect(() => {
-    if (!isName && isInView) {
+    if ((!isName || (isName != metadata?.username && metadata)) && isInView) {
       state();
     }
   }, [cvID, metadata, isInView]);
@@ -35,7 +35,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
     <Link
       ref={ref}
       href={`/profile/${metadata?.cvID || cvID || cv}`}
-      className={styles + " w-fit hover:text-info"}
+      className={" w-fit hover:text-info " + styles}
     >
       {isName || "No name"}
     </Link>

@@ -19,6 +19,7 @@ export const MyTextArea = ({ label, target, styles }) => {
   let setter = (_value) => {
     setValue(_value);
     let _form = form;
+
     _form[target] = _value;
     doInitStateForm(dispatch, form);
 

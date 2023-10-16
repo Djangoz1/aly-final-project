@@ -44,9 +44,11 @@ const PageCreateFeature = () => {
   let dispatch = useMissionDispatch();
 
   let submitForm = async (form) => {
+    console.log("form", form);
     let uri = await createURIFeature(form);
     let missionID = parseInt(form?.missionID);
     let estimatedDays = parseInt(form?.estimatedDays);
+
     if (missionID > 0 && estimatedDays > 0) {
       let value = await ethers.utils.parseEther(form?.wadge);
       await _apiPost(
@@ -72,12 +74,15 @@ const PageCreateFeature = () => {
         title={"Create Feature"}
         side={<MySteps arr={MENUS_CREATE_FEATURE} />}
         stateInit={{
+          allowed: true,
           form: moock_create_feature,
           placeholders: moock_create_feature_placeholders,
           checked: [
             [],
-            ["title", "domain", "description"],
-            ["missionID", "specification", "wadge", "worker", "estimatedDays"],
+            [],
+            [],
+            // ["title", "domain", "description"],
+            // ["missionID", "specification", "wadge", "worker", "estimatedDays"],
           ],
         }}
         btn={"Create feature"}

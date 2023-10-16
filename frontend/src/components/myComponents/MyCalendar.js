@@ -10,7 +10,15 @@ const localizer = momentLocalizer(moment);
 export const MyCalendar = ({ events }) => {
   let { state } = useToolsState();
   const ref = useRef(null);
-
+  function getEventStyle(event, start, end, isSelected) {
+    const style = {
+      backgroundColor: event.backgroundColor, // Utilisez la propriété 'color' de l'événement comme couleur de fond.
+      color: event.color, // Couleur du texte
+    };
+    return {
+      style,
+    };
+  }
   return (
     <div ref={ref} className="text-xs  ">
       <Calendar
@@ -19,7 +27,8 @@ export const MyCalendar = ({ events }) => {
         events={events}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 600, width: 800 }}
+        eventPropGetter={getEventStyle}
+        style={{ height: 600, width: 600 }}
       />
     </div>
   );

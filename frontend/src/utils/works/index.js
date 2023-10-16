@@ -44,7 +44,7 @@ export let fetchMission = async (missionID) => {
     ]);
     datas.owner = parseInt(await _apiGet("cvOf", [owner]));
     datas.pubs = await _apiGet("pubsOfMission", [missionID]);
-
+    datas.disputes = null;
     return datas;
   }
 };

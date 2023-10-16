@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MyTableEl } from "./MyTableEl";
 import { _table_features } from "utils/states/tables/feature";
-export const MyTable = ({ head, list, editBtns }) => {
+export const MyTable = ({ head, list, btns, editBtns }) => {
   let [isCountView, setIsViewCount] = useState(5);
   return (
     <>
@@ -34,7 +34,7 @@ export const MyTable = ({ head, list, editBtns }) => {
                       key={uuidv4()}
                       id={el?.id}
                       arr={el?.arr}
-                      btns={el?.btns}
+                      btns={btns}
                     />
                   )
               )}

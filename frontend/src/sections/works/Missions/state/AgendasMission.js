@@ -7,8 +7,14 @@ import { useAuthState } from "context/auth";
 import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 
 import { MyCalendar } from "components/myComponents/MyCalendar";
-import { MyCard1 } from "components/myComponents/card/MyCard";
+import {
+  MyCard,
+  MyCard1,
+  MyCardInfos,
+} from "components/myComponents/card/MyCard";
 import { v4 } from "uuid";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { fromTimestamp } from "utils/ux-tools";
 
 export const AgendasMission = () => {
   const { cv } = useAuthState();
@@ -20,10 +26,11 @@ export const AgendasMission = () => {
   const isInView = useInView(ref);
   let dispatch = useToolsDispatch();
 
+  let [isInfos, setIsInfos] = useState(null);
   let fetch = async () => {
     let _state = state;
     _state.events = [];
-
+    let infos = [];
     for (let index = 0; index < _state?.features?.length; index++) {
       const feature = _state?.features[index];
 
@@ -33,12 +40,72 @@ export const AgendasMission = () => {
       let event = {
         start: start,
         end: end,
+        index,
         days: feature?.datas?.estimatedDays,
         title: feature?.metadatas?.title,
       };
       _state.events.push(event);
-    }
+      infos.push({
+        title: (
+          <>
+            <div className="badge badge-xs badge-primary mr-2" />
+            {event?.title}
+          </>
+        ),
+        value: (
+          <div className="flex flex-col">
+            <div className="flex items-center">
+              <p className="mr-2 text-white/40">Started At</p>
+              <span>{fromTimestamp(event?.start.getTime())}</span>
+            </div>
+            <div className="flex items-center">
+              <p className="mr-2 text-white/40">Claimable At</p>
+              <span>{fromTimestamp(event?.end.getTime())}</span>
+            </div>
+          </div>
+        ),
+      });
+      if (feature?.details?.dispute?.datas?.timers?.createdAt) {
+        let start = new Date(parseInt(feature?.datas?.startedAt) * 1000);
+        let end = new Date(start);
+        end.setDate(
+          start.getDate() + feature.details?.dispute?.datas?.reclamationPeriod
+        );
+        let event = {
+          start: start,
+          end: end,
+          index,
+          days: feature?.details?.dispute?.datas?.reclamationPeriod,
+          title: `Court - ${feature?.metadatas?.title}`,
+          backgroundColor: "red",
+          color: "white",
+        };
 
+        infos.push({
+          title: (
+            <>
+              <div className="badge badge-xs mr-2 badge-error" />
+              {event?.title}
+            </>
+          ),
+          value: (
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <p className="mr-2 text-white/40">Started At</p>
+                <span>{fromTimestamp(event?.start.getTime())}</span>
+              </div>
+              <div className="flex items-center">
+                <p className="mr-2 text-white/40">Closed At</p>
+
+                <span>{fromTimestamp(event?.end.getTime())}</span>
+              </div>
+            </div>
+          ),
+        });
+        _state.events.push(event);
+      }
+    }
+    setIsInfos(infos);
     doStateTools(dispatch, _state);
   };
   useEffect(() => {
@@ -50,34 +117,26 @@ export const AgendasMission = () => {
 
   return (
     <div ref={ref}>
-      <div className="tabs tabs-boxed backdrop-blur  mb-1">
-        <button
-          onClick={() => setIsClicked(null)}
-          className={`  tab mr-5 btn-xs ${
-            isClicked === null ? "bg-black text-white" : " "
-          }`}
-        >
-          All
-        </button>
-        {state?.features?.map((el, i) => (
-          <button
-            onClick={() => setIsClicked(i)}
-            key={v4()}
-            className={`  tab mr-5 btn-xs ${
-              isClicked === i ? " bg1 text-white" : " "
-            }`}
-          >
-            {el?.metadatas?.title}
-          </button>
-        ))}
+      <MyMenusTabs
+        setter={setIsClicked}
+        arr={state?.features?.map((el) => el?.metadatas?.title)}
+        value={isClicked}
+      >
+        All
+      </MyMenusTabs>
+      <div className="flex ">
+        <MyCardInfos style={"rounded-tl-none mr-3"} arr={isInfos}></MyCardInfos>
+
+        <MyCard styles={"rounded-tl-none w-fit"} color={1}>
+          <MyCalendar
+            events={
+              isClicked !== null
+                ? state?.events?.filter((el) => el.index === isClicked)
+                : state?.events
+            }
+          />
+        </MyCard>
       </div>
-      <MyCard1 color={1}>
-        <MyCalendar
-          events={
-            isClicked !== null ? [state?.events?.[isClicked]] : state?.events
-          }
-        />
-      </MyCard1>
     </div>
   );
 };

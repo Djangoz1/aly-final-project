@@ -1,263 +1,248 @@
 "use client";
 
-import { MyTable } from "components/myComponents/table/MyTable";
+import React, { useEffect, useRef, useState } from "react";
 
-import {
-  HEAD_table_features,
-  _table_features,
-} from "utils/states/tables/feature";
+import { useAuthState } from "context/auth";
+import { useToolsState } from "context/tools";
 
-import { LayoutMission } from "sections/works/Missions/LayoutMission";
-import {
-  doStateMission,
-  useMissionDispatch,
-  useMissionState,
-} from "context/hub/mission";
-import {
-  MyCard,
-  MyCard1,
-  MyCardList,
-} from "components/myComponents/card/MyCard";
-import { icfy, icfyETHER, icfyROCKET } from "icones";
-import { useEffect, useState } from "react";
-import { v4 } from "uuid";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { stateLaunchpad } from "utils/ui-tools/state-tools";
+
 import { Icon } from "@iconify/react";
-import Link from "next/link";
-import { _apiPost } from "utils/ui-tools/web3-tools";
-import { doStateCV } from "context/hub/cv";
+import { icfy, icfyETHER } from "icones";
 
-import { MyCalendar } from "components/myComponents/MyCalendar";
-import { MENUS_EDIT } from "constants/menus";
-import { doAuthCV, useAuthDispatch } from "context/auth";
-import { useAccount } from "wagmi";
-import { LayoutLaunchpad } from "sections/Launchpad/LayoutLaunchpad";
-import { useLaunchpadState } from "context/hub/launchpad";
-import { MyCountdown } from "components/myComponents/MyCountdown";
-import { Hg } from "components/text/HeroGradient";
-import { STATUS } from "constants/status";
+import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { _table_features } from "utils/states/tables/feature";
+import { _table_invites } from "utils/works/feature";
+
+import { Viewport } from "components/myComponents/layout/MyViewport";
+
+import { _apiGet } from "utils/ui-tools/web3-tools";
+import { CVOverview } from "sections/Profile/state/CVOverview";
+
+import { LaunchpadProfile } from "sections/Launchpad/state/LaunchpadProfile";
+import { AssetProfile1 } from "components/assets/AssetProfile";
 import { ethers } from "ethers";
-import { ProfileAvatar } from "components/profile/ProfileAvatar";
-import useSpline from "@splinetool/r3f-spline";
-import { OrthographicCamera } from "@react-three/drei";
-import { Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import Spline from "@splinetool/react-spline";
-import { FormProvider, useFormState } from "context/form";
-import { MyInput } from "components/myComponents/form/MyInput";
-import { LayoutForm } from "sections/Form/LayoutForm";
-import { MyFormModal } from "components/myComponents/form/MyFormModal";
-export default function PageLaunchpad({ params }) {
-  const launchpadID = params.launchpadID;
-  let { address } = useAccount();
-  let state = useMissionState();
+import { fromTimestamp } from "utils/ux-tools";
+import { STATUS } from "constants/status";
+import Link from "next/link";
 
+function App({ params }) {
+  const { cv } = useAuthState();
+
+  const tools = useToolsState();
+  const { state, status } = useToolsState();
+
+  let [isState, setIsState] = useState(null);
+
+  const launchpadID = params.launchpadID;
+
+  let fetch = async () => {
+    let launchpad = await stateLaunchpad(launchpadID);
+
+    let _state = {
+      launchpad: {
+        datas: launchpad.datas,
+        launchpadID: launchpad.launchpadID,
+        metadatas: launchpad.metadatas,
+      },
+      owner: launchpad.owner,
+    };
+
+    setIsState(_state);
+  };
+  useEffect(() => {
+    if (!isState || status === "reload") {
+      fetch();
+      console.log("Anormal !!!! fetch is datas page", isState);
+    }
+  }, [launchpadID, status]);
+  console.log("state launchpad page", state);
   return (
-    <LayoutLaunchpad id={launchpadID}>
-      <Page />
-    </LayoutLaunchpad>
+    <MyLayoutApp
+      particles={true}
+      id={launchpadID}
+      url={`/launchpad/${launchpadID}`}
+      ownerProfile={
+        <AssetProfile1
+          target={"owner"}
+          metadatas={state?.owner}
+          cvID={state?.owner?.cvID}
+        />
+      }
+      side={
+        <div className="flex flex-col  ml-auto w-full  justify-end">
+          <h6 className="text-white text-right mb-3">
+            {state?.launchpad?.datas?.tokenName}
+          </h6>
+          <div className="flex  ml-auto  mb-5 w-2/3  flex-col">
+            <div className="flex text-xs justify-end items-end">
+              <Icon icon={icfy.bank.bag} className="text-2xl mr-3" />
+              <span>{state?.launchpad?.datas?.allowance}</span>
+            </div>
+            <div className="flex text-xs justify-end items-end">
+              <Icon icon={icfy.person.team} className="text-2xl mr-3" />
+
+              <span>{parseInt(state?.launchpad?.datas?.totalUser)}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end mb-1">
+            <Icon icon={icfyETHER} className="text-white c2 text-[74px]" />
+            <div className="flex flex-col items-end">
+              <span className="text-xs text-white/40">Récoltés</span>
+              <p className="text-sm">
+                <span>{state?.launchpad?.datas?.amountRaised}</span>
+                <span className="text-white c2 text-sm ml-3">ETH</span>
+              </p>
+              <span className="text-xs text-white/40">Token price</span>
+              <p className="text-sm">
+                <span>{state?.launchpad?.datas?.tokenPrice}</span>
+                <span className="text-white c2 text-sm ml-3">ETH</span>
+              </p>
+            </div>
+          </div>
+
+          <div
+            className={`flex items-center  p-3 mt-3 ml-auto badge badge-outline badge-xs text-xs badge-${
+              STATUS.launchpad?.[state?.launchpad?.datas?.status]?.color
+            }`}
+          >
+            <Icon
+              icon={STATUS.launchpad[state?.launchpad?.datas?.status]?.icon}
+              className="text-lg mr-4"
+            />
+            {STATUS.launchpad[state?.launchpad?.datas?.status]?.status}
+          </div>
+          <Link
+            href={"/edit/launchpad/" + launchpadID}
+            className="btn btn-xs btn-outline"
+          >
+            Invest on token
+          </Link>
+        </div>
+      }
+      subMenus={[
+        { title: "", tag: "1" },
+        { title: "descriptions", tag: "description" },
+        { title: "Rules", tag: "rules" },
+        { title: "Overview", tag: "overview" },
+      ]}
+      target={""}
+      initState={isState}
+    >
+      <Viewport
+        img={state?.launchpad?.metadatas?.attributes?.[0]?.banniere}
+        id={"1"}
+        index={0}
+      >
+        <div className="mt-auto">
+          <LaunchpadProfile />
+        </div>
+      </Viewport>
+
+      <Viewport id={"cv"} index={1}>
+        <div
+          className="backdrop-blur  mr-4 w-full  h-[75vh] p-5 text-xs rounded-lg shadow overflow-scroll hide-scrollbar  text-justify whitespace-break-spaces"
+          noBtn={true}
+        >
+          {state?.launchpad?.metadatas?.description}
+        </div>
+      </Viewport>
+      <Viewport id={"missions"} index={2}>
+        <div className="backdrop-blur w-full flex flex-col">
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Total participants</p>
+            <span>{parseInt(state?.launchpad?.datas?.totalUser)}</span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Launchpad contract</p>
+            <span>{state?.launchpad?.metadatas?.title}</span>
+            <span className="text-[10px]">
+              {state?.launchpad?.datas?.address}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Balance Token owner</p>
+            <span>{state?.launchpad?.datas?.balanceOwner}</span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Allowance Contract</p>
+            <span>{state?.launchpad?.datas?.allowance} Tokens</span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Balance Contract</p>
+            <span>{state?.launchpad?.datas?.amountRaised} ETH</span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Round actuel</p>
+            <span>
+              {state?.launchpad?.datas?.currentTier + 1}/
+              {state?.launchpad?.datas?.numberOfTier}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Token contract</p>
+            <span>
+              {state?.launchpad?.datas?.tokenName}{" "}
+              {state?.launchpad?.datas?.tokenSymbol}
+            </span>
+            <span className="text-[10px]">
+              {state?.launchpad?.datas?.tokenAddress}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">
+              Capitalization <span className="text-[10px]">min / max</span>
+            </p>
+            <span>
+              {state?.launchpad?.datas &&
+                ethers?.utils?.formatEther(state?.launchpad?.datas?.minCap)}
+              /
+              {state?.launchpad?.datas &&
+                ethers?.utils?.formatEther(
+                  state?.launchpad?.datas?.maxCap
+                )}{" "}
+              ETH
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">
+              Invest allowance <span className="text-[10px]">min / max</span>
+            </p>
+            <span>
+              {state?.launchpad?.datas &&
+                ethers?.utils.formatEther(state?.launchpad?.datas?.minInvest)}
+              /
+              {state?.launchpad?.datas &&
+                ethers?.utils.formatEther(
+                  state?.launchpad?.datas?.maxInvest
+                )}{" "}
+              ETH
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Started</p>
+            <span>
+              {fromTimestamp(parseInt(state?.launchpad?.datas?.saleStart))}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Ended</p>
+            <span>
+              {fromTimestamp(parseInt(state?.launchpad?.datas?.saleEnd))}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-white/40">Locked time</p>
+            <span>{parseInt(state?.launchpad?.datas?.lockedTime)}</span>
+          </div>
+        </div>
+      </Viewport>
+      <Viewport id={"overview"} index={3}>
+        <CVOverview />
+      </Viewport>
+    </MyLayoutApp>
   );
 }
 
-let Page = () => {
-  let state = useLaunchpadState();
-
-  let submitInvest = async (form) => {
-    console.log("form", form);
-    let value = ethers.utils.parseEther(form?.value)._hex;
-    let hash = await _apiPost(
-      "buyTokens",
-      [parseInt(state.launchpadID)],
-      value
-    );
-    console.log(hash);
-  };
-
-  let tier = state?.datas?.tiersDatas?.[state?.datas?.currentTier];
-  return (
-    <div className="flex">
-      <div className="w-3/4 mr-12">
-        <MyCard1
-          color={2}
-          head={{
-            component: (
-              <>
-                <div className="flex items-center">
-                  <span className="text-white  text-xs flex flex-col items-center mr-3">
-                    <Icon icon={icfyETHER} className="text-4xl text-white" />{" "}
-                    <Hg>Price</Hg>
-                  </span>
-                  <div className="flex flex-col">
-                    <span className="text-2xl text-white items-center flex ">
-                      {ethers.utils.formatEther(`${tier?.tokenPrice || 0}`)}
-                      <Hg style="text-lg ml-2">ETH</Hg>{" "}
-                      <span className="text-xs ml-2 text-white/20">
-                        {" "}
-                        per Tokens
-                      </span>
-                    </span>
-                    <div
-                      className={`badge badge-sm badge-outline py-2 px-4 badge-${
-                        STATUS.launchpad[state?.datas?.status]?.color
-                      }`}
-                    >
-                      <Icon
-                        icon={STATUS.launchpad[state?.datas?.status]?.icon}
-                        className="mr-4  text-sm"
-                      />
-                      {STATUS.launchpad[state?.datas?.status]?.status}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex ml-auto items-center text-xs ">
-                  <MyCountdown timestamp={parseInt(state?.datas?.saleEnd)} />
-                  <Icon
-                    icon={icfy.ux.calendar}
-                    className="ml-4 text-4xl text-white"
-                  />
-                </div>
-              </>
-            ),
-          }}
-        >
-          <p className="w-full text-xs mt-5  whitespace-break-spaces text-justify">
-            {state?.metadatas?.description}
-          </p>
-        </MyCard1>
-      </div>
-      <div className="w-1/4">
-        <MyCard1
-          color={2}
-          head={{
-            icon: icfy.bank.coin,
-            title: (
-              <div className="flex flex-col">
-                <div className="flex items-center">
-                  {state?.datas?.tokenName}
-                  <span className="text-xs ml-3">
-                    ({state?.datas?.tokenSymbol})
-                  </span>
-                </div>
-              </div>
-            ),
-          }}
-          menus={["Owner", "Token"]}
-          styles={"mb-5"}
-          components={[
-            <div className="flex  w-full flex-col">
-              <ProfileAvatar
-                component={
-                  <p className="text-[10px] ">
-                    {state?.owner?.attributes?.[0]?.identity?.email}
-                  </p>
-                }
-                metadatas={state?.owner}
-                cvID={state?.datas?.owner}
-              />
-
-              <h6 className="text-xs w-full border-t-1 mt-4 pt-2 border border-x-0 border-b-0 border-white/10  text-white/40">
-                Balance owner
-              </h6>
-              <p className="text-lg">
-                {state?.datas?.balanceOwner}
-                <span className="text-xs  ml-2">Tokens</span>
-              </p>
-              <h6 className="text-xs w-full mt-2  text-white/40">
-                Balance contract
-              </h6>
-
-              <p className="text-lg">
-                {state?.datas?.amountRaised}
-                <span className="text-xs ml-2">ETH</span>
-              </p>
-              <span className="mt-2 text-white/40 text-[8px]">
-                {state?.datas?.tokenAddress}
-              </span>
-            </div>,
-            <div className="flex flex-col w-full">
-              <h6 className="text-xs text-white/40">Tokens pool</h6>
-              <p className="text-lg">{state?.datas?.allowance}</p>
-              <h6 className="text-xs text-white/40">Tokens price</h6>
-              <p className="text-lg flex  items-center">
-                {state?.datas?.tokenPrice} <Icon icon={icfyETHER} />
-              </p>
-              <h6 className="text-xs text-white/40">Locked time</h6>
-              <p className="text-lg flex  items-center">
-                {parseInt(state?.datas?.lockedTime)} day(s)
-              </p>
-
-              <MyFormModal
-                submit={submitInvest}
-                components={[
-                  <MyInput
-                    min={ethers.utils.formatEther(state?.datas?.minInvest || 0)}
-                    max={ethers.utils.formatEther(state?.datas?.maxInvest || 0)}
-                    step={0.1}
-                    type={"number"}
-                    target={"value"}
-                  />,
-                ]}
-                styles={{
-                  modal: "w-[30vw] h-fit",
-                  btn: "ml-auto gb2 mt-2 w-fit btn-xs",
-                }}
-                arr={[
-                  {
-                    title: (
-                      <span className={"flex"}>
-                        <Icon icon={icfyROCKET} className="text-error mr-4" />{" "}
-                        Invest on launchpad
-                      </span>
-                    ),
-                    description: (
-                      <>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        In harum beatae earum, placeat repellendus sequi
-                        reprehenderit libero necessitatibus magni voluptate sint
-                        aut! Labore aut sint suscipit fugit reiciendis. Aliquam,
-                        explicabo!
-                      </>
-                    ),
-                  },
-                ]}
-                stateInit={{
-                  form: {
-                    value: null,
-                  },
-                  placeholders: {
-                    value: "300 ETH",
-                  },
-                }}
-                btn={"Participate"}
-              />
-            </div>,
-          ]}
-        ></MyCard1>
-        <MyCardList
-          color={2}
-          head={{ title: "Informations", icon: icfyROCKET }}
-          arr={[
-            { title: "Owner", value: <CVName metadata={state?.owner} /> },
-            {
-              title: "Min invest",
-              value: ethers?.utils?.formatEther?.(state?.datas?.minCap || 0),
-            },
-            {
-              title: "Max invest",
-              value: ethers?.utils?.formatEther?.(state?.datas?.maxCap || 0),
-            },
-            { title: "Nombre de rounds", value: state?.datas?.numberOfTier },
-            {
-              title: (
-                <span className=" text-white/40 absolute bottom-0 text-[8px]">
-                  {state?.datas?.address}
-                </span>
-              ),
-            },
-          ]}
-        />
-      </div>
-    </div>
-  );
-};
+export default App;

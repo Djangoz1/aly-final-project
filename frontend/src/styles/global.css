@@ -9,6 +9,15 @@ body {
   height: fit-content;
 }
 
+.CodeMirror {
+  min-height: 70vh;
+  max-width: 100%;
+}
+.fit-editor .CodeMirror {
+  min-height: fit-content;
+  max-width: 100%;
+}
+
 .logo:hover {
   color: rgba(11, 129, 167, 0.92);
 }
@@ -116,8 +125,14 @@ body {
   /* border-radius: 25px; */
   /* background: linear-gradient(145deg, #153518, #193f1d);
   box-shadow: 17px 17px 32px #143317, -17px -17px 32px #1a431f; */
-
-  background: linear-gradient(
+  background: rgb(6, 3, 43);
+  background: radial-gradient(
+    circle,
+    rgba(6, 3, 43, 1) 0%,
+    rgba(0, 0, 0, 1) 87%,
+    rgba(0, 6, 8, 1) 100%
+  );
+  /* background: linear-gradient(
     30deg,
     rgba(0, 0, 0, 1),
     rgb(12, 10, 18),
@@ -126,7 +141,7 @@ body {
     rgb(17, 14, 25),
     rgb(8, 7, 11),
     rgb(21, 16, 33)
-  );
+  ); */
 }
 
 .gradient-button {

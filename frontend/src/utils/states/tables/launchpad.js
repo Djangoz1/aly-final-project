@@ -13,7 +13,6 @@ import { timestampToCounter } from "utils/ux-tools";
 export let _table_launchpad = (launchpads, owner) => {
   let list = [];
 
-  console.log("launchpads ...", launchpads);
   for (let index = 0; index < launchpads?.length; index++) {
     const el = launchpads[index];
 

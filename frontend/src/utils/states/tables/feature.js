@@ -104,6 +104,7 @@ export let _table_features = (features, owner) => {
 };
 export let _table_invites = (features) => {
   let list = [];
+
   for (let index = 0; index < features?.length; index++) {
     const feature = features?.[index];
     if (parseInt(feature?.datas?.startedAt) === 0) {

@@ -4,6 +4,18 @@
 
 import { ethers } from "ethers";
 
+export let moock_create_post = {
+  target: "Post",
+  description: null,
+  image: null,
+  code: null,
+  missionID: null,
+  answerID: null,
+  reference: null,
+  language: null,
+  tags: null,
+};
+
 export let moock_create_profile = {
   id: null,
   target: "create profile",
@@ -100,11 +112,30 @@ export let toMockProfile = ({ address, metadatas, cvID }) => {
   return moock;
 };
 
+export let moock_create_escrow = {
+  target: "escrow",
+  image: null,
+  arbitrators: null,
+  appeal: null,
+  feature: null,
+  court: null,
+  description: null,
+};
+export let moock_create_escrow_placeholder = {
+  target: "escrow",
+  arbitrators: "Number of arbitrators",
+  appeal: "Appeal delay",
+  feature: "For wich feature",
+  court: "Do you want switch court ?",
+  description: "Write reason of dispute",
+};
+
 // ************ ------- ************ //
 // ************ MISSION ************ //
 // ************ ------- ************ //
 
 export let moock_create_mission = {
+  target: "mission",
   title: null,
   domain: null,
   image: null,
@@ -129,6 +160,7 @@ export let moock_create_mission_placeholder = {
 // ************ ------- ************ //
 
 export let moock_create_feature = {
+  target: "feature",
   ia: true,
   title: null,
   domain: null,
@@ -159,6 +191,7 @@ export let moock_create_feature_placeholders = {
 // ********** --------- ********** //
 
 export let moock_create_launchpad = {
+  target: "Launchpad",
   tokenAddress: null,
   isAddress: null,
   tokenAllowance: null,

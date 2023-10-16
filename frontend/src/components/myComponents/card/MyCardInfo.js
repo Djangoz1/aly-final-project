@@ -27,14 +27,13 @@ export const MyCardInfo = ({ header, noBtn, main, btn, styles, color }) => {
   ];
 
   let titles = [
-    <p className={"font-light c2 uppercase "}>{header?.title}</p>,
-    <p className={"font-light c2 uppercase "}>{header?.title}</p>,
-
-    <p className={"font-light c2 uppercase"}>{header?.title}</p>,
+    <Hg className={"font-light c2 uppercase "}>{header?.title}</Hg>,
+    <Hg1 className={"font-light c2 uppercase "}>{header?.title}</Hg1>,
+    <Hg className={"font-light c2 uppercase"}>{header?.title}</Hg>,
   ];
   return (
     <MyCard styles={styles || "w-fit"}>
-      <div className="flex flex-col  overflow-hidden rounded-t-lg  relative ">
+      <div className="flex flex-col   rounded-t-lg   ">
         {header?.banniere && (
           <div className="h-[8vh]">
             <ImagePin
@@ -44,12 +43,19 @@ export const MyCardInfo = ({ header, noBtn, main, btn, styles, color }) => {
           </div>
         )}
         {header?.icon && (
-          <Icon
-            icon={header?.icon}
-            className={`text-${_colors?.[color]} mb-6 text-[90px]`}
-          />
+          <div
+            className={`${
+              header?.badge && "bg-black/90 backdrop-blur "
+            }  absolute p-4 top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40px] mask mask-hexagon`}
+          >
+            <Icon
+              icon={header?.icon}
+              // className={`text-${_colors?.[color]} mb-6 text-[90px]`}
+              className={`c2  `}
+            />
+          </div>
         )}
-        <div className="flex justify-between items-end">
+        <div className="flex  justify-between items-end">
           {/* {header?.image && (
             <Avatar style={"w-12 mb-2 mask-hexagon"} CID={header?.image} />
           )} */}
@@ -60,8 +66,9 @@ export const MyCardInfo = ({ header, noBtn, main, btn, styles, color }) => {
                 CID={header?.image}
               />
             )}
-            <div className="w-full pl-2   mb-2 text-lg  ">
-              <div className="w-full  relative z-10">{titles?.[color]}</div>
+            <div className="w-full    mb-2 text-lg  ">
+              <div className="w-full my-2  relative z-10">{header?.title}</div>
+              {/* <div className="w-full  relative z-10">{titles?.[color]}</div> */}
               {header?.component && (
                 <p className="text-xs">{header?.component}</p>
               )}
@@ -78,7 +85,7 @@ export const MyCardInfo = ({ header, noBtn, main, btn, styles, color }) => {
         </div>
         <div
           onClick={() => setIsClicked(!isClicked)}
-          className={`cursor-pointer ${
+          className={`cursor-pointer text-xs text-white/40 ${
             isClicked ? "line-clamp-none" : "line-clamp-6"
           }`}
         >
@@ -89,11 +96,9 @@ export const MyCardInfo = ({ header, noBtn, main, btn, styles, color }) => {
       </div>
 
       {!noBtn ? (
-        <>
-          <div className="mt-2" />
-
+        <div className="mt-2 w-full flex">
           {btn?.component ? btn?.component : btns[color]}
-        </>
+        </div>
       ) : null}
     </MyCard>
   );

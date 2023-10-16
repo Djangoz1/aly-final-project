@@ -6,6 +6,7 @@ export const icfy = {
     open: "ic:outline-remove-red-eye",
   },
   ux: {
+    admin: "mdi:administrator-outline",
     key: "iconoir:key-alt-back",
     mediation: "material-symbols:mediation",
     experiment: "ant-design:experiment-twotone",

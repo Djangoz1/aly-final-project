@@ -15,37 +15,43 @@ import { fromTimestamp } from "utils/ux-tools";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
+import { CodeEditor } from "components/myComponents/MyEditor";
+import { ENUMS } from "constants/enums";
 
-export const Pub = ({ id, styles, _owner, modal }) => {
+export const Pub = ({ id, _pub, styles, _owner, modal }) => {
   const [isDatas, setIsDatas] = useState(null);
   let [isClicked, setIsClicked] = useState(null);
   let { isConnected, address } = useAccount();
+
   const state = async () => {
-    const pub = await statePub(id);
-    let owner;
-    if (!_owner) {
-      let uriOwner = await _apiGet("tokenURIOf", [
-        pub?.owner,
-        ADDRESSES["cvsHub"],
-      ]);
-      owner = await fetchJSONByCID(uriOwner);
-    } else {
-      owner = _owner;
-    }
-    let likers = [];
-    if (pub?.datas?.likes > 0) {
-      let likes = await _apiGet("indexerOfToken", [
-        id,
-        ADDRESSES["pubsDatasHub"],
-      ]);
-      for (let index = 0; index < likes?.length; index++) {
-        const likeID = likes?.[index];
-        likers.push(
-          await _apiGet("ownerOfToken", [likeID, ADDRESSES["pubsDatasHub"]])
-        );
+    if (parseInt(id) > 0) {
+      const pub = await statePub(id);
+      let owner;
+
+      if (!_owner) {
+        let uriOwner = await _apiGet("tokenURIOf", [
+          pub?.owner,
+          ADDRESSES["cvsHub"],
+        ]);
+        owner = await fetchJSONByCID(uriOwner);
+      } else {
+        owner = _owner;
       }
+      let likers = [];
+      if (pub?.datas?.likes > 0) {
+        let likes = await _apiGet("indexerOfToken", [
+          id,
+          ADDRESSES["pubsDatasHub"],
+        ]);
+        for (let index = 0; index < likes?.length; index++) {
+          const likeID = likes?.[index];
+          likers.push(
+            await _apiGet("ownerOfToken", [likeID, ADDRESSES["pubsDatasHub"]])
+          );
+        }
+      }
+      setIsDatas({ pub, owner, likers });
     }
-    setIsDatas({ pub, owner, likers });
   };
 
   useEffect(() => {
@@ -60,11 +66,10 @@ export const Pub = ({ id, styles, _owner, modal }) => {
       state();
     }
   };
-
   return (
     <div
       className={
-        "flex border border-t-0 border-b-1 border-white/10 hover:bg-black/20 hover:text-white border-x-0  px-4 py-5  items-start"
+        "flex border  border-t-0 border-b-1 border-white/10 hover:bg-black/20 hover:text-white border-x-0  px-4 py-5  w-full items-start"
       }
     >
       <div className="flex flex-col h-full  items-center ">
@@ -81,21 +86,44 @@ export const Pub = ({ id, styles, _owner, modal }) => {
         </span>
       </div>
 
-      <div className="flex h-max  border border-l-1 border-white/10 border-y-0 border-r-0  px-5 flex-col ml-5 ">
+      <div className="flex h-max  border border-l-1 w-full border-white/10 border-y-0 border-r-0  px-5 flex-col ml-5 ">
         <CVName
-          styles={"text-white/40  mb-3 font-semibold text-sm"}
+          styles={"text-white/40  mb-1 font-semibold text-sm"}
           metadata={isDatas?.owner}
           cvID={isDatas?.pub?.owner}
         />
 
-        <p
-          className={`text-[${styles?.size}] line-clamp-${
-            isClicked ? "none" : styles?.clamp
-          } cursor-pointer whitespace-pre-line text-justify`}
-          onClick={() => setIsClicked(!isClicked)}
-        >
-          {isDatas?.pub?.metadata?.description}
-        </p>
+        {!isDatas?.pub?.metadata?.attributes?.[0]?.code ? (
+          <p
+            className={`text-[${styles?.size}] line-clamp-${
+              isClicked ? "none" : styles?.clamp
+            } cursor-pointer whitespace-pre-line text-justify`}
+            onClick={() => setIsClicked(!isClicked)}
+          >
+            {isDatas?.pub?.metadata?.description}
+          </p>
+        ) : (
+          <>
+            {isDatas?.pub?.metadata?.title && (
+              <h6 className="flex mb-2 items-center">
+                <Icon
+                  icon={
+                    ENUMS?.courts?.[
+                      isDatas?.pub?.metadata?.attributes?.[0]?.language
+                    ]?.badge
+                  }
+                  className="mr-5 text-2xl"
+                />{" "}
+                {isDatas?.pub?.metadata?.title}{" "}
+              </h6>
+            )}
+            <CodeEditor
+              style={"fit-editor"}
+              onClick={() => setIsClicked(!isClicked)}
+              value={isDatas?.pub?.metadata?.description}
+            ></CodeEditor>
+          </>
+        )}
 
         {isDatas?.pub?.metadata?.image && (
           <MyModal

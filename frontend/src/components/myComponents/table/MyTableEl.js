@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { MyModal } from "components/myComponents/modal/MyModal";
+import { MyBtnPost } from "../btn/MyBtnPost";
 export const MyTableEl = ({ id, arr, index, editBtns, btns }) => {
   console.log(index, index % 2);
   return (
@@ -25,34 +26,25 @@ export const MyTableEl = ({ id, arr, index, editBtns, btns }) => {
           <td key={uuidv4()}>{el}</td>
         ))}
 
-        <th className="border  border-white/10   relative border-l-1 border-r-0 border-y-0">
-          <div className="flex  justify-between items-center relative w-full h-full">
+        <th className="border  border-white/10 w-fit max-w-[130px]     border-l-1 border-r-0 border-y-0">
+          <div className="flex  justify-between w-full items-center   h-full">
             {!btns ? (
               <>
-                <button className="btn btn-ghost btn-xs text-[9px]">
+                {/* <button className="btn btn-ghost btn-xs text-[9px]">
                   details
-                </button>
-
-                <MyModal
-                  btn={
-                    <Icon icon={icfy.ux.dots.horizontal} className=" text-xl" />
-                  }
-                  styles={{ btn: "btn-ghost" }}
-                  modal={
-                    <div className="flex flex-col">
-                      {editBtns?.map((el) => (
-                        <button
-                          className="btn w-full flex justify-start text-left btn-ghost"
-                          key={uuidv4()}
-                          onClick={() => el?.setter && el?.setter(id)}
-                        >
-                          <Icon icon={el?.icon} />
-                          {el?.title}
-                        </button>
-                      ))}
-                    </div>
-                  }
-                />
+                </button> */}
+                <div className="flex w-full   items-center">
+                  {editBtns?.map((el) => (
+                    <MyBtnPost
+                      style={el?.style}
+                      key={uuidv4()}
+                      setter={() => el?.setter && el?.setter(id)}
+                    >
+                      {el?.icon && <Icon icon={el?.icon} />}
+                      {el?.title}
+                    </MyBtnPost>
+                  ))}
+                </div>
               </>
             ) : (
               btns

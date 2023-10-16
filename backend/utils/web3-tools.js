@@ -134,7 +134,7 @@ let _createFeature = async ({
     id: featureID,
     title,
     description,
-    attributes: { domain },
+    attributes: [{ domain }],
   });
 
   await apiPost
@@ -142,7 +142,9 @@ let _createFeature = async ({
     .createFeature(
       _missionID,
       estimatedDays || moock?.estimatedDays,
-      isInviteOnly || moock?.isInviteOnly,
+      isInviteOnly === false || isInviteOnly === true
+        ? isInviteOnly
+        : moock?.isInviteOnly,
       uri,
       specification || moock?.specification,
       {

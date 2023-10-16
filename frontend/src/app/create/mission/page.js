@@ -108,9 +108,10 @@ const PageCreateProfile = () => {
         title={"Create Mission"}
         submit={submitForm}
         stateInit={{
+          allowed: true,
           form: moock_create_mission,
           placeholders: moock_create_mission_placeholder,
-          checked: [[], ["title", "domain", "description"]],
+          checked: [[], []],
         }}
         side={<MySteps arr={MENUS_CREATE_MISSION} />}
         arr={_form_create_mission}

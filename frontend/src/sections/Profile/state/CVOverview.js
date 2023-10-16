@@ -1,6 +1,11 @@
 import { MyTable } from "components/myComponents/table/MyTable";
-import { MENUS_EDIT } from "constants/menus";
-import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
+import { MENUS_EDIT, MENUS_ID } from "constants/menus";
+import {
+  doStateProfileTools,
+  doStateTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
 import { useInView } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -24,12 +29,23 @@ import {
   HEAD_table_launchpads,
   _table_launchpad,
 } from "utils/states/tables/launchpad";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { MyBtnPost } from "components/myComponents/btn/MyBtnPost";
+import { _apiPost } from "utils/ui-tools/web3-tools";
+import { doAuthCV } from "context/auth";
 
 export const CVOverview = () => {
   let { state, index, status } = useToolsState();
   let [isClicked, setIsClicked] = useState(0);
   let [isLists, setIsLists] = useState(null);
+  let ref = useRef(null);
+  let isInView = useInView(ref);
+  let dispatch = useToolsDispatch();
+  let handlePost = async (func, id) => {
+    await _apiPost(func, [id]);
 
+    doStateProfileTools({ dispatch, cvID: state?.owner?.cvID });
+  };
   let infos = [
     {
       btn: "Missions",
@@ -37,7 +53,7 @@ export const CVOverview = () => {
       head: HEAD_table_missions,
       setState: stateMission,
 
-      btns: MENUS_EDIT.mission,
+      // btns: MENUS_EDIT.mission,
     },
     {
       btn: "Jobs",
@@ -45,7 +61,7 @@ export const CVOverview = () => {
       head: HEAD_table_features,
       setState: stateFeature,
       arr: state?.owner?.datas?.proposals,
-      btns: MENUS_EDIT.feature,
+      // btns: MENUS_EDIT.feature,
     },
     {
       btn: "Launchpads",
@@ -53,28 +69,35 @@ export const CVOverview = () => {
       head: HEAD_table_launchpads,
       arr: state?.owner?.datas?.launchpads,
       setState: stateLaunchpad,
-      btns: MENUS_EDIT.invite,
+      // btns: MENUS_EDIT.invite,
     },
     {
-      btn: "Invitations",
+      btn: "Invites",
       table: _table_invites(state?.owner?.details?.invites),
       head: HEAD_table_invites,
-      arr: state?.owner?.details?.invitation,
+      arr: state?.owner?.details?.invites,
       setState: stateFeature,
-      btns: MENUS_EDIT.invite,
+      editBtns: [
+        {
+          title: "Accept job",
+          setter: (featureID) => handlePost("acceptJob", [featureID]),
+        },
+        {
+          title: "Decline job",
+          setter: (featureID) => handlePost("declineJob", [featureID]),
+          style: "btn-xs btn-error btn-outline ml-2",
+        },
+      ],
     },
   ];
 
-  let ref = useRef(null);
-  let isInView = useInView(ref);
-  let dispatch = useToolsDispatch();
   let fetch = async () => {
-    console.log("state", state);
     let _state = state;
     let _infos = infos;
     let element = _infos?.[isClicked];
+
     if (!element?.arr) {
-      console.log("aborted fetch cv overview");
+      console.log("aborted fetch cv overview", element);
       return;
     }
     let target = element.btn.toLowerCase();
@@ -98,11 +121,7 @@ export const CVOverview = () => {
 
       fetch();
     }
-  }, [
-    state?.owner?.details?.[infos?.[isClicked]?.btn.toLowerCase()],
-    isClicked,
-    isInView,
-  ]);
+  }, [isClicked, isInView]);
 
   useEffect(() => {
     let target = infos?.[isClicked]?.btn.toLowerCase();
@@ -123,35 +142,25 @@ export const CVOverview = () => {
         [target]: infos?.[isClicked],
       });
     }
-  }, [
-    state?.owner?.details?.[infos?.[isClicked]?.btn.toLowerCase()]?.length > 0,
-    isLists?.[infos?.[isClicked]?.btn.toLowerCase()]?.table?.length,
-    status,
-    isClicked,
-    isInView,
-  ]);
+  }, [status, isClicked, isInView]);
+
+  console.log("list", isLists);
 
   return (
     <>
-      <div className="tabs tabs-boxed backdrop-blur  mb-1">
-        {infos.map((el, i) => (
-          <button
-            onClick={() => setIsClicked(i)}
-            key={v4()}
-            className={`  tab mr-5 btn-xs ${
-              isClicked === i ? "bg1 text-white" : " "
-            }`}
-          >
-            {el.btn}
-          </button>
-        ))}
-      </div>
+      <MyMenusTabs
+        setter={setIsClicked}
+        value={isClicked}
+        arr={infos}
+        target={"btn"}
+      />
 
       <div ref={ref} className="w-full h-full rounded-lg shadow backdrop-blur ">
         <MyTable
           list={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.table}
           head={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.head}
-          editBtns={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.btns}
+          btns={infos?.[isClicked]?.btns}
+          editBtns={infos?.[isClicked]?.editBtns}
         />
       </div>
     </>

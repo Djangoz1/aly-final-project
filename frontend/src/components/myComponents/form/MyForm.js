@@ -188,7 +188,7 @@ let Child1 = ({ components, side, arr, submit, editer }) => {
   useEffect(() => {
     if (!isConnected) doStateFormDisabled(dispatch, true);
     if (pointer === 0 && isConnected) doStateFormDisabled(dispatch, false);
-    if (checked[pointer]?.length > 0) {
+    if (checked?.[pointer]?.length > 0) {
       // doStateFormChecked({ dispatch, pointer, form, checked, superChecked });
     }
   }, [isConnected, pointer]);
@@ -232,7 +232,7 @@ let Child1 = ({ components, side, arr, submit, editer }) => {
     <>
       <Particle style={"fixed z-1"} />
       <Viewport full={true}>
-        <div className="w-[75%] ml-auto">
+        <div className="w-[100%]  ml-auto">
           <div>
             <AnimatePresence>
               <motion.div
@@ -299,40 +299,6 @@ let Child1 = ({ components, side, arr, submit, editer }) => {
   );
 };
 
-let Elem = ({ elem, index }) => {
-  let ref = useRef(null);
-  let isInView = useInView(ref);
-
-  let { checked, disabled, pointer } = useFormState();
-  let dispatch = useFormDispatch();
-  // useEffect(() => {
-  //   // console.log(
-  //   //   "test ,",
-  //   //   isInView &&
-  //   //     checked?.[index]?.length === 0 &&
-  //   //     (pointer === 0 || index === pointer + 1)
-  //   // );
-  //   if (isInView && checked?.[index]?.length === 0 && index === pointer + 1) {
-  //     doStateFormPointer(dispatch, index);
-  //     console.log("Update pointer Form Elem ...", index);
-  //   } else if (isInView && pointer === 0 && checked?.[pointer]?.length === 0) {
-  //     // doStateFormPointer(dispatch, 1);
-  //   }
-  // }, [isInView, disabled]);
-  return (
-    <Viewport
-      full={true}
-      // particles={i === 0 ? "z-2 fixed" : false}
-    >
-      <div
-        ref={ref}
-        className="w-[68vw] backdrop-blur  px-6 shadow py-3 rounded-lg ml-auto"
-      >
-        {isInView && elem}
-      </div>
-    </Viewport>
-  );
-};
 // <Viewport particles={"z-2 fixed"} full={true}>
 //   <div className="flex w-[65vw] ml-auto">
 //     {/* <div className="backdrop-blur  mb-1 rounded-lg px-3 max-h-[75vh] overflow-scroll hide-scrollbar w-2/5 mr-4 py-2">

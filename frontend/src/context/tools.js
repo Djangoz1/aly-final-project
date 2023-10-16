@@ -1,11 +1,20 @@
 "use client";
 
+import { ENUMS } from "constants/enums";
+import { STATUS } from "constants/status";
 import { ADDRESSES } from "constants/web3";
 import { createContext, useContext, useReducer } from "react";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
-import { stateCV } from "utils/ui-tools/state-tools";
+import {
+  stateCV,
+  stateDetailsCV,
+  stateFeature,
+  stateLaunchpad,
+  stateMission,
+  statePub,
+} from "utils/ui-tools/state-tools";
 
-import { _apiGet } from "utils/ui-tools/web3-tools";
+import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 // Mise en place du reducer auth
 const reducer = (currentState, newState) => {
@@ -38,6 +47,84 @@ export const doIndexTools = async (dispatch, index) => {
 
 export const doReloadTools = async (dispatch) => {
   dispatch({ status: "reload" });
+};
+
+export const doStateProfileTools = async ({ dispatch, cvID }) => {
+  dispatch({ status: "pending profile" });
+  let owner = await stateCV(cvID);
+  owner.details = await stateDetailsCV(cvID);
+  let invites = await _apiGet("invitesOfCV", [cvID]);
+  owner.details.invites = [];
+  for (let index = 0; index < invites?.length; index++) {
+    let feature = await stateFeature(invites[index]);
+    owner.details.invites.push({
+      featureID: feature?.featureID,
+      title: feature?.metadatas?.title,
+      domain: feature?.metadatas?.attributes?.[0]?.domain,
+      specification: feature?.datas?.specification,
+      status: feature?.datas?.status,
+      specification: feature?.datas?.specification,
+      wadge: feature?.datas?.wadge,
+    });
+  }
+  let _pubs = await _apiGet("indexerOfToken", [cvID, ADDRESSES["pubsHub"]]);
+  owner.details.launchpads = { arr: [], totalRaised: 0 };
+
+  for (let index = 0; index < owner?.datas?.launchpads?.length; index++) {
+    let launchpad = await stateLaunchpad(owner?.datas?.launchpads?.[index]);
+    owner.details.launchpads.arr.push({
+      title: launchpad?.metadatas?.title,
+      domain: launchpad?.metadatas?.attributes?.[0]?.domain,
+      launchpadID: launchpad?.launchpadID,
+    });
+    owner.details.launchpads.totalRaised += parseInt(
+      launchpad.datas.amountRaised
+    );
+  }
+
+  let _state = {
+    owner,
+    pubs: [],
+  };
+
+  for (let index = 0; index < _pubs.length; index++) {
+    _state.pubs.push(await statePub(_pubs[index]));
+  }
+
+  dispatch({
+    status: "success",
+    state: _state,
+  });
+  return _state;
+};
+
+export const doStateMissionTools = async (dispatch, missionID) => {
+  dispatch({ status: "pending mission" });
+  try {
+    let mission = await stateMission(missionID);
+    let owner = await stateCV(mission?.datas?.owner);
+    owner.details = await stateDetailsCV(mission?.datas?.cvOwner);
+    let features = [];
+
+    for (let index = 0; index < mission?.datas?.features?.length; index++) {
+      const featureID = mission?.datas?.features[index];
+      let feature = await stateFeature(featureID);
+      if (feature?.datas?.dispute) {
+        mission.datas.disputes++;
+      }
+      features.push(feature);
+    }
+
+    let _state = {
+      mission,
+      owner,
+      features,
+    };
+    dispatch({ status: "success", state: _state });
+    return _state;
+  } catch (error) {
+    dispatch({ status: "error mission", error: { error } });
+  }
 };
 
 export const doStateTools = async (dispatch, state, pointer) => {

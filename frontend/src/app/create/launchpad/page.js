@@ -3,7 +3,6 @@ import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import React, { useEffect, useState } from "react";
 
 import { _form_create_profile } from "utils/ux-tools/form/profile";
-import { MyFormModal } from "components/myComponents/form/MyFormModal";
 import { MySteps } from "components/myComponents/MySteps";
 import { MENUS } from "constants/menus";
 import { useAccount } from "wagmi";

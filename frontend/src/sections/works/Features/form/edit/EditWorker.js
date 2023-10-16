@@ -19,6 +19,11 @@ import { fetchMissionsOfCV } from "utils/works";
 import { stateFeature } from "utils/ui-tools/state-tools";
 import { useFormState } from "context/form";
 import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
+import {
+  doStateProfileTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
 
 let moock = {
   description: null,
@@ -26,20 +31,22 @@ let moock = {
   tags: null,
 };
 
-export const EditWorker = ({ answerID, missionID, styles }) => {
+export const EditWorker = ({ styles }) => {
   const { cv } = useAuthState();
   let { address, isConnected } = useAccount();
   let { cvID, datas, metadatas } = useCVState();
+  let { state } = useToolsState();
+  console.log(state);
+  let dispatch = useToolsDispatch();
 
-  let dispatchCV = useCVDispatch();
   let dispatchAuth = useAuthDispatch();
   let [isFeatures, setIsFeatures] = useState(null);
 
   let submitForm = async (form) => {
     let featureID = isFeatures[parseInt(form.featureID)].id;
-    if (featureID > 0 && cvID > 0) {
-      await _apiPost("inviteWorker", [parseInt(cvID), featureID]);
-      doStateCV(dispatchCV, cvID);
+    if (featureID > 0 && state?.owner?.cvID > 0) {
+      await _apiPost("inviteWorker", [parseInt(state?.owner?.cvID), featureID]);
+      doStateProfileTools({ dispatch, cvID: state?.owner?.cvID });
       doAuthCV(dispatchAuth, address);
     }
   };
@@ -66,7 +73,6 @@ export const EditWorker = ({ answerID, missionID, styles }) => {
 
   useEffect(() => {
     fetchFeatures();
-    //   if (cv && !isMissions && datas.missions > 0)
   }, [cv]);
 
   return (
@@ -75,6 +81,7 @@ export const EditWorker = ({ answerID, missionID, styles }) => {
         submit={submitForm}
         stateInit={{
           form: {
+            target: "Worker",
             featureID: null,
           },
           checked: [["featureID"]],
@@ -82,23 +89,24 @@ export const EditWorker = ({ answerID, missionID, styles }) => {
             featureID: "For wich mission ?",
           },
         }}
-        btn={"Invite worker"}
+        btns={{
+          btn: "Invite worker",
+          submit: (
+            <>
+              <Icon icon={icfySEND} className="text-2xl mr-2 my-2 " />
+              <span className="flex  items-center text-white">
+                Invite worker
+              </span>
+            </>
+          ),
+        }}
         styles={{
           btn: styles,
-          modal: "w-2/4",
+          modal: "w-fit",
         }}
-        editer={
-          <>
-            <Icon icon={icfySEND} className="text-2xl mr-2 my-2 " />
-            <span className="flex  items-center text-white">Invite worker</span>
-          </>
-        }
-        components={[
-          <div className="">
-            <FormWorker features={isFeatures} />
-          </div>,
-        ]}
-      />
+      >
+        <FormWorker features={isFeatures} />
+      </MyFormModal>
     )
   );
 };
@@ -111,7 +119,7 @@ let FormWorker = ({ features }) => {
     <MyFormInfo
       title={
         <>
-          <Icon icon={icfy.work.casual} className="mr-2 text-2xl text-info" />
+          <Icon icon={icfy.work.casual} className="mr-2 text-2xl text-info" />{" "}
           Invite worker
         </>
       }

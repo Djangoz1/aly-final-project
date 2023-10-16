@@ -4,6 +4,7 @@ import { icfy } from "icones";
 import { styles } from "styles/style";
 import { EditTokenLaunchpad } from "sections/Launchpad/form/EditLockToken";
 import Link from "next/link";
+import { _apiPost } from "utils/ui-tools/web3-tools";
 
 export const MENUS_CREATE_FEATURE = [
   { i: "ℹ️", title: "Introduction" },
@@ -49,6 +50,12 @@ export const MENUS = {
       { i: "ℹ️", title: "Introduction" },
       { i: "🗂️", title: "Information personnelle" },
       { i: "👨‍💻", title: "Work" },
+    ],
+  },
+  escrow: {
+    create: [
+      { i: "ℹ️", title: "Introduction" },
+      { i: "🗂️", title: "Informations" },
     ],
   },
   // launchpad: {
@@ -111,6 +118,22 @@ export let MENUS_ID = (id, owner, cvID) => {
         component: <EditTokenLaunchpad btn={"Lock token"} />,
       },
     ],
+
+    edit: {
+      invite: [
+        {
+          icon: icfy.person.uncheck,
+          title: "Refuse job",
+          setter: () => _apiPost("declineJob", [id]),
+        },
+        {
+          icon: icfy.person.friend,
+          title: "Accept job",
+          setter: () => _apiPost("acceptJob", [id]),
+        },
+      ],
+    },
+
     profile: [
       {
         title: "Overview",

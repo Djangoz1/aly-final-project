@@ -7,7 +7,7 @@ export const MyCard = ({ head, children, icon, styles }) => {
   let [isClicked, setIsClicked] = useState(null);
   return (
     <div
-      className={`relative backdrop-blur  py-4 px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
+      className={`relative backdrop-blur bg-white/5 py-4  px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">
@@ -83,6 +83,29 @@ export const MyCard1 = ({
         )}
       </div>
     </div>
+  );
+};
+
+export const MyCardInfos = ({ style, arr, title, children }) => {
+  return (
+    <MyCard styles={style}>
+      {title && <div className="w-full text-sm ">{title}</div>}
+      {arr?.map(
+        (el) =>
+          el?.title && (
+            <div
+              key={v4()}
+              className="flex items-center relative text-left text-[10px] border py-4  border-t-0 border-x-0 border-white/10  justify-between"
+            >
+              <div className="w-1/2 flex items-center text-white/40">
+                {el?.title}
+              </div>
+              <div className="w-1/2 flex items-center  ">{el?.value}</div>
+            </div>
+          )
+      )}
+      {children}
+    </MyCard>
   );
 };
 

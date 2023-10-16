@@ -19,8 +19,9 @@ import {
 export const ENUMS_FEATURE_TYPE = ["New Feature", "Bug", "Improvement"];
 
 export const ENUMS = {
+  languagesLevel: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
   courts: [
-    { badge: icfyGITHUB, court: "Centralized" },
+    { badge: icfy.ux.admin, court: "Centralized" },
     { badge: icfyGITHUB, court: "Kleros" },
     { badge: icfyREACT, court: "React" },
     { badge: icfyPYTHON, court: "Python" },

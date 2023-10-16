@@ -31,10 +31,14 @@ export default function RootLayout({ children }) {
         ></link>
       </head>
 
-      {/* <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
-      <script src="https://threejs.org/examples/js/libs/stats.min.js"></script> */}
-
+      <script
+        src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"
+        async
+      ></script>
+      <script
+        src="https://threejs.org/examples/js/libs/stats.min.js"
+        async
+      ></script>
       <body className="bg-neutral-900 min-h-100vh">
         <AccountProvider>
           <AuthProvider>

@@ -121,6 +121,8 @@ async function main() {
 
   feature = await _createFeature({
     account: this.owner,
+    isInviteOnly: false,
+
     accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
   });
@@ -129,10 +131,36 @@ async function main() {
 
   feature = await _createFeature({
     account: this.owner,
+    isInviteOnly: false,
+
     accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
     specification: 5,
   });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
+  feature = await _createFeature({
+    account: this.owner,
+    isInviteOnly: false,
+
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+    specification: 5,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
+  feature = await _createFeature({
+    account: this.owner,
+    isInviteOnly: false,
+
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    addressSystem: addressSystem.target,
+    specification: 11,
+  });
+
+  [this.addr1, this.addr2, this.addr3, this.addr4].map((el) =>
+    apiPost.connect(el).askToJoin(feature?.id)
+  );
   _missionID = feature.missionID;
   console.log("mission#", _missionID, "feature#", feature?.id);
 
