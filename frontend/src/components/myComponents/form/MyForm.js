@@ -16,7 +16,7 @@ import { styles as _styles } from "styles/style";
 
 import { useAccount } from "wagmi";
 import { Icon } from "@iconify/react";
-import { icfy } from "icones";
+import { icfy, icfyARROWD } from "icones";
 import { MyCard1 } from "../card/MyCard";
 import { Viewport } from "../layout/MyViewport";
 import { Particle } from "../MyParticles";
@@ -154,17 +154,8 @@ export const MyFormCreate = ({
 }) => {
   return (
     <LayoutForm stateInit={stateInit}>
-      <div className="fixed top-[9vh] left-[5vw] w-[20vw]  flex flex-col">
-        {title && (
-          <div className="flex items-center text-2xl font2 mb-2">
-            <Icon icon={icfy.ux.plus} className="text-2xl mr-2" />
-            <Hg>{title}</Hg>
-          </div>
-        )}
-        {side && side}
-      </div>
-
       <Child1
+        title={title}
         editer={editer}
         components={components}
         side={side}
@@ -176,7 +167,11 @@ export const MyFormCreate = ({
 };
 
 import { motion, AnimatePresence } from "framer-motion";
-let Child1 = ({ components, side, arr, submit, editer }) => {
+import { MyBtnPost } from "components/btn/MyBtnPost";
+import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
+import { MySteps } from "../MySteps";
+import { MENUS_CREATE_FEATURE } from "constants/menus";
+let Child1 = ({ components, side, title, arr, submit, editer }) => {
   let dispatch = useFormDispatch();
   let [isLoading, setIsLoading] = useState(null);
   let { form, placeholders, pointer, disabled, checked, superChecked } =
@@ -231,58 +226,76 @@ let Child1 = ({ components, side, arr, submit, editer }) => {
   return (
     <>
       <Particle style={"fixed z-1"} />
-      <Viewport full={true}>
-        <div className="w-[100%]  ml-auto">
+      <Viewport
+        side={
+          side && (
+            <>
+              {title && (
+                <div className="flex items-center text-2xl font2 mb-2 p-3">
+                  <Icon icon={icfy.ux.plus} className="text-2xl mr-2" />
+                  <Hg>{title}</Hg>
+                </div>
+              )}
+              {side && side}
+            </>
+          )
+        }
+      >
+        <div className="w-[100%]   ml-auto">
           <div>
             <AnimatePresence>
               <motion.div
-                className=" flex overflow-hidden   flex-col relative box-border  rounded-lg shadow "
+                className=" flex overflow-hidden shadow2 bg-white/5 flex-col relative box-border  rounded-lg shadow "
                 key={components?.[pointer]?.label}
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 // exit={{ y: -10, opacity: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                <div className="absolute w-full h-full bg-white/5 backdrop-blur z-0"></div>
                 <div className="z-1 relative px-5 pt-3 pb-5 flex flex-col">
                   <MyFormInfo
+                    style={"mb-5"}
                     title={arr?.[pointer]?.title}
                     description={arr?.[pointer]?.description}
                   />
                   {components?.[pointer]?.component}
-                  <div className="mt-5 ml-auto">
+                  <div className="mt-5 flex  w-full">
                     {!isLoading && !editer && pointer > 0 && (
-                      <button
-                        onClick={() =>
-                          doStateFormPointer(dispatch, pointer - 1)
-                        }
-                        className="btn btn-xs btn-outline btn-error mr-3"
+                      <MyMainBtn1
+                        setter={() => doStateFormPointer(dispatch, pointer - 1)}
+                        color="error"
+                        style={"mr-auto w-[150px]"}
+                        disabled={disabled}
                       >
-                        Précédent
-                      </button>
+                        <Icon
+                          icon={icfy.ux.arrow}
+                          className="text-error text-lg -rotate-90 mr-2"
+                        />
+                        Previous
+                      </MyMainBtn1>
                     )}
                     {!editer && isConnected && pointer != arr?.length - 1 && (
-                      <button
-                        onClick={() =>
-                          doStateFormPointer(dispatch, pointer + 1)
-                        }
-                        className="btn btn-xs btn-outline btn-success "
+                      <MyMainBtn1
+                        setter={() => doStateFormPointer(dispatch, pointer + 1)}
+                        color="success"
+                        style={"w-[150px]"}
                         disabled={disabled}
                       >
-                        Suivant
-                      </button>
+                        <Icon
+                          icon={icfy.ux.arrow}
+                          className="text-success text-lg rotate-90 mr-2"
+                        />
+                        Next
+                      </MyMainBtn1>
                     )}
                     {isConnected && (editer || pointer === arr?.length - 1) && (
-                      <button
-                        onClick={handleSubmit}
+                      <MyMainBtn
+                        setter={handleSubmit}
                         disabled={disabled}
-                        className="btn btn-xs btn-outline h-fit  btn-info "
+                        // className="btn btn-xs btn-outline h-fit  btn-info "
                       >
                         {editer || "Submit"}
-                        {isLoading && (
-                          <span className="loading loading-bars loading-md"></span>
-                        )}
-                      </button>
+                      </MyMainBtn>
                     )}
                   </div>
                 </div>

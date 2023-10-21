@@ -11,12 +11,12 @@ import { Icon } from "@iconify/react";
 import { parseTimestamp } from "helpers";
 import { ENUMS } from "constants/enums";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
-import { MyBtnPost } from "components/myComponents/btn/MyBtnPost";
+import { MyBtnPost } from "components/btn/MyBtnPost";
 
 import { useAuthState } from "context/auth";
 import { Avatar } from "components/profile/ProfileAvatar";
 
-export const FeatureNotifications = () => {
+export const FeatureNotifications = ({ feature }) => {
   let { state, index } = useToolsState();
 
   let { cv } = useAuthState();
@@ -32,16 +32,23 @@ export const FeatureNotifications = () => {
     doStateMissionTools(dispatch, state?.mission?.missionID);
   };
 
+  let [isFeature, setIsFeature] = useState(null);
+
+  useEffect(() => {
+    if (feature) {
+      setIsFeature(feature);
+    } else if (state?.features?.[index]) {
+      setIsFeature(state?.features?.[index]);
+    }
+  }, [feature, index]);
+
   let [isInfos, setIsInfos] = useState(null);
 
   useEffect(() => {
-    if (
-      (!isInfos || isInfos?.length === 0) &&
-      state?.features?.[index]?.details?.demands
-    ) {
+    if ((!isInfos || isInfos?.length === 0) && isFeature?.details?.demands) {
       let arr = [];
 
-      state?.features?.[index]?.details?.demands?.map((profile) => {
+      isFeature?.details?.demands?.map((profile) => {
         arr.push({
           title: (
             <>
@@ -53,11 +60,7 @@ export const FeatureNotifications = () => {
             <>
               <MyBtnPost
                 setter={() =>
-                  handlePost(
-                    "signWorker",
-                    state?.features?.[index]?.featureID,
-                    profile?.cvID
-                  )
+                  handlePost("signWorker", isFeature?.featureID, profile?.cvID)
                 }
                 style={
                   "h-fit ml-auto btn-xs c2 btn-outline text-[10px] normal-case "
@@ -72,7 +75,7 @@ export const FeatureNotifications = () => {
 
       setIsInfos(arr);
     }
-    if (!state?.features?.[index]?.details?.demands) {
+    if (!isFeature?.details?.demands) {
       setIsInfos(null);
     }
   }, [state, index]);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { statePub } from "utils/ui-tools/state-tools";
 
@@ -17,15 +17,27 @@ import { useAccount } from "wagmi";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { CodeEditor } from "components/myComponents/MyEditor";
 import { ENUMS } from "constants/enums";
+import { useInView } from "framer-motion";
 
 export const Pub = ({ id, _pub, styles, _owner, modal }) => {
   const [isDatas, setIsDatas] = useState(null);
   let [isClicked, setIsClicked] = useState(null);
   let { isConnected, address } = useAccount();
+  let ref = useRef(null);
+  let isInView = useInView(ref);
 
   const state = async () => {
-    if (parseInt(id) > 0) {
-      const pub = await statePub(id);
+    if (_pub && _owner) {
+      setIsDatas({ pub: _pub, owner: _owner });
+    } else if (parseInt(id) > 0) {
+      console.log("fetch pub", id);
+      let pub;
+
+      if (_pub) {
+        pub = _pub;
+      } else {
+        pub = await statePub(id);
+      }
       let owner;
 
       if (!_owner) {
@@ -37,28 +49,16 @@ export const Pub = ({ id, _pub, styles, _owner, modal }) => {
       } else {
         owner = _owner;
       }
-      let likers = [];
-      if (pub?.datas?.likes > 0) {
-        let likes = await _apiGet("indexerOfToken", [
-          id,
-          ADDRESSES["pubsDatasHub"],
-        ]);
-        for (let index = 0; index < likes?.length; index++) {
-          const likeID = likes?.[index];
-          likers.push(
-            await _apiGet("ownerOfToken", [likeID, ADDRESSES["pubsDatasHub"]])
-          );
-        }
-      }
-      setIsDatas({ pub, owner, likers });
+
+      setIsDatas({ pub, owner });
     }
   };
 
   useEffect(() => {
-    if (!isDatas && id) {
+    if ((!isDatas && isInView) || (isInView && id != isDatas?.pub?.pubID)) {
       state();
     }
-  }, [id]);
+  }, [id, _pub, isInView, _owner]);
 
   let setterLike = async (func) => {
     if (isConnected) {
@@ -68,6 +68,7 @@ export const Pub = ({ id, _pub, styles, _owner, modal }) => {
   };
   return (
     <div
+      ref={ref}
       className={
         "flex border  border-t-0 border-b-1 border-white/10 hover:bg-black/20 hover:text-white border-x-0  px-4 py-5  w-full items-start"
       }

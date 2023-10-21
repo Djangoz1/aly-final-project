@@ -11,7 +11,14 @@ export const MyTextArea = ({ label, target, styles }) => {
   let { form, placeholders, pointer, modal, checked } = useFormState();
   let [value, setValue] = useState(null);
   let dispatch = useFormDispatch();
+  let [isFocus, setIsFocus] = useState(null);
 
+  let handleFocus = () => {
+    setIsFocus(true);
+  };
+  let handleBlur = () => {
+    setIsFocus(false);
+  };
   useEffect(() => {
     if (target && !value) setValue(form?.[target]);
   }, [target, modal]);
@@ -40,9 +47,11 @@ export const MyTextArea = ({ label, target, styles }) => {
       <textarea
         onChange={(e) => setter(e.target.value)}
         value={value || undefined}
-        className={`textarea font2 font-light textarea-bordered ${
-          styles || "max-h-[30vh]"
-        }`}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        className={`textarea font2 bg-transparent   font-light ${
+          !isFocus ? "shadow1" : "shadow2"
+        }  ${styles || "max-h-[30vh]"}`}
         placeholder={placeholders?.[target]}
       ></textarea>
     </div>

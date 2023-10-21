@@ -1,0 +1,258 @@
+.main-btn a {
+  position: relative;
+  display: inline-block;
+  /* padding: 8px 5px; */
+  border: 1px solid rgba(218, 165, 32, 0.255);
+  text-transform: uppercase;
+  /* color: #fefefe; */
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 12px;
+  /* box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.778),
+    -1px -1px 6px rgba(255, 255, 255, 0.214); */
+}
+
+.main-btn a::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% - 12px);
+  background-color: #212121;
+  transition: 0.3s ease-in-out;
+  transform: scaleY(1);
+}
+
+.main-btn a:hover::before {
+  transform: scaleY(0);
+}
+
+.main-btn a::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: -2px;
+  height: calc(100% + 4px);
+  width: calc(100% - 12px);
+  background-color: #212121;
+  transition: 0.3s ease-in-out;
+  transform: scaleX(1);
+  transition-delay: 0.5s;
+}
+
+.main-btn a:hover::after {
+  transform: scaleX(0);
+}
+
+.main-btn a span {
+  position: relative;
+  z-index: 3;
+}
+
+.main-btn {
+  background-color: none;
+  text-decoration: none;
+  background-color: #212121;
+  border: none;
+}
+
+.main-btn {
+  --btn-hover-bg: rgb(51, 51, 51);
+  --btn-letter-spacing: 0.07rem;
+  --btn-animation-duration: 1.2s;
+  --hover-btn-color: #fac921;
+}
+
+/* .border-el-btn settings 👆 */
+
+.main-btn span {
+  letter-spacing: var(--btn-letter-spacing);
+}
+
+.main-btn span::before {
+  /* box-sizing: border-box; */
+  position: absolute;
+  content: "";
+  background: inherit;
+}
+
+.main-btn:hover,
+.main-btn:focus {
+  background: var(--btn-hover-bg);
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 1),
+    -1px -1px 6px rgba(255, 255, 255, 0.4), inset 3px 3px 10px rgba(0, 0, 0, 1),
+    inset -1px -1px 6px rgba(255, 255, 255, 0.4);
+}
+
+.main-btn:hover span,
+.main-btn:focus span {
+  color: var(--hover-btn-color);
+}
+
+.main-btn:hover span::before,
+.main-btn:focus span::before {
+  animation: chitchat linear both var(--btn-animation-duration);
+}
+
+@keyframes chitchat {
+  0% {
+    content: "#";
+  }
+
+  5% {
+    content: ".";
+  }
+
+  10% {
+    content: "^{";
+  }
+
+  15% {
+    content: "-!";
+  }
+
+  20% {
+    content: "#$_";
+  }
+
+  25% {
+    content: "№:0";
+  }
+
+  30% {
+    content: "#{+.";}35%{content: "@}-?";
+  }
+
+  40% {
+    content: "?{4@%";
+  }
+
+  45% {
+    content: "=.,^!";
+  }
+
+  50% {
+    content: "?2@%";
+  }
+
+  55% {
+    content: "\;1}]";
+  }
+
+  60% {
+    content: "?{%:%";
+    right: 0;
+  }
+
+  65% {
+    content: "|{f[4";
+    right: 0;
+  }
+
+  70% {
+    content: "{4%0%";
+    right: 0;
+  }
+
+  75% {
+    content: "'1_0<";
+    right: 0;
+  }
+
+  80% {
+    content: "{0%";
+    right: 0;
+  }
+
+  85% {
+    content: "]>'";
+    right: 0;
+  }
+
+  90% {
+    content: "4";
+    right: 0;
+  }
+
+  95% {
+    content: "2";
+    right: 0;
+  }
+
+  100% {
+    content: "";
+    right: 0;
+  }
+}
+
+/* BTN SLICE */
+
+/*  */
+
+.btn-white {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ffffff09;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 1),
+    -1px -1px 6px rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  z-index: 1;
+  position: relative;
+  background-color: transparent;
+}
+/* 
+.btn-white::before {
+  content: "";
+  background-color: #e3dddd;
+  display: block;
+  width: 25px;
+  left: 0;
+  height: 1px;
+  margin-right: 10px;
+} */
+
+.btn-white::after {
+  content: "";
+  /* background-color: #fff; */
+
+  display: block;
+  width: 0%;
+  height: 100%;
+  right: 0;
+  top: 0;
+  position: absolute;
+  z-index: -1;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+}
+
+.btn-white:hover {
+  color: white;
+  text-decoration: none;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+}
+
+.btn-white:hover::after {
+  width: 100%;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 1),
+    -1px -1px 6px rgba(255, 255, 255, 0.4), inset 3px 3px 10px rgba(0, 0, 0, 1),
+    inset -1px -1px 6px rgba(255, 255, 255, 0.4);
+}
+
+.btn-white:hover::before {
+  background-color: #232963;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+}

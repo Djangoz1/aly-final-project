@@ -25,52 +25,41 @@ export const stateCV = async (cvID) => {
 };
 
 export const stateDetailsCV = async (cvID) => {
-  let _missions = await _apiGet("indexerOfToken", [
-    cvID,
-    ADDRESSES["missionsHub"],
-  ]);
-
   let _jobs = await _apiGet("jobsOfCV", [cvID]);
-  let missions = [];
+
   let badges = [];
 
   let _wadge = 0;
-  for (let index = 0; index < _missions?.length; index++) {
-    let missionID = _missions[index];
-    let mission = await stateMission(missionID);
-
-    missions.push(mission);
-  }
 
   let features = [];
-  let arbitrators = {
-    nbArbitrations: null,
-    court: [],
-    totalBalance: 0,
-    totalArbitration: 0,
-  };
+  let arbitrators = [];
   let disputes = [];
   let _arbitrators = [];
 
   for (let index = 0; index < _jobs?.length; index++) {
     const featureID = _jobs[index];
     let feature = await stateFeature(featureID);
-    _wadge += parseFloat(feature?.datas?.wadge);
-
     !badges.includes(feature?.datas?.specification) &&
       badges.push(feature?.datas?.specification);
+    _wadge += parseFloat(feature?.datas?.wadge);
 
     if (feature?.datas?.status === 2) {
-      _arbitrators.push(
-        await _apiGet("arbitrationOfCV", [cvID, feature?.datas?.specification])
-      );
+      let arbitration = await _apiGet("arbitrationOfCV", [
+        cvID,
+        feature?.datas?.specification,
+      ]);
+      if (!_arbitrators.includes(arbitration)) {
+        _arbitrators.push(arbitration);
+      }
     }
     if (feature?.datas?.dispute) {
       disputes.push(featureID);
     }
+
     features.push({
       featureID: feature?.featureID,
       title: feature?.metadatas?.title,
+      dispute: feature?.datas?.dispute,
       domain: feature?.metadatas?.attributes?.[0]?.domain,
       specification: feature?.datas?.specification,
       status: feature?.datas?.status,
@@ -79,26 +68,99 @@ export const stateDetailsCV = async (cvID) => {
     });
   }
 
-  arbitrators.nbArbitrations = _arbitrators.length;
   for (let index = 0; index < _arbitrators.length; index++) {
-    let arbitrator = await _apiGet("datasOfArbitrator", [_arbitrators[index]]);
-    arbitrators.totalBalance += parseInt(arbitrator?.balance);
-    arbitrators.totalArbitration += parseInt(arbitrator?.nbArbitrations);
-    arbitrators.arr.push(arbitrator);
+    let arbitrator = {
+      arbitratorID: _arbitrators?.[index],
+
+      disputes: [],
+    };
+
+    let disputes = await _apiGet("indexerOfToken", [
+      _arbitrators[index],
+      ADDRESSES["disputesDatasHub"],
+    ]);
+
+    for (let index1 = 0; index1 < disputes?.length; index1++) {
+      arbitrator.disputes.push({
+        disputeID: disputes[index1],
+        allowance: await _apiGet("allowanceOfArbitrator", [
+          disputes[index1],
+          arbitrator.arbitratorID,
+        ]),
+      });
+    }
+    arbitrators.push(arbitrator);
+
+    // let arbitrator = await _apiGet("datasOfArbitrator", [_arbitrators[index]]);
+    // let disputes = await _apiGet("indexerOfToken", [
+    //   _arbitrators[index],
+    //   ADDRESSES["disputesDatasHub"],
+    // ]);
+    // let _disputes = [];
+    // for (let index = 0; index < disputes.length; index++) {
+    //   const disputeID = disputes[index];
+
+    //   let dispute = await _apiGet("datasOfDispute", [disputeID]);
+    //   let uriFeature = await _apiGet("tokenURIOf", [
+    //     dispute?.featureID,
+    //     ADDRESSES["featuresHub"],
+    //   ]);
+    //   let metadatas = await fetchJSONByCID(uriFeature);
+    //   dispute.title = await metadatas?.title;
+    //   dispute.allowance = await _apiGet("allowanceOfArbitrator", [
+    //     dispute?.id,
+    //     _arbitrators[index],
+    //   ]);
+    //   _disputes.push(dispute);
+    // }
+
+    // arbitrators.arr.push({
+    //   court: arbitrator?.courtID,
+    //   arbitratorID: _arbitrators[index],
+    //   disputes: _disputes,
+    // });
+
+    // arbitrators.totalBalance += parseInt(arbitrator?.balance);
+    // arbitrators.totalArbitration += parseInt(arbitrator?.nbArbitrations);
   }
 
   let wadge = _jobs?.length > 0 ? _wadge / _jobs.length : 0;
 
   return {
-    missions,
+    missions: null,
     badges,
     wadge,
     invites: null,
     launchpads: null,
     arbitrators,
+
     features,
     disputes,
   };
+};
+
+export const stateDispute = async (disputeID) => {
+  let dispute = {
+    ...(await _apiGet("datasOfDispute", [disputeID])),
+    rules: null,
+    timers: null,
+    arbitrators: null,
+    counters: null,
+  };
+  let uriFeature = await _apiGet("tokenURIOf", [
+    dispute?.featureID,
+    ADDRESSES["featuresHub"],
+  ]);
+
+  dispute.rules = await _apiGet("rulesOfDispute", [disputeID]);
+  dispute.timers = await _apiGet("timersOfDispute", [disputeID]);
+  dispute.arbitrators = await _apiGet("arbitratorsOfDispute", [disputeID]);
+  dispute.counters = await _apiGet("countersOfDispute", [disputeID]);
+
+  let metadatas = await fetchJSONByCID(dispute?.tokenURI);
+  let _metadatas = await fetchJSONByCID(uriFeature);
+  metadatas.title = _metadatas?.title;
+  return { datas: dispute, disputeID, metadatas };
 };
 
 export const stateMission = async (missionID) => {
@@ -145,9 +207,6 @@ export let stateFeature = async (featureID) => {
       ADDRESSES["featuresHub"],
     ]);
 
-    if (datas.status === 3) {
-      datas.dispute = await _apiGet("disputeOfFeature", [featureID]);
-    }
     datas.owner = await _apiGet("cvOf", [owner]);
     datas.wadge = await ethers.utils.formatEther(datas?.wadge);
     let uri = await _apiGet("tokenURIOf", [
@@ -157,12 +216,20 @@ export let stateFeature = async (featureID) => {
     let metadatas = await fetchJSONByCID(uri);
 
     let details = await _apiGet("datasOfWork", [featureID]);
+    if (details?.workerContest || details?.ownerContest) {
+      datas.dispute = await _apiGet("disputeOfFeature", [featureID]);
+    } else {
+      datas.dispute = null;
+    }
     details.dispute = null;
     if (datas?.dispute) {
       let disputeDatas = await _apiGet("datasOfDispute", [datas?.dispute]);
       disputeDatas.rules = await _apiGet("rulesOfDispute", [datas?.dispute]);
       disputeDatas.timers = await _apiGet("timersOfDispute", [datas?.dispute]);
       disputeDatas.counters = await _apiGet("countersOfDispute", [
+        datas?.dispute,
+      ]);
+      disputeDatas.arbitrators = await _apiGet("arbitratorsOfDispute", [
         datas?.dispute,
       ]);
       details.dispute = {

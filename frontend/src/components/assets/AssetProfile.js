@@ -1,18 +1,34 @@
 import { Icon } from "@iconify/react";
+import { ImagePin } from "components/Image/ImagePin";
+import { BtnsSocial } from "components/btn/BtnsSocial";
+import { BtnFollow } from "components/btn/BtnsSocial/BtnFollow";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { BtnGb1, BtnGr1 } from "components/myComponents/btn/MyGradientButton";
+import { MyCard } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+import { MyStatus } from "components/myComponents/item/MyStatus";
+import { MyFunMenus } from "components/myComponents/menu/MyFunMenus";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { ENUMS } from "constants/enums";
+import { STATUS } from "constants/status";
 import { useAuthState } from "context/auth";
 import {
+  doStateMissionTools,
   doStateProfileTools,
   doStateTools,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 import { useInView } from "framer-motion";
-import { icfy, icfyETHER } from "icones";
+import {
+  icfy,
+  icfyARROWD,
+  icfyETHER,
+  icfyFB,
+  icfyGITHUB2,
+  icfyLINKEDIN,
+} from "icones";
+import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import {
@@ -155,6 +171,223 @@ export const AssetProfile = ({
         }
       />
     </div>
+  );
+};
+
+export const AssetFreelancer = ({ owner, style }) => {
+  let [isImages, setIsImages] = useState(null);
+  let [isPointerImg, setIsPointerImg] = useState(0);
+  useEffect(() => {
+    if (!isImages && owner?.metadatas) {
+      let images = [];
+      owner?.metadatas?.image && images.push(owner?.metadatas?.image);
+      owner?.metadatas?.attributes?.[0]?.banniere &&
+        images.push(owner?.metadatas?.attributes?.[0]?.banniere);
+      setIsImages(images);
+    }
+  }, [owner?.metadatas]);
+
+  let handleChangeImage = (value) => {
+    if (value > isImages.length - 1) {
+      setIsPointerImg(0);
+    } else if (value < 0) {
+      setIsPointerImg(isImages.length - 1);
+    } else {
+      setIsPointerImg(value);
+    }
+  };
+  return (
+    <MyCard
+      styles={` overflow-hidden  h-[430px] min-h-[430px] w-[300px] ${style}`}
+    >
+      <div className=" absolute h-1/2 top-0 left-0 w-full   flex flex-col">
+        <div className="mt-auto bg-gradient-to-br px-5 from-black/10  via-black/20 to-black/30 transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col z-10">
+          <CVName
+            styles="text-xl"
+            cvID={owner?.cvID}
+            metadata={owner?.metadatas}
+          />
+
+          <p className="text-xs">{owner?.metadatas?.description}</p>
+          <span className="badge -mb-3 mt-1 badge-outline bg-white shadow1 text-black py-1 px-2 h-fit badge-xs ">
+            {owner?.details?.wadge?.toFixed(4)} ETH
+          </span>
+        </div>
+
+        <ImagePin
+          style={"absolute left-0 z-0 top-0 h-full w-full h-full"}
+          CID={isImages?.[isPointerImg]}
+        />
+        <Icon
+          onClick={() => handleChangeImage(isPointerImg - 1)}
+          icon={icfyARROWD}
+          className="absolute left-1  top-1/2 -translate-y-1/2 rotate-90 text-white text-4xl transition-all cursor-pointer hover:scale-110"
+        />
+        <Icon
+          onClick={() => handleChangeImage(isPointerImg + 1)}
+          icon={icfyARROWD}
+          className="absolute right-1 top-1/2 -translate-y-1/2 -rotate-90 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
+        />
+        <MyStatus
+          style={"absolute top-3 bg-white shadow1 py-1 px-3 left-3 z-1"}
+          target={"visibility"}
+          status={owner?.metadatas?.attributes?.[0]?.visibility ? 0 : 1}
+        />
+        <div
+          className="
+        bg-zinc-900 rounded-full absolute  -top-1 z-3 -right-1"
+        >
+          <BtnFollow
+            cvID={owner?.cvID}
+            follow={<Icon icon={icfy.person.check} />}
+            unfollow={<Icon icon={icfy.person.uncheck} />}
+            style={" text-xl"}
+          />
+        </div>
+      </div>
+      <div className="absolute bottom-0 h-1/2 flex flex-col pt-10 pb-4 left-0 w-full px-2 ">
+        <h6 className="text-xl capitalize flex items-center">
+          <Icon
+            icon={ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.icon}
+            className={
+              "text-3xl mr-2 text-" +
+              ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.color
+            }
+          />
+          {ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.name}
+        </h6>
+        <div className="flex overflow-y-scroll mt-5 hide-scrollbar pb-3 flex-wrap w-full ">
+          {owner?.details?.badges?.map(
+            (el, i) =>
+              i < 5 && (
+                <div
+                  key={v4()}
+                  className="shadow1 rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[9px] px-4 py-1 "
+                >
+                  {i !== 4 ? (
+                    <>
+                      <Icon
+                        icon={ENUMS.courts[el].badge}
+                        className="mr-1 text-lg"
+                      />
+                      {ENUMS.courts[el].court}
+                      <Icon
+                        icon={icfy.ux.medal}
+                        className="absolute top-0 right-0 text-xs"
+                      />
+                    </>
+                  ) : (
+                    "... More"
+                  )}
+                </div>
+              )
+          )}
+          {owner?.metadatas?.attributes?.[0]?.skills?.map(
+            (el, i) =>
+              owner.details.badges.length + i < 5 && (
+                <div
+                  key={v4()}
+                  className="shadow1 rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[9px] px-4 py-1 "
+                >
+                  {owner.details.badges.length + i !== 4 ? (
+                    <>
+                      <Icon
+                        icon={ENUMS.courts[el].badge}
+                        className="mr-1 text-lg"
+                      />
+                      {ENUMS.courts[el].court}
+                    </>
+                  ) : (
+                    "... More"
+                  )}
+                </div>
+              )
+          )}
+        </div>
+      </div>
+    </MyCard>
+  );
+};
+
+export const AssetProfileCard = () => {
+  let dispatch = useToolsDispatch();
+  let { cv, state } = useToolsState();
+  return (
+    <MyFunMenus
+      menus={[
+        {
+          height: "65%",
+          width: "70%",
+          component: (
+            <>
+              <Icon icon={icfyFB} />
+            </>
+          ),
+        },
+
+        {
+          height: "45%",
+          width: "50%",
+          component: (
+            <>
+              <Icon icon={icfyLINKEDIN} />
+            </>
+          ),
+        },
+        {
+          height: "25%",
+          width: "30%",
+          component: (
+            <>
+              <Icon icon={icfyGITHUB2} />
+            </>
+          ),
+        },
+      ]}
+      top={
+        cv &&
+        cv != state?.owner?.cvID && (
+          <BtnFollow
+            refresh={() => doStateMissionTools(dispatch, missionID)}
+            follow={<Icon icon={icfy.person.add} className="c2 text-2xl " />}
+            unfollow={
+              <Icon icon={icfy.person.uncheck} className=" text-2xl " />
+            }
+            cvID={state?.owner?.cvID}
+          />
+        )
+      }
+      bottom={
+        <div className="stats_profile font2 flex justify-between w-full ">
+          <div className="shadow1 text-zinc-400">
+            <Icon icon={icfy.person.friend} className="mr-2 text-white" />
+            {state?.owner?.datas?.followers}
+          </div>
+          <div className="shadow1 text-zinc-400">
+            <Icon icon={icfy.person.team} className="mr-2 text-white" />
+
+            {state?.owner?.datas?.follows}
+          </div>
+
+          <div className="shadow1 text-zinc-400">
+            <Icon icon={icfy.msg.chat} className="mr-2 text-white" />
+            {state?.owner?.datas?.pubs}
+          </div>
+        </div>
+      }
+    >
+      <div className="flex w-full  text-xs flex-col">
+        <Avatar CID={state?.owner?.metadatas?.image} />
+        <CVName
+          styles={"mt-2 mb-1"}
+          metadata={state?.owner?.metadatas}
+          cvID={state?.owner?.cvID}
+        />
+        <p className="text-[10px] text-zinc-400">
+          {state?.owner?.metadatas?.description}
+        </p>
+      </div>
+    </MyFunMenus>
   );
 };
 

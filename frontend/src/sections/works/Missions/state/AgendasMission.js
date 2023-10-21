@@ -89,7 +89,7 @@ export const AgendasMission = () => {
             </>
           ),
           value: (
-            <div className="flex flex-col">
+            <div className="flex   flex-col">
               <div className="flex items-center">
                 <p className="mr-2 text-white/40">Started At</p>
                 <span>{fromTimestamp(event?.start.getTime())}</span>
@@ -125,7 +125,10 @@ export const AgendasMission = () => {
         All
       </MyMenusTabs>
       <div className="flex ">
-        <MyCardInfos style={"rounded-tl-none mr-3"} arr={isInfos}></MyCardInfos>
+        <MyCardInfos
+          style={"rounded-tl-none w-1/4 mr-3"}
+          arr={isInfos}
+        ></MyCardInfos>
 
         <MyCard styles={"rounded-tl-none w-fit"} color={1}>
           <MyCalendar

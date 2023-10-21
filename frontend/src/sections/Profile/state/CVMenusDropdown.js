@@ -1,54 +1,217 @@
-import React, { useEffect, useState } from "react";
-import { v4 } from "uuid";
-import { doIndexTools, useToolsDispatch, useToolsState } from "context/tools";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+import { useToolsState } from "context/tools";
 import Link from "next/link";
 import { ENUMS } from "constants/enums";
-import { Icon } from "@iconify/react";
+
 import { icfy, icfyARROWD, icfyCODE, icfyCODER, icfyROCKET } from "icones";
-import { Avatar } from "components/profile/ProfileAvatar";
+
 import { STATUS } from "constants/status";
 
-export const CVMenusDropdown = ({ setter, value, children, arr, target }) => {
-  let { state, index } = useToolsState();
+import {
+  stateDispute,
+  stateFeature,
+  stateLaunchpad,
+  stateMission,
+} from "utils/ui-tools/state-tools";
+import { MyMenusDropdown } from "components/myComponents/menu/MyMenus";
+
+export const CVMenusDropdown = () => {
+  let { state } = useToolsState();
   let [isFolders, setIsFolders] = useState(null);
-  let [isItems, setIsItems] = useState(null);
-  let [isOpen, setIsOpen] = useState(0);
 
-  console.log("state", state);
-  useEffect(() => {
-    if (!isFolders && state?.owner?.details) {
-      let missions = state?.owner?.details?.missions;
-      let jobs = state?.owner?.details?.features;
-      let launchpads = state?.owner?.details?.launchpads?.arr;
-      let object = JSON.parse(JSON.stringify(ENUMS.domain));
-      let objectJobs = JSON.parse(JSON.stringify(ENUMS.domain));
-      let objectCourt = JSON.parse(JSON.stringify(ENUMS.courts));
+  let fetchDisputes = async () => {
+    if (isFolders?.disputes?.arr === null) {
+      await fetchMission();
+      await fetchJobs();
+      await fetchArbitration();
+    }
+  };
 
-      let objectLaunchpads = JSON.parse(JSON.stringify(ENUMS.domain));
+  let [isCvID, setIsCvID] = useState(null);
 
-      let _id = 0;
-      let items = [];
+  let fetchLaunchpads = async () => {
+    let launchpads = state?.owner?.datas?.launchpads;
+    let folders = { ...isFolders };
+
+    if (folders?.launchpads?.arr === null) {
+      console.log("----- fetch launchpad ------");
+
+      let objectLaunchpads = JSON?.parse(JSON?.stringify(ENUMS.domain));
+
+      for (let index = 0; index < launchpads?.length; index++) {
+        let launchpad = await stateLaunchpad(launchpads[index]);
+        let domain = launchpad?.metadatas?.attributes?.[0]?.domain;
+        if (!objectLaunchpads[domain].arr?.length) {
+          objectLaunchpads[domain].arr = [];
+        }
+
+        if (domain >= 0) {
+          objectLaunchpads[domain].arr.push({
+            target: "launchpad",
+            props: [launchpad?.launchpadID],
+            name: launchpad?.metadatas?.title,
+            icon: icfyROCKET,
+          });
+        }
+      }
+
+      folders.launchpads.arr = objectLaunchpads.filter(
+        (el) => el?.arr?.length > 0
+      );
+
+      folders.launchpads.arr.push({
+        icon: icfy.ux.plus,
+        name: <Link href={"/create/launchpad"}>Create launchpad</Link>,
+        color: "success",
+      });
+      setIsFolders(folders);
+    }
+    return folders.launchpads.arr;
+  };
+
+  let fetchArbitration = async () => {
+    let allowed = true;
+    let folders = { ...isFolders };
+    folders?.disputes?.arr?.filter((el) =>
+      el?.name === "Arbitration" ? (allowed = false) : null
+    );
+
+    let arbitrators = state?.owner?.details?.arbitrators;
+    console.log("aerrrere", arbitrators);
+    if (allowed && arbitrators?.length > 0) {
+      let objectCourt = JSON?.parse?.(JSON?.stringify(ENUMS.courts));
+      console.log("----fetch arbitration------");
+
+      for (let index = 0; index < arbitrators?.length; index++) {
+        const arbitrator = arbitrators[index];
+        console.log("arbitrato", arbitrator);
+
+        for (let index = 0; index < arbitrator?.disputes?.length; index++) {
+          const dispute = await stateDispute(
+            arbitrator?.disputes[index]?.disputeID
+          );
+          if (!objectCourt[dispute?.datas?.courtID]?.arr?.length) {
+            objectCourt[dispute?.datas?.courtID].arr = [];
+            objectCourt[dispute?.datas?.courtID].name =
+              objectCourt[dispute?.datas?.courtID].court;
+            objectCourt[dispute?.datas?.courtID].icon =
+              objectCourt[dispute?.datas?.courtID].badge;
+          }
+
+          objectCourt[dispute?.datas?.courtID].arr.push({
+            name: dispute?.metadatas?.title,
+            target: "disputes",
+            props: [dispute?.disputeID],
+            icon: icfy.court.injustice,
+            color: "success",
+          });
+        }
+      }
+
+      let disputesArbitration = {
+        name: "Arbitration",
+        arr: objectCourt?.filter((el) => el?.arr?.length > 0),
+        icon: icfy?.court?.hammer,
+        color: "info",
+      };
+      if (disputesArbitration?.arr?.length > 0) {
+        if (folders?.disputes?.arr === null) {
+          folders.disputes.arr = [disputesArbitration];
+        } else {
+          folders.disputes.arr.push(disputesArbitration);
+        }
+
+        setIsFolders(folders);
+      }
+    }
+    return isFolders.disputes.arr;
+  };
+
+  let fetchTechnos = async () => {
+    let _jobs = await fetchJobs();
+    let _missions = await fetchMission();
+    let jobs = _jobs?.filter((el) => el?.arr?.length > 0);
+    let folders = { ...isFolders };
+
+    if (folders?.technologies?.arr === null) {
+      console.log("----fetch technos -----");
+      let technos = JSON?.parse(JSON?.stringify(ENUMS.courts));
+
+      for (let index = 0; index < jobs?.length; index++) {
+        let elem = jobs[index];
+
+        for (let index = 0; index < elem.arr.length; index++) {
+          const elem1 = elem.arr[index];
+          if (!technos[elem1?.pointer].arr?.length) {
+            technos[elem1?.pointer].arr = [];
+            technos[elem1?.pointer].name = technos[elem1?.pointer].court;
+            technos[elem1?.pointer].icon = technos[elem1?.pointer].badge;
+          }
+
+          technos[elem1?.pointer].arr.push({
+            target: "feature",
+            props: elem1?.props,
+            name: elem1?.name,
+            icon: icfy.code.casual,
+            component: elem1?.component,
+          });
+        }
+      }
+
+      for (let index = 0; index < _missions?.length; index++) {
+        const elem = _missions[index];
+
+        for (let index1 = 0; index1 < elem?.arr?.length; index1++) {
+          const elem1 = elem?.arr[index1];
+
+          for (let index = 0; index < elem1?.arr?.length; index++) {
+            const elem2 = elem1?.arr[index];
+
+            for (let index = 0; index < elem2?.arr?.length; index++) {
+              const elem3 = elem2?.arr[index];
+
+              if (!technos[elem3?.pointer].arr?.length) {
+                technos[elem3?.pointer].arr = [];
+                technos[elem3?.pointer].name = technos[elem3?.pointer].court;
+                technos[elem3?.pointer].icon = technos[elem3?.pointer].badge;
+              }
+              technos[elem3?.pointer].arr.push({
+                target: "feature",
+                props: elem3?.props,
+                name: elem3?.name,
+                icon: icfy.work?.casual,
+                component: elem3?.component,
+              });
+            }
+          }
+        }
+      }
+
+      folders.missions.arr = _missions;
+      folders.jobs.arr = _jobs;
+      folders.technologies.arr = technos.filter((el) => el?.arr?.length > 0);
+      setIsFolders(folders);
+    }
+  };
+
+  let fetchMission = async () => {
+    let folders = { ...isFolders };
+    if (folders?.missions?.arr === null) {
+      console.log("----fetch mission------");
+      let missions = state?.owner?.datas?.missions;
+
+      let object = JSON?.parse(JSON?.stringify(ENUMS.domain));
+
+      let objectCourt = JSON?.parse(JSON?.stringify(ENUMS.courts));
+
       for (let index = 0; index < missions?.length; index++) {
-        const mission = missions?.[index];
+        const mission = await stateMission(missions?.[index]);
 
-        let id_ = _id;
-        _id++;
-        items.push({
-          index: id_,
-          target: "mission",
-          props: [mission?.missionID],
-        });
         if (!object[mission?.metadatas?.attributes?.[0]?.domain].arr?.length) {
           object[mission?.metadatas?.attributes?.[0]?.domain].arr = [];
-          object[mission?.metadatas?.attributes?.[0]?.domain].id = _id;
-          items.push({
-            index: _id,
-            target: "missionDomain",
-            props: [mission?.metadatas?.attributes?.[0]?.domain],
-          });
-          _id++;
         }
-        let object2 = JSON.parse(JSON.stringify(ENUMS.domain));
+        let object2 = JSON?.parse(JSON?.stringify(ENUMS.domain));
 
         for (
           let index1 = 0;
@@ -59,320 +222,254 @@ export const CVMenusDropdown = ({ setter, value, children, arr, target }) => {
 
           if (!object2[feature?.domain]?.arr?.length) {
             object2[feature?.domain].arr = [];
-            object2[feature?.domain].id = _id;
-            items.push({
-              index: _id,
-              target: "featureDomain",
-              props: [feature?.domain],
-            });
-            _id++;
           }
-          if (!objectCourt[feature?.specification]?.arr?.length) {
-            objectCourt[feature?.specification].arr = [];
+
+          if (
+            !objectCourt[feature?.specification]?.arr?.length &&
+            feature?.dispute > 0
+          ) {
+            objectCourt[feature?.specification].arr =
+              isFolders?.disputes?.arr || [];
             objectCourt[feature?.specification].name =
               objectCourt[feature?.specification].court;
             objectCourt[feature?.specification].icon =
               objectCourt[feature?.specification].badge;
           }
-          if (feature?.specification >= 0) {
-            items.push({
-              index: _id,
-              target: "feature",
-              props: [feature?.featureID],
-            });
-
+          if (feature?.dispute > 0) {
             objectCourt[feature?.specification].arr.push({
               name: feature?.title,
-              index: _id,
-              icon: icfy.work.casual,
+              target: "dispute",
+              props: [feature?.dispute],
+              icon: icfy.court.hammer,
               component: (
                 <div
                   className={`p-1 rounded-full bg-${
-                    STATUS.feature[feature?.status]?.color
+                    STATUS.feature[feature.status]?.color
                   }`}
                 />
               ),
             });
-            _id++;
           }
-          if (feature?.domain >= 0) {
-            items.push({
-              index: _id,
-              target: "feature",
-              props: [feature?.featureID],
-            });
 
+          if (feature?.domain >= 0) {
             object2[feature?.domain].arr.push({
+              target: "feature",
+              props: [feature?.id],
               name: feature?.title,
-              index: _id,
+              pointer: feature?.specification,
               icon: ENUMS.courts[feature?.specification]?.badge,
               component: (
                 <div
-                  className={`p-1 rounded-full bg-${
+                  className={`badge badge-xs badge-${
                     STATUS.feature[feature?.status]?.color
                   }`}
                 />
               ),
             });
-            _id++;
           }
         }
 
         if (mission?.metadatas?.attributes?.[0]?.domain >= 0) {
           object[mission?.metadatas?.attributes?.[0]?.domain].arr.push({
             name: mission?.metadatas?.title,
-            index: id_,
+            target: "mission",
+            props: [mission?.missionID],
             img: mission?.metadatas?.image,
             arr: object2.filter((el) => el?.arr),
           });
         }
       }
-      for (let index = 0; index < jobs?.length; index++) {
-        let feature = jobs[index];
 
-        if (!objectJobs[feature?.domain]?.arr?.length) {
-          objectJobs[feature?.domain].arr = [];
-          objectJobs[feature?.domain].id = _id;
-          items.push({
-            index: _id,
-            target: "domain",
-            props: [feature?.domain],
-          });
-          _id++;
-        }
-        if (!objectCourt[feature?.specification]?.arr?.length) {
-          objectCourt[feature?.specification].arr = [];
-          objectCourt[feature?.specification].name =
-            objectCourt[feature?.specification].court;
-          objectCourt[feature?.specification].icon =
-            objectCourt[feature?.specification].badge;
-          objectCourt[feature?.domain].id = _id;
-          items.push({
-            index: _id,
-            target: "court",
-            props: [feature?.specification],
-          });
-          _id++;
-        }
-        if (feature?.specification >= 0) {
-          items.push({
-            index: _id,
-            target: "feature",
-            props: [feature?.featureID],
-          });
-
-          objectCourt[feature?.specification].arr.push({
-            name: feature?.title,
-            index: _id,
-            icon: icfyCODER,
-            component: (
-              <div
-                className={`p-1 rounded-full bg-${
-                  STATUS.feature[feature?.status].color
-                }`}
-              />
-            ),
-          });
-          _id++;
-        }
-
-        if (feature?.domain >= 0) {
-          items.push({
-            index: _id,
-            target: "feature",
-            props: [feature?.featureID],
-          });
-
-          objectJobs[feature?.domain].arr.push({
-            name: feature?.title,
-            index: _id,
-            icon: ENUMS.courts[feature?.specification].badge,
-            component: (
-              <div
-                className={`p-1 rounded-full bg-${
-                  STATUS.feature[feature?.status].color
-                }`}
-              />
-            ),
-          });
-          _id++;
-        }
-      }
-
-      for (let index = 0; index < launchpads?.length; index++) {
-        let launchpad = launchpads[index];
-        if (!objectLaunchpads[launchpad?.domain].arr?.length) {
-          objectLaunchpads[launchpad.domain].arr = [];
-          objectLaunchpads[launchpad.domain].id = _id;
-          items.push({
-            index: _id,
-            target: "domainLaunchpad",
-            props: [launchpad?.domain],
-          });
-          _id++;
-        }
-
-        if (launchpad?.domain >= 0) {
-          items.push({
-            index: _id,
-            target: "launchpad",
-            props: [launchpad?.launchpadID],
-          });
-
-          objectLaunchpads[launchpad?.domain].arr.push({
-            name: launchpad?.title,
-            index: _id,
-            icon: icfyROCKET,
-          });
-          _id++;
-        }
-      }
-
-      items.push({ index: _id, target: "missions", props: ["table ?"] });
-
-      let _missions = {
+      folders.missions = {
         arr: object?.filter((el) => el?.arr?.length > 0),
         name: "Missions",
-        index: _id,
         icon: icfy.work.casual,
         color: "info",
       };
-      _id++;
+      let allowed = true;
+      folders?.disputes?.arr?.filter((el) =>
+        el?.name === "Owner" ? (allowed = false) : null
+      );
 
-      items.push({ index: _id, target: "jobs", props: ["table ?"] });
+      if (allowed) {
+        let disputesOwner = {
+          name: "Owner",
+          arr: objectCourt?.filter((el) => el?.arr?.length > 0),
+          icon: icfy?.work?.casual,
+          color: "info",
+        };
+        if (disputesOwner?.arr?.length > 0) {
+          if (folders?.disputes?.arr === null) {
+            folders.disputes.arr = [disputesOwner];
+          } else {
+            folders.disputes.arr.push(disputesOwner);
+          }
+        }
+      }
+
+      folders.missions.arr.push({
+        icon: icfy.ux.plus,
+        name: <Link href={"/create/mission"}>Create mission</Link>,
+        color: "success",
+      });
+      setIsFolders(folders);
+    }
+    return folders.missions.arr;
+  };
+
+  let fetchJobs = async () => {
+    let jobs = state?.owner?.datas?.proposals;
+    let folders = { ...isFolders };
+    if (folders?.jobs?.arr === null) {
+      console.log("-----fetch jobs -----");
+
+      let objectJobs = JSON?.parse(JSON?.stringify(ENUMS.domain));
+      let objectCourt = JSON?.parse(JSON?.stringify(ENUMS.courts));
+
+      for (let index = 0; index < jobs?.length; index++) {
+        let feature = await stateFeature(jobs[index]);
+        let domain = feature?.metadatas?.attributes?.[0]?.domain;
+        let specification = feature?.datas?.specification;
+        if (!objectJobs[domain]?.arr?.length) {
+          objectJobs[domain].arr = [];
+        }
+        if (!objectCourt[specification]?.arr?.length) {
+          objectCourt[specification].arr = [];
+          objectCourt[specification].name = objectCourt[specification]?.court;
+          objectCourt[specification].icon = objectCourt[specification]?.badge;
+        }
+
+        if (feature?.datas?.dispute > 0) {
+          objectCourt[specification].arr.push({
+            name: feature?.metadatas?.title,
+            target: "dispute",
+            props: [feature?.datas?.dispute],
+            icon: icfy.court.hammer,
+            component: (
+              <div
+                className={`p-1 rounded-full bg-${
+                  STATUS.feature[feature.status]?.color
+                }`}
+              />
+            ),
+          });
+        }
+
+        if (domain >= 0) {
+          objectJobs[domain].arr.push({
+            target: "feature",
+            pointer: specification,
+            props: [feature?.featureID],
+            name: feature?.metadatas?.title,
+            icon: ENUMS.courts[specification].badge,
+            component: (
+              <div
+                className={`badge badge-xs badge-${
+                  STATUS.feature[feature?.datas?.status].color
+                }`}
+              />
+            ),
+          });
+        }
+      }
+      let allowed = true;
+      folders?.disputes?.arr?.filter((el) =>
+        el?.name === "Worker" ? (allowed = false) : null
+      );
+
+      if (allowed) {
+        let disputesWorker = {
+          name: "Worker",
+          arr: objectCourt?.filter((el) => el?.arr?.length > 0),
+          icon: icfyCODER,
+          color: "info",
+        };
+        if (disputesWorker?.arr?.length > 0) {
+          if (folders?.disputes?.arr === null) {
+            folders.disputes.arr = [disputesWorker];
+          } else {
+            folders.disputes.arr.push(disputesWorker);
+          }
+        }
+      }
+      folders.jobs.arr = objectJobs?.filter((el) => el?.arr?.length > 0);
+      folders.jobs.arr.push({
+        icon: icfy.ux.plus,
+        name: <Link href={"/create/feature"}>Create Feature</Link>,
+        color: "success",
+      });
+      setIsFolders(folders);
+    }
+    return folders.jobs.arr;
+  };
+
+  let funcs = {
+    disputes: fetchDisputes,
+    missions: fetchMission,
+    jobs: fetchJobs,
+    launchpads: fetchLaunchpads,
+    technologies: fetchTechnos,
+  };
+
+  useEffect(() => {
+    if (
+      (!isFolders && state?.owner?.details) ||
+      (state?.owner?.cvID != isCvID && state?.owner?.details)
+    ) {
+      console.log("Mount dropdown profile ...");
+      setIsCvID(state?.owner?.cvID);
+
+      let _missions = {
+        arr: null,
+        name: "Missions",
+
+        icon: icfy.work.casual,
+        color: "info",
+      };
 
       let _jobs = {
-        arr: objectJobs?.filter((el) => el?.arr?.length > 0),
+        arr: null,
         name: "Jobs",
-        index: _id,
         icon: icfyCODER,
         color: "secondary",
       };
-      _id++;
-      items.push({ index: _id, target: "jobs", props: ["table ?"] });
 
-      let _courts = {
-        arr: objectCourt?.filter((el) => el?.arr?.length > 0),
+      let _technos = {
+        arr: null,
         name: "Technologies",
-        index: _id,
         icon: icfyCODE,
         color: "error",
       };
-      _id++;
-      items.push({ index: _id, target: "launchpads", props: ["table ?"] });
 
       let _launchpads = {
-        arr: objectLaunchpads?.filter((el) => el?.arr?.length > 0),
+        arr: null,
         name: "Launchpads",
-        index: _id,
         icon: icfyROCKET,
         color: "primary",
       };
-      _id++;
-      console.log("object", object);
-      setIsItems(items);
-      setIsFolders([_missions, _jobs, _courts, _launchpads]);
-    }
-  }, [state?.owner?.details?.missions]);
-  console.log("items", isItems?.[index]);
-  console.log("indeeeex", index);
-  console.log("isItems", isItems);
-  let dispatch = useToolsDispatch();
 
-  let handleChangeIndex = (index, i) => {
-    doIndexTools(dispatch, index);
-    if (i) {
-      setIsOpen(isOpen === i ? null : i);
+      let _disputes = {
+        name: "Disputes",
+
+        icon: icfy?.court.injustice,
+        arr: null,
+        color: "warning",
+      };
+
+      let folders = {
+        missions: _missions,
+        jobs: _jobs,
+        technologies: _technos,
+        launchpads: _launchpads,
+        disputes: _disputes,
+      };
+      setIsFolders(folders);
     }
-  };
+  }, [state?.owner?.details?.missions, state?.owner?.cvID]);
 
   return (
-    <div className="flex flex-col w-full  ">
-      {isFolders?.map((el, i) => (
-        <div
-          className={`flex flex-col text-xs box-border w-full ${
-            isOpen === i && "bg-white/5"
-          }`}
-          key={v4()}
-        >
-          <div
-            className="flex cursor-pointer py-3 items-center capitalize transition-all box-border w-full"
-            onClick={() => handleChangeIndex(el?.index, i)}
-          >
-            <Icon
-              icon={el?.icon}
-              className={"mr-4 ml-2 text-lg text-" + el?.color}
-            />
-            {el?.name}
-            <Icon
-              icon={icfyARROWD}
-              className={`ml-auto mr-2 ${isOpen !== i && "rotate-180"}`}
-            />
-          </div>
-
-          {i === isOpen && (
-            <div className="box-border h-fit  border flex-auto ml-2 border-l-1 border-r-0 border-y-0  border-white/10">
-              {el?.arr?.map((el2) => (
-                <Child
-                  key={v4()}
-                  setter={() => handleChangeIndex(el2?.index)}
-                  element={el2}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-let Child = ({ element, setter }) => {
-  let [isOpen, setIsOpen] = useState(false);
-  let dispatch = useToolsDispatch();
-
-  let handleChangeIndex = () => {
-    console.log("element", element);
-    doIndexTools(dispatch, element?.index);
-  };
-
-  return (
-    <>
-      <div
-        onClick={handleChangeIndex}
-        className={`flex  cursor-pointer  items-center py-3 ${
-          isOpen ? "bg-white/5 text-white" : "hover:bg-white/10 text-white/40"
-        }`}
-      >
-        {element?.icon && (
-          <Icon
-            icon={element?.icon}
-            className={`
-              mr-4 ml-2 text-lg ${element?.color && "text-" + element?.color}
-            `}
-          />
-        )}
-        {element?.img && <Avatar CID={element?.img} style="mr-2 ml-2 w-6" />}
-        <p className="w-fit capitalize">{element?.name}</p>
-        {element?.arr && (
-          <Icon
-            icon={icfyARROWD}
-            className={`ml-auto  mr-3 text-xs   ${
-              !isOpen ? "rotate-180 " : "rotate-0"
-            }`}
-          />
-        )}
-        {element?.component && (
-          <div className={`ml-auto  mr-3 `}>{element?.component}</div>
-        )}
-      </div>
-      {isOpen && (
-        <div className="box-border h-fit border flex-auto ml-2 border-l-1 border-r-0 border-y-0  border-white/10">
-          {element?.arr?.map((el) => (
-            <Child key={v4()} element={el} />
-          ))}
-        </div>
-      )}
-    </>
+    <MyMenusDropdown funcs={funcs} isFolders={isFolders}>
+      All
+    </MyMenusDropdown>
   );
 };

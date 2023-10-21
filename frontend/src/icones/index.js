@@ -6,6 +6,9 @@ export const icfy = {
     open: "ic:outline-remove-red-eye",
   },
   ux: {
+    medal: "noto:sports-medal",
+    filter: "ion:filter-outline",
+    arrow: "line-md:arrow-up",
     admin: "mdi:administrator-outline",
     key: "iconoir:key-alt-back",
     mediation: "material-symbols:mediation",

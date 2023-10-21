@@ -75,8 +75,8 @@ contract Dispute is Ownable {
         _tools.datasHub = _iAS.disputesDatasHub();
         _tools.id = _data.id;
 
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
-        _iEDH.setDatasOf(_tools.id, _data);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
+        _iDDH.setDatasOf(_tools.id, _data);
 
         transferOwnership(_owner);
     }
@@ -97,21 +97,21 @@ contract Dispute is Ownable {
 
         _selectArbitrators();
 
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         DisputeTimes.Data memory _timers;
 
         _timers.createdAt = block.timestamp;
-        _iEDH.setTimersOf(_tools.id, _timers);
+        _iDDH.setTimersOf(_tools.id, _timers);
     }
 
     function acceptArbitration(
         uint _cvID
     ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         DisputeDatas.Data memory data = _data();
 
         uint arbitratorID = _arbitratorOf(_cvID);
-        uint _arbitratorsLength = _iEDH.addArbitratorOn(
+        uint _arbitratorsLength = _iDDH.addArbitratorOn(
             _tools.id,
             arbitratorID
         );
@@ -123,17 +123,17 @@ contract Dispute is Ownable {
     function refuseArbitration(
         uint _cvID
     ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
 
         uint arbitratorID = _arbitratorOf(_cvID);
-        uint slot = _iEDH.refuseArbitration(_tools.id, arbitratorID);
+        uint slot = _iDDH.refuseArbitration(_tools.id, arbitratorID);
         if (slot < 3) {
             _selectArbitrators();
         }
     }
 
     function _selectArbitrators() internal {
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         address arbitratorsHub = _iAS.arbitratorsHub();
         IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(arbitratorsHub);
         DisputeDatas.Data memory data = _data();
@@ -164,11 +164,11 @@ contract Dispute is Ownable {
                     Bindings.ownerOf(randomID, arbitratorsHub)
                 );
                 if (
-                    _iEDH.allowanceOf(_tools.id, randomID) ==
+                    _iDDH.allowanceOf(_tools.id, randomID) ==
                     DisputeArbitrators.Status.None &&
                     !_checkCVLink(randomCV)
                 ) {
-                    _iEDH.setAllowanceOf(
+                    _iDDH.setAllowanceOf(
                         _tools.id,
                         randomID,
                         DisputeArbitrators.Status.Invited
@@ -179,12 +179,12 @@ contract Dispute is Ownable {
                 }
             }
         }
-        _iEDH.setCountersOf(_tools.id, counters);
+        _iDDH.setCountersOf(_tools.id, counters);
     }
 
     function _startedVotePeriod() internal {
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
-        _iEDH.startVotesOf(_tools.id);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
+        _iDDH.startVotesOf(_tools.id);
     }
 
     function startedVotePeriod(
@@ -208,17 +208,19 @@ contract Dispute is Ownable {
     ) external onlyProxy onlyStatus(DisputeRules.Status.Disputed, true) {
         IArbitratorsHub _iArbH = IArbitratorsHub(_iAS.arbitratorsHub());
 
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
-        DisputeDatas.Data memory _data = _iEDH.datasOf(_tools.id);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
+        DisputeDatas.Data memory _data = _iDDH.datasOf(_tools.id);
 
         uint arbitratorID = _arbitratorOf(_cvID);
 
-        uint votesLength = _iEDH.voteFor(_tools.id, arbitratorID, _vote);
+        uint votesLength = _iDDH.voteFor(_tools.id, arbitratorID, _vote);
 
         _iArbH.incrementVote(_cvID, _data.courtID);
         if (
             votesLength == _arbitrators().length ||
-            _iEDH.timersOf(_tools.id).startedAt + _data.reclamationPeriod <
+            _iDDH.timersOf(_tools.id).startedAt +
+                _data.reclamationPeriod *
+                1 days <
             block.timestamp
         ) {
             _tally();
@@ -227,17 +229,17 @@ contract Dispute is Ownable {
 
     function _reclaimed(uint _winnerID) internal {
         require(_winnerID > 0, "Unclear decision");
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         DisputeDatas.Data memory data = _data();
         IFeaturesHub _iFH = IFeaturesHub(_iAS.featuresHub());
         bool success = _iFH.resolvedDispute(_winnerID, data.featureID);
-        _iEDH.reclaimedFor(_tools.id);
+        _iDDH.reclaimedFor(_tools.id);
     }
 
     function _tally() internal returns (uint) {
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
 
-        uint256 winnerID = _iEDH.tallyFor(_tools.id);
+        uint256 winnerID = _iDDH.tallyFor(_tools.id);
 
         if (_rules().appeal) {
             _resolvedDispute();
@@ -259,8 +261,8 @@ contract Dispute is Ownable {
         onlyStatus(DisputeRules.Status.Tally, true)
     {
         uint winnerID = DisputeTools.winner(_data(), _counters());
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
-        _iEDH.resolveDisputeOf(_tools.id);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
+        _iDDH.resolveDisputeOf(_tools.id);
         if (winnerID > 0) {
             _reclaimed(winnerID);
         }
@@ -274,9 +276,9 @@ contract Dispute is Ownable {
         onlyStatus(DisputeRules.Status.Tally, true)
         checkLink(_cvID)
     {
-        IDisputesDatasHub _iEDH = IDisputesDatasHub(_tools.datasHub);
+        IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
 
-        bool success = _iEDH.appealOf(_tools.id);
+        bool success = _iDDH.appealOf(_tools.id);
         require(success, "Error appeal");
         _selectArbitrators();
     }

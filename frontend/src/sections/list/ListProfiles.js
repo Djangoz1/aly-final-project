@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { AssetProfile } from "components/assets/AssetProfile";
+import { AssetFreelancer, AssetProfile } from "components/assets/AssetProfile";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { MissionName } from "components/inputs/inputsMission/MissionName";
 import {
@@ -25,6 +25,8 @@ import { v4 } from "uuid";
 
 export const ListProfiles = ({ bool }) => {
   let [isList, setIsList] = useState(null);
+
+  console.log(isList);
   let fetch = async () => {
     let arr = [];
     let length = parseInt(
@@ -46,14 +48,9 @@ export const ListProfiles = ({ bool }) => {
   }, [bool]);
 
   return (
-    <div className="flex flex-wrap">
+    <div className="flex   justify-center w-fit  flex-wrap ">
       {isList?.map((el) => (
-        <AssetProfile
-          state={el}
-          style={"w-[23%] mx-2 mb-3 h-fit "}
-          key={v4()}
-          color={2}
-        />
+        <AssetFreelancer style={"m-2"} key={v4()} owner={el} />
       ))}
     </div>
   );

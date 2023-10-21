@@ -28,6 +28,7 @@ import { icfy, icfyROCKET } from "icones";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { Viewport } from "components/myComponents/layout/MyViewport";
 import Link from "next/link";
+import { MyCardIc } from "components/myComponents/card/MyCardIc";
 
 const LaunchpadPage = () => {
   let [isList, setIsList] = useState(null);
@@ -65,48 +66,15 @@ const LaunchpadPage = () => {
               <Hg1 style={"font-light "}>Investor</Hg1>
             </h2>
             <div className="flex justify-evenly">
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={2}
-                header={{
-                  icon: icfy.ux.flag,
-                  title: "Launch Project",
-                }}
-                btn={{
-                  component: (
-                    <Link
-                      className="btn btn-xs btn-outline c2"
-                      href="/create/launchpad"
-                    >
-                      Create Launchpad
-                    </Link>
-                  ),
-                }}
+              <MyCardIc
+                icon={icfy.ux.flag}
+                title={"Launch Project"}
+                url={"/create/launchpad"}
+                btn={"Create Launchpad"}
               />
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={2}
-                header={{
-                  icon: icfy.ux.mediation,
-                  title: "Manage Launchpad",
-                }}
-              />
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={1}
-                header={{
-                  icon: icfy.bank.coin,
-                  title: "Standard ERC20",
-                }}
-              />
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={1}
-                header={{
-                  icon: icfy.bank.bag,
-                  title: "Invest on Launchpad",
-                }}
-              />
+              <MyCardIc icon={icfy.ux.mediation} title={"Manage Launchpad"} />
+              <MyCardIc icon={icfy.bank.coin} title={"Standard ERC20"} />
+              <MyCardIc icon={icfy.bank.bag} title={"Invest on Launchpad"} />
             </div>
           </div>
         </Viewport>

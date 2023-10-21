@@ -52,7 +52,52 @@ export const doReloadTools = async (dispatch) => {
 export const doStateProfileTools = async ({ dispatch, cvID }) => {
   dispatch({ status: "pending profile" });
   let owner = await stateCV(cvID);
-  owner.details = await stateDetailsCV(cvID);
+  owner.details = {
+    wadge: 0,
+    // ! To fix
+    missions: [],
+    features: [],
+    arbitrators: [],
+    badges: [],
+    disputes: [],
+  };
+
+  for (let index = 0; index < owner?.datas?.proposals?.length; index++) {
+    const featureID = owner?.datas?.proposals?.[index];
+    let feature = {
+      datas: await _apiGet("datasOfFeature", [featureID]),
+      details: await _apiGet("datasOfWork", [featureID]),
+    };
+
+    console.log("feature", feature);
+
+    !owner?.details?.badges.includes(feature?.datas?.specification) &&
+      owner?.details?.badges.push(feature?.datas?.specification);
+
+    // * Si status === validated chercher l'arbitratorID du worker
+    if (feature?.datas?.status === 2) {
+      let arbitration = await _apiGet("arbitrationOfCV", [
+        cvID,
+        feature?.datas?.specification,
+      ]);
+      if (!owner?.details?.arbitrators.includes(arbitration)) {
+        owner?.details?.arbitrators.push(arbitration);
+      }
+    }
+    if (feature?.details?.workerContest || feature?.details?.ownerContest) {
+      feature.datas.dispute = await _apiGet("disputeOfFeature", [featureID]);
+
+      owner.details.disputes.push(feature.datas.dispute);
+    }
+    owner?.details?.features?.push(feature);
+  }
+
+  for (let index = 0; index < owner?.datas?.missions?.length; index++) {
+    let missionID = owner?.datas?.missions?.[index];
+    let mission = await stateMission(missionID);
+
+    owner?.details?.missions?.push(mission);
+  }
   let invites = await _apiGet("invitesOfCV", [cvID]);
   owner.details.invites = [];
   for (let index = 0; index < invites?.length; index++) {
@@ -84,12 +129,8 @@ export const doStateProfileTools = async ({ dispatch, cvID }) => {
 
   let _state = {
     owner,
-    pubs: [],
+    pubs: _pubs,
   };
-
-  for (let index = 0; index < _pubs.length; index++) {
-    _state.pubs.push(await statePub(_pubs[index]));
-  }
 
   dispatch({
     status: "success",

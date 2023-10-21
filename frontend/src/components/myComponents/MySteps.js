@@ -20,8 +20,8 @@ export const MySteps = ({ arr, styles }) => {
           data-content={el?.i}
           className={`step px-5  cursor-pointer relative border-y-1 rounded-lg m-0 text-xs  text-left whitespace-nowrap w-full border-x-0 ${
             index === pointer
-              ? "border-none bg-white/10 font-bold "
-              : "border-white/10"
+              ? "border-none bg-white/10 font-bold shadow2 "
+              : "border-white/10 "
           } ${
             index === pointer ? " text-white  " : "text-white/40 opacity-40"
           }`}

@@ -230,7 +230,7 @@ export const CVInfos = () => {
       <div className="flex">
         <MyCardInfos
           title={"Work protocole"}
-          style={"w-1/3 rounded-tl-none"}
+          style={"w-1/3 rounded-tl-none "}
           arr={[infos, infoOffChain][isTabs]}
         />
         {

@@ -11,8 +11,6 @@ export const MySelects = ({ selects, styles }) => {
   let formState = useFormState();
   let dispatch = useFormDispatch();
 
-  console.log("selects", formState);
-
   let setter = (target, index, el) => {
     let _form = form;
 
@@ -39,7 +37,7 @@ export const MySelects = ({ selects, styles }) => {
                 {el?.label && checked?.[pointer]?.includes(el?.target) && " *"}
               </label>
               <select
-                className="select font-light select-xs select-bordered w-full max-w-xs"
+                className="select bg-transparent shadow1  py-2 h-fit font-light select-xs  w-full max-w-xs"
                 onChange={(e) => setter(el?.target, e.target.value, el)}
                 value={
                   form?.[el?.target] !== null

@@ -5,7 +5,8 @@ import { doStateFormModal, useFormDispatch, useFormState } from "context/form";
 import { useToolsDispatch } from "context/tools";
 import { useAccount } from "wagmi";
 import { useAuthState } from "context/auth";
-import { MyBtnPost } from "../btn/MyBtnPost";
+import { MyBtnPost } from "../../btn/MyBtnPost";
+import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
 
 export const MyFModal = ({ children, btns, isForm, submit, styles, title }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,8 +24,6 @@ export const MyFModal = ({ children, btns, isForm, submit, styles, title }) => {
   };
 
   let handleSubmit = async () => {
-    console.log("je submit");
-
     await submit(formState?.form);
 
     setIsOpen(false);
@@ -43,12 +42,12 @@ export const MyFModal = ({ children, btns, isForm, submit, styles, title }) => {
 
   return (
     <>
-      <button className={styles?.btn} onClick={openModal}>
+      <MyMainBtn1 style={styles?.btn} setter={openModal}>
         {btns?.btn}
-      </button>
+      </MyMainBtn1>
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed w-screen debug h-screen z-[100] flex items-end justify-center top-0 left-0">
+          <div className="fixed w-screen  h-screen z-[100] flex items-end justify-center top-0 left-0">
             <MyOverlay setter={openModal} />
             <motion.div
               initial="hidden"

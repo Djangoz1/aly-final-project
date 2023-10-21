@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { MyToggle } from "components/myComponents/form/MyToggle";
 
 import { _apiPostAt } from "utils/ui-tools/web3-tools";
 let MENUS = [
@@ -67,12 +68,7 @@ export let _form_create_mission_intro = {
         confirme 😄
       </span>
       <div className="text-error -mt-3 flex items-center ml-auto">
-        <input
-          type="checkbox"
-          className="toggle toggle-sm toggle-success mr-2"
-          checked
-        />
-        Désactiver
+        <MyToggle target={"ia"} label={"Désactiver"} />
       </div>
     </>
   ),

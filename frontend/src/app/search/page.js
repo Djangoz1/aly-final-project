@@ -18,7 +18,14 @@ import {
   MyCard1,
   MyCardList,
 } from "components/myComponents/card/MyCard";
-import { icfy, icfyETHER, icfyROCKET, icfySEARCH } from "icones";
+import {
+  icfy,
+  icfyETHER,
+  icfyLOCK,
+  icfyROCKET,
+  icfySEARCH,
+  icfyUNLOCK,
+} from "icones";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 import { CVName } from "components/inputs/inputsCV/CVName";
@@ -56,16 +63,19 @@ import { ListLaunchpads } from "sections/list/ListLaunchpads";
 import { ENUMS } from "constants/enums";
 import { Viewport } from "components/myComponents/layout/MyViewport";
 import { LayoutTools } from "sections/Layout/LayoutTools";
+import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { MyLoader } from "components/myComponents/layout/MyLoader";
 export default function PageLaunchpad({ params }) {
   let { address } = useAccount();
   let state = useMissionState();
 
   return (
-    <LayoutTools>
-      <Viewport id={"All"} index={0} styles={"items-start"}>
+    <MyLayoutApp>
+      <Viewport id={"All"} full={true} index={0} styles={"items-start"}>
         <Page />
       </Viewport>
-    </LayoutTools>
+    </MyLayoutApp>
   );
 }
 
@@ -128,13 +138,11 @@ let Page = () => {
   return (
     <div
       id={1}
-      className="flex flex-col h-full overflow-scroll hide-scrollbar w-full"
+      className="flex overflow-scroll hide-scrollbar flex-col h-full   w-full"
     >
-      <MyCard1
+      <MyCard
         styles={"w-full mb-10"}
         color={1}
-        setterMenu={setterMenu}
-        menus={["Jobs", "Freelancers", "Launchpad", "Disputes"]}
         head={{
           title: "Search",
           component: (
@@ -147,213 +155,132 @@ let Page = () => {
           ),
           icon: icfySEARCH,
         }}
-        components={
-          isExtend
-            ? [
-                <div className="flex  flex-col w-full">
-                  <p className="text-xs mb-1">Language techno</p>
+      >
+        <MyMenusTabs
+          value={isPointer}
+          setter={setIsPointer}
+          arr={["Jobs", "Freelancers", "Launchpad", "Disputes"]}
+        />
+        {isExtend ? (
+          <>
+            <div className="flex  flex-col w-full overflow-scroll hide-scrollbar">
+              <p className="text-xs mb-1">Language techno</p>
 
-                  <div className="flex w-full overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsCourt(0)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        0 === isCourt ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    {ENUMS.courts.map(
-                      (el, i) =>
-                        i > 1 && (
-                          <button
-                            onClick={() => setIsCourt(i)}
-                            className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                              i === isCourt ? "c1 bg2" : "c2"
-                            }`}
-                            key={v4()}
-                          >
-                            <Icon icon={el.badge} />
-                            {el?.court}
-                          </button>
-                        )
-                    )}
+              <MyMenusTabs
+                setter={setIsCourt}
+                value={isCourt}
+                arr={ENUMS.courts.map((el) => (
+                  <div className="flex items-center ">
+                    <Icon icon={el.badge} className={"mr-3 "} />
+                    {el?.court}
                   </div>
+                ))}
+              >
+                All
+              </MyMenusTabs>
+
+              <div className="flex flex-row"></div>
+            </div>
+
+            <div className="flex  flex-col w-full">
+              <p className="text-xs my-1">Domaine</p>
+
+              <MyMenusTabs
+                setter={setIsDomain}
+                value={isDomain}
+                arr={ENUMS.domain.map((el) => (
+                  <div className="flex items-center">
+                    <Icon icon={el.icon} className={"mr-3 text-" + el.color} />
+
+                    {el?.name}
+                  </div>
+                ))}
+              >
+                All
+              </MyMenusTabs>
+
+              <div className="flex flex-row">
+                <div className="flex mr-5 flex-col">
                   <p className="text-xs my-1">Invite only</p>
 
-                  <div className="flex w-full  overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsInvite(0)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        0 === isInvite ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setIsInvite(1)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        1 === isInvite ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      Yes
-                    </button>
-                    <button
-                      onClick={() => setIsInvite(2)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        2 === isInvite ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      No
-                    </button>
-                  </div>
-                  <p className="text-xs my-1">Started</p>
-
-                  <div className="flex w-full  overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsStarted(0)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        0 === isStarted ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setIsStarted(1)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        1 === isStarted ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      Yes
-                    </button>
-                    <button
-                      onClick={() => setIsStarted(2)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        2 === isStarted ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      No
-                    </button>
-                  </div>
-                </div>,
-                <div className="flex  flex-col w-full">
-                  <p className="text-xs mb-1">Language techno</p>
-
-                  <div className="flex w-full overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsCourt(0)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        0 === isCourt ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    {ENUMS.courts.map(
-                      (el, i) =>
-                        i > 1 && (
-                          <button
-                            onClick={() => setIsCourt(i)}
-                            className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                              i === isCourt ? "c1 bg2" : "c2"
-                            }`}
-                            key={v4()}
-                          >
-                            <Icon icon={el.badge} />
-                            {el?.court}
-                          </button>
-                        )
-                    )}
-                  </div>
-                  <p className="text-xs my-1">Domaine</p>
-
-                  <div className="flex w-full overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsDomain(null)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        isDomain === null ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    {ENUMS.domain.map(
-                      (el, i) =>
-                        i > 1 && (
-                          <button
-                            onClick={() => setIsDomain(i)}
-                            className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                              i === isDomain ? "c1 bg2" : "c2"
-                            }`}
-                            key={v4()}
-                          >
-                            <Icon
-                              icon={el.icon}
-                              className={"text-" + el.color}
-                            />
-                            {el?.name}
-                          </button>
-                        )
-                    )}
-                  </div>
+                  <MyMenusTabs
+                    setter={setIsInvite}
+                    value={isInvite}
+                    arr={[
+                      <div className="flex items-center">
+                        <Icon icon={icfyLOCK} className="mr-3 text-error" />
+                        Yes
+                      </div>,
+                      <div className="flex items-center">
+                        <Icon icon={icfyUNLOCK} className="mr-3 text-success" />
+                        No
+                      </div>,
+                    ]}
+                  >
+                    All
+                  </MyMenusTabs>
+                </div>
+                <div className="flex flex-col">
                   <p className="text-xs my-1">Visibility</p>
 
-                  <div className="flex w-full  overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsInvite(0)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        0 === isInvite ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setIsInvite(1)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        1 === isInvite ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      Disponible
-                    </button>
-                    <button
-                      onClick={() => setIsInvite(2)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        2 === isInvite ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      Indisponible
-                    </button>
-                  </div>
+                  <MyMenusTabs
+                    setter={setIsInvite}
+                    value={isInvite}
+                    arr={[
+                      <div className="flex items-center">
+                        {" "}
+                        <Icon
+                          icon={icfy.eye.open}
+                          className="mr-3 text-success"
+                        />
+                        Disponible
+                      </div>,
+                      <div className="flex items-center">
+                        {" "}
+                        <Icon
+                          icon={icfy.eye.close}
+                          className="mr-3 text-error"
+                        />
+                        Indisponible
+                      </div>,
+                    ]}
+                  >
+                    All
+                  </MyMenusTabs>
+                </div>
+                <div className="flex flex-col ml-5">
                   <p className="text-xs my-1">Experience</p>
 
-                  <div className="flex w-full  overflow-x-scroll hide-scrollbar">
-                    <button
-                      onClick={() => setIsStarted(0)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        0 === isStarted ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setIsStarted(1)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        1 === isStarted ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      Junior
-                    </button>
-                    <button
-                      onClick={() => setIsStarted(2)}
-                      className={`flex btn-xs rounded-full   mr-8  items-center btn  ${
-                        2 === isStarted ? "c1 bg2" : "c2"
-                      }`}
-                    >
-                      Senior
-                    </button>
-                  </div>
-                </div>,
-              ]
-            : []
-        }
-      ></MyCard1>
+                  <MyMenusTabs
+                    setter={setIsStarted}
+                    value={isStarted}
+                    arr={[
+                      <div className="flex items-center">Junior</div>,
+                      <div className="flex items-center">
+                        <Icon
+                          icon={icfy.eye.close}
+                          className="mr-3 text-error"
+                        />
+                        Senior
+                      </div>,
+                    ]}
+                  >
+                    All
+                  </MyMenusTabs>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          []
+        )}
+        <button
+          onClick={() => setIsExtend(!isExtend)}
+          className="absolute top-0 right-0 btn btn-ghost btn-sm "
+        >
+          <Icon icon={icfy.ux.filter} className="text-3xl" />
+        </button>
+      </MyCard>
       {lists?.[isPointer]}
       {/* <ListLaunchpads /> */}
       {/* <ListJobs /> */}

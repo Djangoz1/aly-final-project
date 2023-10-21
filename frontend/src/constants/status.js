@@ -4,6 +4,11 @@ export const STATUS = {
   _feature: {
     hiring: { icon: icfy.hand.check, status: "Hiring", color: "warning" },
   },
+
+  visibility: [
+    { icon: icfy.eye.open, status: "Disponible", color: "success" },
+    { icon: icfy.eye.close, status: "Indisponible", color: "error" },
+  ],
   feature: [
     { icon: icfy.code.casual, status: "Process", color: "info" },
     { icon: icfy.code.tool, status: "Improve", color: "warning" },
@@ -11,6 +16,12 @@ export const STATUS = {
     { icon: icfy.court.justice, status: "Contest", color: "error" },
   ],
 
+  arbitratorForDispute: [
+    { status: "Waiting", icon: icfy.code.tool, color: "warning" },
+    { status: "Invited", icon: icfy.code.tool, color: "info" },
+    { status: "Refused", icon: icfy.code.tool, color: "error" },
+    { status: "Accepted", icon: icfy.code.tool, color: "success" },
+  ],
   dispute: [
     { status: "Initial", icon: icfy.code.tool, color: "success" },
     { status: "Reclaimed", icon: icfy.code.tool, color: "success" },

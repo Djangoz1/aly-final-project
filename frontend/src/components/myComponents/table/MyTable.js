@@ -6,7 +6,7 @@ export const MyTable = ({ head, list, btns, editBtns }) => {
   let [isCountView, setIsViewCount] = useState(5);
   return (
     <>
-      <div className="overflow-x-auto overflow-y-visible w-full min-h-[20vh] font2">
+      <div className="overflow-x-auto  overflow-y-visible w-full min-h-[20vh] font2">
         <table className="table">
           {/* head */}
           <thead className="bg-black/10 text-[10px]">

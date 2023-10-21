@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { AssetProfile } from "components/assets/AssetProfile";
+import { MissionName } from "components/inputs/inputsMission/MissionName";
 import { MyCard1, MyCardInfos } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
 import { MyMenus, MyMenusTabs } from "components/myComponents/menu/MyMenus";
@@ -15,31 +16,26 @@ import {
   HEAD_table_features,
   _table_features,
 } from "utils/states/tables/feature";
+import { stateMission } from "utils/ui-tools/state-tools";
 import { _table_invites } from "utils/works/feature";
+import { v4 } from "uuid";
 
 export const MissionProfile = ({ missionID }) => {
   let { state, pointer } = useToolsState();
-  let [isClicked, setIsClicked] = useState(0);
+  let [isMission, setIsMission] = useState(null);
 
-  let [isTables, setIsTables] = useState(null);
+  let fetch = async () => {
+    setIsMission(await stateMission(missionID));
+  };
 
   useEffect(() => {
-    if (
-      !isTables?.invites &&
-      !isTables?.features &&
-      state?.features &&
-      state?.owner
-    ) {
-      let invites = _table_invites(state?.features);
-      let features = _table_features(state?.features, state?.owner);
-      setIsTables({
-        invites,
-        features,
-      });
-      console.log("set Is tables mission profile ...");
+    if (missionID && isMission?.missionID !== missionID) {
+      fetch();
+    } else if (state?.mission) {
+      setIsMission(state?.mission);
     }
-  }, [state?.features, state?.owner]);
-  console.log("state mission profile", state);
+  }, [missionID, state?.mission]);
+
   let infos = [
     {
       title: "Status",
@@ -47,38 +43,38 @@ export const MissionProfile = ({ missionID }) => {
         <div
           className={
             "flex items-center p-3   badge badge-outline badge-xs text-xs badge-" +
-            STATUS?.mission[state?.mission?.datas?.status]?.color
+            STATUS?.mission[isMission?.datas?.status]?.color
           }
         >
           <Icon
-            icon={STATUS?.mission[state?.mission?.datas?.status]?.icon}
+            icon={STATUS?.mission[isMission?.datas?.status]?.icon}
             className="text-lg mr-4"
           />
-          {STATUS?.mission[state?.mission?.datas?.status]?.status}
+          {STATUS?.mission[isMission?.datas?.status]?.status}
         </div>
       ),
     },
     {
       title: "Features",
-      value: state?.mission?.datas?.features?.length,
+      value: isMission?.datas?.features?.length,
     },
     {
       title: "Work slot",
       value:
-        state?.mission?.datas?.features?.length -
-        state?.mission?.datas?.workers,
+        isMission?.datas?.features?.length - isMission?.datas?.workers || 0,
     },
     {
       title: "Disputes",
-      value: state?.mission?.datas?.disputes,
+      value: isMission?.datas?.disputes || 0,
     },
+
     {
       title: "Total wadge",
       value: (
         <>
           <p className="flex items-center">
             <Icon icon={icfyETHER} className="text-white text-lg mr-1  " />
-            <span>{state?.mission?.datas?.amount.toFixed(5)}</span>
+            <span>{isMission?.datas?.amount.toFixed(5)}</span>
             <span className="text-white c2  ml-1">ETH</span>
           </p>
         </>
@@ -86,7 +82,7 @@ export const MissionProfile = ({ missionID }) => {
     },
     {
       title: "Posts",
-      value: state?.mission?.datas?.pubs?.length,
+      value: isMission?.datas?.pubs?.length,
     },
     {
       title: "Domain",
@@ -94,27 +90,27 @@ export const MissionProfile = ({ missionID }) => {
         <p className="flex items-center  capitalize">
           <Icon
             className={`mr-2 text-2xl text-${
-              ENUMS.domain[state?.mission?.metadatas?.attributes?.[0]?.domain]
-                ?.color
+              ENUMS.domain[isMission?.metadatas?.attributes?.[0]?.domain]?.color
             }`}
             icon={
-              ENUMS.domain[state?.mission?.metadatas?.attributes?.[0]?.domain]
-                ?.icon
+              ENUMS.domain[isMission?.metadatas?.attributes?.[0]?.domain]?.icon
             }
           />
-          {
-            ENUMS.domain[state?.mission?.metadatas?.attributes?.[0]?.domain]
-              ?.name
-          }
+          {ENUMS.domain[isMission?.metadatas?.attributes?.[0]?.domain]?.name}
         </p>
       ),
     },
+
     {
       title: "Technology",
       value: (
         <div className="w-full flex overflow-x-scroll h-full hide-scrollbar">
-          {state?.mission?.badges?.map((el) => (
-            <Icon icon={el?.badge} className="text-white c2 text-[24px] mr-4" />
+          {isMission?.details?.badges?.map((el) => (
+            <Icon
+              key={v4()}
+              icon={ENUMS.courts?.[el]?.badge}
+              className="text-white c2 text-[24px] mr-4"
+            />
           ))}
         </div>
       ),
@@ -125,39 +121,25 @@ export const MissionProfile = ({ missionID }) => {
       <MyCardInfos style={"w-1/3 mr-3"} arr={infos}></MyCardInfos>
       <MyCardInfo
         header={{
-          title: state?.mission?.metadatas?.title,
-          image: state?.mission?.metadatas?.image,
+          title: (
+            <MissionName
+              metadatas={isMission?.metadatas}
+              id={isMission?.missionID}
+            />
+          ),
+
+          image: isMission?.metadatas?.image,
         }}
         color={1}
         styles={" w-full h-full  "}
         noBtn={true}
         main={{
-          text: state?.mission?.metadatas?.description,
+          text: isMission?.metadatas?.description,
           title:
-            ENUMS?.domain?.[state?.mission?.metadatas?.attributes?.[0]?.domain]
+            ENUMS?.domain?.[isMission?.metadatas?.attributes?.[0]?.domain]
               ?.name,
         }}
       />
-
-      {/* <div className="backdrop-blur w-full mt-2">
-          <MyMenusTabs
-            setter={setIsClicked}
-            value={isClicked}
-            arr={["Jobs", "Worker"]}
-          />
-
-          {isClicked === 0 ? (
-            <>
-              <MyTable list={isTables?.invites} head={["Job", "Worker"]} />
-            </>
-          ) : (
-            <MyTable
-              list={isTables?.features}
-              head={HEAD_table_features}
-              editBtns={MENUS_EDIT.feature}
-            />
-          )}
-        </div> */}
     </div>
   );
 };

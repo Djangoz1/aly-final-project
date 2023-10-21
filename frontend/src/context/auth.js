@@ -3,7 +3,7 @@
 import { ADDRESSES } from "constants/web3";
 import { createContext, useContext, useReducer } from "react";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
-import { stateCV } from "utils/ui-tools/state-tools";
+import { stateCV, stateDetailsCV } from "utils/ui-tools/state-tools";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
@@ -31,10 +31,11 @@ export const doAuthCV = async (dispatch, address) => {
 
   let cvID = parseInt(await _apiGet("cvOf", [address]));
   let state = await stateCV(cvID);
-
+  let details = await stateDetailsCV(cvID);
   if (!state?.error) {
     dispatch({
       cv: cvID,
+      details,
       metadatas: state?.metadatas,
       datas: state?.datas,
       status: "idle",

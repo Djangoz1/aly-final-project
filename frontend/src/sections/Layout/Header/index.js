@@ -1,5 +1,6 @@
 import { v4 as uuidv4, v4 } from "uuid";
 import { Logo } from "components/Logo";
+import "./style.css";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -116,7 +117,7 @@ export const Header = ({ setter, isOpen }) => {
     },
     closed: {
       opacity: 0,
-      x: -200, // Déplace la sidebar vers la gauche
+      x: 200, // Déplace la sidebar vers la gauche
       transition: { duration: 0.3 },
     },
   };
@@ -141,18 +142,26 @@ export const Header = ({ setter, isOpen }) => {
               whileHover={{ opacity: 1, y: 0 }}
               initial={{ opacity: 1, y: 0 }}
               animate={(!isHovered || pointer === 0) && controls}
-              className="relative flex z-100 w-screen py-5 px-5   box-border items-center justify-between backdrop-blur"
+              className="relative   flex z-100 w-screen py-5 px-5   box-border items-center justify-between backdrop-blur"
             >
               <Logo />
 
               <button
                 onClick={() => setIsClicked(!isClicked)}
-                className="btn cursor-pointer z-1000  flex btn-ghost flex-col items-center transition-all  btn-sm "
+                className="cursor-pointer absolute right-4 z-1000"
               >
-                {!isClicked && (
+                <div
+                  className={`burger_btn ${isClicked && "burger_btn_clicked"}`}
+                >
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                {/* {!isClicked && (
                   <div className="w-8 py-[1px] rounded-full mb-1 bg-white"></div>
                 )}
-                <div className="w-8 py-[1px] rounded-full  bg-white"></div>
+                <div className="w-8 py-[1px] rounded-full  bg-white"></div> */}
               </button>
               <MyProgress style="progress g1 mr-5 w-[97%] gr2 absolute bottom-0 " />
             </motion.div>
@@ -162,7 +171,7 @@ export const Header = ({ setter, isOpen }) => {
                 initial={false}
                 animate={isClicked ? "open" : "closed"}
                 variants={sidebarVariants}
-                className={`h-[95vh]  backdrop-blur absolute left-0    bg-white/60 font2 top-[8vh]        flex flex-col items-start   ${
+                className={`h-[100vh]  backdrop-blur rounded-l-3xl absolute right-0    bg-white/60 font2 top-0        flex flex-col items-start   ${
                   isClicked ? "w-[25vw]" : "w-0"
                 }`}
               >

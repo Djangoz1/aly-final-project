@@ -46,11 +46,10 @@ import { useToolsState } from "context/tools";
 import { stateFeature } from "utils/ui-tools/state-tools";
 import { STATUS } from "constants/status";
 
-const PageCreateProfile = () => {
+const PageCreateEscrow = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useAuthDispatch();
 
-  let [price, setPrice] = useState(null);
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
   let { state } = useToolsState();
@@ -160,4 +159,4 @@ const PageCreateProfile = () => {
   );
 };
 
-export default PageCreateProfile;
+export default PageCreateEscrow;

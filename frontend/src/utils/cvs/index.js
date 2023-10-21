@@ -21,9 +21,11 @@ export let fetchCV = async (cvID) => {
 
 export let fetchStatsOfCV = async (cvID) => {
   if (cvID && cvID > 0) {
-    let missions = parseInt(
-      await _apiGet("balanceOfToken", [cvID, ADDRESSES["missionsHub"]])
-    );
+    let missions = await _apiGet("indexerOfToken", [
+      cvID,
+      ADDRESSES["missionsHub"],
+    ]);
+
     let features = parseInt(
       await _apiGet("balanceOfToken", [cvID, ADDRESSES["featuresHub"]])
     );
@@ -43,18 +45,8 @@ export let fetchStatsOfCV = async (cvID) => {
     let followers = parseInt(await _apiGet("lengthOfFollower", [cvID]));
     let follows = parseInt(await _apiGet("lengthOfFollowed", [cvID]));
 
-    let _missions =
-      features > 0
-        ? await _apiGet("indexerOfToken", [cvID, ADDRESSES["missionsHub"]])
-        : null;
     let amount = 0;
-    for (let index = 0; index < _missions?.length; index++) {
-      const _id = _missions[index];
-      if (_id && _id > 0) {
-        let stats = await fetchStatOfMission(_id);
-        amount += stats?.amount;
-      }
-    }
+    // ! To dooooo
 
     let stats = {
       missions,

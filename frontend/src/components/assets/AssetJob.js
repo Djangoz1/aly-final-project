@@ -24,6 +24,7 @@ export const AssetJob = ({ feature, style, noBtn, featureID }) => {
   let fetchState = async () => {
     setIsFeature(await stateFeature(featureID));
   };
+  console.log("state ------- feature", isFeature);
 
   useEffect(() => {
     if (isFeature === null && feature && isInView && isInView1) {
@@ -51,13 +52,12 @@ export const AssetJob = ({ feature, style, noBtn, featureID }) => {
         key={v4()}
         color={1}
         header={{
-          icon: ENUMS.courts?.[state?.features?.[index]?.datas?.specification]
-            ?.badge,
-          title: state?.features?.[index]?.metadatas?.title,
+          icon: ENUMS.courts?.[isFeature?.datas?.specification]?.badge,
+          title: isFeature?.metadatas?.title,
           component: (
             <MissionName
               metadatas={state?.mission?.metadatas}
-              id={state?.features?.[index]?.datas?.missionID}
+              id={isFeature?.datas?.missionID}
             />
           ),
         }}
@@ -65,10 +65,10 @@ export const AssetJob = ({ feature, style, noBtn, featureID }) => {
           title: (
             <CVName
               metadata={state?.owner?.metadatas}
-              cvID={state?.features?.[index]?.datas?.owner}
+              cvID={isFeature?.datas?.owner}
             />
           ),
-          text: state?.features?.[index]?.metadatas?.description,
+          text: isFeature?.metadatas?.description,
         }}
         btn={
           !noBtn
@@ -76,7 +76,7 @@ export const AssetJob = ({ feature, style, noBtn, featureID }) => {
                 title: (
                   <>
                     <span className="flex items-center text-xs">
-                      {state?.features?.[index]?.datas?.wadge}{" "}
+                      {isFeature?.datas?.wadge}{" "}
                       <Icon icon={icfyETHER} className="ml-1" />
                     </span>
                     <p>Ask to join</p>

@@ -41,7 +41,7 @@ export const FormCreateProfile1 = () => {
           { title: "Mme.", value: "Mme" },
         ]}
       />
-      <div className={"flex " + margin}>
+      <div className={"flex  debug" + margin}>
         <MyInput target={"firstName"} label={"Prénom"} />
         <MyInput target={"lastName"} label={"Nom"} />
       </div>

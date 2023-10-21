@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
         src="https://threejs.org/examples/js/libs/stats.min.js"
         async
       ></script>
-      <body className="bg-neutral-900 min-h-100vh">
+      <body className="bg-zinc-900 min-h-100vh">
         <AccountProvider>
           <AuthProvider>
             <ToolsProvider>

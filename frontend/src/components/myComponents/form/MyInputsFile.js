@@ -10,9 +10,10 @@ export const MyInputsFile = ({ inputs, styles }) => {
     _form[target] = file;
     doInitStateForm(dispatch, _form);
   };
+
   return (
     <div className={`flex w-fit text-left ${styles}`}>
-      {inputs?.map((el) => (
+      {inputs?.map((el, i) => (
         <div
           key={uuidv4()}
           className={`flex hover:text-white flex-col mr-5 ${
@@ -25,7 +26,7 @@ export const MyInputsFile = ({ inputs, styles }) => {
           <input
             type="file"
             onChange={(e) => setter(el?.target, e.target.files[0])}
-            className="file-input font-light file-input-xs file-input-bordered w-fit"
+            className={`file-input bg-transparent shadow1 py-2 h-fit font-light file-input-xs file-input-bordered w-fit `}
           />
         </div>
       ))}

@@ -39,9 +39,7 @@ export const MyFormModal = ({
         submit={submit}
         btns={btns}
         styles={{
-          btn: `    ${
-            styles?.btn || " w-fit c2 btn-outline cursor-pointer btn btn-xs"
-          }`,
+          btn: `    ${styles?.btn}`,
           modal: `overflow-y-auto ${
             styles?.modal || "w-[80vw]  min-h-[80vh] max-h-[90vh]"
           }`,

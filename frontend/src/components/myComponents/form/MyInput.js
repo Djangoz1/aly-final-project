@@ -4,9 +4,9 @@ import {
   useFormDispatch,
   useFormState,
 } from "context/form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { _apiGet } from "utils/ui-tools/web3-tools";
-
+import "./style.css";
 export let MyInput = ({
   target,
   min,
@@ -39,6 +39,14 @@ export let MyInput = ({
       superChecked: superChecked,
     });
   };
+  let [isFocus, setIsFocus] = useState(null);
+
+  let handleFocus = () => {
+    setIsFocus(true);
+  };
+  let handleBlur = () => {
+    setIsFocus(false);
+  };
 
   useEffect(() => {
     if (min) {
@@ -60,10 +68,10 @@ export let MyInput = ({
   }, [max]);
 
   return (
-    <div className="flex flex-col w-fit mr-5">
+    <div className={` ${styles || "w-fit mr-5"}`}>
       <label
-        className={`font-light text-left text-xs mb-1 uppercase 
-           ${form?.[target]?.length > 1 && "text-white"}
+        className={`label font-light leading-0 text-xs mb-1  py-0  uppercase 
+          ${form?.[target]?.length > 1 && "text-white"}
            ${type === "number" && form?.[target] > 0 && "text-white"}
           `}
       >
@@ -71,16 +79,9 @@ export let MyInput = ({
         {checked?.[pointer]?.includes(target) && " *"}
       </label>
       <input
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         type={type ? type : "text"}
-        className={`input min-w-[120px] w-fit input-xs font-light  mr-1 ${
-          form?.[target]?.length > 1 && "text-white "
-        }
-      ${type === "number" && form?.[target] > 0 && "text-white "}
-      ${
-        type === "number" && index && form?.[target][index] > 0 && "text-white "
-      }
-      ${styles}
-      `}
         placeholder={placeholders?.[target]}
         onChange={(e) => handleChange(e.target.value)}
         min={min || null}
@@ -93,6 +94,9 @@ export let MyInput = ({
             ? form?.[target]
             : ""
         }
+        className={` input rounded-lg input-xs font-light bg-transparent py-2 h-fit ${
+          !isFocus ? "shadow1" : "shadow2"
+        }`}
       />
       <div className="flex items-center justify-between">
         {min && (

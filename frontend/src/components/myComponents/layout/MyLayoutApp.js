@@ -121,17 +121,20 @@ export let MyLayoutApp = ({
       {particles && <Particle style={"fixed w-screen top-0 left-0 h-screen"} />}
       {/* <MyHeader /> */}
       {children}
-      {side && (
+
+      {(ownerProfile || subMenus || side) && (
         <div className="fixed -z-1  top-[10vh] flex flex-col  w-[16vw]  max-w-[230px]  right-[2vw]">
           {ownerProfile && ownerProfile}
-          <MyMenus1 arr={subMenus} />
-          <div className=" backdrop-blur mt-4 bg-white/5  rounded-lg shadow flex flex-col  w-full justify-between  items-end ">
-            {/* <div className="whiteglass rounded-2xl h-fit"></div> */}
-            <div className="whiteglass-text p-5 flex flex-col w-full justify-end ">
-              {/* <MyMenus2 arr={menus} /> */}
-              {side}
+          {subMenus && <MyMenus1 arr={subMenus} />}
+          {side && (
+            <div className=" backdrop-blur mt-4 bg-white/5  rounded-lg shadow flex flex-col  w-full justify-between  items-end ">
+              {/* <div className="whiteglass rounded-2xl h-fit"></div> */}
+              <div className="whiteglass-text p-5 flex flex-col w-full justify-end ">
+                {/* <MyMenus2 arr={menus} /> */}
+                {side}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </LayoutTools>

@@ -9,6 +9,7 @@ import {
 import { useInView } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  stateDispute,
   stateFeature,
   stateLaunchpad,
   stateMission,
@@ -30,14 +31,26 @@ import {
   _table_launchpad,
 } from "utils/states/tables/launchpad";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
-import { MyBtnPost } from "components/myComponents/btn/MyBtnPost";
+import { MyBtnPost } from "components/btn/MyBtnPost";
 import { _apiPost } from "utils/ui-tools/web3-tools";
-import { doAuthCV } from "context/auth";
+import { doAuthCV, useAuthState } from "context/auth";
+import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
+import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
+import { FeatureDispute } from "sections/works/Features/state/FeatureDispute";
+import { MyCard } from "components/myComponents/card/MyCard";
+import {
+  HEAD_table_arbitrators,
+  _table_arbitrators,
+} from "utils/states/tables/escrow";
+import { ENUMS } from "constants/enums";
+import { STATUS } from "constants/status";
 
 export const CVOverview = () => {
   let { state, index, status } = useToolsState();
   let [isClicked, setIsClicked] = useState(0);
   let [isLists, setIsLists] = useState(null);
+
+  let { cv } = useAuthState();
   let ref = useRef(null);
   let isInView = useInView(ref);
   let dispatch = useToolsDispatch();
@@ -46,6 +59,50 @@ export const CVOverview = () => {
 
     doStateProfileTools({ dispatch, cvID: state?.owner?.cvID });
   };
+  let [isArbitratorsState, setIsArbitratorsState] = useState(null);
+
+  let fetchDisputes = async () => {
+    let disputes = [];
+    for (
+      let index = 0;
+      index < state?.owner?.details?.arbitrators?.length;
+      index++
+    ) {
+      let arbitrator = state?.owner?.details?.arbitrators?.[index];
+      for (let index = 0; index < arbitrator?.disputes.length; index++) {
+        let dispute = await stateDispute(
+          arbitrator?.disputes?.[index].disputeID
+        );
+        dispute.datas.allowance = arbitrator?.disputes?.[index]?.allowance;
+        disputes.push(dispute);
+      }
+    }
+    setIsArbitratorsState(disputes);
+  };
+
+  useEffect(() => {
+    if (
+      !isArbitratorsState &&
+      ((!state?.front?.target && isClicked === 4) ||
+        state?.front?.target === "dispute")
+    ) {
+      fetchDisputes();
+    }
+  }, [state?.front?.target, isClicked]);
+
+  const components = {
+    launchpad: <div>Launchpad</div>,
+    feature: state?.front?.target === "feature" && (
+      <MissionFeatures featureID={state?.front?.props?.[0]} />
+    ),
+    mission: state?.front?.target === "mission" && (
+      <MissionProfile missionID={state?.front?.props?.[0]} />
+    ),
+    dispute: state?.front?.target === "dispute" && (
+      <FeatureDispute disputeID={state?.front?.props?.[0]} />
+    ),
+  };
+
   let infos = [
     {
       btn: "Missions",
@@ -80,12 +137,37 @@ export const CVOverview = () => {
       editBtns: [
         {
           title: "Accept job",
-          setter: (featureID) => handlePost("acceptJob", [featureID]),
+          setter: (featureID) => {
+            fetchDisputes();
+            handlePost("acceptJob", [featureID]);
+          },
         },
         {
           title: "Decline job",
-          setter: (featureID) => handlePost("declineJob", [featureID]),
+          setter: (featureID) => {
+            fetchDisputes();
+            handlePost("declineJob", [featureID]);
+          },
           style: "btn-xs btn-error btn-outline ml-2",
+        },
+      ],
+    },
+    {
+      btn: "Arbitrators",
+      table: _table_arbitrators(isArbitratorsState),
+      head: HEAD_table_arbitrators,
+      arr: isArbitratorsState,
+      setState: stateDispute,
+      editBtns: [
+        {
+          title: "Accept",
+          setter: (disputeID) => handlePost("acceptArbitration", [disputeID]),
+          style: " c2",
+        },
+        {
+          title: "Refuse",
+          setter: (disputeID) => handlePost("refuseArbitration", [disputeID]),
+          style: "text-error ml-2",
         },
       ],
     },
@@ -97,7 +179,6 @@ export const CVOverview = () => {
     let element = _infos?.[isClicked];
 
     if (!element?.arr) {
-      console.log("aborted fetch cv overview", element);
       return;
     }
     let target = element.btn.toLowerCase();
@@ -132,11 +213,6 @@ export const CVOverview = () => {
       state?.owner?.details?.[target]?.length >= 0 &&
       isInView
     ) {
-      console.log(
-        "list state CV Overview ...",
-        state?.owner?.details?.[target]
-      );
-
       setIsLists({
         ...isLists,
         [target]: infos?.[isClicked],
@@ -144,25 +220,29 @@ export const CVOverview = () => {
     }
   }, [status, isClicked, isInView]);
 
-  console.log("list", isLists);
-
   return (
     <>
-      <MyMenusTabs
-        setter={setIsClicked}
-        value={isClicked}
-        arr={infos}
-        target={"btn"}
-      />
-
-      <div ref={ref} className="w-full h-full rounded-lg shadow backdrop-blur ">
-        <MyTable
-          list={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.table}
-          head={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.head}
-          btns={infos?.[isClicked]?.btns}
-          editBtns={infos?.[isClicked]?.editBtns}
-        />
-      </div>
+      {components?.[state?.front?.target] || (
+        <MyCard styles={"h-full"}>
+          <MyMenusTabs
+            setter={setIsClicked}
+            value={isClicked}
+            arr={infos}
+            target={"btn"}
+          />
+          <div
+            ref={ref}
+            className="w-full h-full rounded-lg shadow backdrop-blur "
+          >
+            <MyTable
+              list={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.table}
+              head={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.head}
+              btns={infos?.[isClicked]?.btns}
+              editBtns={infos?.[isClicked]?.editBtns}
+            />
+          </div>
+        </MyCard>
+      )}
     </>
   );
 };

@@ -99,7 +99,7 @@ export function Viewport({ index, side, particles, img, full, children, id }) {
           #00<span className="c2 ">{`${id}`}</span>
         </motion.span>
         {side && (
-          <div className="w-[15vw] h-[92vh] border border-white/10 border-l-0  bottom-0 left-0  absolute  z-10">
+          <div className="w-[15vw] h-[92vh] backdrop-blur  rounded-tr-lg overflow-hidden shadow1 bottom-0 left-0  absolute  z-10">
             {side}
           </div>
         )}

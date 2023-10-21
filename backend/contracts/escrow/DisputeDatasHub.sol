@@ -10,6 +10,7 @@ import {DisputeDatas} from "../libraries/disputes/DisputeDatas.sol";
 import {DisputeCounters} from "../libraries/disputes/DisputeCounters.sol";
 import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
 import {BindingsMint} from "../libraries/BindingsMint.sol";
+import {Bindings} from "../libraries/Bindings.sol";
 
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
@@ -25,7 +26,8 @@ contract DisputesDatasHub is Ownable {
     mapping(uint => mapping(uint => DisputeArbitrators.Status))
         private _allowances;
     mapping(uint => mapping(uint => DisputeRules.Vote)) private _votes;
-    mapping(uint => uint[]) private _arbitrators;
+    mapping(uint => uint[]) private _disputesToArbitrators;
+    mapping(uint => uint[]) private _arbitratorsToDisputes;
 
     modifier onlyStatusOf(uint _disputeID, DisputeRules.Status _status) {
         require(_rules[_disputeID].status == _status, "Invalid dispute status");
@@ -61,11 +63,25 @@ contract DisputesDatasHub is Ownable {
         );
     }
 
+    /**
+     * @notice _arbitratorID
+     * @return disputeIDs []
+     */
+    function indexerOf(
+        uint _arbitratorID
+    ) external view returns (uint[] memory) {
+        require(
+            _arbitratorID <= Bindings.tokensLength(_iAS.arbitratorsHub()),
+            "Arbitrator : ID out of range"
+        );
+        return _arbitratorsToDisputes[_arbitratorID];
+    }
+
     function setArbitratorsOf(
         uint _disputeID,
         uint[] memory _indexer
     ) external {
-        _arbitrators[_disputeID] = _indexer;
+        _disputesToArbitrators[_disputeID] = _indexer;
     }
 
     function addArbitratorOn(
@@ -84,13 +100,13 @@ contract DisputesDatasHub is Ownable {
         _allowances[_disputeID][_arbitratorID] = DisputeArbitrators
             .Status
             .Accepted;
-        _arbitrators[_disputeID].push(_arbitratorID);
-        return _arbitrators[_disputeID].length;
+        _disputesToArbitrators[_disputeID].push(_arbitratorID);
+        return _disputesToArbitrators[_disputeID].length;
     }
 
     function startVotesOf(uint _disputeID) external onlyDispute {
         require(
-            _arbitrators[_disputeID].length >= 3,
+            _disputesToArbitrators[_disputeID].length >= 3,
             "Insuficient arbitrators"
         );
 
@@ -194,10 +210,10 @@ contract DisputesDatasHub is Ownable {
         DisputeCounters.Data memory _newCounters;
         for (
             uint256 index = 0;
-            index < _arbitrators[_disputeID].length;
+            index < _disputesToArbitrators[_disputeID].length;
             index++
         ) {
-            uint256 arbitratorID = _arbitrators[_disputeID][index];
+            uint256 arbitratorID = _disputesToArbitrators[_disputeID][index];
             _allowances[_disputeID][arbitratorID] = DisputeArbitrators
                 .Status
                 .None;
@@ -209,7 +225,7 @@ contract DisputesDatasHub is Ownable {
         _timers[_disputeID].startedAt = 0;
         _timers[_disputeID].resolvedAt = 0;
         _counters[_disputeID] = _newCounters;
-        _arbitrators[_disputeID] = _newArbitrators;
+        _disputesToArbitrators[_disputeID] = _newArbitrators;
         return true;
     }
 
@@ -255,6 +271,7 @@ contract DisputesDatasHub is Ownable {
         DisputeArbitrators.Status _status
     ) external {
         _allowances[_disputeID][_arbitratorID] = _status;
+        _arbitratorsToDisputes[_arbitratorID].push(_disputeID);
     }
 
     function datasOf(
@@ -266,7 +283,7 @@ contract DisputesDatasHub is Ownable {
     function arbitratorsOf(
         uint _disputeID
     ) external view returns (uint[] memory) {
-        return _arbitrators[_disputeID];
+        return _disputesToArbitrators[_disputeID];
     }
 
     function timersOf(

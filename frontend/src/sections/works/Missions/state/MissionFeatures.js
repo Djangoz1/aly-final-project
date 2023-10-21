@@ -11,9 +11,9 @@ import {
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { MyOverlay } from "components/myComponents/MyOverlay";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { _apiPost } from "utils/ui-tools/web3-tools";
@@ -24,33 +24,56 @@ import { icfy, icfyETHER } from "icones";
 import { parseTimestamp } from "helpers";
 import { ENUMS } from "constants/enums";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
-import { MyBtnPost } from "components/myComponents/btn/MyBtnPost";
+import { MyBtnPost } from "components/btn/MyBtnPost";
 import Link from "next/link";
 import { useAuthState } from "context/auth";
 import { FeatureInformations } from "sections/works/Features/state/FeatureInformations";
 import { FeatureDispute } from "sections/works/Features/state/FeatureDispute";
 import { FeatureNotifications } from "sections/works/Features/state/FeatureNotifications";
+import { stateFeature, stateMission } from "utils/ui-tools/state-tools";
 
-export const MissionFeatures = () => {
-  let { state, index } = useToolsState();
+export const MissionFeatures = ({ featureID, index }) => {
+  let ref = useRef(null);
+  let { state } = useToolsState();
   let { cv } = useAuthState();
   let [isTabs, setIsTabs] = useState(0);
+  let [isState, setIsState] = useState({
+    feature: null,
+  });
+  let isInView = useInView(ref);
+  let fetch = async () => {
+    setIsState({
+      feature: await stateFeature(featureID),
+    });
+  };
+  useEffect(() => {
+    if (isInView && featureID && isState?.feature?.featureID != featureID) {
+      fetch();
+    }
+  }, [isInView, featureID]);
 
-  let dispatch = useToolsDispatch();
+  useEffect(() => {
+    if (!featureID && state?.front?.props[0]) {
+      setIsState({ feature: state?.features?.[index] });
+    }
+  }, [index]);
+
   let handleChangeMenu = (i) => {
     setIsTabs(i);
   };
 
   let components = [
-    <FeatureInformations />,
+    <FeatureInformations feature={isState?.feature} />,
 
-    <FeatureNotifications />,
+    <FeatureNotifications feature={isState?.feature} />,
     <div className=""></div>,
-    state?.features?.[index]?.datas?.dispute && <FeatureDispute />,
+    isState?.feature?.datas?.dispute && (
+      <FeatureDispute disputeID={isState?.feature?.datas?.dispute} />
+    ),
   ];
   return (
     <>
-      <div className="flex h-full  flex-col">
+      <div ref={ref} className="flex h-full  flex-col">
         <MyMenusTabs
           arr={[
             "Informations",

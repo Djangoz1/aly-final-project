@@ -81,9 +81,10 @@ export const FormCreateFeature2 = () => {
         ]}
       />
       <div className={"flex " + margin}>
-        <MyInput target={"wadge"} type={"number"} />
-        <MyInput target={"worker"} type={"number"} />
+        <MyInput target={"wadge"} styles={"mr-3"} type={"number"} />
+        <MyInput target={"worker"} styles={"mr-3"} type={"number"} />
         <MyInput
+          styles={"mr-3"}
           target={"estimatedDays"}
           label={"Temps estimé"}
           type={"number"}

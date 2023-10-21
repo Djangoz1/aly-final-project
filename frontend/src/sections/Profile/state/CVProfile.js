@@ -21,8 +21,9 @@ import {
   useInView,
 } from "framer-motion";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { BtnsSocial } from "components/btn/BtnsSocial";
 
-export const CVProfile = ({ cvID }) => {
+export const CVProfile = ({}) => {
   let { state, pointer } = useToolsState();
 
   let [isTabs, setIsTabs] = useState(0);
@@ -43,29 +44,27 @@ export const CVProfile = ({ cvID }) => {
 
   return (
     <div className="flex w-full  relative flex-col">
-      <div className="flex  h-[80vh] relative border border-1 border-white/10 overflow-scroll hide-scrollbar  flex-wrap ">
+      <div className="flex  h-[80vh]  relative border border-1 border-white/5 rounded-t-lg overflow-scroll hide-scrollbar  flex-wrap ">
         <div className="relative  flex items-end justify-between    w-full h-[26vh]">
           <div className="overflow-hidden rounded-xl h-[26vh] absolute w-full">
             <ImagePin
               CID={state?.owner?.metadatas?.attributes?.[0]?.banniere}
               style={"w-full z-0 top-0 absolute opacity-80"}
             />
+            <div className="z-100 w-full h-full bottom-0 absolute   flex flex-col">
+              <BtnsSocial />
+            </div>
           </div>
-          <div className="z-1 relative px-5 py-5  flex flex-col">
-            <Avatar CID={state?.owner?.metadatas?.image} />
+          <div className="z-100 relative px-5 py-5  flex flex-col">
+            {/* <Avatar CID={state?.owner?.metadatas?.image} />
             <h6 className="text-white text-lg">
               {state?.owner?.metadatas?.username}
             </h6>
             <span className="text-white text-xs">
               {state?.owner?.metadatas?.description}
-            </span>
+            </span> */}
           </div>
-          <div className="absolute right-1  -bottom-1 flex ml-auto -mt-10 z-1">
-            <Icon icon={icfyFB} className="text-2xl mr-3" />
-            <Icon icon={icfyGITHUB2} className="text-2xl mr-3" />
-            <Icon icon={icfyLINKEDIN} className="text-2xl mr-3" />
-            <Icon icon={icfyTWITTER} className="text-2xl  " />
-          </div>
+          <div className="absolute left-1  top-1 flex ml-auto  z-10"></div>
         </div>
 
         <motion.div
@@ -77,17 +76,28 @@ export const CVProfile = ({ cvID }) => {
             setter={setIsTabs}
             arr={["All", "Posts", "Codes"]}
           />
-          <div
-            className={`  badge badge-xs py-3  ml-3  px-5 whitespace-nowrap mr-5 badge-outline badge-info`}
-          >
-            <Icon icon={icfy?.person?.friend} className="mr-2 text-lg" />{" "}
-            {state?.owner?.datas?.followers} Followers
-          </div>
-          <div
-            className={`  badge badge-xs py-3  px-5 mr-5 whitespace-nowrap badge-outline badge-success`}
-          >
-            <Icon icon={icfy.msg.chat} className="mr-2 text-lg" />{" "}
-            {state?.owner?.datas?.pubs} Pubs
+          <div className="stats_social   bg-zinc-900  py-2 items-center  flex-auto justify-evenly flex   text-xs">
+            <div className="flex  border border-r-1 h-fit border-l-0 border-y-0 border-white/30  items-center">
+              {state?.owner?.datas?.followers}
+              <Icon
+                icon={icfy.person.friend}
+                className="ml-1 text-lg text-white/80"
+              />
+            </div>
+            <div className="flex   border border-r-1 h-fit border-l-0 border-y-0 border-white/30 flex-row items-center">
+              {state?.owner?.datas?.follows}
+              <Icon
+                icon={icfy.person.team}
+                className="ml-1 text-lg text-white/80"
+              />
+            </div>
+            <div className="flex flex-row border-r-0 border-white/0 items-center">
+              {state?.owner?.datas?.pubs}
+              <Icon
+                icon={icfy.msg.chat}
+                className="ml-1 text-lg text-white/80"
+              />
+            </div>
           </div>
         </motion.div>
 
@@ -98,8 +108,7 @@ export const CVProfile = ({ cvID }) => {
                 bools(pub) && (
                   <Pub
                     _owner={state?.owner?.metadatas}
-                    id={pub?.pubID}
-                    _pub={pub}
+                    id={pub}
                     styles={{ size: "10px", clamp: "none" }}
                     key={v4()}
                   />

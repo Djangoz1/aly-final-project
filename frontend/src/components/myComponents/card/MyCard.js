@@ -7,14 +7,14 @@ export const MyCard = ({ head, children, icon, styles }) => {
   let [isClicked, setIsClicked] = useState(null);
   return (
     <div
-      className={`relative backdrop-blur bg-white/5 py-4  px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
+      className={`relative  shadow1 backdrop-blur  bg-white/5 py-4  px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">
           <Icon icon={head?.icon} className="text-xl mr-2" /> {head?.title}
         </h6>
       )}
-      <div className="w-full h-full" onClick={() => setIsClicked(false)}>
+      <div className="w-full  h-full " onClick={() => setIsClicked(false)}>
         {children}
       </div>
     </div>
@@ -47,7 +47,7 @@ export const MyCard1 = ({
   ];
   return (
     <div
-      className={`${styles} box-border rounded-lg shadow-inner font2 backdrop-blur  flex justify-between  right-0  py-5 px-5`}
+      className={`${styles}  box-border rounded-lg shadow-inner font2 backdrop-blur  flex justify-between  right-0  py-5 px-5`}
     >
       <div className="flex flex-col relative w-full  items-start">
         <div className="flex  items-center w-full">

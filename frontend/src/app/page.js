@@ -26,6 +26,7 @@ import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { Viewport } from "components/myComponents/layout/MyViewport";
 import { Particle } from "components/myComponents/MyParticles";
 import Link from "next/link";
+import { MyCardIc } from "components/myComponents/card/MyCardIc";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
@@ -249,67 +250,29 @@ export default function Home() {
               </p>
 
               <div className="flex justify-evenly">
-                <MyCardInfo
-                  styles={"w-[23%]"}
-                  color={1}
-                  header={{
-                    icon: icfy.work.casual,
-                    title: "Freelance Protocole",
-                  }}
-                  btn={{
-                    component: (
-                      <Link
-                        className="btn ml-auto btn-xs btn-outline"
-                        href={"/create/mission"}
-                      >
-                        Create Mission
-                      </Link>
-                    ),
-                  }}
+                <MyCardIc
+                  icon={icfy.work.casual}
+                  title={"Freelance protocole"}
+                  btn={"create mission"}
+                  url={"/create/mission"}
                 />
-                <MyCardInfo
-                  styles={"w-[23%]"}
-                  color={2}
-                  header={{
-                    icon: icfy.court.hammer,
-                    title: "Escrow Protocole",
-                  }}
+                <MyCardIc
+                  icon={icfy.msg.chat}
+                  title={"Social protocole"}
+                  url={"/create/profile"}
+                  btn={"Create account"}
                 />
-                <MyCardInfo
-                  styles={" w-[23%]"}
-                  color={1}
-                  btn={{
-                    component: (
-                      <Link
-                        className="btn ml-auto btn-xs btn-outline"
-                        href={"/create/profile"}
-                      >
-                        Create Profile
-                      </Link>
-                    ),
-                  }}
-                  header={{
-                    icon: icfy.msg.chat,
-                    title: "Social Protocole",
-                  }}
+                <MyCardIc
+                  icon={icfyROCKET}
+                  title={"Launchpad protocole"}
+                  btn={"Create launchpad"}
+                  url={"/create/launchpad"}
                 />
-                <MyCardInfo
-                  styles={"w-[23%]"}
-                  color={2}
-                  header={{
-                    icon: icfyROCKET,
-                    title: "Launchpad Protocole",
-                  }}
-                  btn={{
-                    component: (
-                      <Link
-                        className="btn ml-auto btn-xs btn-outline"
-                        href={"/create/launchpad"}
-                      >
-                        Create Launchpad
-                      </Link>
-                    ),
-                  }}
+                <MyCardIc
+                  icon={icfy.court.hammer}
+                  btn={"Declare dispute"}
+                  url={"/create/escrow"}
+                  title={"Escrow protocole"}
                 />
               </div>
             </div>

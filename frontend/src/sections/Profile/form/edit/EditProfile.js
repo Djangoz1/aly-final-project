@@ -48,6 +48,7 @@ export const EditProfile = ({ styles }) => {
   return (
     <MyForm
       stateInit={{
+        allowed: true,
         form: moock,
         placeholders: moock,
       }}

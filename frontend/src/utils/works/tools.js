@@ -39,6 +39,8 @@ export let stateDetailsMission = async ({ features }) => {
     _features.push({
       title: feature?.metadatas?.title,
       id: feature?.featureID,
+      status: feature?.datas?.status,
+      dispute: feature?.datas?.dispute,
       domain: feature?.metadatas?.attributes?.[0]?.domain,
       specification: feature?.datas?.specification,
     });

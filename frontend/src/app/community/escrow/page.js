@@ -15,6 +15,7 @@ import { icfy } from "icones";
 
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { Viewport } from "components/myComponents/layout/MyViewport";
+import { MyCardIc } from "components/myComponents/card/MyCardIc";
 
 const EscrowPage = () => {
   let [isList, setIsList] = useState(null);
@@ -81,31 +82,13 @@ const EscrowPage = () => {
               <Hg1 style={"font-light "}>Escrow protocole</Hg1>
             </h2>
             <div className="flex justify-evenly">
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={2}
-                header={{
-                  icon: icfy.court.injustice,
-                  title: "Protect by Juror",
-                }}
+              <MyCardIc
+                icon={icfy.court.injustice}
+                title={"Protect by Juror"}
               />
 
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={1}
-                header={{
-                  icon: icfy.ux.warning,
-                  title: "Escrow protocole",
-                }}
-              />
-              <MyCardInfo
-                styles={"w-[23%]"}
-                color={1}
-                header={{
-                  icon: icfy.court.justice,
-                  title: "Became juror",
-                }}
-              />
+              <MyCardIc icon={icfy.ux.warning} title={"Escrow protocole"} />
+              <MyCardIc icon={icfy.court.justice} title={"Became juror"} />
             </div>
           </div>
         </Viewport>

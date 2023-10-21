@@ -112,6 +112,7 @@ let _createFeature = async ({
   description,
   account,
   accounts,
+  finish,
   wadge,
   domain,
   addressSystem,
@@ -163,6 +164,9 @@ let _createFeature = async ({
     await apiPost.connect(_account).acceptJob(featureID);
 
     console.log(cvID, " is worker");
+    if (finish) {
+      await apiPost.connect(account).validFeature(featureID);
+    }
   }
 
   return { id: featureID, missionID: _missionID };

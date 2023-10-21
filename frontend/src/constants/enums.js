@@ -101,5 +101,6 @@ export const ENUMS = {
       icon: icfy.domain.blockchain,
     },
   ],
+
   feature: {},
 };

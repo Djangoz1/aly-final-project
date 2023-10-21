@@ -68,20 +68,11 @@ async function main() {
 
   console.log("launchpad#", launchpad, "created");
 
-  let pub = await _createPub({
-    account: this.owner,
-    addressSystem: addressSystem.target,
-  });
-  console.log("pub#", pub, "created");
-  pub = await _createPub({
-    account: this.owner,
-    addressSystem: addressSystem.target,
-  });
-  console.log("pub#", pub, "created");
-
   let feature = await _createFeature({
     account: this.owner,
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    accounts: [this.addr2, this.addr3, this.addr4],
+    specification: 8,
+    finish: true,
     addressSystem: addressSystem.target,
   });
   let _missionID = feature.missionID;
@@ -91,8 +82,9 @@ async function main() {
     isInviteOnly: false,
     missionID: _missionID,
     specification: 8,
+    finish: true,
+    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     title: "Dev Backend",
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
   });
   _missionID = feature.missionID;
@@ -101,9 +93,24 @@ async function main() {
     account: this.owner,
     isInviteOnly: false,
     missionID: _missionID,
-    specification: 12,
+    specification: 8,
+
+    accounts: [this.addr3],
+    title: "Toi t'es nickey",
+    addressSystem: addressSystem.target,
+  });
+  _missionID = feature.missionID;
+  console.log("mission#", _missionID, "feature#", feature?.id);
+
+  feature = await _createFeature({
+    account: this.owner,
+    isInviteOnly: false,
+    missionID: _missionID,
+    finish: true,
+    specification: 8,
     title: "IA engeneer",
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
+    finish: true,
+    accounts: [this.addr4, this.addr4],
     addressSystem: addressSystem.target,
   });
   _missionID = feature.missionID;
@@ -112,7 +119,9 @@ async function main() {
     account: this.owner,
     isInviteOnly: false,
     missionID: _missionID,
-    specification: 15,
+    finish: true,
+    specification: 8,
+    accounts: [this.addr5],
     title: "Dev frontend",
     addressSystem: addressSystem.target,
   });
@@ -143,7 +152,6 @@ async function main() {
     account: this.owner,
     isInviteOnly: false,
 
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
     specification: 5,
   });
@@ -153,7 +161,6 @@ async function main() {
     account: this.owner,
     isInviteOnly: false,
 
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
     addressSystem: addressSystem.target,
     specification: 11,
   });
