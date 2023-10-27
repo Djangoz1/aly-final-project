@@ -56,7 +56,6 @@ interface ILaunchpadsDatasHub {
      */
     function _setTiers(
         uint256 _tierLength,
-        address _ownerOf,
         uint256 _id,
         uint256[] calldata _maxTierCaps,
         uint256[] calldata _minTierCaps,

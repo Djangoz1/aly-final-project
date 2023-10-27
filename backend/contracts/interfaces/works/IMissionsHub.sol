@@ -6,7 +6,8 @@ import {DataTypes} from "../../libraries/DataTypes.sol";
 interface IMissionsHub {
     function mint(
         address _for,
-        string calldata _tokenURI
+        string calldata _tokenURI,
+        uint _launchpadID
     ) external returns (uint);
 
     function addFeature(
@@ -20,6 +21,10 @@ interface IMissionsHub {
     function checkRegistred(uint _id) external view;
 
     function indexerOf(uint _cvID) external view returns (uint[] memory);
+
+    function indexerOfLaunchpad(
+        uint _launchpadID
+    ) external view returns (uint[] memory);
 
     function dataOf(
         uint _missionID

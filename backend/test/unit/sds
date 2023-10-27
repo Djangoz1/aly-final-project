@@ -78,14 +78,15 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe("Create : Launchpad", () => {
+  describe.only("Scenario", () => {
     let token;
     let datas;
     let price;
+    const tokens = 100000000;
 
     beforeEach(async () => {
-      token = await _testInitToken(this.owner, "Django", "DJN", 300000);
-      datas = LAUNCHPAD_DATAS_EXEMPLE;
+      token = await _testInitToken(this.owner, "Django", "DJN", tokens);
+      datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
       datas.saleStart = new Date().getTime() + 10000;
 
       datas.saleEnd = new Date().getTime() + 100000;
@@ -93,106 +94,19 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       price = await balancesHub.launchpadPrice();
     });
 
-    describe("WORKS", () => {
-      it("Should mint launchpad ", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "tokenURI", {
+    describe("With 3 tiers", async () => {
+      let tierDatas;
+      beforeEach(async () => {
+        tierDatas = [
+          TIER_DATAS_EXEMPLE,
+          TIER_DATAS_EXEMPLE,
+          TIER_DATAS_EXEMPLE,
+        ];
+        await apiPost.createLaunchpad(datas, tierDatas, "tokenURI", {
           value: `${price}`,
         });
-        expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
       });
-
-      it("Should return true token address", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-
-        expect(_datas.tokenAddress).to.be.equal(token.target);
-      });
-
-      it("Should return 0 total user", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.totalUser).to.be.equal(0);
-      });
-
-      it("Should return true pub URI", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI1", {
-          value: `${price}`,
-        });
-        let _length = await apiGet.tokensLengthOf(contract.target);
-        let uri = await apiGet.tokenURIOf(
-          _length,
-          await addressSystem.launchpadsDatasHub()
-        );
-
-        expect(uri).to.be.equal("pubURI1");
-      });
-
-      it("Should return true number of tier", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.numberOfTier).to.be.equal(1);
-      });
-
-      it("Should return true locked time", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.lockedTime).to.be.equal(datas.lockedTime);
-      });
-
-      it("Should return true min invest", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.minInvest).to.be.equal(datas.minInvest);
-      });
-
-      it("Should return true max invest", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.maxInvest).to.be.equal(datas.maxInvest);
-      });
-
-      it("Should return true sale start", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.saleStart).to.be.equal(datas.saleStart);
-      });
-
-      it("Should return true sale end", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-        let _datas = await apiGet.datasOfLaunchpad(1);
-        expect(_datas.saleEnd).to.be.equal(datas.saleEnd);
-      });
-
-      it("Should return true id", async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-          value: `${price}`,
-        });
-
-        let length = await apiGet.tokensLengthOf(contract.target);
-        expect(length).to.be.equal(1);
-      });
-
       it("Should  return true max cap", async () => {
-        let tierDatas = [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE];
-        await apiPost.createLaunchpad(datas, tierDatas, "pubURI", {
-          value: `${price}`,
-        });
         let _datas = await apiGet.datasOfLaunchpad(1);
         let _maxCap = 0n;
         for (let index = 0; index < tierDatas.length; index++) {
@@ -203,167 +117,204 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should  return true min cap", async () => {
-        let tierDatas = [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE];
-        await apiPost.createLaunchpad(datas, tierDatas, "pubURI", {
-          value: `${price}`,
-        });
         let _datas = await apiGet.datasOfLaunchpad(1);
-
         let _minCap = 0n;
         for (let index = 0; index < tierDatas.length; index++) {
           const element = tierDatas[index];
-
           _minCap += element.minTierCap;
         }
-
         expect(_datas.minCap).to.be.equal(_minCap);
       });
     });
 
-    describe("NOT WORKS", () => {
-      it("Should  NOT mint launchpad with wrong bindings", async () => {
-        await expect(
-          contract.mint(1, LAUNCHPAD_DATAS_EXEMPLE, [TIER_DATAS_EXEMPLE])
-        ).to.be.revertedWith("Must call function with proxy bindings");
+    describe("With original value ", async () => {
+      beforeEach(async () => {
+        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "tokenURI", {
+          value: `${price}`,
+        });
+      });
+      describe("", () => {
+        it("Should mint launchpad ", async () => {
+          expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
+        });
+
+        it("Should return true token address", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.tokenAddress).to.be.equal(token.target);
+        });
+
+        it("Should return 0 total user", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.totalUser).to.be.equal(0);
+        });
+
+        it("Should return true pub URI", async () => {
+          let _length = await apiGet.tokensLengthOf(contract.target);
+          let uri = await apiGet.tokenURIOf(
+            _length,
+            await addressSystem.launchpadsDatasHub()
+          );
+
+          expect(uri).to.be.equal("pubURI1");
+        });
+
+        it("Should return true number of tier", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.numberOfTier).to.be.equal(1);
+        });
+
+        it("Should return true locked time", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.lockedTime).to.be.equal(datas.lockedTime);
+        });
+
+        it("Should return true min invest", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.minInvest).to.be.equal(datas.minInvest);
+        });
+
+        it("Should return true max invest", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.maxInvest).to.be.equal(datas.maxInvest);
+        });
+
+        it("Should return true sale start", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.saleStart).to.be.equal(datas.saleStart);
+        });
+
+        it("Should return true sale end", async () => {
+          let _datas = await apiGet.datasOfLaunchpad(1);
+          expect(_datas.saleEnd).to.be.equal(datas.saleEnd);
+        });
+
+        it("Should return true id", async () => {
+          let length = await apiGet.tokensLengthOf(contract.target);
+          expect(length).to.be.equal(1);
+        });
       });
 
-      it("Should  NOT mint launchpad without cv", async () => {
-        let price = await balancesHub.launchpadPrice();
-        await expect(
-          apiPost
-            .connect(this.addr4)
-            .createLaunchpad(
+      describe("NOT WORKS", () => {
+        it("Should  NOT mint launchpad with wrong bindings", async () => {
+          await expect(
+            contract.mint(1, LAUNCHPAD_DATAS_EXEMPLE, [TIER_DATAS_EXEMPLE])
+          ).to.be.revertedWith("Must call function with proxy bindings");
+        });
+
+        it("Should  NOT mint launchpad without cv", async () => {
+          await expect(
+            apiPost
+              .connect(this.addr4)
+              .createLaunchpad(
+                LAUNCHPAD_DATAS_EXEMPLE,
+                [TIER_DATAS_EXEMPLE],
+                "pubURI",
+                {
+                  value: `${price}`,
+                }
+              )
+          ).to.be.revertedWith("CV not found");
+        });
+
+        it("Should  NOT mint launchpad if value < launchpadPrice", async () => {
+          await expect(
+            apiPost.createLaunchpad(
               LAUNCHPAD_DATAS_EXEMPLE,
               [TIER_DATAS_EXEMPLE],
+              "pubURI",
+              {
+                value: `2000`,
+              }
+            )
+          ).to.be.revertedWith("Launchpad price : Invalid value");
+        });
+
+        it("Should  NOT mint launchpad without pubURI", async () => {
+          await expect(
+            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], {
+              value: `${price}`,
+            })
+          ).to.be.revertedWith("Launchpad price : Invalid value");
+        });
+
+        it("Should  NOT mint launchpad with wrong sale start", async () => {
+          let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
+          datas.saleStart = 300;
+          await expect(
+            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+              value: `${price}`,
+            })
+          ).to.be.revertedWith("Invalid sale start");
+        });
+
+        it("Should  NOT mint launchpad with wrong sale end", async () => {
+          let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
+          datas.saleStart = new Date().getTime();
+          datas.saleEnd = 0;
+          await expect(
+            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+              value: `${price}`,
+            })
+          ).to.be.revertedWith("Invalid sale end");
+
+          datas.saleEnd = datas.saleStart - 1000;
+
+          await expect(
+            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+              value: `${price}`,
+            })
+          ).to.be.revertedWith("Missmatch sale time");
+        });
+
+        it("Should  NOT mint launchpad with 0 tokenAddress", async () => {
+          let _datas = { ...datas };
+
+          _datas.tokenAddress = ZERO_ADDRESS;
+
+          await expect(
+            apiPost.createLaunchpad(_datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+              value: `${price}`,
+            })
+          ).to.be.revertedWith("Invalid address");
+        });
+
+        it("Should  NOT mint without balance of tokenAddress", async () => {
+          await expect(
+            apiPost
+              .connect(this.addr2)
+              .createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+                value: `${price}`,
+              })
+          ).to.be.revertedWith("0 tokens balance");
+        });
+
+        it("Should  NOT mint without tierDatas", async () => {
+          await expect(
+            apiPost.createLaunchpad(datas, [], "pubURI", {
+              value: `${price}`,
+            })
+          ).to.be.revertedWith("Must have at least one tier");
+        });
+
+        it("Should  NOT mint with 6 tierDatas", async () => {
+          await expect(
+            apiPost.createLaunchpad(
+              datas,
+              [
+                TIER_DATAS_EXEMPLE,
+                TIER_DATAS_EXEMPLE,
+                TIER_DATAS_EXEMPLE,
+                TIER_DATAS_EXEMPLE,
+                TIER_DATAS_EXEMPLE,
+                TIER_DATAS_EXEMPLE,
+              ],
               "pubURI",
               {
                 value: `${price}`,
               }
             )
-        ).to.be.revertedWith("CV not found");
-      });
-
-      it("Should  NOT mint launchpad with wrong value", async () => {
-        await expect(
-          apiPost.createLaunchpad(
-            LAUNCHPAD_DATAS_EXEMPLE,
-            [TIER_DATAS_EXEMPLE],
-            "pubURI",
-            {
-              value: `2000`,
-            }
-          )
-        ).to.be.revertedWith("Launchpad price : Invalid value");
-      });
-
-      it("Should  NOT mint launchpad without pubURI", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-
-        await expect(
-          apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], {
-            value: `${price}`,
-          })
-        ).to.be.revertedWith("Launchpad price : Invalid value");
-      });
-
-      it("Should  NOT mint launchpad with wrong sale start", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-        datas.saleStart = 0;
-
-        await expect(
-          apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-            value: `${price}`,
-          })
-        ).to.be.revertedWith("Invalid sale start");
-      });
-
-      it("Should  NOT mint launchpad with wrong sale end", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-        datas.saleStart = new Date().getTime();
-        datas.saleEnd = 0;
-        await expect(
-          apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-            value: `${price}`,
-          })
-        ).to.be.revertedWith("Invalid sale end");
-
-        datas.saleEnd = datas.saleStart - 1000;
-
-        await expect(
-          apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-            value: `${price}`,
-          })
-        ).to.be.revertedWith("Missmatch sale time");
-      });
-
-      it("Should  NOT mint launchpad with 0 tokenAddress", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-        datas.saleEnd = datas.saleStart + 1000;
-        datas.tokenAddress = ZERO_ADDRESS;
-
-        await expect(
-          apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-            value: `${price}`,
-          })
-        ).to.be.revertedWith("Invalid address");
-      });
-
-      it("Should  NOT mint without balance of tokenAddress", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-        let token = await _testInitToken(this.owner, "Django", "DJN", 300000);
-        datas.tokenAddress = token.target;
-        datas.saleEnd = datas.saleStart + 1000;
-
-        await expect(
-          apiPost
-            .connect(this.addr2)
-            .createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
-              value: `${price}`,
-            })
-        ).to.be.revertedWith("0 tokens balance");
-      });
-
-      it("Should  NOT mint without tierDatas", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-        let token = await _testInitToken(this.owner, "Django", "DJN", 300000);
-        datas.tokenAddress = token.target;
-
-        await expect(
-          apiPost.createLaunchpad(datas, [], "pubURI", {
-            value: `${price}`,
-          })
-        ).to.be.revertedWith("Must have at least one tier");
-      });
-
-      it("Should  NOT mint with 6 tierDatas", async () => {
-        let price = await balancesHub.launchpadPrice();
-        let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
-        let token = await _testInitToken(this.owner, "Django", "DJN", 300000);
-        datas.tokenAddress = token.target;
-
-        await expect(
-          apiPost.createLaunchpad(
-            datas,
-            [
-              TIER_DATAS_EXEMPLE,
-              TIER_DATAS_EXEMPLE,
-              TIER_DATAS_EXEMPLE,
-              TIER_DATAS_EXEMPLE,
-              TIER_DATAS_EXEMPLE,
-              TIER_DATAS_EXEMPLE,
-            ],
-            "pubURI",
-            {
-              value: `${price}`,
-            }
-          )
-        ).to.be.revertedWith("Too many tiers datas");
+          ).to.be.revertedWith("Too many tiers datas");
+        });
       });
     });
   });
@@ -1783,7 +1734,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe.only("Create Mission with Launchpad balance", () => {
+  describe("Create Mission with Launchpad balance", () => {
     let token;
     let datas;
     let price;
@@ -1830,9 +1781,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       block = await provider.getBlock("latest");
       timestamp = block.timestamp;
 
-      secondsToIncrease = parseInt(
-        datas.saleStart + datas.lockedTime - timestamp
-      );
+      secondsToIncrease = parseInt(datas.saleStart + datas.lockedTime);
       if (secondsToIncrease > 0) {
         await network.provider.send("evm_increaseTime", [secondsToIncrease]);
       }

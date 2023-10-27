@@ -164,6 +164,7 @@ library DataTypes {
 
     struct MissionData {
         uint256 id;
+        uint256 launchpad;
         MissionStatus status;
         uint[] features;
     }
@@ -291,7 +292,8 @@ library DataTypes {
     enum LaunchpadStatus {
         Waiting,
         Init,
-        Paused
+        Paused,
+        Closed
     }
 
     struct LaunchpadData {

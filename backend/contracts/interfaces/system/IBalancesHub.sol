@@ -6,5 +6,17 @@ interface IBalancesHub {
 
     function launchpadPrice() external view returns (uint);
 
+    function launchpadBalance(uint _launchpadID) external view returns (uint);
+
+    function addLaunchpadBalance(
+        uint _launchpadID,
+        uint _value
+    ) external returns (bool);
+
+    function withdrawLaunchpadBalance(
+        uint _launchpadID,
+        uint _value
+    ) external returns (bool);
+
     // Ajoutez votre code ici
 }

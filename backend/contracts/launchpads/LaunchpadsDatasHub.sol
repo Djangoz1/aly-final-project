@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -29,7 +29,10 @@ contract LaunchpadsDatasHub is Ownable {
 
     modifier onlyFromContract(uint _id) {
         require(
-            _iAS.apiPost() == msg.sender || address(_iLH) == msg.sender,
+            _iAS.apiPost() == msg.sender ||
+                address(_iLH) == msg.sender ||
+                address(_iAS.launchpadsInvestorsHub()) == msg.sender ||
+                _iLH.addressOf(_id) == msg.sender,
             // _iLH.addressOf(_id) == msg.sender,
             "Only contracts can call this function"
         );
@@ -90,41 +93,8 @@ contract LaunchpadsDatasHub is Ownable {
     }
 
     /**
-     * @notice owner can change start time while session is not started
-     * @param _saleStart new start time
+     *
      */
-    function _setStartTime(
-        uint256 _id,
-        uint256 _saleStart
-    ) external onlyFromContract(_id) {
-        require(
-            launchpadDatas[_id].saleStart > block.timestamp,
-            "Sale already started"
-        );
-        require(_saleStart > block.timestamp, "Sale start cant be in the past");
-        require(
-            launchpadDatas[_id].saleEnd > _saleStart,
-            "Sale start can't be more than end time"
-        );
-        launchpadDatas[_id].saleStart = _saleStart;
-    }
-
-    /**
-     * @notice owner can change end time while session is not started
-     * @param _saleEnd new end time
-     */
-    function _setEndTime(
-        uint256 _id,
-        uint256 _saleEnd
-    ) external onlyFromContract(_id) {
-        require(_saleEnd > block.timestamp, "Sale end can't be in the past");
-        require(
-            launchpadDatas[_id].saleStart < _saleEnd,
-            "Sale end can't be less than start time"
-        );
-        launchpadDatas[_id].saleEnd = _saleEnd;
-    }
-
     function setLaunchpadData(
         uint _launchpadID,
         address _ownerOf,
@@ -181,7 +151,6 @@ contract LaunchpadsDatasHub is Ownable {
      */
     function _setTiers(
         uint256 _tierLength,
-        address _ownerOf,
         uint256 _id,
         uint256[] calldata _maxTierCaps,
         uint256[] calldata _minTierCaps,
@@ -246,24 +215,23 @@ contract LaunchpadsDatasHub is Ownable {
             _tierID < launchpadDatas[_launchpadID].numberOfTier,
             "Tier out of range"
         );
-        uint256 _balance = tierDetails[_launchpadID][_tierID].amountRaised;
 
         require(
-            tierDetails[_launchpadID][_tierID].maxTierCap <=
-                _balance.add(_value),
+            tierDetails[_launchpadID][_tierID].maxTierCap >=
+                tierDetails[_launchpadID][_tierID].amountRaised.add(_value),
             "Value out of range for this tier"
-        );
-        require(
-            launchpadDatas[_launchpadID].minInvest < _value,
-            "Mismatches value and minimum investment"
         );
         uint256 _balanceOf = ILaunchpadsInvestorsHub(
             _iAS.launchpadsInvestorsHub()
         ).datasOf(_launchpadID, _cvID).investedAmount;
+
         require(
-            _balanceOf.add(_value) <= launchpadDatas[_launchpadID].maxInvest,
-            "Maximum investments out of range"
+            launchpadDatas[_launchpadID].minInvest <= _value &&
+                _balanceOf.add(_value) <=
+                launchpadDatas[_launchpadID].maxInvest,
+            "Value not in range invest"
         );
+
         return true;
     }
 
@@ -272,8 +240,8 @@ contract LaunchpadsDatasHub is Ownable {
         uint _tierID
     ) external returns (bool) {
         if (
-            tierDetails[_launchpadID][_tierID].maxTierCap ==
-            tierDetails[_launchpadID][_tierID].amountRaised
+            tierDetails[_launchpadID][_tierID].amountRaised >=
+            tierDetails[_launchpadID][_tierID].maxTierCap
         ) {
             return false;
         } else {

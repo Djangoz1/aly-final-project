@@ -2,8 +2,11 @@
 pragma solidity 0.8.20;
 import {DataTypes} from "./DataTypes.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 library InteractionLogic {
+    using SafeMath for uint256;
+
     function _followMission(
         address _toFollow,
         address[] memory _followMissions
@@ -28,12 +31,16 @@ library InteractionLogic {
         DataTypes.LaunchpadData calldata _data
     ) internal view returns (bool) {
         require(
+            _data.saleStart >= block.timestamp, // ! Test value ! Increase on prod
+            "Invalid sale start"
+        );
+        require(
             _data.tokenAddress != address(0),
             "Must assign a token address"
         );
         IERC20 token = IERC20(_data.tokenAddress);
         require(token.balanceOf(_ownerOf) > 0, "0 tokens balance");
-        require(_data.numberOfTier >= 0, "Must have at least on tier");
+        require(_data.numberOfTier >= 0, "Must have at least one tier");
         // require(_data.pubURI != "", "Must have pubURI");
         require(_data.minCap > 0, "Min cap must be greater than 0");
         require(_data.maxCap > 0, "Max cap must be greater than 0");
@@ -42,11 +49,8 @@ library InteractionLogic {
             "Missmatch capitalization values"
         );
         require(_data.minInvest > 0, "Min invest must be greater than 0");
-        require(
-            _data.saleStart > block.timestamp + 10000,
-            "Invalid sale start"
-        );
-        require(_data.saleEnd > block.timestamp + 100000, "Invalid sale end");
+        require(_data.maxInvest <= _data.maxCap, "Missmatch invest value");
+        require(_data.saleEnd > block.timestamp + 1000, "Invalid sale end"); // ! Test value ! Increase on prod
         require(_data.saleStart < _data.saleEnd, "Missmatch sale time");
         require(_data.lockedTime > 0, "Locked time must be greater than 0");
         require(_data.totalUser == 0, "Total user must be 0 at first");

@@ -47,6 +47,11 @@ async function main() {
 
   let cv = await _createCV("Django", this.owner, addressSystem.target);
   console.log("cv#", cv, "created");
+  let launchpad = await _createLaunchpad({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+  console.log("launchpad#", launchpad, "created");
 
   cv = await _createCV("Testor1", this.addr1, addressSystem.target);
   console.log("cv#", cv, "created");
@@ -60,13 +65,6 @@ async function main() {
   console.log("cv#", cv, "created");
   cv = await _createCV("Testor6", this.addr6, addressSystem.target);
   console.log("cv#", cv, "created");
-
-  let launchpad = await _createLaunchpad({
-    account: this.owner,
-    addressSystem: addressSystem.target,
-  });
-
-  console.log("launchpad#", launchpad, "created");
 
   let feature = await _createFeature({
     account: this.owner,

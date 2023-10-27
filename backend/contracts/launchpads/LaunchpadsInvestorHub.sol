@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -13,6 +13,8 @@ import {Events} from "../libraries/Events.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {ILaunchpad} from "../interfaces/launchpads/ILaunchpad.sol";
 import {ILaunchpadHub} from "../interfaces/launchpads/ILaunchpadHub.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 import {ILaunchpadsDatasHub} from "../interfaces/launchpads/ILaunchpadsDatasHub.sol";
 
 contract LaunchpadsInvestorsHub is Ownable {
@@ -22,6 +24,24 @@ contract LaunchpadsInvestorsHub is Ownable {
 
     using SafeMath for uint256;
 
+    modifier onlyExist(uint _launchpadID) {
+        require(
+            Bindings.tokensLength(address(iLH)) >= _launchpadID &&
+                _launchpadID > 0,
+            "ID out of range"
+        );
+        _;
+    }
+    modifier onlyFromContract(uint _id) {
+        require(
+            _iAS.apiPost() == msg.sender ||
+                address(iLH) == msg.sender ||
+                iLH.addressOf(_id) == msg.sender,
+            // _iLH.addressOf(_id) == msg.sender,
+            "Only contracts can call this function"
+        );
+        _;
+    }
     /**
      * @dev tierDetails is a mapping of investor address to index launchpad to tier details
      * @dev tierDetails[investorAddr][launchpadID] = tierDetails
@@ -49,25 +69,30 @@ contract LaunchpadsInvestorsHub is Ownable {
     function datasOf(
         uint _launchpadID,
         uint _cvID
-    ) external view returns (DataTypes.InvestorData memory) {
+    )
+        external
+        view
+        onlyExist(_launchpadID)
+        returns (DataTypes.InvestorData memory)
+    {
         return investorDetails[_cvID][_launchpadID];
     }
 
     /**
-     * @param _launchpadID is ID of invested launchpad
      * @param _tierID is ID of current tier ID
      * @param _cvID is sender of value
      * @param _value is msg.value of sender
      */
     function _investOnLaunchpad(
-        uint _launchpadID,
         uint _tierID,
         uint _cvID,
         uint _value
     ) external payable returns (bool) {
-        // if tier.length == 0 means is not invest
+        uint _launchpadID = iLH.idOf(msg.sender);
+
         if (investorDetails[_cvID][_launchpadID].tier.length == 0) {
             investorDetails[_cvID][_launchpadID].tier.push(uint8(_tierID));
+
             // So data tier user must be increment
             cLD._incrementTierUser(_launchpadID, _tierID);
             // And data launchpad user must be increment too
@@ -89,6 +114,8 @@ contract LaunchpadsInvestorsHub is Ownable {
             }
             // if we findn't tier current ID on his data we must increment tier user
             if (!alreadyInvested) {
+                investorDetails[_cvID][_launchpadID].tier.push(uint8(_tierID));
+
                 cLD._incrementTierUser(_launchpadID, _tierID);
             }
         }
@@ -115,11 +142,11 @@ contract LaunchpadsInvestorsHub is Ownable {
         // Recuperation launchpadAddr by ID
         address launchpadAddr = iLH.addressOf(_launchpadID);
         ILaunchpad launchpad = ILaunchpad(launchpadAddr);
-        require(_value > 0, "Amount must be greater than 0");
-        require(_cvID != 0, "cant lock to no user");
+        ERC20 iERC20 = ERC20(cLD.datasOf(_launchpadID).tokenAddress);
 
         // Calcul  msg.value / tokenPrice (tokenPrice is relative for each tierID)
-        uint _amount = _value.div(cLD.tierOf(_launchpadID, _tierID).tokenPrice);
+        uint _amount = (_value * 10 ** iERC20.decimals()) /
+            cLD.tierOf(_launchpadID, _tierID).tokenPrice;
         require(_amount > 0, "Amount tokens must be greater than 0");
 
         // Function which verified if launchpad have allowance, if true launchpad transfer token on his address
@@ -137,5 +164,12 @@ contract LaunchpadsInvestorsHub is Ownable {
             _amount
         );
         return true;
+    }
+
+    function withdrawTokens(
+        uint _cvID,
+        uint _launchpadID
+    ) external onlyFromContract(_launchpadID) {
+        investorDetails[_cvID][_launchpadID].lockedTokens = 0;
     }
 }

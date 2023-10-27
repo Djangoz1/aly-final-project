@@ -238,7 +238,7 @@ contract APIGet {
             );
     }
 
-    function currentTierIDOf(uint _launchpadID) external view returns (uint) {
+    function currentTierIDOf(uint _launchpadID) external view returns (uint8) {
         return
             ILaunchpad(
                 ILaunchpadHub(_iAS.launchpadsHub()).addressOf(_launchpadID)
@@ -305,6 +305,13 @@ contract APIGet {
     // ---------------------------- //
     // *********** WORKS *********** //
     // *********** ---- *********** //
+
+    function missionsOfLaunchpad(
+        uint _launchpadID
+    ) external view returns (uint[] memory) {
+        return
+            IMissionsHub(_iAS.missionsHub()).indexerOfLaunchpad(_launchpadID);
+    }
 
     function jobsOfCV(uint _cvID) external view returns (uint[] memory) {
         return

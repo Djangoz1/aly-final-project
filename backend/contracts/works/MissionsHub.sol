@@ -22,6 +22,8 @@ contract MissionsHub is ERC721URIStorage, Ownable {
      */
     mapping(uint => uint[]) private indexers;
 
+    mapping(uint => uint[]) private indexersLaunchpad;
+
     /**
      * @notice mission ID return data mission
      */
@@ -67,14 +69,20 @@ contract MissionsHub is ERC721URIStorage, Ownable {
 
     function mint(
         address _for,
-        string calldata _tokenURI
+        string calldata _tokenURI,
+        uint _launchpadID
     ) external onlyProxy returns (uint) {
         _tokenIDs.increment();
         uint newMissionID = _tokenIDs.current();
         DataTypes.MissionData memory newMission;
         newMission.id = newMissionID;
+        newMission.launchpad = _launchpadID;
+        if (_launchpadID > 0) {
+            indexersLaunchpad[_launchpadID].push(newMissionID);
+        }
         indexers[_cvOf(_for)].push(newMissionID);
         datas[newMissionID] = newMission;
+
         _mint(_for, newMissionID);
         _setTokenURI(newMissionID, _tokenURI);
         return newMissionID;
@@ -115,6 +123,12 @@ contract MissionsHub is ERC721URIStorage, Ownable {
             "MissionsHub : Invalid cv ID"
         );
         return indexers[_cvID];
+    }
+
+    function indexerOfLaunchpad(
+        uint _launchpadID
+    ) external view returns (uint[] memory) {
+        return indexersLaunchpad[_launchpadID];
     }
 
     function dataOf(

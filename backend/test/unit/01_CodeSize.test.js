@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 const { codeSize, _testInitAll } = require("../../helpers/test_init");
 
-describe.only(`TEST CODE SIZE`, () => {
+describe(`TEST CODE SIZE`, () => {
   let contracts;
 
   beforeEach(async () => {
@@ -56,6 +56,14 @@ describe.only(`TEST CODE SIZE`, () => {
       await codeSize(contracts.escrows.arbitratorsHub.target);
     });
     it(`DisputesDatasHub | DisputesHub | ArbitratorsHub`, () => {});
+  });
+  describe("Launchpad contracts", () => {
+    afterEach(async () => {
+      await codeSize(contracts.launchpads.datas.target);
+      await codeSize(contracts.launchpads.investors.target);
+      await codeSize(contracts.launchpads.hub.target);
+    });
+    it(`LaunchpadDatasHub | LaunchpadInvestorsHub | LaunchpadHub`, () => {});
   });
   describe("Pubs contracts", () => {
     afterEach(async () => {

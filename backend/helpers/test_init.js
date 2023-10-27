@@ -151,13 +151,12 @@ let _testInitSystemsContracts = async (addressSystem) => {
   await factory.waitForDeployment();
   expect(await _iAS.factory()).to.be.equal(factory.target);
 
-  const apiPost = await ethers.deployContract("APIPost", [addressSystem]);
-  await apiPost.waitForDeployment();
-  expect(await _iAS.apiPost()).to.be.equal(apiPost.target);
-
   const apiGet = await ethers.deployContract("APIGet", [addressSystem]);
   await apiGet.waitForDeployment();
   expect(await _iAS.apiGet()).to.be.equal(apiGet.target);
+  const apiPost = await ethers.deployContract("APIPost", [addressSystem]);
+  await apiPost.waitForDeployment();
+  expect(await _iAS.apiPost()).to.be.equal(apiPost.target);
   return {
     apiGet,
     balancesHub,
@@ -563,10 +562,21 @@ const _testInitToken = async (account, _name, _symbol, _totalSupply) => {
     _totalSupply,
   ]);
 
-  // expect(token.runner.address).to.equal(account.address);
   expect(await token.name()).to.equal(_name);
-  expect(await token.totalSupply()).to.equal(_totalSupply);
+  expect(await token.totalSupply()).to.equal(
+    BigInt(_totalSupply) * BigInt(10 ** 18)
+  );
+
   expect(await token.symbol()).to.equal(_symbol);
+
+  if (account.address !== token.runner.address) {
+    await token.transfer(account.address, await token.totalSupply());
+  }
+
+  expect(await token.balanceOf(account.address)).to.equal(
+    await token.totalSupply()
+  );
+
   return token;
 };
 

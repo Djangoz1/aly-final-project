@@ -10,6 +10,8 @@ interface ILaunchpad {
 
     function status() external view returns (DataTypes.LaunchpadStatus);
 
+    function withdrawOwner(uint _value, address _to) external returns (bool);
+
     /**
      * @notice check if contract have allowance to transfered that amount
      * check if owner have enough funds
@@ -25,13 +27,9 @@ interface ILaunchpad {
      */
     function lockTokens(uint _cvID, uint _tokens) external;
 
-    function getCurrentTierID() external view returns (uint);
+    function getCurrentTierID() external view returns (uint8);
 
     function dataOfs() external view returns (DataTypes.LaunchpadData memory);
-
-    function tierOfs(
-        uint _tierID
-    ) external view returns (DataTypes.TierData memory);
 
     function setTimer(uint _saleEnd, uint _saleStart) external;
 
@@ -58,4 +56,6 @@ interface ILaunchpad {
     // *::::::::: ------------- :::::::::* //
 
     function buyTokens(uint _cvSender, uint _value) external;
+
+    function withdrawTokens(uint _cvID) external;
 }

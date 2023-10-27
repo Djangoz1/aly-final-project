@@ -3,12 +3,14 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "hardhat/console.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/system/IAccessControl.sol";
 import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
+import {IAPIGet} from "../interfaces/system/IAPIGet.sol";
 import {IBalancesHub} from "../interfaces/system/IBalancesHub.sol";
 import {IContract} from "../interfaces/system/IContract.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
@@ -27,26 +29,23 @@ import {IFeaturesHub} from "../interfaces/works/IFeaturesHub.sol";
 import {ICollectWorkInteraction} from "../interfaces/works/ICollectWorkInteraction.sol";
 
 contract APIPost is Ownable {
-    // Ajoutez votre code ici
+    IAddressSystem private _iAS;
+    IAPIGet private _iAPIGet;
+    IBalancesHub private _iBalancesHub;
 
-    IAddressSystem _iAS;
     address private _cvsHub;
+
+    address private _cvsDatasHub;
     address private _collectWorkInteraction;
     address private _featuresHub;
     address private _missionsHub;
     address private _pubsHub;
+    address private _pubsDatasHub;
     address private _disputesHub;
-
-    modifier ifTokenExist(uint _id, address _contract) {
-        require(
-            Bindings.tokensLength(_contract) >= _id,
-            "PubsDatasHub: Invalid ID"
-        );
-        _;
-    }
+    address private _launchpadsHub;
 
     modifier onlyCVOwner() {
-        require(ICVsHub(_cvsHub).cvOf(msg.sender) > 0, "Must have CV");
+        require(_cvOf(msg.sender) > 0, "Must have CV");
         _;
     }
 
@@ -54,7 +53,7 @@ contract APIPost is Ownable {
         require(
             _disputesHub == msg.sender ||
                 _featuresHub == msg.sender ||
-                _iAS.launchpadsHub() == msg.sender,
+                _launchpadsHub == msg.sender,
             "Only callable by our contracts"
         );
         _;
@@ -72,27 +71,34 @@ contract APIPost is Ownable {
     constructor(address _addressSystem) {
         _iAS = IAddressSystem(_addressSystem);
         _iAS.setApiPost();
-        require(_iAS.apiPost() == address(this), "APIPost: Error deployment");
+        require(
+            _iAS.apiPost() == address(this),
+            "APIPost : Address system failure"
+        );
+        _iAPIGet = IAPIGet(_iAS.apiGet());
         _cvsHub = _iAS.cvsHub();
+        _cvsDatasHub = _iAS.cvsDatasHub();
         _collectWorkInteraction = _iAS.collectWorkInteraction();
         _featuresHub = _iAS.featuresHub();
         _missionsHub = _iAS.missionsHub();
+        _launchpadsHub = _iAS.launchpadsHub();
         _pubsHub = _iAS.pubsHub();
+        _pubsDatasHub = _iAS.pubsDatasHub();
         _disputesHub = _iAS.disputesHub();
-        require(_cvsHub != address(0), "APIPost : Must deploy CVsHub first");
+        _iBalancesHub = IBalancesHub(_iAS.balancesHub());
         require(
-            _missionsHub != address(0),
-            "APIPost : Must deploy missionsHub first"
+            address(_iAPIGet) != address(0) &&
+                _cvsHub != address(0) &&
+                _cvsDatasHub != address(0) &&
+                _launchpadsHub != address(0) &&
+                _pubsHub != address(0) &&
+                _pubsDatasHub != address(0) &&
+                _collectWorkInteraction != address(0) &&
+                _missionsHub != address(0) &&
+                address(_iBalancesHub) != address(0) &&
+                _featuresHub != address(0),
+            "APIPost : Deployment failed"
         );
-        require(
-            _featuresHub != address(0),
-            "APIPost : Must deploy featuresHub first"
-        );
-        require(
-            _collectWorkInteraction != address(0),
-            "APIPost : Must deploy collectWorkInteraction first"
-        );
-        require(_pubsHub != address(0), "APIPost : Must deploy pubsHub first");
     }
 
     function sendTransaction(
@@ -139,12 +145,12 @@ contract APIPost is Ownable {
 
     function followCV(uint _cvToFollow) external {
         uint cvFollower = _cvOf(msg.sender);
-        require(_cvToFollow != cvFollower, "Can't follow yourself");
         require(
-            Bindings.ownerOf(_cvToFollow, _cvsHub) != address(0),
-            "ERC721: invalid token ID"
+            _cvToFollow != cvFollower &&
+                Bindings.tokensLength(_cvsHub) >= _cvToFollow,
+            "Can't follow yourself"
         );
-        ICVsDatasHub(_iAS.cvsDatasHub()).follow(cvFollower, _cvToFollow);
+        ICVsDatasHub(_cvsDatasHub).follow(cvFollower, _cvToFollow);
     }
 
     /**
@@ -156,12 +162,12 @@ contract APIPost is Ownable {
 
     function unfollowCV(uint _cvToUnfollow) external {
         uint cvFollower = _cvOf(msg.sender);
-        require(_cvToUnfollow != cvFollower, "Can't unfollow yourself");
         require(
-            Bindings.ownerOf(_cvToUnfollow, _cvsHub) != address(0),
-            "ERC721: invalid token ID"
+            _cvToUnfollow != cvFollower &&
+                Bindings.tokensLength(_cvsHub) >= _cvToUnfollow,
+            "Can't unfollow yourself"
         );
-        ICVsDatasHub(_iAS.cvsDatasHub()).unfollow(cvFollower, _cvToUnfollow);
+        ICVsDatasHub(_cvsDatasHub).unfollow(cvFollower, _cvToUnfollow);
     }
 
     // ************* -------- ************* //
@@ -176,12 +182,46 @@ contract APIPost is Ownable {
      * msg.value == BalancesHub.missionPrice
      */
 
+    function createMissionLaunchpad(
+        uint _launchpadID,
+        string calldata _tokenURI
+    ) external payable onlyCVOwner {
+        address _launchpadAddr = _launchpadAddr(_launchpadID);
+
+        uint missionPrice = _iBalancesHub.missionPrice();
+
+        require(
+            Bindings.ownerOf(_launchpadID, _launchpadsHub) == msg.sender &&
+                _iAPIGet.statusOfLaunchpad(_launchpadID) ==
+                DataTypes.LaunchpadStatus.Closed &&
+                _iBalancesHub.launchpadBalance(_launchpadID) > missionPrice,
+            "APIPost: Error create mission"
+        );
+
+        bool success = _iBalancesHub.withdrawLaunchpadBalance(
+            _launchpadID,
+            missionPrice
+        );
+
+        require(success, "APIPost: Withdraw failed");
+        _createMission(_tokenURI, _launchpadID);
+    }
+
     function createMission(
         string calldata _tokenURI
     ) external payable onlyCVOwner {
-        uint missionPrice = IBalancesHub(_iAS.balancesHub()).missionPrice();
-        require(msg.value == missionPrice, "Mission price : Invalid value");
-        IMissionsHub(_missionsHub).mint(msg.sender, _tokenURI);
+        require(
+            msg.value == _iBalancesHub.missionPrice(),
+            "Mission price : Invalid value"
+        );
+        _createMission(_tokenURI, 0);
+    }
+
+    function _createMission(
+        string calldata _tokenURI,
+        uint _launchpadID
+    ) internal {
+        IMissionsHub(_missionsHub).mint(msg.sender, _tokenURI, _launchpadID);
     }
 
     /**
@@ -204,6 +244,42 @@ contract APIPost is Ownable {
     // ************* -------- ************* //
     // ************* Features ************* //
     // ************* -------- ************* //
+
+    function createFeatureLaunchpad(
+        uint _value,
+        uint _missionID,
+        uint16 _estimatedDays,
+        bool _isInviteOnly,
+        string calldata _tokenURI,
+        DataTypes.CourtIDs _specification
+    ) external onlyCVOwner onlyOwnerOf(_missionID, msg.sender, _missionsHub) {
+        uint launchpadID = _iAPIGet.datasOfMission(_missionID).launchpad;
+        address _launchpadAddr = _launchpadAddr(launchpadID);
+
+        require(
+            launchpadID > 0 &&
+                Bindings.ownerOf(launchpadID, _launchpadsHub) == msg.sender &&
+                _iBalancesHub.launchpadBalance(launchpadID) >= _value &&
+                _iAPIGet.statusOfLaunchpad(launchpadID) ==
+                DataTypes.LaunchpadStatus.Closed,
+            "APIPost: Error create feature"
+        );
+        bool success = _iBalancesHub.withdrawLaunchpadBalance(
+            launchpadID,
+            _value
+        );
+
+        require(success, "APIPost: Error withdraw");
+
+        _createFeature(
+            _value,
+            _missionID,
+            _estimatedDays,
+            _isInviteOnly,
+            _tokenURI,
+            _specification
+        );
+    }
 
     /**
      * @notice Binding for create feature
@@ -229,7 +305,25 @@ contract APIPost is Ownable {
         onlyCVOwner
         onlyOwnerOf(_missionID, msg.sender, _missionsHub)
     {
-        uint wadge = msg.value;
+        _createFeature(
+            msg.value,
+            _missionID,
+            _estimatedDays,
+            _isInviteOnly,
+            _tokenURI,
+            _specification
+        );
+    }
+
+    function _createFeature(
+        uint _value,
+        uint _missionID,
+        uint16 _estimatedDays,
+        bool _isInviteOnly,
+        string calldata _tokenURI,
+        DataTypes.CourtIDs _specification
+    ) internal {
+        uint wadge = _value;
         require(wadge > 0, "Insuficient value");
         uint newFeature = IFeaturesHub(_featuresHub).mint(
             msg.sender,
@@ -418,17 +512,10 @@ contract APIPost is Ownable {
      * msg.sender == ownerOfCV(x)
      * Permet de poster une réponse à une publication
      */
-    function createPubAnswer(
-        uint _pubID,
-        string calldata _tokenURI
-    ) external ifTokenExist(_pubID, _pubsHub) {
+    function createPubAnswer(uint _pubID, string calldata _tokenURI) external {
         uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI);
         require(newPubID != 0, "Error create pub");
-        IPubsDatasHub(_iAS.pubsDatasHub()).addPubAnswer(
-            newPubID,
-            _pubID,
-            _tokenURI
-        );
+        IPubsDatasHub(_pubsDatasHub).addPubAnswer(newPubID, _pubID, _tokenURI);
     }
 
     /**
@@ -442,9 +529,9 @@ contract APIPost is Ownable {
     function createPubMission(
         uint _missionID,
         string calldata _tokenURI
-    ) external ifTokenExist(_missionID, _missionsHub) {
+    ) external {
         uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI);
-        IPubsDatasHub(_iAS.pubsDatasHub()).addPubMission(
+        IPubsDatasHub(_pubsDatasHub).addPubMission(
             newPubID,
             _missionID,
             _tokenURI
@@ -458,8 +545,8 @@ contract APIPost is Ownable {
      * msg.sender == ownerOfCV(x)
      * Permet de liké une publication
      */
-    function likePub(uint _pubID) external ifTokenExist(_pubID, _pubsHub) {
-        IPubsDatasHub(_iAS.pubsDatasHub()).like(_cvOf(msg.sender), _pubID);
+    function likePub(uint _pubID) external {
+        IPubsDatasHub(_pubsDatasHub).like(_cvOf(msg.sender), _pubID);
     }
 
     /**
@@ -469,8 +556,8 @@ contract APIPost is Ownable {
      * msg.sender == ownerOfCV(x)
      * Permet d'unliké une publication liké
      */
-    function unlikePub(uint _pubID) external ifTokenExist(_pubID, _pubsHub) {
-        IPubsDatasHub(_iAS.pubsDatasHub()).unlike(_cvOf(msg.sender), _pubID);
+    function unlikePub(uint _pubID) external {
+        IPubsDatasHub(_pubsDatasHub).unlike(_cvOf(msg.sender), _pubID);
     }
 
     // ************* ---------- ************* //
@@ -527,8 +614,7 @@ contract APIPost is Ownable {
      * Doit être trigger par le worker ou l'owner pour démarrer le workflow
      */
     function initDispute(uint _disputeID) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).init(_cvOf(msg.sender));
+        IDispute(_disputeAddr(_disputeID)).init(_cvOf(msg.sender));
     }
 
     /**
@@ -539,8 +625,7 @@ contract APIPost is Ownable {
      * Permet d'accepté d'arbitrer une dispute lorsque l'on est invité
      */
     function acceptArbitration(uint _disputeID) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).acceptArbitration(_cvOf(msg.sender));
+        IDispute(_disputeAddr(_disputeID)).acceptArbitration(_cvOf(msg.sender));
     }
 
     /**
@@ -551,8 +636,7 @@ contract APIPost is Ownable {
      * Permet de refuser l'invitation à arbitrer une dispute lorsque l'on y est invité
      */
     function refuseArbitration(uint _disputeID) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).refuseArbitration(_cvOf(msg.sender));
+        IDispute(_disputeAddr(_disputeID)).refuseArbitration(_cvOf(msg.sender));
     }
 
     /**
@@ -563,8 +647,7 @@ contract APIPost is Ownable {
      * Permet de changer le workflow pour pouvoir démarrer le lancement des votes
      */
     function startedVotePeriod(uint _disputeID) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).startedVotePeriod(_cvOf(msg.sender));
+        IDispute(_disputeAddr(_disputeID)).startedVotePeriod(_cvOf(msg.sender));
     }
 
     /**
@@ -577,8 +660,7 @@ contract APIPost is Ownable {
      */
 
     function vote(uint _disputeID, DisputeRules.Vote _vote) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).vote(_cvOf(msg.sender), _vote);
+        IDispute(_disputeAddr(_disputeID)).vote(_cvOf(msg.sender), _vote);
     }
 
     /**
@@ -589,8 +671,7 @@ contract APIPost is Ownable {
      * Permet au worker ou à l'owner de la feature de faire appel de la décision
      */
     function appeal(uint _disputeID) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).doAppeal(_cvOf(msg.sender));
+        IDispute(_disputeAddr(_disputeID)).doAppeal(_cvOf(msg.sender));
     }
 
     /**
@@ -602,8 +683,7 @@ contract APIPost is Ownable {
      * Elle ne peut être appelé que selon un workflow précis
      */
     function resolvedDispute(uint _disputeID) external {
-        address _dispute = IDisputesHub(_disputesHub).addressOf(_disputeID);
-        IDispute(_dispute).resolvedDispute(_cvOf(msg.sender));
+        IDispute(_disputeAddr(_disputeID)).resolvedDispute(_cvOf(msg.sender));
     }
 
     // ************* --------- ************* //
@@ -615,42 +695,103 @@ contract APIPost is Ownable {
         DataTypes.TierData[] memory _tierDatas,
         string memory _tokenURI
     ) external payable {
-        uint price = IBalancesHub(_iAS.balancesHub()).launchpadPrice();
-        require(msg.value == price, "Launchpad price : Invalid value");
         uint cvID = _cvOf(msg.sender);
-        uint newID = ILaunchpadHub(_iAS.launchpadsHub()).mint(
+
+        require(
+            msg.value == _iBalancesHub.launchpadPrice() &&
+                _datas.tokenAddress != address(0),
+            "APIPost: Error create launchpad"
+        );
+        //
+        _datas.maxCap = 0;
+        _datas.minCap = 0;
+
+        uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
+        uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
+        uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
+
+        for (uint256 index = 0; index < _tierDatas.length; index++) {
+            DataTypes.TierData memory _tierData = _tierDatas[index];
+            _maxTierCaps[index] = _tierData.maxTierCap;
+            _minTierCaps[index] = _tierData.minTierCap;
+            _tokenPrice[index] = _tierData.tokenPrice;
+            _datas.maxCap += _tierData.maxTierCap;
+            _datas.minCap += _tierData.minTierCap;
+            require(
+                _tierData.tokenPrice < _datas.maxCap &&
+                    _tierData.tokenPrice < _datas.maxInvest &&
+                    _datas.minInvest <= _tierData.maxTierCap,
+                "LaunchpadHub: Missmatch value"
+            );
+        }
+
+        _datas.numberOfTier = uint8(_tierDatas.length);
+
+        //
+        uint newID = ILaunchpadHub(_launchpadsHub).mint(
             cvID,
             _datas,
             _tierDatas
         );
         require(newID > 0, "Invalid launchpad ID");
-        ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).setTokenURI(
-            msg.sender,
-            newID,
-            _tokenURI
+
+        //!>>
+        _datas.id = newID;
+
+        ILaunchpadsDatasHub cLD = ILaunchpadsDatasHub(
+            _iAS.launchpadsDatasHub()
         );
+        cLD.setLaunchpadData(newID, msg.sender, _datas);
+        cLD._setTiers(
+            _tierDatas.length,
+            newID,
+            _maxTierCaps,
+            _minTierCaps,
+            _tokenPrice
+        );
+        //
+        // ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).setTokenURI(
+        cLD.setTokenURI(msg.sender, newID, _tokenURI);
+    }
+
+    function setTierID(
+        uint _launchpadID
+    ) external onlyOwnerOf(_launchpadID, msg.sender, _launchpadsHub) {
+        ILaunchpad(_launchpadAddr(_launchpadID)).setTierID();
     }
 
     function lockTokens(uint _launchpadID, uint _tokens) external {
         require(_tokens > 0, "Invalid tokens quantity");
-        address launchpad = ILaunchpadHub(_iAS.launchpadsHub()).addressOf(
-            _launchpadID
+        ILaunchpad(_launchpadAddr(_launchpadID)).lockTokens(
+            _cvOf(msg.sender),
+            _tokens
         );
-        ILaunchpad _iL = ILaunchpad(launchpad);
-
-        _iL.lockTokens(_cvOf(msg.sender), _tokens);
     }
 
     function buyTokens(uint _launchpadID) external payable {
-        address launchpad = ILaunchpadHub(_iAS.launchpadsHub()).addressOf(
-            _launchpadID
-        );
-        ILaunchpad _iL = ILaunchpad(launchpad);
         require(msg.value > 0, "Value must be more than 0");
-        _iL.buyTokens(_cvOf(msg.sender), msg.value);
+        ILaunchpad(_launchpadAddr(_launchpadID)).buyTokens(
+            _cvOf(msg.sender),
+            msg.value
+        );
+        _iBalancesHub.addLaunchpadBalance(_launchpadID, msg.value);
+    }
+
+    function withdrawTokens(uint _launchpadID) external {
+        ILaunchpad(_launchpadAddr(_launchpadID)).withdrawTokens(
+            _cvOf(msg.sender)
+        );
     }
 
     function _cvOf(address _for) internal view returns (uint) {
-        return Bindings.cvOf(_for, _cvsHub);
+        return _iAPIGet.cvOf(_for);
+    }
+
+    function _launchpadAddr(uint _launchpadID) internal view returns (address) {
+        return _iAPIGet.addressOfLaunchpad(_launchpadID);
+    }
+
+    function _disputeAddr(uint _disputeID) internal view returns (address) {
+        return _iAPIGet.addressOfDispute(_disputeID);
     }
 }

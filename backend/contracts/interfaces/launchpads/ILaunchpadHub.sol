@@ -12,6 +12,8 @@ interface ILaunchpadHub {
         DataTypes.TierData[] memory _tierDatas
     ) external returns (uint);
 
+    function idOf(address _launchpad) external view returns (uint);
+
     function owner() external view returns (address);
 
     function tokensLength() external view returns (uint);

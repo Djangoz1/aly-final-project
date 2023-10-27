@@ -106,6 +106,7 @@ let _createMission = async ({
 let _createFeature = async ({
   missionID,
   estimatedDays,
+  launchpadID,
   isInviteOnly,
   specification,
   title,
@@ -138,20 +139,35 @@ let _createFeature = async ({
     attributes: [{ domain }],
   });
 
-  await apiPost
-    .connect(account)
-    .createFeature(
-      _missionID,
-      estimatedDays || moock?.estimatedDays,
-      isInviteOnly === false || isInviteOnly === true
-        ? isInviteOnly
-        : moock?.isInviteOnly,
-      uri,
-      specification || moock?.specification,
-      {
-        value: `${wadge || (await balancesHub.missionPrice())}`,
-      }
-    );
+  if (launchpadID) {
+    await apiPost
+      .connect(account)
+      .createFeatureLaunchpad(
+        wadge,
+        _missionID,
+        estimatedDays || moock?.estimatedDays,
+        isInviteOnly === false || isInviteOnly === true
+          ? isInviteOnly
+          : moock?.isInviteOnly,
+        uri,
+        specification || moock?.specification
+      );
+  } else {
+    await apiPost
+      .connect(account)
+      .createFeature(
+        _missionID,
+        estimatedDays || moock?.estimatedDays,
+        isInviteOnly === false || isInviteOnly === true
+          ? isInviteOnly
+          : moock?.isInviteOnly,
+        uri,
+        specification || moock?.specification,
+        {
+          value: `${wadge || (await balancesHub.missionPrice())}`,
+        }
+      );
+  }
 
   if (account.address != (await apiGet.ownerOfToken(featureID, _addrFH))) {
     throw new Error("Error Feature: URI ID");
@@ -179,6 +195,7 @@ let _createLaunchpad = async ({
   metadatas,
   tiersDatas,
 }) => {
+  let tokensAllowance = 30000000000000000000000000000000n;
   let _iAS = await getContractAt("AddressSystem", addressSystem);
   let balancesHub = await getContractAt(
     "BalancesHub",
@@ -191,7 +208,7 @@ let _createLaunchpad = async ({
   let id = parseInt(await apiGet.tokensLengthOf(_addrLH)) + 1;
 
   let { launchpadURI, tokenURI } = await createURILaunchpad({ id, metadatas });
-  const token = await _testInitToken(account, "Django", "DJN", 3000000000);
+  const token = await _testInitToken(account, "Django", "DJN", tokensAllowance);
 
   let _launchpadDatas = {
     id,
@@ -219,6 +236,10 @@ let _createLaunchpad = async ({
     .createLaunchpad(_launchpadDatas, _tierDatas, tokenURI, {
       value: await balancesHub.launchpadPrice(),
     });
+
+  let launchpadAddr = await apiGet.addressOfLaunchpad(id);
+  await token.approve(launchpadAddr, tokensAllowance);
+  await apiPost.lockTokens(id, tokensAllowance);
   if (account.address != (await apiGet.ownerOfToken(id, _addrLH))) {
     throw new Error("Error Launchpad: URI ID");
   }
