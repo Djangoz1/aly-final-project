@@ -78,6 +78,7 @@ async function main() {
   feature = await _createFeature({
     account: this.owner,
     isInviteOnly: false,
+    launchpad: true,
     missionID: _missionID,
     specification: 8,
     finish: true,
@@ -86,7 +87,14 @@ async function main() {
     addressSystem: addressSystem.target,
   });
   _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
+  console.log(
+    "mission#",
+    _missionID,
+    "launchpad#",
+    feature.launchpadID,
+    "feature#",
+    feature?.id
+  );
   feature = await _createFeature({
     account: this.owner,
     isInviteOnly: false,

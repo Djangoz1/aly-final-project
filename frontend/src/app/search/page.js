@@ -25,6 +25,7 @@ import {
   icfyROCKET,
   icfySEARCH,
   icfyUNLOCK,
+  icsystem,
 } from "icones";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
@@ -66,16 +67,25 @@ import { LayoutTools } from "sections/Layout/LayoutTools";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyLoader } from "components/myComponents/layout/MyLoader";
+import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 export default function PageLaunchpad({ params }) {
   let { address } = useAccount();
   let state = useMissionState();
 
   return (
-    <MyLayoutApp>
-      <Viewport id={"All"} full={true} index={0} styles={"items-start"}>
-        <Page />
-      </Viewport>
-    </MyLayoutApp>
+    <MyLayoutDashboard
+      color={2}
+      id={0}
+      menus={[
+        { title: "Jobs", icon: icsystem.feature },
+        { title: "Freelancers", icon: icsystem.profile },
+        { title: "Launchpad", ic: icsystem.escrow },
+        { title: "Disputes", icon: icsystem.escrow },
+      ]}
+      template={1}
+    >
+      <Page />
+    </MyLayoutDashboard>
   );
 }
 
@@ -136,34 +146,40 @@ let Page = () => {
     setIsDomain(0);
   };
   return (
-    <div
-      id={1}
-      className="flex overflow-scroll hide-scrollbar flex-col h-full   w-full"
-    >
-      <MyCard
-        styles={"w-full mb-10"}
-        color={1}
-        head={{
-          title: "Search",
-          component: (
+    <div id={1} className="flex relative flex-col h-full   w-full">
+      <div className="w-full flex rounded-lg items-center justify-between  bg-gradient-to-l from-neutral-200 to-neutral-300 mb-3">
+        {/* <MyMenusTabs
+          target={"value"}
+          value={isPointer}
+          color={0}
+          setter={setIsPointer}
+          arr={[
+            { value: "Jobs", icon: icsystem.feature },
+            { value: "Freelancers", icon: icsystem.profile },
+            { value: "Launchpad", ic: icsystem.escrow },
+            { value: "Disputes", icon: icsystem.escrow },
+          ]}
+        /> */}
+        <div className="flex absolute -translate-y-full -top-5 right-0 items-center">
+          <LayoutForm
+            stateInit={{
+              placeholders: { search: "Search ..." },
+              allowed: true,
+              form: { target: "search", search: null },
+            }}
+          >
+            <MyInput label={false} target={"search"} icon={icfySEARCH} />
             <button
               onClick={() => setIsExtend(!isExtend)}
-              className="absolute top-0 right-0 btn btn-outline btn-xs"
+              className=" btn btn-outline relative  "
             >
-              Filter
+              <Icon icon={icfy.ux.filter} className="text-3xl c3  " />
             </button>
-          ),
-          icon: icfySEARCH,
-        }}
-      >
-        <MyMenusTabs
-          value={isPointer}
-          setter={setIsPointer}
-          arr={["Jobs", "Freelancers", "Launchpad", "Disputes"]}
-        />
+          </LayoutForm>
+        </div>
         {isExtend ? (
           <>
-            <div className="flex  flex-col w-full overflow-scroll hide-scrollbar">
+            <div className="flex  absolute flex-col w-full overflow-scroll hide-scrollbar">
               <p className="text-xs mb-1">Language techno</p>
 
               <MyMenusTabs
@@ -274,13 +290,7 @@ let Page = () => {
         ) : (
           []
         )}
-        <button
-          onClick={() => setIsExtend(!isExtend)}
-          className="absolute top-0 right-0 btn btn-ghost btn-sm "
-        >
-          <Icon icon={icfy.ux.filter} className="text-3xl" />
-        </button>
-      </MyCard>
+      </div>
       {lists?.[isPointer]}
       {/* <ListLaunchpads /> */}
       {/* <ListJobs /> */}

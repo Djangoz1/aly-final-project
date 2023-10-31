@@ -19,7 +19,7 @@ import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { doAuthCV, useAuthDispatch } from "context/auth";
 import { createURICv } from "utils/ui-tools/pinata-tools";
 import { Icon } from "@iconify/react";
-import { icfyCV } from "icones";
+import { icfy, icfyCV } from "icones";
 import { styles } from "styles/style";
 import { MyForm, MyFormCreate } from "components/myComponents/form/MyForm";
 import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
@@ -27,6 +27,8 @@ import {
   FormCreateProfile1,
   FormCreateProfile2,
 } from "sections/Profile/form/create/FormCreateProfile1";
+import { MyCardList } from "components/myComponents/card/MyCardList";
+import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
@@ -40,23 +42,26 @@ const PageCreateProfile = () => {
   };
 
   return (
-    <MyLayoutApp>
+    <MyLayoutApp
+      initState={{ allowed: true }}
+      target={"profile"}
+      url={"/create/profile"}
+    >
       <MyFormCreate
         title={"Create profile"}
         stateInit={{
+          allowed: true,
           form: moock_create_profile,
           placeholders: moock_create_profile_placeholder,
           checked: moock_create_profile_checked,
         }}
         submit={submitForm}
-        side={<MySteps arr={MENUS.profile.create} />}
+        sideImg={"/profile.gif"}
         arr={_form_create_profile}
         styles={{ btn: styles.gbtn + " uppercase gb2 border-none" }}
         components={[
-          {
-            component: <></>,
-            label: "Information",
-          },
+          {},
+
           {
             component: <FormCreateProfile1 />,
             label: "Profile",

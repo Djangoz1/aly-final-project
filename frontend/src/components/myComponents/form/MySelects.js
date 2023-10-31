@@ -37,7 +37,7 @@ export const MySelects = ({ selects, styles }) => {
                 {el?.label && checked?.[pointer]?.includes(el?.target) && " *"}
               </label>
               <select
-                className="select bg-transparent shadow1  py-2 h-fit font-light select-xs  w-full max-w-xs"
+                className="select bg-zinc-900   py-2 h-fit font-light select-xs  w-full max-w-xs"
                 onChange={(e) => setter(el?.target, e.target.value, el)}
                 value={
                   form?.[el?.target] !== null

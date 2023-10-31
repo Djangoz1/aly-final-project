@@ -3,246 +3,299 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
-import { useToolsState } from "context/tools";
+import {
+  doStateLaunchpadTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
 
-import { stateLaunchpad } from "utils/ui-tools/state-tools";
+import { icfy, icfyETHER, icfyTIME } from "icones";
 
-import { Icon } from "@iconify/react";
-import { icfy, icfyETHER } from "icones";
-
-import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
-import { Viewport } from "components/myComponents/layout/MyViewport";
-
-import { _apiGet } from "utils/ui-tools/web3-tools";
+import { _apiGet, _apiPost, _apiPostAt } from "utils/ui-tools/web3-tools";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 
-import { LaunchpadProfile } from "sections/Launchpad/state/LaunchpadProfile";
-import { AssetProfile1 } from "components/assets/AssetProfile";
+import {
+  AssetProfile1,
+  AssetProfileCard,
+} from "components/assets/AssetProfile";
 import { ethers } from "ethers";
 import { fromTimestamp } from "utils/ux-tools";
 import { STATUS } from "constants/status";
 import Link from "next/link";
+import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
+import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyStatus } from "components/myComponents/item/MyStatus";
+import { MyForm } from "components/myComponents/form/MyForm";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { LayoutForm } from "sections/Form/LayoutForm";
+import { doStateFormPointer, useFormState } from "context/form";
+import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
+import { v4 } from "uuid";
+import { MyBtnPost } from "components/btn/MyBtnPost";
+import { useInView } from "framer-motion";
+import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
+import { AssetLaunchpad } from "components/assets/AssetLaunchpad";
+import { StateLaunchpadInfos } from "sections/Launchpad/state/StateLaunchpadInfos";
+import { StateLaunchpadForm } from "sections/Launchpad/state/StateLaunchpadForm";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 
 function App({ params }) {
   const { cv } = useAuthState();
+  let { isConnected } = useAccount();
+  let dispatch = useToolsDispatch();
+  const { state, status, pointer } = useToolsState();
+  let ref = useRef();
+  let ref1 = useRef();
 
-  const tools = useToolsState();
-  const { state, status } = useToolsState();
-
-  let [isState, setIsState] = useState(null);
-
+  let isInView1 = useInView(ref1);
   const launchpadID = params.launchpadID;
-
-  let fetch = async () => {
-    let launchpad = await stateLaunchpad(launchpadID);
-
-    let _state = {
-      launchpad: {
-        datas: launchpad.datas,
-        launchpadID: launchpad.launchpadID,
-        metadatas: launchpad.metadatas,
-      },
-      owner: launchpad.owner,
-    };
-
-    setIsState(_state);
-  };
+  let router = useRouter();
   useEffect(() => {
-    if (!isState || status === "reload") {
-      fetch();
-      console.log("Anormal !!!! fetch is datas page", isState);
+    if (state?.launchpad?.launchpadID != launchpadID || status === "reload") {
+      doStateLaunchpadTools(dispatch, launchpadID);
+      console.log("Anormal !!!! fetch is datas page");
     }
   }, [launchpadID, status]);
+
   console.log("state launchpad page", state);
+
   return (
-    <MyLayoutApp
-      particles={true}
-      id={launchpadID}
-      url={`/launchpad/${launchpadID}`}
-      ownerProfile={
-        <AssetProfile1
-          target={"owner"}
-          metadatas={state?.owner}
-          cvID={state?.owner?.cvID}
-        />
-      }
-      side={
-        <div className="flex flex-col  ml-auto w-full  justify-end">
-          <h6 className="text-white text-right mb-3">
-            {state?.launchpad?.datas?.tokenName}
-          </h6>
-          <div className="flex  ml-auto  mb-5 w-2/3  flex-col">
-            <div className="flex text-xs justify-end items-end">
-              <Icon icon={icfy.bank.bag} className="text-2xl mr-3" />
-              <span>{state?.launchpad?.datas?.allowance}</span>
-            </div>
-            <div className="flex text-xs justify-end items-end">
-              <Icon icon={icfy.person.team} className="text-2xl mr-3" />
+    <MyLayoutDashboard
+      price={state?.launchpad?.datas?.amountRaised || 0}
+      owner={state?.owner}
+      btn={{
+        title: "Mint token",
 
-              <span>{parseInt(state?.launchpad?.datas?.totalUser)}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end mb-1">
-            <Icon icon={icfyETHER} className="text-white c2 text-[74px]" />
-            <div className="flex flex-col items-end">
-              <span className="text-xs text-white/40">Récoltés</span>
-              <p className="text-sm">
-                <span>{state?.launchpad?.datas?.amountRaised}</span>
-                <span className="text-white c2 text-sm ml-3">ETH</span>
-              </p>
-              <span className="text-xs text-white/40">Token price</span>
-              <p className="text-sm">
-                <span>{state?.launchpad?.datas?.tokenPrice}</span>
-                <span className="text-white c2 text-sm ml-3">ETH</span>
-              </p>
-            </div>
-          </div>
-
-          <div
-            className={`flex items-center  p-3 mt-3 ml-auto badge badge-outline badge-xs text-xs badge-${
-              STATUS.launchpad?.[state?.launchpad?.datas?.status]?.color
-            }`}
-          >
-            <Icon
-              icon={STATUS.launchpad[state?.launchpad?.datas?.status]?.icon}
-              className="text-lg mr-4"
-            />
-            {STATUS.launchpad[state?.launchpad?.datas?.status]?.status}
-          </div>
-          <Link
-            href={"/edit/launchpad/" + launchpadID}
-            className="btn btn-xs btn-outline"
-          >
-            Invest on token
-          </Link>
-        </div>
-      }
-      subMenus={[
-        { title: "", tag: "1" },
-        { title: "descriptions", tag: "description" },
-        { title: "Rules", tag: "rules" },
-        { title: "Overview", tag: "overview" },
-      ]}
-      target={""}
-      initState={isState}
-    >
-      <Viewport
-        img={state?.launchpad?.metadatas?.attributes?.[0]?.banniere}
-        id={"1"}
-        index={0}
-      >
-        <div className="mt-auto">
-          <LaunchpadProfile />
-        </div>
-      </Viewport>
-
-      <Viewport id={"cv"} index={1}>
-        <div
-          className="backdrop-blur  mr-4 w-full  h-[75vh] p-5 text-xs rounded-lg shadow overflow-scroll hide-scrollbar  text-justify whitespace-break-spaces"
-          noBtn={true}
-        >
-          {state?.launchpad?.metadatas?.description}
-        </div>
-      </Viewport>
-      <Viewport id={"missions"} index={2}>
-        <div className="backdrop-blur w-full flex flex-col">
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Total participants</p>
-            <span>{parseInt(state?.launchpad?.datas?.totalUser)}</span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Launchpad contract</p>
-            <span>{state?.launchpad?.metadatas?.title}</span>
-            <span className="text-[10px]">
-              {state?.launchpad?.datas?.address}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Balance Token owner</p>
-            <span>{state?.launchpad?.datas?.balanceOwner}</span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Allowance Contract</p>
-            <span>{state?.launchpad?.datas?.allowance} Tokens</span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Balance Contract</p>
-            <span>{state?.launchpad?.datas?.amountRaised} ETH</span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Round actuel</p>
-            <span>
-              {state?.launchpad?.datas?.currentTier + 1}/
+        info: (
+          <>
+            Nombres de rounds:
+            <span className="c1 text-lg font-semibold ml-2">
               {state?.launchpad?.datas?.numberOfTier}
             </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Token contract</p>
-            <span>
-              {state?.launchpad?.datas?.tokenName}{" "}
-              {state?.launchpad?.datas?.tokenSymbol}
-            </span>
-            <span className="text-[10px]">
-              {state?.launchpad?.datas?.tokenAddress}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">
-              Capitalization <span className="text-[10px]">min / max</span>
-            </p>
-            <span>
-              {state?.launchpad?.datas &&
-                ethers?.utils?.formatEther(state?.launchpad?.datas?.minCap)}
-              /
-              {state?.launchpad?.datas &&
-                ethers?.utils?.formatEther(
-                  state?.launchpad?.datas?.maxCap
-                )}{" "}
-              ETH
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">
-              Invest allowance <span className="text-[10px]">min / max</span>
-            </p>
-            <span>
-              {state?.launchpad?.datas &&
-                ethers?.utils.formatEther(state?.launchpad?.datas?.minInvest)}
-              /
-              {state?.launchpad?.datas &&
-                ethers?.utils.formatEther(
-                  state?.launchpad?.datas?.maxInvest
-                )}{" "}
-              ETH
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Started</p>
-            <span>
-              {fromTimestamp(parseInt(state?.launchpad?.datas?.saleStart))}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Ended</p>
-            <span>
-              {fromTimestamp(parseInt(state?.launchpad?.datas?.saleEnd))}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-white/40">Locked time</p>
-            <span>{parseInt(state?.launchpad?.datas?.lockedTime)}</span>
+          </>
+        ),
+      }}
+      statusObj={{
+        to:
+          state?.launchpad?.datas?.status == 0 ||
+          (state?.launchpad?.datas?.status == 1 &&
+            state?.launchpad?.datas?.saleStart > Math.floor(Date.now() / 1000))
+            ? 1
+            : 3,
+        current: state?.launchpad?.datas?.status,
+      }}
+      allowed={
+        cv == state?.owner?.cvID &&
+        state?.launchpad?.datas?.currentTier ==
+          state?.launchpad?.datas?.tiersDatas?.length - 1 &&
+        (state?.launchpad?.datas?.tiersDatas?.[
+          state?.launchpad?.datas?.currentTier
+        ]?.amountRaised >=
+          state?.launchpad?.datas?.tiersDatas?.[
+            state?.launchpad?.datas?.currentTier
+          ]?.minTierCap ||
+          state?.launchpad?.datas?.saleEnd >= Math.floor(Date.now() / 1000)) &&
+        (state?.launchpad?.datas?.status == 0 ||
+          (state?.launchpad?.datas?.status == 1 &&
+            state?.launchpad?.datas?.saleStart >
+              Math.floor(Date.now() / 1000)) ||
+          state?.launchpad?.datas?.currentTier ==
+            state?.launchpad?.datas?.tiersDatas?.length - 1)
+      }
+      lists={[
+        {
+          title: "Investors",
+          description: (
+            <>
+              <span className="text-xs uppercase mr-2">Total users</span>
+              {parseInt(state?.launchpad?.datas?.totalUser)}
+            </>
+          ),
+          icon: icfy.person.team,
+        },
+        {
+          title: "Token allowed left",
+          description: (
+            <>
+              <span className="text-xs uppercase mr-2">Round</span>
+              {state?.launchpad?.datas?.currentTier + 1}
+            </>
+          ),
+          icon: icfy.bank.coin,
+        },
+        {
+          title: "Allowance",
+          description: (
+            <>
+              {state?.launchpad?.datas?.allowance}
+              <span className="text-xs ml-2 uppercase">tokens</span>
+            </>
+          ),
+          icon: icfy.bank.coin,
+        },
+        {
+          title: "Fundraising goal",
+          description: (
+            <>
+              {parseInt(
+                ethers.utils.formatEther(
+                  `${state?.launchpad?.datas?.maxCap || 0}`
+                )
+              ).toFixed(5)}
+              <span className="text-xs ml-2">ETH</span>
+            </>
+          ),
+          icon: icfy.bank.coin,
+        },
+        {
+          title: "Token price",
+          description: (
+            <>
+              {ethers?.utils?.formatEther(
+                state?.launchpad?.datas?.tiersDatas?.[
+                  state?.launchpad?.datas?.currentTier
+                ]?.tokenPrice || 0
+              )}
+              <span className="text-xs ml-2">ETH</span>
+            </>
+          ),
+          icon: icfyETHER,
+        },
+        {
+          icon: icfyTIME,
+          title:
+            state?.launchpad?.datas?.status === 1 ? "Sale start" : "Sale end",
+          description: (
+            <MyCountdown
+              style={"mt-2 c2"}
+              size={10}
+              startDate={Math.floor(Date.now() / 1000)}
+              check={
+                Math.floor(Date.now() / 1000) < state?.launchpad?.datas?.endDate
+              }
+              timestamp={parseInt(
+                state?.launchpad?.datas?.status === 1
+                  ? state?.launchpad?.datas?.saleEnd
+                  : state?.launchpad?.datas?.saleStart
+              )}
+            />
+          ),
+        },
+        {
+          icon: STATUS.launchpad[state?.launchpad?.datas?.status]?.icon,
+        },
+      ]}
+      menus={[
+        { title: "Rules", url: "#section0", icon: icfy.ux.admin },
+        {
+          title: "Description",
+          url: "#section1",
+          icon: icfy.ux.admin,
+        },
+
+        {
+          title: "Form",
+          url: "#section2",
+          icon: icfy.ux.admin,
+        },
+      ]}
+      id={launchpadID}
+      target={"launchpad"}
+    >
+      {/* <Viewport full={true} id={"missions"} index={0}>
+        <div ref={ref} className="h-full  w-[1000px]">
+          <div className="flex w-full justify-between  mb-10">
+            <MyCard styles={"min-w-[300px] overflow-hidden  "}>
+              <div className="flex items-center justify-between w-full">
+                {(state?.launchpad?.datas?.saleStart >
+                  Math.floor(Date.now() / 1000) &&
+                  state?.launchpad?.datas?.status == 1) ||
+                state?.launchpad?.datas?.saleEnd >
+                  Math.floor(Date.now() / 1000) ? (
+                  <div className="absolute shadow2 px-3 pt-1  pb-1  rounded-bl-xl  -top-0 -right-0 flex flex-col items-end text-xs text-white/40">
+                    {state?.launchpad?.datas?.status == 1 &&
+                    state?.launchpad?.datas?.saleStart <
+                      Math.floor(Date.now() / 1000)
+                      ? "Ended"
+                      : "Started"}
+                    <MyCountdown
+                      style={"mt-1"}
+                      size={10}
+                      startDate={Math.floor(Date.now() / 1000)}
+                      timestamp={parseInt(
+                        state?.launchpad?.datas?.status == 1 &&
+                          state?.launchpad?.datas?.saleStart <
+                            Math.floor(Date.now() / 1000)
+                          ? state?.launchpad?.datas?.saleEnd
+                          : state?.launchpad?.datas?.saleStart
+                      )}
+                    />
+                  </div>
+                ) : undefined}
+              </div>
+            </MyCard>
           </div>
         </div>
-      </Viewport>
-      <Viewport id={"overview"} index={3}>
-        <CVOverview />
-      </Viewport>
-    </MyLayoutApp>
+      </Viewport> */}
+
+      {/* {isConnected && <Viewport id={"admin"} index={2}></Viewport>}
+      <Viewport fixed={true} id={"description"} index={1}>
+        <AssetLaunchpad
+          
+         
+          btn={"Mint token"}
+          state={{ ...state?.launchpad, owner: state?.owner }}
+        > */}
+      {pointer === 0 ? (
+        <StateLaunchpadInfos />
+      ) : pointer === 2 ? (
+        <StateLaunchpadForm />
+      ) : undefined}
+      {/* </AssetLaunchpad>
+      </Viewport> */}
+    </MyLayoutDashboard>
   );
 }
+
+const LockToken = () => {
+  let { address } = useAccount();
+  const { form } = useFormState();
+  const { state } = useToolsState();
+  const router = useRouter();
+  let dispatch = useToolsDispatch();
+  const handleSubmit = async () => {
+    await _apiPostAt({
+      args: [state?.launchpad?.datas?.address, form.tokens * 10 ** 18],
+      targetContract: "erc20",
+      func: "approve",
+      address: state?.launchpad?.datas?.tokenAddress,
+    });
+    await _apiPost("lockTokens", [
+      state?.launchpad?.launchpadID,
+      form.tokens * 10 ** 18,
+    ]);
+    await doStateLaunchpadTools(dispatch, state?.launchpad?.launchpadID);
+  };
+  console.log("fooorm", form);
+  return (
+    <MyCard>
+      <MyInput
+        type={"number"}
+        max={state?.launchpad?.datas?.balanceOwner}
+        target={"tokens"}
+        label={"Number of token"}
+      />
+      <MyMainBtn style={"mt-4"} setter={handleSubmit}>
+        Lock tokens
+      </MyMainBtn>
+    </MyCard>
+  );
+};
 
 export default App;

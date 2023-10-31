@@ -35,7 +35,7 @@ export const FormCreateLaunchpad1 = () => {
       </div>
 
       <MyInputsFile
-        styles={margin}
+        styles={`${margin} mr-5`}
         inputs={[{ target: "image" }, { target: "banniere" }]}
       />
 

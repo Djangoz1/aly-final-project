@@ -128,12 +128,12 @@ const LAUNCHPAD_DATAS_EXEMPLE = {
   id: 0,
   tokenAddress: ZERO_ADDRESS,
   numberOfTier: 3,
-  maxCap: 1000000000,
+  maxCap: ethers.parseEther("25"),
   minCap: 10000000,
   minInvest: 300,
-  maxInvest: ethers.parseEther("3"),
-  saleStart: new Date().getTime() + 3000,
-  saleEnd: new Date().getTime() + 8000,
+  maxInvest: ethers.parseEther("25"),
+  saleStart: new Date().getTime(),
+  saleEnd: new Date().getTime() + 80000000,
   lockedTime: 1,
   totalUser: 0,
   tokenURI: "tokenURI",
@@ -179,7 +179,7 @@ Nous vous invitons à vous plonger dans le monde des tokens ERC-20 sur notre lau
 };
 
 const TIER_DATAS_EXEMPLE = {
-  maxTierCap: ethers.parseEther("10"),
+  maxTierCap: ethers.parseEther("25"),
   minTierCap: ethers.parseEther("8"),
   amountRaised: 0,
   tokenPrice: ethers.parseEther("0.002"),

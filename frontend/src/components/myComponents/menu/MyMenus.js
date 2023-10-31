@@ -25,7 +25,7 @@ import Link from "next/link";
 import { MyProgress } from "../layout/MyProgress";
 import { ENUMS } from "constants/enums";
 import { Icon } from "@iconify/react";
-import { icfy, icfyARROWD } from "icones";
+import { icfy, icfyARROWD, icfyGITHUB, icsystem } from "icones";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { MyMainBtn1 } from "../btn/MyMainBtn";
 
@@ -61,38 +61,161 @@ export const MyMenus = ({ menus, styles, setter }) => {
   );
 };
 
-export const MyMenusTabs = ({ setter, value, children, arr, target }) => {
+export const MyMenusTabs = ({
+  setter,
+  style,
+  value,
+  template,
+  children,
+  arr,
+  styleOrigin,
+  target,
+  color,
+}) => {
+  let { pointer } = useToolsState();
+  let colors = [
+    { color: "c1", hover: "text-black/60", border: "bc1", bg: "bg-sky-700/30" },
+    { color: "c2", border: "bc2", hover: "text-white/60", bg: "bg-success/40" },
+    { color: "c3", hover: "text-black/60", border: "bc1", bg: "bg-sky-700/30" },
+    {
+      color: "c3",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "bg-warning/30",
+    },
+    {
+      color: "c1",
+      border: "bc3",
+      hover: "text-white/60",
+      bg: "gb1 g1",
+      bg1: "bg2",
+    },
+  ];
   return (
-    <div className="tabs flex-nowrap  overflow-x-scroll hide-scrollbar transition-all  mb-3">
-      {children && (
-        <button
-          onClick={() => setter(null)}
-          className={`px-4 py-2 text-xs    mr-3 rounded-lg   ${
-            value === null
-              ? "tab-active shadow2  text-white"
-              : "shadow1 text-white/40 backdrop-blur"
-          }`}
-        >
-          {children}
-        </button>
-      )}
-      {arr?.map(
-        (el, i) =>
-          el && (
-            <button
-              onClick={() => setter(i)}
-              key={v4()}
-              className={` px-4 py-2 text-xs   mr-3 rounded-lg  ${
-                value === i
-                  ? " c2 shadow2 "
-                  : "text-white/60 shadow1 backdrop-blur"
-              }`}
-            >
+    <div
+      className={`c4    border-gray-200/30 ${
+        [" border-b ", "  border-r  "]?.[template || 0]
+      } ${style}`}
+    >
+      <div
+        className={`-mb-px flex  hidden-scrollbar   ${
+          ["overflow-x-scroll ", "overflow-y-scroll flex-col h-full w-fit "]?.[
+            template || 0
+          ]
+        }  ${styleOrigin}`}
+      >
+        {children ? (
+          <Link
+            onClick={() => setter(null)}
+            key={v4()}
+            href={"#section" + pointer}
+            as={"#section" + pointer}
+            className={`inline-flex  ${
+              ["items-center  rounded-tr-lg", "items-end rounded-b-lg"]?.[
+                template || 0
+              ]
+            } gap-2 border-b-4  px-3 py-4 text-sm font-medium   ${
+              value === null
+                ? ` ${colors[color || 0].bg} c ${colors[color || 0]}`
+                : ` border-transparent hover:border-gray-300 hover:${
+                    colors[color || 0].hover
+                  }`
+            }`}
+          >
+            <Icon icon={icfy.ux.plus} className="text-lg" />
+
+            {children}
+          </Link>
+        ) : undefined}
+        {arr?.map((el, i) => (
+          <Link
+            onClick={() => setter(i)}
+            key={v4()}
+            href={el?.url || "#section" + pointer}
+            as={el?.url || "#section" + pointer}
+            className={` relative  min-w-[70px]     rounded-t-lg overflow-hidden  border-b-4  px-3   text-sm    
+            ${
+              [
+                "items-center gap-2 inline-flex justify-center h-full text-center py-4 rounded-tr-lg",
+                `flex items-center justify-between min-h-[100px] py-2 text-left rounded-b-lg shadowh _hover ${
+                  i == value && "shadow1"
+                }`,
+              ]?.[template || 0]
+            }
+            
+            ${
+              value === i
+                ? ` font-bold ${colors[color || 0]?.border} ${
+                    colors[color || 0]?.color
+                  }  `
+                : `c4 border-transparent  font-medium hover:border-gray-300 hover:text-gray-600 hover:bg-black/5`
+            }`}
+          >
+            {
+              <>
+                <span
+                  className={`h-full w-full  top-0 right-0 -z-1 absolute  ${
+                    value === i && colors?.[color]?.bg1
+                      ? colors[color]?.bg1
+                      : "bg-black/50"
+                  }`}
+                />
+                <span
+                  className={`h-full  ${
+                    [
+                      "top-0 rounded-tr-full left-0",
+                      "-top-10 -right-10 mask mask-hexagon ",
+                    ]?.[template || 0]
+                  }   absolute transition-all ${
+                    value === i ? "w-full" : " w-0"
+                  }  ${colors[color || 0]?.bg}`}
+                />
+              </>
+            }
+            {el?.icon ? (
+              <Icon
+                icon={el?.icon}
+                className={
+                  [
+                    "text-lg",
+                    `text-2xl absolute right-2 top-2 ${
+                      i != value && "opacity-0"
+                    }`,
+                  ]?.[template || 0]
+                }
+              />
+            ) : undefined}
+            <span className="flex items-center my-auto relative">
               {target ? el?.[target] : el}
-            </button>
-          )
-      )}
+            </span>
+          </Link>
+        ))}
+      </div>
     </div>
+
+    // <div className="tabs flex-nowrap  overflow-x-scroll hide-scrollbar transition-all  mb-3">
+    //   {children && (
+    //     <button
+    //       onClick={() => setter(null)}
+    //       className={`px-4 py-2 text-xs    mr-3 rounded-lg   ${
+    //         value === null
+    //           ? "tab-active shadow2  text-white"
+    //           : "shadow1 text-white/40 backdrop-blur"
+    //       }`}
+    //     >
+    //       {children}
+    //     </button>
+    //   )}
+    //   {arr?.map(
+    //     (el, i) =>
+    //       el && (
+    //         <button
+
+    //         >
+    //         </button>
+    //       )
+    //   )}
+    // </div>
   );
 };
 
@@ -130,10 +253,10 @@ export const MyMenus1 = ({ arr, target0, target1 }) => {
       {arr?.map(
         (el, index) =>
           el?.title && (
-            <div
+            <Link
               key={v4()}
-              url={`${el?.tag ? "#section" + index : el?.href}`}
-              className={`flex  items-center  transition-all rounded-lg mt-3 uppercase text-xs   py-2 font2 justify-between       w-full px-0 
+              href={`${el?.tag ? "#section" + index : el?.href}`}
+              className={`flex  items-center cursor-pointer transition-all rounded-lg mt-3 uppercase text-xs   py-2 font2 justify-between       w-full px-0 
            ${
              index === pointer
                ? "    c2 shadow2"
@@ -152,7 +275,7 @@ export const MyMenus1 = ({ arr, target0, target1 }) => {
               {index === pointer && (
                 <div className=" g1 gb2 py-[1px] w-12  flex justify-end" />
               )}
-            </div>
+            </Link>
           )
       )}
     </div>

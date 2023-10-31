@@ -43,7 +43,6 @@ export const MENUS = {
     edit: [
       { i: "👤", title: "Information personnelle" },
       { i: "🫂", title: "Social" },
-      { i: "👨‍💻", title: "Work" },
       { i: "🔌", title: "Blockchain" },
     ],
     create: [

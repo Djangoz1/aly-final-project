@@ -109,28 +109,31 @@ export const AgendasMission = () => {
     doStateTools(dispatch, _state);
   };
   useEffect(() => {
-    if (!state?.events && isInView) {
+    if (!state?.events) {
       fetch();
       console.log("fetch events ...");
     }
   }, [state?.events, isInView]);
-
+  console.log("isinfos", isInfos);
   return (
-    <div ref={ref}>
+    <div className="w-full mt-[1px] flex" ref={ref}>
       <MyMenusTabs
+        template={1}
+        style={"backdrop-blur-[1px] bg-neutral-50/10"}
+        color={2}
+        styleOrigin={"  c2  "}
         setter={setIsClicked}
         arr={state?.features?.map((el) => el?.metadatas?.title)}
         value={isClicked}
       >
         All
       </MyMenusTabs>
-      <div className="flex ">
-        <MyCardInfos
-          style={"rounded-tl-none w-1/4 mr-3"}
-          arr={isInfos}
-        ></MyCardInfos>
+      <div className="flex w-full justify-between ">
+        <MyCardInfos style={"rounded-tl-none w-full mr-3"} arr={isInfos}>
+          coucou
+        </MyCardInfos>
 
-        <MyCard styles={"rounded-tl-none w-fit"} color={1}>
+        <div className={"ml-auto backdrop-blur-[2px] w-full"} color={1}>
           <MyCalendar
             events={
               isClicked !== null
@@ -138,7 +141,7 @@ export const AgendasMission = () => {
                 : state?.events
             }
           />
-        </MyCard>
+        </div>
       </div>
     </div>
   );

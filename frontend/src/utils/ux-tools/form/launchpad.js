@@ -25,28 +25,28 @@ export let _form_create_launchpad_intro = {
   title: `${MENU_LAUNCHPAD.create[0].i} ${MENU_LAUNCHPAD.create[0].title}`,
   description: (
     <>
-      <h6 className=" font-semibold">🚀 Créez Votre Propre Launchpad !</h6>
+      <h6 className=" c1">🚀 Créez Votre Propre Launchpad !</h6>
       <br />
       Bienvenue dans notre univers de la crypto ! 🌌 Sur notre plateforme, tout
       le monde a le pouvoir de devenir un pionnier en créant son propre
       launchpad. Voici comment ça marche en trois étapes simples :
       <br />
       <br />
-      <h6 className=" font-semibold">🌟 La Création du Launchpad</h6>
+      <h6 className=" c1">🌟 La Création du Launchpad</h6>
       <br />
       Inscrivez-vous sur notre site en toute simplicité. Concevez votre
       launchpad personnalisé en définissant les règles et les objectifs.
       Donnez-lui un nom accrocheur et choisissez des cryptomonnaies compatibles.
       <br />
       <br />
-      <h6 className=" font-semibold">🚀 Le lancement Épique</h6>
+      <h6 className=" c1">🚀 Le lancement Épique</h6>
       <br /> Annoncez votre launchpad à notre communauté passionnée. Les
       contributeurs investissent dans vos projets en utilisant des cryptos
       exclusives à notre site. Le compte à rebours commence, et la collecte de
       fonds décolle !
       <br />
       <br />
-      <h6 className=" font-semibold">💼 Engagez des Freelances Talentueux</h6>
+      <h6 className=" c1">💼 Engagez des Freelances Talentueux</h6>
       <br /> Une fois la collecte terminée avec succès, les fonds récoltés sont
       automatiquement transférés sur votre compte. Utilisez ces fonds
       exclusivement sur notre plateforme pour engager des freelances talentueux.
@@ -77,7 +77,7 @@ export let _form_create_launchpad_token = {
 
   description: (
     <>
-      <h6 className="text-white font-semibold">
+      <h6 className="c1 font-semibold">
         🚀 Explorez l'Univers des Tokens ERC-20
       </h6>
       <br />
@@ -89,7 +89,7 @@ export let _form_create_launchpad_token = {
       voici ce que vous devez savoir :
       <br />
       <br />
-      <h6 className="text-white font-semibold">Tokens ERC-20 💎</h6>
+      <h6 className="c1 font-semibold">Tokens ERC-20 💎</h6>
       <br />
       Notre launchpad prend en charge exclusivement les tokens ERC-20, qui sont
       parmi les plus répandus et les plus fiables de l'écosystème blockchain.
@@ -97,9 +97,7 @@ export let _form_create_launchpad_token = {
       tokens ERC-20 pour leurs campagnes de financement.
       <br />
       <br />
-      <h6 className="text-white font-semibold">
-        L'Étape Cruciale : L'Allowance 📈
-      </h6>
+      <h6 className="c1 font-semibold">L'Étape Cruciale : L'Allowance 📈</h6>
       <br />
       Avant de commencer à investir dans les projets de notre launchpad, vous
       devez confier une "allowance" au contrat du launchpad. L'allowance est une
@@ -109,7 +107,7 @@ export let _form_create_launchpad_token = {
       sécurité.
       <br />
       <br />
-      <h6 className="text-white font-semibold">Soyez Prêt à Investir 💰</h6>
+      <h6 className="c1 font-semibold">Soyez Prêt à Investir 💰</h6>
       <br />
       Une fois que vous avez configuré l'allowance, vous êtes prêt à configurer
       votre launchpad. Investissez dans les campagnes qui vous intéressent en
@@ -129,7 +127,7 @@ export let _form_create_launchpad_blockchain = {
 
   description: (
     <>
-      <h6 className="text-white font-semibold">
+      <h6 className="c1 font-semibold">
         🚀 Explorez l'Univers des Tokens ERC-20
       </h6>
       <br />
@@ -141,7 +139,7 @@ export let _form_create_launchpad_blockchain = {
       voici ce que vous devez savoir :
       <br />
       <br />
-      <h6 className="text-white font-semibold">Tokens ERC-20 💎</h6>
+      <h6 className="c1 font-semibold">Tokens ERC-20 💎</h6>
       <br />
     </>
   ),
@@ -151,7 +149,7 @@ export let _form_create_launchpad_resume = {
 
   description: (
     <>
-      <h6 className="text-white font-semibold">
+      <h6 className="c1 font-semibold">
         🚀 Explorez l'Univers des Tokens ERC-20
       </h6>
       <br />
@@ -163,7 +161,7 @@ export let _form_create_launchpad_resume = {
       voici ce que vous devez savoir :
       <br />
       <br />
-      <h6 className="text-white font-semibold">Tokens ERC-20 💎</h6>
+      <h6 className="c1 font-semibold">Tokens ERC-20 💎</h6>
       <br />
     </>
   ),
@@ -182,7 +180,7 @@ export let _form_edit_launchpad_lock_token = {
 
   description: (
     <>
-      <h6 className="text-white font-semibold">
+      <h6 className="c1 font-semibold">
         🚀 Explorez l'Univers des Tokens ERC-20
       </h6>
       <br />
@@ -194,7 +192,7 @@ export let _form_edit_launchpad_lock_token = {
       voici ce que vous devez savoir :
       <br />
       <br />
-      <h6 className="text-white font-semibold">Tokens ERC-20 💎</h6>
+      <h6 className="c1 font-semibold">Tokens ERC-20 💎</h6>
       <br />
       Notre launchpad prend en charge exclusivement les tokens ERC-20, qui sont
       parmi les plus répandus et les plus fiables de l'écosystème blockchain.
@@ -202,9 +200,7 @@ export let _form_edit_launchpad_lock_token = {
       tokens ERC-20 pour leurs campagnes de financement.
       <br />
       <br />
-      <h6 className="text-white font-semibold">
-        L'Étape Cruciale : L'Allowance 📈
-      </h6>
+      <h6 className="c1 font-semibold">L'Étape Cruciale : L'Allowance 📈</h6>
       <br />
       Avant de commencer à investir dans les projets de notre launchpad, vous
       devez confier une "allowance" au contrat du launchpad. L'allowance est une
@@ -214,7 +210,7 @@ export let _form_edit_launchpad_lock_token = {
       sécurité.
       <br />
       <br />
-      <h6 className="text-white font-semibold">Soyez Prêt à Investir 💰</h6>
+      <h6 className="c1 font-semibold">Soyez Prêt à Investir 💰</h6>
       <br />
       Une fois que vous avez configuré l'allowance, le protocole aura le
       nécessaire pour mener à bien le contrat. Les chercheurs de projets

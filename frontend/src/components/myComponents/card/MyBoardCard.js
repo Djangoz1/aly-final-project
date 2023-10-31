@@ -80,7 +80,7 @@ export const MyBoardCard = () => {
                     className="btn px-1 btn-ghost"
                   >
                     <Icon
-                      icon={icfy.ux.check}
+                      icon={icfy.ux.check.table}
                       className="text-success text-2xl"
                     />
                   </button>
@@ -104,7 +104,7 @@ export const MyBoardCard = () => {
   return (
     <MyCard
       styles={"w-[30vw] h-[50vh] overflow-y-scrol hide-scrolbar "}
-      head={{ title: "Board", icon: icfy.ux.checkList }}
+      head={{ title: "Board", icon: icfy.ux.check.tableList }}
     >
       <div className="flex w-full rounded-full bg-white/10 mb-5">
         {menus.map((el, i) => (

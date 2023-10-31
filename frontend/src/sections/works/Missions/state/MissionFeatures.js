@@ -31,6 +31,7 @@ import { FeatureInformations } from "sections/works/Features/state/FeatureInform
 import { FeatureDispute } from "sections/works/Features/state/FeatureDispute";
 import { FeatureNotifications } from "sections/works/Features/state/FeatureNotifications";
 import { stateFeature, stateMission } from "utils/ui-tools/state-tools";
+import { MissionMenusDropdown } from "./MissionMenusDropdown";
 
 export const MissionFeatures = ({ featureID, index }) => {
   let ref = useRef(null);
@@ -66,18 +67,28 @@ export const MissionFeatures = ({ featureID, index }) => {
     <FeatureInformations feature={isState?.feature} />,
 
     <FeatureNotifications feature={isState?.feature} />,
-    <div className=""></div>,
+    <AssetJob
+      style={" w-full rounded-t-none "}
+      noBtn={true}
+      feature={isState?.feature}
+      featureID={isState?.feature}
+    />,
+
     isState?.feature?.datas?.dispute && (
       <FeatureDispute disputeID={isState?.feature?.datas?.dispute} />
     ),
   ];
   return (
     <>
-      <div ref={ref} className="flex h-full  flex-col">
+      <div ref={ref} className="flex h-full w-full  ">
         <MyMenusTabs
+          template={1}
+          color={4}
+          styleOrigin={"bg-white/5 h-full  backdrop-blur-[1px] p-0"}
           arr={[
             "Informations",
             "Notifications",
+            "Description",
             "Gallery",
             state?.features?.[index]?.datas?.dispute && "Disputes",
           ]}
@@ -85,6 +96,9 @@ export const MissionFeatures = ({ featureID, index }) => {
           setter={handleChangeMenu}
         />
         <div className=" w-full h-full relative flex">{components[isTabs]}</div>
+        <div className="w-fit overflow-y-scroll backdrop-blur-[1px]">
+          <MissionMenusDropdown />
+        </div>
       </div>
     </>
   );

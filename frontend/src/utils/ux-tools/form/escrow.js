@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { MyToggle } from "components/myComponents/form/MyToggle";
 import { MENUS as menus } from "constants/menus";
 
 import { _apiPostAt } from "utils/ui-tools/web3-tools";
@@ -18,39 +19,43 @@ export let _form_create_escrow_intro = {
       fluide et agréable que possible pour vous.
       <br />
       <br />
-      <span className="text-white">
+      <span className="c1">
         🔍 Conseils pour la rédaction de votre mission :
       </span>
+      <br />
       Je vais vous poser quelques questions clés pour comprendre vos besoins, et
       en fonction de vos réponses, je vous aiderai à rédiger une description de
       mission claire et concise.
       <br />
       <br />
-      <span className="text-white">
-        📅 Planification et gestion des délais :
-      </span>
+      <span className="c1">📅 Planification et gestion des délais :</span>
+      <br />
       Une fois votre mission créée, je vous aiderai à définir des délais
       réalistes et à établir un calendrier pour suivre le progrès de votre
       projet.
       <br />
       <br />
-      <span className="text-white">👥 Recherche de freelances :</span>
+      <span className="c1">👥 Recherche de freelances :</span>
+      <br />
       Je vous orienterai vers les plateformes de freelance populaires où vous
       pourrez trouver des talents correspondant à vos besoins spécifiques.
       <br />
       <br />
-      <span className="text-white">📧 Communication avec les freelances :</span>
+      <span className="c1">📧 Communication avec les freelances :</span>
+      <br />
       Je vous donnerai des conseils sur la communication efficace avec les
       freelances, y compris les questions à poser lors de l'entretien et les
       étapes à suivre pour conclure un contrat.
       <br />
       <br />
-      <span className="text-white">🔒 Sécurité et confidentialité :</span>
+      <span className="c1">🔒 Sécurité et confidentialité :</span>
+      <br />
       Vos informations sont en sécurité avec moi. Je prends la confidentialité
       au sérieux et ne partagerai aucune donnée personnelle.
       <br />
       <br />
-      <span className="text-white">💬 Support continu :</span>
+      <span className="c1">💬 Support continu :</span>
+      <br />
       Je suis disponible 24/7 pour répondre à vos questions et vous aider à
       résoudre tout problème qui pourrait survenir lors de votre recherche de
       freelance. N'hésitez pas à me poser des questions ou à demander de l'aide
@@ -58,18 +63,14 @@ export let _form_create_escrow_intro = {
       idéal.
       <br />
       <br />
-      <span className="text-white">
+      <span className="c1">
         Je te laise commencer et je reviendrais vers toi avant que tu ne
         confirme 😄
+        <br />
       </span>
-      <div className="text-error -mt-3 flex items-center ml-auto">
-        <input
-          type="checkbox"
-          className="toggle toggle-sm toggle-success mr-2"
-          checked
-        />
-        Désactiver
-      </div>
+      <MyToggle style={"text-error mt-5"} target={"ia"}>
+        <span className="text-error">Désactiver</span>
+      </MyToggle>
     </>
   ),
 };
@@ -83,8 +84,11 @@ export let _form_create_escrow_info = {
       <br />
       <br />
       Les informations fournis seront confiés aux arbitres afin qu'il statut sur
-      votre cas. Notez-ici toutes les informations qui vous semblent nécessaire.
-      <br /> Toutes les consignes de cette tâches seront également recueillis.
+      votre cas.
+      <br />
+      Notez-ici toutes les informations qui vous semblent nécessaire.
+      <br />
+      Toutes les consignes de cette tâches seront également recueillis.
       <br />
       Veuillez choisir le nombre d'arbitres que vous désirez, ainsi que le
       délais pour faire appel

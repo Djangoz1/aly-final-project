@@ -61,7 +61,7 @@ export const Header = ({ setter, isOpen }) => {
   const handleMouseLeave = () => {
     setIsHovered(false);
 
-    // startHideTimer();
+    startHideTimer();
   };
 
   // Appeler startHideTimer lorsque le composant est monté

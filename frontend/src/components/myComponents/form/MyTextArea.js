@@ -1,3 +1,5 @@
+import { Icon } from "@iconify/react";
+import { MyBtnLoading, MyBtnPost } from "components/btn/MyBtnPost";
 import {
   doInitStateForm,
   doStateFormChecked,
@@ -5,9 +7,10 @@ import {
   useFormDispatch,
   useFormState,
 } from "context/form";
+import { icfySEND } from "icones";
 import React, { useEffect, useState } from "react";
 
-export const MyTextArea = ({ label, target, styles }) => {
+export const MyTextArea = ({ label, target, setter, styles }) => {
   let { form, placeholders, pointer, modal, checked } = useFormState();
   let [value, setValue] = useState(null);
   let dispatch = useFormDispatch();
@@ -23,7 +26,7 @@ export const MyTextArea = ({ label, target, styles }) => {
     if (target && !value) setValue(form?.[target]);
   }, [target, modal]);
 
-  let setter = (_value) => {
+  let handleChange = (_value) => {
     setValue(_value);
     let _form = form;
 
@@ -38,22 +41,28 @@ export const MyTextArea = ({ label, target, styles }) => {
   };
 
   return (
-    <div
-      className={`flex flex-col text-left ${form?.[target] && "text-white"}`}
-    >
+    <div className={`flex w-full flex-col  ${form?.[target] && "text-white"}`}>
       <label className="text-light font-light text-xs mb-1 uppercase ">
         {label || target} {checked?.[pointer]?.includes(target) && " *"}
       </label>
-      <textarea
-        onChange={(e) => setter(e.target.value)}
-        value={value || undefined}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        className={`textarea font2 bg-transparent   font-light ${
-          !isFocus ? "shadow1" : "shadow2"
-        }  ${styles || "max-h-[30vh]"}`}
-        placeholder={placeholders?.[target]}
-      ></textarea>
+      <div className="w-full h-full relative">
+        <textarea
+          onChange={(e) => handleChange(e.target.value)}
+          value={value || undefined}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          className={`textarea font2 bg-zinc-900   font-light ${
+            !isFocus ? "" : "shadow1"
+          }  ${styles || "min-h-[10vh] max-h-[30vh]"}`}
+          placeholder={placeholders?.[target]}
+        ></textarea>
+        <MyBtnLoading
+          setter={() => setter(form?.[target], target)}
+          style={"absolute top-0 right-0 btn btn-ghost  text-2xl c2"}
+        >
+          <Icon icon={icfySEND} />
+        </MyBtnLoading>
+      </div>
     </div>
   );
 };

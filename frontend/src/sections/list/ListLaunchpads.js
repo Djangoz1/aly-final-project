@@ -37,7 +37,7 @@ export const ListLaunchpads = () => {
     for (let index = 1; index <= length; index++) {
       const element = await stateLaunchpad(index);
 
-      arr.push(element);
+      arr.push({ element, id: index });
     }
     setIsList(arr);
   };
@@ -50,11 +50,11 @@ export const ListLaunchpads = () => {
 
   return (
     <div className="flex flex-wrap">
-      {isList?.map((el) => (
+      {isList?.map((el, index) => (
         <AssetLaunchpad
-          id={1}
-          state={el}
-          style={"w-[31%] mx-2 mb-3 h-fit "}
+          id={el?.id}
+          state={el.element}
+          style={"w-full  mb-3 h-fit "}
           key={v4()}
           color={2}
         />

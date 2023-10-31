@@ -55,11 +55,14 @@ import { CVName } from "components/inputs/inputsCV/CVName";
 import { BtnFollow } from "components/btn/BtnsSocial/BtnFollow";
 import { MissionMenusDropdown } from "sections/works/Missions/state/MissionMenusDropdown";
 import { MyLoader } from "components/myComponents/layout/MyLoader";
+import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
+import { MySub } from "components/myComponents/text/MySub";
 
 function App({ params }) {
   const { cv } = useAuthState();
 
   const tools = useToolsState();
+  const { state, pointer } = useToolsState();
 
   let [isState, setIsState] = useState(null);
   let [loading, setLoading] = useState(null);
@@ -87,86 +90,86 @@ function App({ params }) {
     await _apiPost("askToJoin", [parseInt(featureID)]);
     await doStateMissionTools(dispatch, parseInt(featureID));
   };
+  console.log(state);
   return (
-    <MyLayoutApp
-      notLoad={true}
-      particles={true}
+    <MyLayoutDashboard
       id={missionID}
+      template={1}
+      isLoading={loading}
+      header={state?.mission?.metadatas?.title}
+      statusObj={{ current: state?.mission?.datas?.status }}
+      price={state?.mission?.datas?.amount || 0}
+      owner={{ ...state?.owner?.metadatas, cvID: state?.owner?.cvID }}
       url={`/works/mission/${missionID}`}
-      ownerProfile={
-        loading ? null : <AssetProfileCard />
-        // <AssetProfile1
-        //   style={"w-full"}
-        //   noBtn={true}
-        //   cvID={isState?.mission?.datas?.owner}
-        //   target={"owner"}
-        // />
-      }
-      subMenus={
+      btn={{
+        title: "Ask to join",
+        info: <>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</>,
+      }}
+      // ownerProfile={
+      //   loading ? null : <AssetProfileCard />
+      //   // <AssetProfile1
+      //   //   style={"w-full"}
+      //   //   noBtn={true}
+      //   //   cvID={isState?.mission?.datas?.owner}
+      //   //   target={"owner"}
+      //   // />
+      // }
+      lists={[
+        {
+          icon: icfyCODE,
+          title: "Nombre de tâches",
+          description: (
+            <>
+              {tools?.state?.mission?.datas?.workers}
+              {tools?.state?.mission?.datas?.workers > 0 && (
+                <> / {tools?.state?.mission?.datas?.features?.length}</>
+              )}
+            </>
+          ),
+        },
+        {
+          icon: icfyETHER,
+          title: "Total wadge",
+          description: (
+            <div className="flex items-center">
+              {tools?.state?.mission?.datas?.amount}
+              <MySub style={"ml-2"}>ETH</MySub>
+            </div>
+          ),
+        },
+      ]}
+      menus={
         loading
           ? []
           : [
-              { title: "Profile", tag: "profile" },
-              { title: "Agendas", tag: "agendas" },
-              { title: "Features", tag: "features" },
-              { title: "Pubs", tag: "pubs" },
+              { title: "Profile", url: "#section0" },
+              { title: "Agendas", url: "#section1" },
+              { title: "Features", url: "#section2" },
+              { title: "Pubs", url: "#section3" },
             ]
       }
       target={"mission"}
     >
-      {loading ? (
-        <Viewport full={true}>
-          <div className="w-full h-full items-center justify-center flex">
-            <MyLoader />
-          </div>
-        </Viewport>
-      ) : (
-        <>
-          <Viewport
+      <div className=" w-full relative">
+        {/* <Viewport
             img={tools?.state?.mission?.metadatas?.attributes?.[0]?.banniere}
             id={"home"}
             full={true}
             index={null}
-          >
-            <MyCard styles={"w-fit px-4 py-3  mt-auto "}>
-              <h6 className="text-3xl mb-4">
-                {tools?.state?.mission?.metadatas?.title}
-              </h6>
-              <div className="flex items-end mt-7 mb-2 text-3xl">
-                <Icon icon={icfyETHER} className="text-6xl w-fit p-0 c2" />
-                {tools?.state?.mission?.datas?.amount}
-                <span className="c2 text-lg ml-3"> ETH</span>
-              </div>
-              <div className="flex items-center  ">
-                <MyStatus
-                  status={tools?.state?.mission?.datas?.status}
-                  target={"mission"}
-                />
-                <div className=" mx-3 flex text-lg items-center">
-                  <Icon
-                    icon={icfyCODE}
-                    className="text-3xl text-secondary mr-2"
-                  />
-                  {tools?.state?.mission?.datas?.workers}
-                  {tools?.state?.mission?.datas?.workers > 0 && (
-                    <> / {tools?.state?.mission?.datas?.features?.length}</>
-                  )}
-                </div>
-              </div>
-            </MyCard>
-          </Viewport>
-          <Viewport id={"profile"} index={0}>
-            <MissionProfile />
-          </Viewport>
-          <Viewport id={"agendas"} index={1}>
-            <AgendasMission />
-          </Viewport>
-          <Viewport side={<MissionMenusDropdown />} id={"features"} index={2}>
-            <MissionFeatures index={tools?.state?.front?.props} />
-          </Viewport>
-          <Viewport id={"pubs"} index={3}>
-            <MissionPubs />
-          </Viewport>
+          > */}
+
+        {/* */}
+        {
+          [
+            <MissionProfile />,
+            <AgendasMission />,
+            <MissionFeatures index={tools?.state?.front?.props} />,
+            <MissionPubs />,
+          ]?.[pointer]
+        }
+        {/* 
+          
+         
 
           <div className="fixed z-100 bottom-20   flex flex-col items-end h-fit right-10">
             <CreatePub
@@ -247,10 +250,9 @@ function App({ params }) {
                   </Link>
                 )}
             </div>
-          </div>
-        </>
-      )}
-    </MyLayoutApp>
+          </div> */}
+      </div>
+    </MyLayoutDashboard>
   );
 }
 

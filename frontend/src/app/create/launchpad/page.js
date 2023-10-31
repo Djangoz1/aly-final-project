@@ -43,6 +43,7 @@ import {
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useAuthDispatch();
+  let [isPrice, setIsPrice] = useState(null);
   let submitForm = async (form) => {
     if (isConnected) {
       let { launchpadURI, tokenURI } = await createURILaunchpad(form);
@@ -51,10 +52,6 @@ const PageCreateProfile = () => {
       let saleStart = dateStart.getTime();
       let dateEnd = new Date(form.saleEnd);
       let saleEnd = dateEnd.getTime();
-      let price = await _apiGetAt({
-        func: "launchpadPrice",
-        targetContract: "balancesHub",
-      });
 
       let minInvest = ethers.utils.parseEther(form.minInvest);
       let maxInvest = ethers.utils.parseEther(form.maxInvest);
@@ -94,7 +91,7 @@ const PageCreateProfile = () => {
       await _apiPost(
         "createLaunchpad",
         [launchpadData, tiersDatas, tokenURI],
-        `${price}`
+        `${ethers?.utils?.parseEther(form?.price)}`
       );
 
       let launchpadID = await _apiGet("tokensLengthOf", [
@@ -124,22 +121,40 @@ const PageCreateProfile = () => {
   };
   let { cv, metadatas } = useAuthState();
 
+  useEffect(() => {
+    if (!isPrice) {
+      (async () => {
+        setIsPrice(
+          ethers.utils.formatEther(
+            await _apiGetAt({
+              func: "launchpadPrice",
+              targetContract: "balancesHub",
+            })
+          )
+        );
+      })();
+    }
+  }, []);
+
   _form_create_launchpad[0].title = `Hello ${metadatas?.username} ! 👋`;
 
   return (
-    <MyLayoutApp>
+    <MyLayoutApp
+      url={"/create/launchpad"}
+      target={"launchpad"}
+      initState={{ allowed: true }}
+    >
       <MyFormCreate
         title={"Create Launchpad"}
         stateInit={{
-          form: moock_create_launchpad,
+          allowed: isPrice ? true : false,
+          form: { ...moock_create_launchpad, price: isPrice },
           placeholders: moock_create_launchpad_placeholder,
           checked: moock_create_launchpad_checked,
           superChecked: moock_create_launchpad_superchecked,
         }}
         submit={submitForm}
-        side={<MySteps arr={MENU_LAUNCHPAD.create} />}
         arr={_form_create_launchpad}
-        styles={{ btn: styles.gbtn + " gb2" }}
         components={[
           { component: <></>, label: "Introduction" },
 

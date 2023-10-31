@@ -260,6 +260,7 @@ export const stateLaunchpad = async (launchpadID) => {
     datas.currentTier = parseInt(
       await _apiGet("currentTierIDOf", [launchpadID])
     );
+    console.log(datas.currentTier);
 
     datas.tokenName = await _apiGetAt({
       func: "name",
@@ -290,34 +291,38 @@ export const stateLaunchpad = async (launchpadID) => {
       launchpadID,
       ADDRESSES["launchpadHub"],
     ]);
+
     datas.allowance = parseInt(
-      await _apiGetAt({
+      (await _apiGetAt({
         func: "allowance",
         targetContract: "erc20",
         args: [_owner, datas.address],
         address: datas?.tokenAddress,
-      })
+      })) /
+        10n ** 18n
     );
 
     datas.balanceOwner = parseInt(
-      await _apiGetAt({
+      (await _apiGetAt({
         func: "balanceOf",
         targetContract: "erc20",
         args: [_owner],
         address: datas?.tokenAddress,
-      })
+      })) /
+        10n ** 18n
     );
 
     let cvOwner = await _apiGet("cvOf", [_owner]);
     let owner = await fetchCV(cvOwner);
 
-    datas.amountRaised = 0;
+    let amountRaised = 0;
     for (let i = 0; i < datas?.numberOfTier; i++) {
       let tierDatas = await _apiGet("tierOfLaunchpad", [launchpadID, i]);
       datas.tiersDatas.push(tierDatas);
       tokenPrice += parseFloat(tierDatas.tokenPrice);
-      datas.amountRaised += parseInt(tierDatas.amountRaised);
+      amountRaised += parseInt(tierDatas.amountRaised);
     }
+    datas.amountRaised = ethers.utils.formatEther(`${amountRaised}`);
     datas.tokenPrice = ethers.utils.formatEther(
       `${tokenPrice / datas?.numberOfTier}`
     );

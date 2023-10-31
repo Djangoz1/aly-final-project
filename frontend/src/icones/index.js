@@ -6,7 +6,9 @@ export const icfy = {
     open: "ic:outline-remove-red-eye",
   },
   ux: {
+    shop: "icon-park-twotone:shopping",
     medal: "noto:sports-medal",
+    phone: "ph:phone-duotone",
     filter: "ion:filter-outline",
     arrow: "line-md:arrow-up",
     admin: "mdi:administrator-outline",
@@ -18,7 +20,11 @@ export const icfy = {
     garbage: "mdi:garbage-can-empty",
     checkList: "line-md:check-list-3-twotone",
     star: "line-md:star-twotone",
-    check: "line-md:clipboard-check-twotone",
+    check: {
+      casual: "line-md:check-all",
+      table: "line-md:clipboard-check-twotone",
+      uncheck: "raphael:cross",
+    },
     flag: "iconamoon:flag-duotone",
     calendar: "line-md:calendar",
     plus: "line-md:plus",
@@ -259,3 +265,12 @@ export const IcShieldCheck = () => (
     />
   </svg>
 );
+
+export const icsystem = {
+  escrow: icfy.court.injustice,
+  launchpad: icfyROCKET,
+  feature: icfyCODE,
+  mission: icfy.work.casual,
+  profile: icfy.person.team,
+  social: icfyMAIL,
+};

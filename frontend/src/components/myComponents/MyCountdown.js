@@ -3,7 +3,7 @@ import { useToolsState } from "context/tools";
 import React, { useEffect, useState } from "react";
 import { timestampToCounter } from "utils/ux-tools";
 
-export const MyCountdown = ({ count, timestamp, size, range }) => {
+export const MyCountdown = ({ count, timestamp, style, size, range }) => {
   function createCountdown(startDateTimestamp, daysRemaining) {
     if (
       typeof startDateTimestamp !== "number" ||
@@ -86,13 +86,13 @@ export const MyCountdown = ({ count, timestamp, size, range }) => {
   return (
     <>
       <div
-        className={`grid grid-flow-col gap-5 text-center auto-cols-max ${
+        className={`grid grid-flow-col ${style} gap-4 text-center auto-cols-max ${
           size ? `text-[${size}px]` : "text-lg"
         }`}
       >
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -102,7 +102,7 @@ export const MyCountdown = ({ count, timestamp, size, range }) => {
         </div>
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -112,7 +112,7 @@ export const MyCountdown = ({ count, timestamp, size, range }) => {
         </div>
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -122,7 +122,7 @@ export const MyCountdown = ({ count, timestamp, size, range }) => {
         </div>
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -185,7 +185,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
       <div className="grid grid-flow-col text-lg gap-5 text-center auto-cols-max">
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -195,7 +195,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
         </div>
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -205,7 +205,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
         </div>
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >
@@ -215,7 +215,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
         </div>
         <div className="flex flex-col items-center">
           <span
-            className={`text-white countdown font-mono ${
+            className={` countdown font-mono ${
               size ? `text-[${size + 8}px]` : "text-2xl"
             } `}
           >

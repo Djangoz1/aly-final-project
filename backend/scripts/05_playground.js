@@ -12,8 +12,9 @@ const { getContractAt } = require("../helpers/test_init");
 
 async function main() {
   //   let addressSystem = mainDeploy.systems.addressSystem;
-  let apiPost = getContractAt("apiPost", ADDRESSES.apiPost);
-  //   let apiGet = getContractAt("apiGet", ADDRESSES.apiGet);
+  let apiPost = await getContractAt("APIPost", ADDRESSES.apiPost);
+
+  let apiGet = await getContractAt("APIGet", ADDRESSES.apiGet);
 
   [
     this.owner,
@@ -28,18 +29,15 @@ async function main() {
 
   // await deleteAllPinnedFiles();
 
-  let feature = await _createFeature({
+  let accounts = [this.addr6, this.addr1, this.addr2, this.addr3];
+  let feature = await _createLaunchpad({
     account: this.owner,
-    accounts: [this.addr6],
-    specification: 8,
-    missionID: 1,
     addressSystem: ADDRESSES.addressSystem,
+    launchpad: true,
+    accounts,
   });
 
-  await apiPost.contestFeature(feature.id, 20, 3);
-
-  let _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
+  console.log('"launchpad', feature);
 
   return;
 

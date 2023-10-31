@@ -1,133 +1,264 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { MyAsset } from "components/myComponents/MyAsset";
+import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
 import { BtnGb1 } from "components/myComponents/btn/MyGradientButton";
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
+import { MyCardList } from "components/myComponents/card/MyCardList";
+import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { ethers } from "ethers";
-import { icfyETHER } from "icones";
+import { icfy, icfyETHER, icfyTIME, icsystem } from "icones";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { stateLaunchpad } from "utils/ui-tools/state-tools";
 import { fromTimestamp } from "utils/ux-tools";
+import { AssetProfile, AssetProfile1 } from "./AssetProfile";
+import { Avatar } from "components/profile/ProfileAvatar";
+import { MyTabs } from "components/myComponents/MyTabs";
+import { doStateFormPointer } from "context/form";
+import {
+  doPointerTools,
+  doStateLaunchpadTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { _apiPost } from "utils/ui-tools/web3-tools";
 
-export const AssetLaunchpad = ({ id, style }) => {
+export const AssetLaunchpad = ({
+  id,
+  setter,
+  allowed,
+  target,
+  header,
+  url,
+  children,
+  style,
+  state,
+}) => {
   let [isLaunchpad, setIsLaunchpad] = useState(null);
   let fetchState = async () => {
     setIsLaunchpad(await stateLaunchpad(id));
   };
+  console.log("test", isLaunchpad);
+  let dispatch = useToolsDispatch();
+  let { pointer } = useToolsState();
   useEffect(() => {
-    if (id != 0 && isLaunchpad === null) {
+    if (state?.launchpadID && isLaunchpad === null) {
+      setIsLaunchpad(state);
+    } else if (id && id != 0 && isLaunchpad === null) {
       fetchState();
     }
-  }, [id]);
+  }, [id, state]);
 
-  return (
-    <MyCardIc
-      icon={{ img: isLaunchpad?.metadatas?.image }}
-      clickable={true}
-      style={style}
-      banniere={isLaunchpad?.metadatas?.attributes?.[0]?.banniere}
-      image={isLaunchpad?.metadatas?.image}
-      title={
+  let lists = [
+    {
+      title: "Investors",
+      description: (
         <>
-          <CVName
-            cvID={isLaunchpad?.owner}
-            metadata={isLaunchpad?.owner}
-            styles={"text-xs text-white/60 mx-auto"}
-          />
-
+          <span className="text-xs uppercase mr-2">Total users</span>
+          {parseInt(isLaunchpad?.datas?.totalUser)}
+        </>
+      ),
+      icon: icfy.person.team,
+    },
+    {
+      title: "Token allowed left",
+      description: (
+        <>
+          <span className="text-xs uppercase mr-2">Round</span>
+          {isLaunchpad?.datas?.currentTier + 1}
+        </>
+      ),
+      icon: icfy.bank.coin,
+    },
+    {
+      title: "Allowance",
+      description: (
+        <>
+          {isLaunchpad?.datas?.allowance}
+          <span className="text-xs ml-2 uppercase">tokens</span>
+        </>
+      ),
+      icon: icfy.bank.coin,
+    },
+    {
+      title: "Fundraising goal",
+      description: (
+        <>
+          {parseInt(
+            ethers.utils.formatEther(`${isLaunchpad?.datas?.maxCap || 0}`)
+          ).toFixed(5)}
+          <span className="text-xs ml-2">ETH</span>
+        </>
+      ),
+      icon: icfy.bank.coin,
+    },
+    {
+      title: "Token price",
+      description: (
+        <>
+          {ethers?.utils?.formatEther(
+            isLaunchpad?.datas?.tiersDatas?.[isLaunchpad?.datas?.currentTier]
+              ?.tokenPrice || 0
+          )}
+          <span className="text-xs ml-2">ETH</span>
+        </>
+      ),
+      icon: icfyETHER,
+    },
+    {
+      icon: icfyTIME,
+      title: isLaunchpad?.datas?.status === 1 ? "Sale start" : "Sale end",
+      description: (
+        <MyCountdown
+          style={"mt-2 c2"}
+          size={10}
+          startDate={Math.floor(Date.now() / 1000)}
+          timestamp={parseInt(
+            isLaunchpad?.datas?.status === 1
+              ? isLaunchpad?.datas?.saleEnd
+              : isLaunchpad?.datas?.saleStart
+          )}
+        />
+      ),
+      check: Math.floor(Date.now() / 1000) < isLaunchpad?.datas?.endDate,
+    },
+    {
+      icon: STATUS.launchpad[isLaunchpad?.datas?.status]?.icon,
+    },
+  ];
+  let price1 = parseInt(
+    state?.launchpad?.datas?.amountRaised || isLaunchpad?.datas?.amountRaised
+  );
+  let price2 = parseInt(
+    parseFloat(
+      state?.launchpad?.datas?.amountRaised || isLaunchpad?.datas?.amountRaised
+    )
+      .toFixed(2)
+      .toString()
+      .split(".")[1]
+  );
+  console.log("price2EZ2", price1);
+  return (
+    <MyCardList
+      target={target}
+      color={0}
+      setter={setter}
+      icon={{ img: isLaunchpad?.metadatas?.image }}
+      style={style}
+      image={isLaunchpad?.metadatas?.image}
+      price={
+        <>
+          <span className="countdown">
+            <span
+              style={{
+                "--value": price1 || 0,
+              }}
+            ></span>{" "}
+            .
+            <span
+              style={{
+                "--value": price2 || 0,
+              }}
+            ></span>
+          </span>
+        </>
+      }
+      url={url || `/launchpad/${isLaunchpad?.launchpadID}`}
+      btn={{
+        title: isLaunchpad?.metadatas?.title,
+        info: (
+          <>
+            Nombres de rounds:
+            <span className="c1 text-lg font-semibold ml-2">
+              {isLaunchpad?.datas?.numberOfTier}
+            </span>
+          </>
+        ),
+      }}
+      head={{
+        icon: icsystem.launchpad,
+        title: (
           <Link
             className="hover:text-info mx-auto"
             href={`/launchpad/${isLaunchpad?.launchpadID}`}
           >
             {isLaunchpad?.metadatas?.title}
           </Link>
+        ),
+        component: header,
+      }}
+      arr={lists}
+    >
+      <div
+        className="flex flex-col c1 w-full  mb-auto flex-start text-start
+      "
+      >
+        <div className="flex pb-3 mb-8 w-full border justify-between bc1 border-b-2 border-t-0 border-x-0   items-start ">
+          <div className="flex items-center">
+            <Avatar CID={isLaunchpad?.owner?.image} />
 
-          <span className="flex absolute top-3 right-1 items-center text-xs mx-auto text-white/90">
-            {isLaunchpad?.datas?.wadge}
-            <Icon icon={icfyETHER} className="mr-1 text-3xl" />
-          </span>
+            <div className="flex ml-3 flex-col">
+              <CVName metadata={isLaunchpad?.owner} styles={"text-lg "} />
+              <p className="font-light text-xs">
+                Créer le
+                <span className="ml-2 font-semibold">
+                  {fromTimestamp(parseInt(isLaunchpad?.datas?.saleStart))}
+                </span>
+              </p>
+            </div>
+          </div>
 
-          {console.log(isLaunchpad)}
           <MyStatus
-            status={isLaunchpad?.datas?.status}
-            style={"mx-auto my-1"}
-            target={"launchpad"}
-          />
-        </>
-      }
-      status={[
-        {
-          title: STATUS.launchpad?.[isLaunchpad?.datas?.status]?.status,
-          color: STATUS.launchpad?.[isLaunchpad?.datas?.status]?.color,
-        },
-        {
-          title: (
-            <>
-              <Icon
-                icon={
-                  ENUMS.domain?.[
-                    isLaunchpad?.metadatas?.attributes?.[0]?.domain
-                  ]?.icon
-                }
-                className={`mr-2`}
-              />
-              {
-                ENUMS.domain?.[isLaunchpad?.metadatas?.attributes?.[0]?.domain]
-                  ?.name
+            allowed={allowed}
+            status={
+              isLaunchpad?.datas?.status == 1 &&
+              isLaunchpad?.datas?.saleStart > Math.floor(Date.now() / 1000)
+                ? 0
+                : isLaunchpad?.datas?.status
+            }
+            setter={async () => {
+              if (isLaunchpad?.datas?.status == 0) {
+                doPointerTools(dispatch, 2);
+              } else {
+                await _apiPost("setTierID", [
+                  parseInt(isLaunchpad?.launchpadID),
+                ]);
+                doStateLaunchpadTools(dispatch, isLaunchpad?.launchpadID);
               }
-            </>
-          ),
-          color:
-            ENUMS.domain?.[isLaunchpad?.metadatas?.attributes?.[0]?.domain]
-              ?.color,
-        },
-      ]}
-      description={isLaunchpad?.metadatas?.description}
-      details={[
-        {
-          title: "Fundraising goal",
-          value: (
-            <>
-              {ethers.utils.formatEther(`${isLaunchpad?.datas?.maxCap || 0}`)}
-              <span className="text-white/40 ml-1">ETH</span>
-            </>
-          ),
-        },
-        {
-          title: "Token price",
-          value: (
-            <>
-              ~ {isLaunchpad?.datas?.tokenPrice}
-              <span className="text-white/40 ml-1">ETH</span>
-            </>
-          ),
-        },
-
-        {
-          value: (
-            <>{fromTimestamp(parseInt(isLaunchpad?.datas?.saleStart || 0))}</>
-          ),
-          title: "Token sale start",
-        },
-        {
-          value: (
-            <>{fromTimestamp(parseInt(isLaunchpad?.datas?.saleEnd || 0))}</>
-          ),
-          title: "Token sale end",
-        },
-        {},
-        {
-          value: (
-            <Link href={`/launchpad/${isLaunchpad?.datas?.id}`}>
-              <BtnGb1 style={" btn-xs mt-3 px-5 normal-case"}>View</BtnGb1>
-            </Link>
-          ),
-        },
-      ]}
-    />
+            }}
+            toStatus={
+              isLaunchpad?.datas?.status == 0 ||
+              (isLaunchpad?.datas?.status == 1 &&
+                isLaunchpad?.datas?.saleStart > Math.floor(Date.now() / 1000))
+                ? 1
+                : 3
+            }
+            style={
+              "text-xs  bg-black/20 backdrop-blur-2xl  rounded   font-bold "
+            }
+            target={"launchpad"}
+          >
+            <p className="text-xs absolute top-1/2 -translate-y-1/2 left-0 -translate-x-full">
+              👉
+            </p>
+          </MyStatus>
+        </div>
+        {children ? (
+          <>{children} </>
+        ) : (
+          <>
+            <h6 className="font-bold uppercase  mb-4 underline">Description</h6>
+            <article className="text-xs  hover:text-black my-3 text-justify whitespace-break-spaces font-light">
+              {isLaunchpad?.metadatas?.description}
+            </article>
+          </>
+        )}
+      </div>
+    </MyCardList>
   );
 };

@@ -3,6 +3,8 @@ import "./style.css";
 import Link from "next/link";
 import { MyBtnPost } from "components/btn/MyBtnPost";
 import { useRouter } from "next/navigation";
+import { Icon } from "@iconify/react";
+import { icfy } from "icones";
 export const MyMainBtn = ({ children, setter, url, disabled, style }) => {
   let [isLoading, setIsLoading] = useState(null);
 
@@ -16,19 +18,26 @@ export const MyMainBtn = ({ children, setter, url, disabled, style }) => {
     }
   };
   return (
-    <button
+    <Link
+      href={url || "#"}
       onClick={handleClick}
       disabled={disabled}
-      className={"main-btn  " + style}
+      className={`${style} w-fit flex  max-w-full grid-cols-2 flex-row items-center  shadowh _hover px-8 py-2 font-semibold text-white transition [box-shadow:rgb(171,_196,_245)_-8px_8px] hover:[box-shadow:rgb(171,_196,_245)_0px_0px] bg1`}
     >
-      <Link className="py-2 shadow1" href={url || "#"}>
-        {isLoading ? (
-          <span className="loading  loading-bars mx-10 loading-xs"></span>
-        ) : (
-          <span className="px-3">{children}</span>
-        )}
-      </Link>
-    </button>
+      {isLoading ? (
+        <span className="loading  loading-bars mx-10 loading-xs"></span>
+      ) : (
+        <>
+          <p className="mr-6 font-bold btn btn-ghost uppercase">{children}</p>
+        </>
+      )}
+      <Icon
+        icon={icfy.ux.arrow}
+        className={`h-4 w-4 flex-none transition-all ${
+          !isLoading ? " rotate-90" : "-rotate-90"
+        }`}
+      />
+    </Link>
   );
 };
 

@@ -38,6 +38,7 @@ import {
   FormCreateMission1,
   FormCreateMission2,
 } from "sections/works/Missions/form/create/FormCreateMission";
+import { MyLoader } from "components/myComponents/layout/MyLoader";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
@@ -53,18 +54,17 @@ const PageCreateProfile = () => {
     </>
   );
 
-  let getPrice = async () => {
-    let _price = await _apiGetAt({
-      func: "missionPrice",
-      targetContract: "balancesHub",
-    });
-    let eth = await ethers?.utils?.formatEther(`${_price}`);
-
-    setPrice(eth);
-  };
-
   useEffect(() => {
-    if (!price) getPrice();
+    if (!price)
+      (async () => {
+        let _price = await _apiGetAt({
+          func: "missionPrice",
+          targetContract: "balancesHub",
+        });
+        let eth = await ethers?.utils?.formatEther(`${_price}`);
+
+        setPrice(eth);
+      })();
   }, [price]);
 
   let submitForm = async (form) => {
@@ -95,21 +95,26 @@ const PageCreateProfile = () => {
       ],
     };
     let uri = await createURI({ id, title: "Mission", images, metadatas });
-    let price = await _apiGetAt({
-      func: "missionPrice",
-      targetContract: "balancesHub",
-    });
-    await _apiPost("createMission", [uri], price);
+
+    await _apiPost(
+      "createMission",
+      [uri],
+      ethers?.utils?.parseEther(form?.price)
+    );
   };
 
   return (
-    <MyLayoutApp>
+    <MyLayoutApp
+      target={"mission"}
+      url={"/create/mission"}
+      initState={{ allowed: true }}
+    >
       <MyFormCreate
         title={"Create Mission"}
         submit={submitForm}
         stateInit={{
-          allowed: true,
-          form: moock_create_mission,
+          allowed: price ? true : undefined,
+          form: { ...moock_create_mission, price },
           placeholders: moock_create_mission_placeholder,
           checked: [[], []],
         }}

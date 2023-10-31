@@ -2,21 +2,22 @@ import { Icon } from "@iconify/react";
 import { Hg, Hg1 } from "components/text/HeroGradient";
 import React, { useState } from "react";
 import { v4 } from "uuid";
+import { MySub } from "../text/MySub";
 
 export const MyCard = ({ head, children, icon, styles }) => {
-  let [isClicked, setIsClicked] = useState(null);
   return (
     <div
-      className={`relative  shadow1 backdrop-blur  bg-white/5 py-4  px-6   z-0 h-fit  rounded-xl  box-border   font2 shadow-xl ${styles}`}
+      className={`${
+        styles || "p-8 h-fit w-full flex   flex-col items-start"
+      }  shadowh hover:-translate-y-[2px] _hover w-fit relative transition-transform   rounded-md bg-[#131313]  c3`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">
           <Icon icon={head?.icon} className="text-xl mr-2" /> {head?.title}
         </h6>
       )}
-      <div className="w-full  h-full " onClick={() => setIsClicked(false)}>
-        {children}
-      </div>
+
+      {children}
     </div>
   );
 };
@@ -88,8 +89,10 @@ export const MyCard1 = ({
 
 export const MyCardInfos = ({ style, arr, title, children }) => {
   return (
-    <MyCard styles={style}>
-      {title && <div className="w-full text-sm ">{title}</div>}
+    <MyCard styles={style + " cursor-default px-5 py-3 "}>
+      {title && (
+        <div className="w-full uppercase font-light c2 text-sm ">{title}</div>
+      )}
       {arr?.map(
         (el) =>
           el?.title && (
@@ -97,9 +100,9 @@ export const MyCardInfos = ({ style, arr, title, children }) => {
               key={v4()}
               className="flex items-center relative text-left text-[10px] border py-4  border-t-0 border-x-0 border-white/10  justify-between"
             >
-              <div className="w-1/2 flex items-center text-white/40">
+              <MySub size={"9"} style="w-1/2 c4 hover:text-neutral-200 ">
                 {el?.title}
-              </div>
+              </MySub>
               <div className="w-1/2 flex items-center  ">{el?.value}</div>
             </div>
           )

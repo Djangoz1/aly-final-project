@@ -5,7 +5,7 @@ export const styles = {
   gbtn: " g1 cursor-pointer   text-white border-none btn px-3 ",
   btn: "btn btn-xs capitalize btn-outline btn-white",
   bborder: " border border-info font-normal my-3 border-1 rounded",
-  hero: "uppercase text-[54px] font-light font2 whitespace-nowrap w-full text-left leading-tight",
+  hero: "uppercase mb-6 pb-4 text-4xl  text-white md:text-6xl  font-light font2 whitespace-nowrap w-full  leading-tight",
 };
 
 export const themes = {

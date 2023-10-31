@@ -13,33 +13,32 @@ import { useAuthState } from "context/auth";
 import React, { useEffect, useState } from "react";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { fetchMissionsOfCV } from "utils/works";
-let margin = "mb-4";
+let margin = "mb-8";
 export const FormCreateFeature1 = () => {
   return (
-    <div>
+    <>
       <MyInput styles={margin} target={"title"} />
-      <MySelects
-        styles={margin}
-        selects={[
-          {
-            label: "Domaine",
-            target: "domain",
-            target1: "name",
-            arr: DEV_DOMAIN,
-          },
-        ]}
-      />
-      <MyInputsFile
-        styles={margin}
-        inputs={[{ label: "Image", target: "image" }]}
-      />
+      <div className={"flex items-center " + margin}>
+        <MySelects
+          styles={"mr-5 w-fit"}
+          selects={[
+            {
+              label: "Domaine",
+              target: "domain",
+              target1: "name",
+              arr: DEV_DOMAIN,
+            },
+          ]}
+        />
+        <MyInputsFile inputs={[{ label: "Image", target: "image" }]} />
+      </div>
       <MyTextArea
-        styles={"min-h-[25vh] "}
+        styles={"min-h-[25vh] max-h-fit  "}
         target={"description"}
         label={"Description"}
         placeholder={"Write your description"}
       />
-    </div>
+    </>
   );
 };
 
@@ -104,54 +103,6 @@ export const FormCreateFeature2 = () => {
           { title: "plus de 10 " },
           { title: "plus de 3 " },
         ]}
-      />
-
-      <MyFormInfo
-        title={
-          <>
-            <div className="text-white text-sm  flex items-center ">
-              <MyToggle
-                target={"onlyInvite"}
-                label={"Seulement sur invitation"}
-              />
-            </div>
-          </>
-        }
-        description={
-          <>
-            <br />
-            <span className="text-white ">⚠️ Attention !</span>
-            <p>
-              <br />
-              Souhaitez vous ouvrir les postulations pour ce poste
-              <br />
-              <br />
-              <span className="text-white ">Si vous acceptez, </span>
-              vous serez en capacité d'ouvrir ce poste à la candidature et vous
-              pourez ensuite signé celui que vous souhaiterez.
-              <br />
-              <span className="text-white ">Si vous refusez, </span>
-              vous ne pourrais pas recevoir les candidatures et vous devrez
-              d'abord proposer ce poste à un freelancer qui choisiras d'accepter
-              ou non .
-              <br />
-              <br />
-              Veuillez choisir correctement la
-              <span className="text-white "> spécification </span>
-              car celle-ci seras déterminante en cas de
-              <span className="text-white "> litiges</span>.
-              <br />
-              <br />
-              En cas de litige, le protocole enverras le dossier directement à
-              la
-              <span className="text-white "> court lié à la spécification</span>
-              .
-              <br />
-              La court est composé de jurys qui ont de l'expérience sur cette
-              spécification.
-            </p>
-          </>
-        }
       />
     </div>
   );

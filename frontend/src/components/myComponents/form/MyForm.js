@@ -1,12 +1,12 @@
-import { MyModal } from "components/myComponents/modal/MyModal";
+import { motion, AnimatePresence } from "framer-motion";
+
+import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
+
 import React, { useEffect, useRef, useState } from "react";
 import { MyFormInfo } from "./MyFormInfo";
-import { v4 as uuidv4, v4 } from "uuid";
 import {
-  doInitStateForm,
   doStateFormChecked,
   doStateFormDisabled,
-  doStateFormModal,
   doStateFormPointer,
   useFormDispatch,
   useFormState,
@@ -16,12 +16,16 @@ import { styles as _styles } from "styles/style";
 
 import { useAccount } from "wagmi";
 import { Icon } from "@iconify/react";
-import { icfy, icfyARROWD } from "icones";
+import { icfy, icfyARROWD, icsystem } from "icones";
 import { MyCard1 } from "../card/MyCard";
 import { Viewport } from "../layout/MyViewport";
 import { Particle } from "../MyParticles";
 import { Hg, Hg1 } from "components/text/HeroGradient";
 import { useInView } from "framer-motion";
+import { v4 } from "uuid";
+import { useToolsState } from "context/tools";
+import { MyCardPrice } from "../card/MyCardPrice";
+import { MyToggle } from "./MyToggle";
 
 export const MyForm = ({
   stateInit,
@@ -145,6 +149,7 @@ export const MyFormCreate = ({
   components,
   side,
   arr,
+  sideImg,
   title,
   submit,
   children,
@@ -155,6 +160,7 @@ export const MyFormCreate = ({
   return (
     <LayoutForm stateInit={stateInit}>
       <Child1
+        sideImg={sideImg}
         title={title}
         editer={editer}
         components={components}
@@ -166,12 +172,7 @@ export const MyFormCreate = ({
   );
 };
 
-import { motion, AnimatePresence } from "framer-motion";
-import { MyBtnPost } from "components/btn/MyBtnPost";
-import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
-import { MySteps } from "../MySteps";
-import { MENUS_CREATE_FEATURE } from "constants/menus";
-let Child1 = ({ components, side, title, arr, submit, editer }) => {
+let Child1 = ({ components, sideImg, title, arr, submit, editer }) => {
   let dispatch = useFormDispatch();
   let [isLoading, setIsLoading] = useState(null);
   let { form, placeholders, pointer, disabled, checked, superChecked } =
@@ -179,7 +180,10 @@ let Child1 = ({ components, side, title, arr, submit, editer }) => {
 
   let { isConnected } = useAccount();
 
+  const { target } = useToolsState();
+
   console.log("form", form);
+  console.log("checked", checked);
   useEffect(() => {
     if (!isConnected) doStateFormDisabled(dispatch, true);
     if (pointer === 0 && isConnected) doStateFormDisabled(dispatch, false);
@@ -225,82 +229,206 @@ let Child1 = ({ components, side, title, arr, submit, editer }) => {
 
   return (
     <>
-      <Particle style={"fixed z-1"} />
       <Viewport
-        side={
-          side && (
-            <>
-              {title && (
-                <div className="flex items-center text-2xl font2 mb-2 p-3">
-                  <Icon icon={icfy.ux.plus} className="text-2xl mr-2" />
-                  <Hg>{title}</Hg>
+        img={{
+          image: (
+            <img
+              src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a26e_Background%20Hero.svg"
+              alt=""
+              className="absolute -z-10 inline-block h-full w-full object-cover"
+            />
+          ),
+        }}
+        full={true}
+      >
+        <div className="mx-auto w-full h-full py-20    ">
+          <div className="h-full w-full   flex flex-row">
+            <div className="   overflow-y-scroll hide-scrollbar relative  pb-10 bg-[#f7f6f2]  rounded-lg px-10 py-3 flex   min-w-[40%] w-[40%]  flex-col h-auto items-center gap-4 ">
+              {/* <div className="absolute -z-2 w-full h-full  backdrop-blur-[3px]"></div> */}
+              <div className="flex relative z-3 justify-between items-end w-full ">
+                <h2 className=" mt-3 text-black max-w-[55px] text-3xl font-extrabold md:text-3xl text-left uppercase w-full">
+                  {title}
+                </h2>
+
+                {(sideImg || target) && (
+                  <img
+                    src={sideImg || `/${target}.gif`}
+                    alt=""
+                    className=" w-64 h-64 ml-3 inline-block"
+                  />
+                )}
+              </div>
+              <AnimatePresence>
+                <motion.div
+                  key={pointer}
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  // exit={{ y: -10, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className=" w-full  text-justify text-xs  whitespace-break-spaces c4"
+                >
+                  {arr?.[pointer]?.description || (
+                    <>
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Asperiores mollitia in dignissimos quia maxime excepturi
+                      harum ex eius rem aliquid voluptatum debitis
+                      necessitatibus tempora quo, reprehenderit atque magni
+                      porro molestias?
+                    </>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+              {isConnected && (
+                <div className="flex w-full relative mt-auto">
+                  {pointer !== 0 && (
+                    <button
+                      onClick={() => doStateFormPointer(dispatch, pointer - 1)}
+                      className="btn btn-outline  shadow hover:bg-black hover:text-error text-black"
+                    >
+                      <Icon icon={icfy.ux.arrow} className="-rotate-90 mr-2" />
+                      <span className=" flex items-center">Previous </span>
+                    </button>
+                  )}
+                  {pointer === 0 && (
+                    <MyToggle
+                      style={form?.ia === true ? "c1" : "text-error"}
+                      target={"ia"}
+                    >
+                      Active / Désactive Aly
+                    </MyToggle>
+                  )}
+
+                  {(editer || pointer === components?.length) && (
+                    <MyMainBtn
+                      style={
+                        "ml-auto bg1 flex w-fit items-center text-white hover:border-[#202361] shadow hover:bg-transparent hc1"
+                      }
+                      setter={handleSubmit}
+                      disabled={disabled}
+                      // className="btn btn-xs btn-outline h-fit  btn-info "
+                    >
+                      {editer || "Submit"}
+                      <Icon icon={icfy.ux.enter} className="text-lg" />
+                    </MyMainBtn>
+                  )}
+                  {pointer < components?.length && !arr?.[pointer]?.error && (
+                    <button
+                      disabled={disabled}
+                      onClick={() => doStateFormPointer(dispatch, pointer + 1)}
+                      className="btn ml-auto shadow z-3 relative  hover:bg-white hover:text-success  bg-black text-white"
+                    >
+                      Next <Icon icon={icfy.ux.arrow} className="rotate-90" />
+                    </button>
+                  )}
                 </div>
               )}
-              {side && side}
-            </>
-          )
-        }
-      >
-        <div className="w-[100%]   ml-auto">
-          <div>
-            <AnimatePresence>
-              <motion.div
-                className=" flex overflow-hidden shadow2 bg-white/5 flex-col relative box-border  rounded-lg shadow "
-                key={components?.[pointer]?.label}
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                // exit={{ y: -10, opacity: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div className="z-1 relative px-5 pt-3 pb-5 flex flex-col">
-                  <MyFormInfo
-                    style={"mb-5"}
-                    title={arr?.[pointer]?.title}
-                    description={arr?.[pointer]?.description}
-                  />
-                  {components?.[pointer]?.component}
-                  <div className="mt-5 flex  w-full">
-                    {!isLoading && !editer && pointer > 0 && (
-                      <MyMainBtn1
-                        setter={() => doStateFormPointer(dispatch, pointer - 1)}
-                        color="error"
-                        style={"mr-auto w-[150px]"}
-                        disabled={disabled}
-                      >
-                        <Icon
-                          icon={icfy.ux.arrow}
-                          className="text-error text-lg -rotate-90 mr-2"
-                        />
-                        Previous
-                      </MyMainBtn1>
-                    )}
-                    {!editer && isConnected && pointer != arr?.length - 1 && (
-                      <MyMainBtn1
-                        setter={() => doStateFormPointer(dispatch, pointer + 1)}
-                        color="success"
-                        style={"w-[150px]"}
-                        disabled={disabled}
-                      >
-                        <Icon
-                          icon={icfy.ux.arrow}
-                          className="text-success text-lg rotate-90 mr-2"
-                        />
-                        Next
-                      </MyMainBtn1>
-                    )}
-                    {isConnected && (editer || pointer === arr?.length - 1) && (
-                      <MyMainBtn
-                        setter={handleSubmit}
-                        disabled={disabled}
-                        // className="btn btn-xs btn-outline h-fit  btn-info "
-                      >
-                        {editer || "Submit"}
-                      </MyMainBtn>
-                    )}
-                  </div>
+            </div>
+
+            <div className="bg-zinc-800  overflow-y-scroll hide-scrollbar rounded-sm  shadowh _hover  ml-10 px-8 pt-6 pb-10 w-full ">
+              {!isConnected ? (
+                <div className="flex flex-col  h-1/2 justify-between items-center w-full text-center">
+                  <span className="text-[44px] font-light text-warning">
+                    Please connect to your account !
+                  </span>
+
+                  <img src="/404.gif" />
+                  {/* <div className="🤚">
+                    <div className="👉"></div>
+                    <div className="👉"></div>
+                    <div className="👉"></div>
+                    <div className="👉"></div>
+                    <div className="🌴"></div>
+                    <div className="👍"></div>
+                  </div> */}
                 </div>
-              </motion.div>
-            </AnimatePresence>
+              ) : (
+                <ol className=" divide-x divide-white/5 bg-white/10   rounded-lg  shadow1   text-sm c4 flex">
+                  {arr?.map((el, i) => (
+                    <li
+                      key={v4()}
+                      onClick={() =>
+                        i < pointer && doStateFormPointer(dispatch, i)
+                      }
+                      className={`relative overflow-hidden transition-all flex items-center justify-center gap-2 p-4 ${
+                        i === pointer
+                          ? "bg3 c1  rounded-lg  "
+                          : "bg-transparent "
+                      }`}
+                    >
+                      {pointer !== i && (
+                        <>
+                          {i != 0 && (
+                            <span className="absolute -left-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-white rtl:border-e-0 rtl:border-t-0 rtl:bg-gray-50 sm:block"></span>
+                          )}
+
+                          {i != arr?.length - 1 && (
+                            <span className="absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-gray-50 rtl:border-e-0 rtl:border-t-0 rtl:bg-white sm:block"></span>
+                          )}
+                        </>
+                      )}
+
+                      <Icon icon={el?.icon} className=" text-[44px]" />
+
+                      <p className="leading-none">
+                        <strong className="block font-semibold">
+                          {el?.title}
+                        </strong>
+                        <small className="mt-1">
+                          Lorem ipsum dolor, sit amet consectetur adipisicing
+                          elit.
+                        </small>
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              )}
+
+              {isConnected ? (
+                <AnimatePresence>
+                  <motion.div
+                    key={arr?.[pointer]?.title}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    // exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="mx-auto h-full mt-10 overflow-y-scroll hide-scrollbar w-full "
+                  >
+                    {arr?.[pointer]?.info ? (
+                      <div className="flex flex-col items-center">
+                        <div className=" w-fit mx-auto mb-6  text-sm text-[#636262] lg:mb-8">
+                          {components?.length != pointer
+                            ? arr?.[pointer]?.info
+                            : "Récapitulatif d'Aly"}
+                        </div>
+                      </div>
+                    ) : undefined}
+                    {pointer !== 0 && pointer !== components?.length && target
+                      ? components?.[pointer]?.component
+                      : isConnected && (
+                          <MyCardPrice
+                            style={"mx-auto"}
+                            btn={{ no: true }}
+                            lists={arr?.map((el, i) => {
+                              return (
+                                i > 0 && {
+                                  title: el?.title,
+
+                                  check:
+                                    pointer === components?.length
+                                      ? true
+                                      : false,
+                                }
+                              );
+                            })}
+                            price={form?.price}
+                            color={2}
+                            badge={{ title: title, icon: icsystem?.[target] }}
+                          />
+                        )}
+                  </motion.div>
+                </AnimatePresence>
+              ) : undefined}
+            </div>
           </div>
         </div>
       </Viewport>

@@ -237,9 +237,9 @@ contract APIPost is Ownable {
         IMissionsHub(_missionsHub).closeMission(_missionID);
     }
 
-    function followMission(uint _IDToFollow) external onlyCVOwner {}
+    // function followMission(uint _IDToFollow) external onlyCVOwner {}
 
-    function unfollowMission(uint _IDToUnfollow) external onlyCVOwner {}
+    // function unfollowMission(uint _IDToUnfollow) external onlyCVOwner {}
 
     // ************* -------- ************* //
     // ************* Features ************* //
@@ -704,6 +704,9 @@ contract APIPost is Ownable {
         );
         //
         _datas.maxCap = 0;
+        if (_datas.saleStart < block.timestamp) {
+            _datas.saleStart = block.timestamp;
+        }
         _datas.minCap = 0;
 
         uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
@@ -770,10 +773,12 @@ contract APIPost is Ownable {
 
     function buyTokens(uint _launchpadID) external payable {
         require(msg.value > 0, "Value must be more than 0");
-        ILaunchpad(_launchpadAddr(_launchpadID)).buyTokens(
+
+        bool success = ILaunchpad(_launchpadAddr(_launchpadID)).buyTokens(
             _cvOf(msg.sender),
             msg.value
         );
+        require(success, "APIPost: Error buy tokens");
         _iBalancesHub.addLaunchpadBalance(_launchpadID, msg.value);
     }
 

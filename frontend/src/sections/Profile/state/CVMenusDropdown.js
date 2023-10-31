@@ -16,7 +16,7 @@ import {
 } from "utils/ui-tools/state-tools";
 import { MyMenusDropdown } from "components/myComponents/menu/MyMenus";
 
-export const CVMenusDropdown = () => {
+export const CVMenusDropdown = ({ style }) => {
   let { state } = useToolsState();
   let [isFolders, setIsFolders] = useState(null);
 
@@ -31,7 +31,7 @@ export const CVMenusDropdown = () => {
   let [isCvID, setIsCvID] = useState(null);
 
   let fetchLaunchpads = async () => {
-    let launchpads = state?.owner?.datas?.launchpads;
+    let launchpads = state?.profile?.datas?.launchpads;
     let folders = { ...isFolders };
 
     if (folders?.launchpads?.arr === null) {
@@ -77,7 +77,7 @@ export const CVMenusDropdown = () => {
       el?.name === "Arbitration" ? (allowed = false) : null
     );
 
-    let arbitrators = state?.owner?.details?.arbitrators;
+    let arbitrators = state?.profile?.details?.arbitrators;
     console.log("aerrrere", arbitrators);
     if (allowed && arbitrators?.length > 0) {
       let objectCourt = JSON?.parse?.(JSON?.stringify(ENUMS.courts));
@@ -199,7 +199,7 @@ export const CVMenusDropdown = () => {
     let folders = { ...isFolders };
     if (folders?.missions?.arr === null) {
       console.log("----fetch mission------");
-      let missions = state?.owner?.datas?.missions;
+      let missions = state?.profile?.datas?.missions;
 
       let object = JSON?.parse(JSON?.stringify(ENUMS.domain));
 
@@ -318,7 +318,7 @@ export const CVMenusDropdown = () => {
   };
 
   let fetchJobs = async () => {
-    let jobs = state?.owner?.datas?.proposals;
+    let jobs = state?.profile?.datas?.proposals;
     let folders = { ...isFolders };
     if (folders?.jobs?.arr === null) {
       console.log("-----fetch jobs -----");
@@ -413,11 +413,11 @@ export const CVMenusDropdown = () => {
 
   useEffect(() => {
     if (
-      (!isFolders && state?.owner?.details) ||
-      (state?.owner?.cvID != isCvID && state?.owner?.details)
+      (!isFolders && state?.profile?.details) ||
+      (state?.profile?.cvID != isCvID && state?.profile?.details)
     ) {
       console.log("Mount dropdown profile ...");
-      setIsCvID(state?.owner?.cvID);
+      setIsCvID(state?.profile?.cvID);
 
       let _missions = {
         arr: null,
@@ -465,11 +465,13 @@ export const CVMenusDropdown = () => {
       };
       setIsFolders(folders);
     }
-  }, [state?.owner?.details?.missions, state?.owner?.cvID]);
+  }, [state?.profile?.details?.missions, state?.profile?.cvID]);
 
   return (
-    <MyMenusDropdown funcs={funcs} isFolders={isFolders}>
-      All
-    </MyMenusDropdown>
+    <div className={style}>
+      <MyMenusDropdown funcs={funcs} isFolders={isFolders}>
+        All
+      </MyMenusDropdown>
+    </div>
   );
 };

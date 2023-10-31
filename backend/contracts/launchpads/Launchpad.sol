@@ -150,10 +150,14 @@ contract Launchpad is Ownable {
     }
 
     function _setTierID() private onlyStatus(DataTypes.LaunchpadStatus.Init) {
-        require(block.timestamp > _datas().saleStart, "Sale not started");
-        uint tierID_ = _tierID.current().add(1);
-        DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
         DataTypes.LaunchpadData memory datas_ = _datas();
+        require(block.timestamp > datas_.saleStart, "Sale not started");
+        DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
+        require(
+            _tierID.current() != datas_.numberOfTier,
+            "Tier ID out of range"
+        );
+        uint tierID_ = _tierID.current().add(1);
         require(
             _tierData.minTierCap <= _tierData.amountRaised ||
                 datas_.saleEnd < block.timestamp,
@@ -169,11 +173,24 @@ contract Launchpad is Ownable {
             return;
         }
         _tierID.increment();
+        _tierData = cLD.tierOf(id, _tierID.current());
+
+        if (
+            _tierID.current() != datas_.numberOfTier - 1 &&
+            _tierData.maxTierCap == _tierData.amountRaised &&
+            _tierData.minTierCap < _tierData.amountRaised
+        ) {
+            _setTierID();
+        }
     }
 
     // *::::::::: ------------- :::::::::* //
     // *::::::::: USER BINDINGS :::::::::* //
     // *::::::::: ------------- :::::::::* //
+
+    function revertIfUncheck(bool success) internal {
+        require(success, "Launchpad: Buy token");
+    }
 
     function buyTokens(
         uint _cvSender,
@@ -183,25 +200,69 @@ contract Launchpad is Ownable {
         onlyStatus(DataTypes.LaunchpadStatus.Init)
         onlyProxy
         onlyProcess
+        returns (bool)
     {
         // whenNotPaused
 
         uint currentTier = _tierID.current();
-        bool inRange = cLD._checkTierBalance(id, currentTier);
-        if (!inRange) {
+        DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
+        if (_tierData.amountRaised == _tierData.maxTierCap) {
             _setTierID();
         }
 
-        bool success = cLD._checkAmount(id, _cvSender, currentTier, _value);
-        require(success, "Error on _checkAmount");
+        // bool inRange = cLD._checkTierBalance(id, currentTier);
+        // if (!inRange) {
+        // }
 
-        success = cLI._investOnLaunchpad(currentTier, _cvSender, _value);
-        require(success, "Error invest on launchpad");
-        cLD._addAmountRaised(id, currentTier, _value);
-        inRange = cLD._checkTierBalance(id, currentTier);
-        if (!inRange) {
+        if (_tierData.amountRaised.add(_value) > _tierData.maxTierCap) {
+            uint rest = _tierData.amountRaised.add(_value).sub(
+                _tierData.maxTierCap
+            );
+            revertIfUncheck(
+                cLD._checkAmount(id, _cvSender, currentTier, _value.sub(rest))
+            );
+
+            // require(success, "Error on _checkAmount");
+            revertIfUncheck(
+                cLD._checkAmount(id, _cvSender, currentTier + 1, rest)
+            );
+
+            // require(success, "Error on _checkAmount");
+            revertIfUncheck(
+                cLI._investOnLaunchpad(currentTier, _cvSender, _value.sub(rest))
+            );
+
+            // require(success, "Error invest on launchpad");
+            revertIfUncheck(
+                cLI._investOnLaunchpad(currentTier + 1, _cvSender, rest)
+            );
+
+            // require(success, "Error invest on launchpad");
+            cLD._addAmountRaised(id, currentTier, _value.sub(rest));
+
+            cLD._addAmountRaised(id, currentTier + 1, rest);
+
             _setTierID();
+        } else {
+            revertIfUncheck(
+                cLD._checkAmount(id, _cvSender, currentTier, _value)
+            );
+            revertIfUncheck(
+                cLI._investOnLaunchpad(currentTier, _cvSender, _value)
+            );
+
+            cLD._addAmountRaised(id, currentTier, _value);
+
+            // inRange = cLD._checkTierBalance(id, currentTier);
+            // if (!inRange) {
+            // }
+
+            _tierData = cLD.tierOf(id, _tierID.current());
+            if (_tierData.amountRaised == _tierData.maxTierCap) {
+                _setTierID();
+            }
         }
+        return true;
     }
 
     function withdrawTokens(

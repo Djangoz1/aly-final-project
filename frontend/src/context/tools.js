@@ -69,8 +69,6 @@ export const doStateProfileTools = async ({ dispatch, cvID }) => {
       details: await _apiGet("datasOfWork", [featureID]),
     };
 
-    console.log("feature", feature);
-
     !owner?.details?.badges.includes(feature?.datas?.specification) &&
       owner?.details?.badges.push(feature?.datas?.specification);
 
@@ -128,7 +126,7 @@ export const doStateProfileTools = async ({ dispatch, cvID }) => {
   }
 
   let _state = {
-    owner,
+    profile: owner,
     pubs: _pubs,
   };
 
@@ -165,6 +163,26 @@ export const doStateMissionTools = async (dispatch, missionID) => {
     return _state;
   } catch (error) {
     dispatch({ status: "error mission", error: { error } });
+  }
+};
+
+export const doStateLaunchpadTools = async (dispatch, launchpadID) => {
+  dispatch({ status: "pending launchpad" });
+  try {
+    let launchpad = await stateLaunchpad(launchpadID);
+
+    let _state = {
+      launchpad: {
+        datas: launchpad.datas,
+        launchpadID: launchpad.launchpadID,
+        metadatas: launchpad.metadatas,
+      },
+      owner: launchpad.owner,
+    };
+    dispatch({ status: "success", state: _state });
+    return _state;
+  } catch (error) {
+    dispatch({ status: "error launchpad", error: { error } });
   }
 };
 

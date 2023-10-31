@@ -457,7 +457,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe("Buy Token: Launchpad", () => {
+  describe.only("Buy Token: Launchpad", () => {
     let token;
     let datas;
     let price;
@@ -504,10 +504,15 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
       block = await provider.getBlock("latest");
       timestamp = block.timestamp;
+      expect(await apiGet.currentTierIDOf(launchpadID)).to.equal(0);
     });
     describe("WORKS", () => {
       it("Should  have good status", async () => {
         expect(await launchpad.status()).to.be.equal(1);
+      });
+
+      it("Should have good current tier ID", async () => {
+        expect(await apiGet.currentTierIDOf(launchpadID)).to.be.equal(0);
       });
 
       it("Should  buy tokens ", async () => {
@@ -954,13 +959,15 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
             value: `${price}`,
           });
 
-        let _launchpad = await apiGet.addressOfLaunchpad(2);
+        let launchpadID = await apiGet.tokensLengthOf(
+          await addressSystem.launchpadsHub()
+        );
+        let _launchpad = await apiGet.addressOfLaunchpad(launchpadID);
         await token
           .connect(this.addr1)
           .approve(_launchpad, await token.totalSupply());
 
         let launchpad = await ethers.getContractAt("Launchpad", _launchpad);
-        let launchpadID = 2;
 
         await apiPost
           .connect(this.addr1)
@@ -973,11 +980,12 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           await network.provider.send("evm_mine");
         }
 
-        await expect(
-          apiPost.connect(this.addr1).buyTokens(launchpadID, {
-            value: TIER_DATAS_EXEMPLE.maxTierCap,
-          })
-        ).to.be.revertedWith("Sale ended");
+        await apiPost.connect(this.addr1).buyTokens(launchpadID, {
+          value: TIER_DATAS_EXEMPLE.maxTierCap,
+        });
+        // await apiPost.connect(this.addr1).buyTokens(launchpadID, {
+        //   value: 10,
+        // });
 
         expect(await launchpad.status()).to.be.equal(3);
       });
@@ -1083,7 +1091,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           apiPost
             .connect(this.addr1)
             .buyTokens(launchpadID, { value: datas.maxInvest })
-        ).to.be.revertedWith("Sale already ended");
+        ).to.be.revertedWith("Sale ended");
       });
 
       it("Should  NOT works if balance owner < invest ", async () => {
@@ -1131,7 +1139,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           apiPost
             .connect(this.addr1)
             .buyTokens(launchpadID, { value: datas.maxInvest })
-        ).to.be.revertedWith("Mismatch balance of owner and allowance !");
+        ).to.be.revertedWith("Error value transfer");
       });
 
       it("Should  NOT works if amountRaised > maxCap", async () => {
@@ -1245,9 +1253,9 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
         await expect(
           apiPost.connect(this.addr1).buyTokens(launchpadID, {
-            value: datas.maxInvest,
+            value: datas.maxInvest + 1n,
           })
-        ).to.be.revertedWith("Value out of range for this tier");
+        ).to.be.revertedWith("AddAmount: Error tier value");
       });
 
       it("Should  NOT works if value > maxInvest", async () => {
@@ -1300,7 +1308,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       it("Should  NOT works for an unknown launchpad", async () => {
         await expect(
           apiPost.connect(this.addr1).buyTokens(10, { value: 100 })
-        ).to.be.revertedWith("ID out of range");
+        ).to.be.revertedWith("LaunchpadHub: Error ID");
       });
 
       it("Should  NOT works if buyer havn't cv", async () => {
@@ -1783,7 +1791,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe.only("Create Mission with Launchpad balance", () => {
+  describe("Create Mission with Launchpad balance", () => {
     let token;
     let datas;
     let price;

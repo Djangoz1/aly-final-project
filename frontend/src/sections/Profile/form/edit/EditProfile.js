@@ -1,6 +1,5 @@
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 
-import { MyMenus } from "components/myComponents/menu/MyMenus";
 import { _form_edit_profile } from "utils/ux-tools/form/profile";
 import { MENUS } from "constants/menus";
 
@@ -21,10 +20,13 @@ import { createURICv } from "utils/ui-tools/pinata-tools";
 import {
   doIndexTools,
   doReloadTools,
+  doStateTools,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 import { MyForm } from "components/myComponents/form/MyForm";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { LayoutForm } from "sections/Form/LayoutForm";
 
 export const EditProfile = ({ styles }) => {
   let { address, isConnected } = useAccount();
@@ -46,32 +48,30 @@ export const EditProfile = ({ styles }) => {
   let moock = toMockProfile({ address, metadatas, cvID: cv });
 
   return (
-    <MyForm
-      stateInit={{
-        allowed: true,
-        form: moock,
-        placeholders: moock,
-      }}
-      editer={"Update account"}
-      btn={"Edit profile"}
-      styles={{ btn: styles }}
-      arr={_form_edit_profile}
-      submit={submitForm}
-      side={
-        <MyMenus
-          styles={{
-            box: "flex-row w-full",
-            el: "px-2 ",
-          }}
-          menus={MENUS.profile?.edit}
+    <div className="bgprim  min-h-[60vh] h-full">
+      <LayoutForm
+        stateInit={{
+          allowed: true,
+          form: moock,
+          placeholders: moock,
+        }}
+      >
+        <MyMenusTabs
+          value={state?.indexSettings || 0}
+          target={"title"}
+          color={1}
+          setter={(i) => doStateTools(dispatch, { ...state, indexSettings: i })}
+          style={" w-full rounded-none "}
+          arr={MENUS.profile?.edit}
         />
-      }
-      components={[
-        <FormEditProfile1 />,
-        <FormEditProfile2 />,
-        <FormEditProfile3 />,
-        <FormEditProfile4 />,
-      ]}
-    />
+        <div className="  px-3 py-5 h-full">
+          {
+            [<FormEditProfile1 />, <FormEditProfile2 />, <FormEditProfile4 />][
+              state?.indexSettings || 0
+            ]
+          }
+        </div>
+      </LayoutForm>
+    </div>
   );
 };

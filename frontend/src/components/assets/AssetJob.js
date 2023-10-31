@@ -44,28 +44,23 @@ export const AssetJob = ({ feature, style, noBtn, featureID }) => {
     }
   }, [isInView, isInView1, index, featureID]);
   return (
-    <div className={style || "w-[23%]  mx-2 mb-3 h-fit " + "relative"}>
+    <div className={style || "w-[23%]  mx-2 h-fit " + "relative"}>
       <div className="absolute w-full top-0 py-1" ref={ref} />
       <div className="absolute w-full bottom-0 py-1" ref={ref1} />
       <MyCardInfo
-        styles={"w-full h-full " + style}
+        styles={"w-full h-full p-0  " + style}
         key={v4()}
         color={1}
         header={{
           icon: ENUMS.courts?.[isFeature?.datas?.specification]?.badge,
           title: isFeature?.metadatas?.title,
-          component: (
-            <MissionName
-              metadatas={state?.mission?.metadatas}
-              id={isFeature?.datas?.missionID}
-            />
-          ),
         }}
         main={{
           title: (
-            <CVName
-              metadata={state?.owner?.metadatas}
-              cvID={isFeature?.datas?.owner}
+            <MissionName
+              style={" ml-5"}
+              metadatas={state?.mission?.metadatas}
+              id={isFeature?.datas?.missionID}
             />
           ),
           text: isFeature?.metadatas?.description,

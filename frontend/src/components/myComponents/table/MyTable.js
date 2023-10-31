@@ -33,6 +33,7 @@ export const MyTable = ({ head, list, btns, editBtns }) => {
                       editBtns={editBtns}
                       key={uuidv4()}
                       id={el?.id}
+                      component={el?.component}
                       arr={el?.arr}
                       btns={btns}
                     />

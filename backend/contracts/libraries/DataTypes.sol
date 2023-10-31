@@ -293,7 +293,8 @@ library DataTypes {
         Waiting,
         Init,
         Paused,
-        Closed
+        Closed,
+        Error
     }
 
     struct LaunchpadData {

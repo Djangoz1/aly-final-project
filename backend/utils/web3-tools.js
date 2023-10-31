@@ -42,8 +42,10 @@ let _createCV = async (name, account, addressSystem) => {
 };
 
 let _createMission = async ({
+  launchpad,
   title,
   description,
+  accounts,
   account,
   social,
   reference,
@@ -60,6 +62,26 @@ let _createMission = async ({
   );
 
   let id = parseInt(await apiGet.tokensLengthOf(_addrMH)) + 1;
+  let launchpadID;
+  if (launchpad) {
+    launchpadID = await _createLaunchpad({ account, addressSystem });
+
+    let datas = await apiGet.datasOfLaunchpad(launchpadID);
+
+    let amount = 0n;
+    for (let index = 0; index < accounts.length; index++) {
+      if (
+        datas.minCap > amount ||
+        (datas.minCap == 0 && datas.maxCap > amountRaised)
+      ) {
+        await apiPost
+          .connect(accounts[index])
+          .buyTokens(launchpadID, { value: datas.minInvest });
+        amount += datas.maxInvest;
+      }
+    }
+    await apiPost.connect(account).setTierID(launchpadID);
+  }
 
   let uri = await createURIMission({
     id,
@@ -100,13 +122,13 @@ let _createMission = async ({
   if (account.address != (await apiGet.ownerOfToken(id, _addrMH))) {
     throw new Error("Error Missions: URI ID");
   }
-  return id;
+  return { missionID: id, launchpadID };
 };
 
 let _createFeature = async ({
   missionID,
   estimatedDays,
-  launchpadID,
+  launchpad,
   isInviteOnly,
   specification,
   title,
@@ -127,8 +149,18 @@ let _createFeature = async ({
     "BalancesHub",
     await _iAS.balancesHub()
   );
-  let _missionID =
-    missionID || (await _createMission({ account, addressSystem }));
+  let _missionID = missionID;
+  let launchpadID;
+  if (!missionID) {
+    let mission = await _createMission({
+      accounts,
+      account,
+      addressSystem,
+      launchpad,
+    });
+    launchpadID = mission.launchpadID;
+    _missionID = mission.missionID;
+  }
 
   let featureID = parseInt(await apiGet.tokensLengthOf(_addrFH)) + 1;
   let moock = FEATURE_DATAS_EXEMPLE;
@@ -185,7 +217,7 @@ let _createFeature = async ({
     }
   }
 
-  return { id: featureID, missionID: _missionID };
+  return { id: featureID, launchpadID, missionID: _missionID };
 };
 
 let _createLaunchpad = async ({
@@ -195,7 +227,8 @@ let _createLaunchpad = async ({
   metadatas,
   tiersDatas,
 }) => {
-  let tokensAllowance = 30000000000000000000000000000000n;
+  let tokens = 3000000n;
+
   let _iAS = await getContractAt("AddressSystem", addressSystem);
   let balancesHub = await getContractAt(
     "BalancesHub",
@@ -205,11 +238,21 @@ let _createLaunchpad = async ({
   let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
   let _addrLH = await _iAS.launchpadsHub();
   let moock = LAUNCHPAD_DATAS_EXEMPLE;
+
   let id = parseInt(await apiGet.tokensLengthOf(_addrLH)) + 1;
 
   let { launchpadURI, tokenURI } = await createURILaunchpad({ id, metadatas });
-  const token = await _testInitToken(account, "Django", "DJN", tokensAllowance);
+  const token = await _testInitToken(account, "Django", "DJN", tokens);
+  let _tierDatas = tiersDatas || [
+    TIER_DATAS_EXEMPLE,
+    TIER_DATAS_EXEMPLE,
+    TIER_DATAS_EXEMPLE,
+  ];
 
+  const currentTimestampSeconds = Math.floor(Date.now() / 1000);
+
+  // Ajoutez 10 secondes
+  const saleStart = currentTimestampSeconds + 10;
   let _launchpadDatas = {
     id,
     tokenURI: launchpadURI,
@@ -217,19 +260,15 @@ let _createLaunchpad = async ({
     numberOfTier: launchpadDatas?.numberOfTier || moock.numberOfTier,
     maxCap: launchpadDatas?.maxCap || moock.maxCap,
     minCap: launchpadDatas?.minCap || moock.minCap,
-    minInvest: launchpadDatas?.minInvest || moock.minInvest,
-    maxInvest: launchpadDatas?.maxInvest || moock.maxInvest,
-    saleStart: launchpadDatas?.saleStart || moock.saleStart,
+    minInvest: launchpadDatas?.minInvest || _tierDatas[0].minTierCap,
+    maxInvest:
+      launchpadDatas?.maxInvest ||
+      _tierDatas[0].maxTierCap * BigInt(_tierDatas.length),
+    saleStart: launchpadDatas?.saleStart || saleStart,
     saleEnd: launchpadDatas?.saleEnd || moock.saleEnd,
     lockedTime: launchpadDatas?.lockedTime || moock.lockedTime,
     totalUser: launchpadDatas?.totalUser || moock.totalUser,
   };
-
-  let _tierDatas = tiersDatas || [
-    TIER_DATAS_EXEMPLE,
-    TIER_DATAS_EXEMPLE,
-    TIER_DATAS_EXEMPLE,
-  ];
 
   await apiPost
     .connect(account)
@@ -238,8 +277,8 @@ let _createLaunchpad = async ({
     });
 
   let launchpadAddr = await apiGet.addressOfLaunchpad(id);
-  await token.approve(launchpadAddr, tokensAllowance);
-  await apiPost.lockTokens(id, tokensAllowance);
+  await token.approve(launchpadAddr, await token.totalSupply());
+  await apiPost.lockTokens(id, await token.totalSupply());
   if (account.address != (await apiGet.ownerOfToken(id, _addrLH))) {
     throw new Error("Error Launchpad: URI ID");
   }

@@ -197,11 +197,9 @@ export const AssetFreelancer = ({ owner, style }) => {
     }
   };
   return (
-    <MyCard
-      styles={` overflow-hidden  h-[430px] min-h-[430px] w-[300px] ${style}`}
-    >
+    <MyCard styles={`   h-[430px] min-h-[430px] w-[300px] ${style}`}>
       <div className=" absolute h-1/2 top-0 left-0 w-full   flex flex-col">
-        <div className="mt-auto bg-gradient-to-br px-5 from-black/10  via-black/20 to-black/30 transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col z-10">
+        <div className="mt-auto bg-gradient-to-br px-5 from-black/10  c3  via-black/20 to-black/30 transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col z-10">
           <CVName
             styles="text-xl"
             cvID={owner?.cvID}
@@ -209,9 +207,23 @@ export const AssetFreelancer = ({ owner, style }) => {
           />
 
           <p className="text-xs">{owner?.metadatas?.description}</p>
-          <span className="badge -mb-3 mt-1 badge-outline bg-white shadow1 text-black py-1 px-2 h-fit badge-xs ">
-            {owner?.details?.wadge?.toFixed(4)} ETH
-          </span>
+          <div className="flex -mb-3 mt-1">
+            <span className="rounded-lg    bg-lime-300 shadow c1 font-semibold py-1 px-2 h-fit w-fit text-xs ">
+              {owner?.details?.wadge?.toFixed(4)} ETH
+            </span>
+            <span className="rounded-lg  ml-3 flex items-center   bg1 shadow c3 font-semibold py-1 px-2 h-fit w-fit text-xs ">
+              <Icon
+                icon={
+                  ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.icon
+                }
+                className={
+                  " mr-2 text-" +
+                  ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.color
+                }
+              />
+              {ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.name}
+            </span>
+          </div>
         </div>
 
         <ImagePin
@@ -221,48 +233,38 @@ export const AssetFreelancer = ({ owner, style }) => {
         <Icon
           onClick={() => handleChangeImage(isPointerImg - 1)}
           icon={icfyARROWD}
-          className="absolute left-1  top-1/2 -translate-y-1/2 rotate-90 text-white text-4xl transition-all cursor-pointer hover:scale-110"
+          className="absolute left-1  top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 rotate-90 text-white text-4xl transition-all cursor-pointer hover:scale-110"
         />
         <Icon
           onClick={() => handleChangeImage(isPointerImg + 1)}
           icon={icfyARROWD}
-          className="absolute right-1 top-1/2 -translate-y-1/2 -rotate-90 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
+          className="absolute right-1 top-1/2 -translate-y-1/2 -rotate-90 opacity-50 hover:opacity-100 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
         />
         <MyStatus
-          style={"absolute top-3 bg-white shadow1 py-1 px-3 left-3 z-1"}
+          style={`absolute top-3  py-2 px-2  text-white left-3 z-1 `}
           target={"visibility"}
           status={owner?.metadatas?.attributes?.[0]?.visibility ? 0 : 1}
         />
         <div
           className="
-        bg-zinc-900 rounded-full absolute  -top-1 z-3 -right-1"
+        bg-black/20 backdrop-blur rounded-full absolute  -top-2 z-3 -right-2"
         >
           <BtnFollow
             cvID={owner?.cvID}
             follow={<Icon icon={icfy.person.check} />}
             unfollow={<Icon icon={icfy.person.uncheck} />}
-            style={" text-xl"}
+            style={" text-xl px-3 backdrop-blur-xl bg-black/60"}
           />
         </div>
       </div>
       <div className="absolute bottom-0 h-1/2 flex flex-col pt-10 pb-4 left-0 w-full px-2 ">
-        <h6 className="text-xl capitalize flex items-center">
-          <Icon
-            icon={ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.icon}
-            className={
-              "text-3xl mr-2 text-" +
-              ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.color
-            }
-          />
-          {ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.name}
-        </h6>
-        <div className="flex overflow-y-scroll mt-5 hide-scrollbar pb-3 flex-wrap w-full ">
+        <div className="flex overflow-y-scroll  hide-scrollbar pb-3 flex-wrap w-full ">
           {owner?.details?.badges?.map(
             (el, i) =>
               i < 5 && (
                 <div
                   key={v4()}
-                  className="shadow1 rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[9px] px-4 py-1 "
+                  className="backdrop-blur  rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[10px] px-4 py-1 "
                 >
                   {i !== 4 ? (
                     <>
@@ -287,7 +289,7 @@ export const AssetFreelancer = ({ owner, style }) => {
               owner.details.badges.length + i < 5 && (
                 <div
                   key={v4()}
-                  className="shadow1 rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[9px] px-4 py-1 "
+                  className="backdrop-blur rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[10px] px-4 py-1 "
                 >
                   {owner.details.badges.length + i !== 4 ? (
                     <>

@@ -6,6 +6,7 @@ import { MyInput } from "components/myComponents/form/MyInput";
 import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
+import { MyToggle } from "components/myComponents/form/MyToggle";
 import { ENUMS } from "constants/enums";
 import { DEV_DOMAIN } from "constants/languages";
 import {
@@ -16,7 +17,14 @@ import {
   useFormState,
 } from "context/form";
 import { useInView } from "framer-motion";
-import { icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
+import {
+  icfy,
+  icfyFB,
+  icfyGITHUB2,
+  icfyLINKEDIN,
+  icfyMAIL,
+  icfyTWITTER,
+} from "icones";
 import React, { useEffect, useRef } from "react";
 
 let margin = "my-4";
@@ -32,7 +40,7 @@ export const FormCreateProfile1 = () => {
   // }, [isInView]);
 
   return (
-    <div className="w-full " ref={ref}>
+    <div className="w-full  flex flex-col " ref={ref}>
       <MyCheckboxes
         label={"Civilité"}
         target={"citizen"}
@@ -41,17 +49,32 @@ export const FormCreateProfile1 = () => {
           { title: "Mme.", value: "Mme" },
         ]}
       />
-      <div className={"flex  debug" + margin}>
-        <MyInput target={"firstName"} label={"Prénom"} />
-        <MyInput target={"lastName"} label={"Nom"} />
-      </div>
-      <div className={"flex " + margin}>
-        <MyInput target={"username"} />
-        <MyInput target={"email"} type={"mail"} />
-      </div>
-      <div className={"flex " + margin}>
-        <MyInput target={"phone"} type={"phone"} />
+      <div className={"flex w-full  mt-4 " + margin}>
         <MyInput
+          styles={"w-full mr-10 "}
+          target={"firstName"}
+          label={"Prénom"}
+        />
+        <MyInput styles={"w-full"} target={"lastName"} label={"Nom"} />
+      </div>
+      <div className={"flex w-full " + margin}>
+        <MyInput target={"username"} styles={"w-full mr-10"} />
+        <MyInput
+          target={"email"}
+          styles={"w-full"}
+          icon={icfyMAIL}
+          type={"mail"}
+        />
+      </div>
+      <div className={"flex " + margin}>
+        <MyInput
+          target={"phone"}
+          styles={"mr-10 w-full"}
+          icon={icfy.ux.phone}
+          type={"phone"}
+        />
+        <MyInput
+          styles={"w-full"}
           target={"dateOfBirth"}
           label={"Date de naissance"}
           type={"date"}
@@ -63,7 +86,7 @@ export const FormCreateProfile1 = () => {
         inputs={[{ label: "Photo de profil", target: "image" }]}
       />
 
-      <MyTextArea target={"description"} label={"Bio"} />
+      <MyTextArea target={"description"} styles={"w-full "} label={"Bio"} />
     </div>
   );
 };
@@ -84,36 +107,9 @@ export const FormCreateProfile2 = () => {
   return (
     <div className="">
       <div className={"flex flex-col mb-4"}>
-        <MyFormInfo
-          title={"👁️ Visibilité"}
-          description={
-            <>
-              En anonymisant votre profil, votre CV sera visible en CVthèque
-              mais sans votre nom, prénom, numéro de téléphone et adresse
-              e-mail. Pensez à bien supprimer ces données également de votre
-              fichier CV. En revanche , lorsque vous postulerez, vos données
-              personnelles deviendront visibles par les recruteurs.
-              <br />
-              <br />
-              Vous pourrez le modifier à tout moment.
-              <div className="flex items-center mt-4 text-white">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-sm toggle-primary "
-                  onChange={handleChange}
-                  checked={form?.["visibility"]}
-                />
-                <span className="text-xs  w-fit ml-4">
-                  Anonymiser mon profil
-                </span>
-              </div>
-            </>
-          }
-        />
-
         <MyInputsFile inputs={[{ label: "CV", target: "cvImg" }]} />
 
-        <p className="text-light text-white font-light text-xs mb-1 ">
+        <p className="text-light c4 font-light text-xs mt-2 mb-1 ">
           Vous pouvez renseigner votre CV hors plateforme afin qu'il soit vu par
           les recruteurs.
         </p>
@@ -166,38 +162,10 @@ export const FormCreateProfile2 = () => {
       />
 
       <div className={"flex " + margin}>
-        <MyInput
-          label={
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyFB} /> Facebook
-            </span>
-          }
-          target={"facebook"}
-        />
-        <MyInput
-          label={
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyLINKEDIN} /> Linkedin
-            </span>
-          }
-          target={"linkedin"}
-        />
-        <MyInput
-          label={
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyGITHUB2} /> Github
-            </span>
-          }
-          target={"github"}
-        />
-        <MyInput
-          label={
-            <span className="flex items-center">
-              <Icon className="text-2xl mr-2" icon={icfyTWITTER} /> Twitter
-            </span>
-          }
-          target={"twitter"}
-        />
+        <MyInput icon={icfyFB} target={"facebook"} />
+        <MyInput icon={icfyLINKEDIN} target={"linkedin"} />
+        <MyInput icon={icfyGITHUB2} target={"github"} />
+        <MyInput icon={icfyTWITTER} target={"twitter"} />
       </div>
     </div>
   );

@@ -6,8 +6,8 @@ import abi_cvh from "../../../backend/artifacts/contracts/cv/CVsHub.sol/CVsHub.j
 import abi_api_p from "../../../backend/artifacts/contracts/system/APIPost.sol/APIPost.json";
 import abi_bh from "../../../backend/artifacts/contracts/system/BalancesHub.sol/BalancesHub.json";
 import abi_l from "../../../backend/artifacts/contracts/launchpads/Launchpad.sol/Launchpad.json";
-import abi_erc20 from "../../../backend/artifacts/contracts/ERC20/ERC20Token.sol/ERC20Token.json";
-
+// import abi_erc20 from "../../../backend/artifacts/contracts/ERC20/ERC20Token.sol/ERC20Token.json";
+import abi_erc20 from "../../../backend/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json";
 export const ABI_ADDRESS_SYSTEM = abi_addr_s.abi;
 export const ABI_API_G = abi_api_g.abi;
 export const ABI_API_P = abi_api_p.abi;

@@ -1,13 +1,14 @@
 import { MyTable } from "components/myComponents/table/MyTable";
 import { MENUS_EDIT, MENUS_ID } from "constants/menus";
 import {
+  doIndexTools,
   doStateProfileTools,
   doStateTools,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 import { useInView } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   stateDispute,
   stateFeature,
@@ -44,6 +45,8 @@ import {
 } from "utils/states/tables/escrow";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
+import { MyModal } from "components/myComponents/modal/MyModal";
+import { ImagePin } from "components/Image/ImagePin";
 
 export const CVOverview = () => {
   let { state, index, status } = useToolsState();
@@ -57,7 +60,7 @@ export const CVOverview = () => {
   let handlePost = async (func, id) => {
     await _apiPost(func, [id]);
 
-    doStateProfileTools({ dispatch, cvID: state?.owner?.cvID });
+    doStateProfileTools({ dispatch, cvID: state?.profile?.cvID });
   };
   let [isArbitratorsState, setIsArbitratorsState] = useState(null);
 
@@ -65,10 +68,10 @@ export const CVOverview = () => {
     let disputes = [];
     for (
       let index = 0;
-      index < state?.owner?.details?.arbitrators?.length;
+      index < state?.profile?.details?.arbitrators?.length;
       index++
     ) {
-      let arbitrator = state?.owner?.details?.arbitrators?.[index];
+      let arbitrator = state?.profile?.details?.arbitrators?.[index];
       for (let index = 0; index < arbitrator?.disputes.length; index++) {
         let dispute = await stateDispute(
           arbitrator?.disputes?.[index].disputeID
@@ -83,12 +86,12 @@ export const CVOverview = () => {
   useEffect(() => {
     if (
       !isArbitratorsState &&
-      ((!state?.front?.target && isClicked === 4) ||
+      ((!state?.front?.target && state?.indexOverview === 4) ||
         state?.front?.target === "dispute")
     ) {
       fetchDisputes();
     }
-  }, [state?.front?.target, isClicked]);
+  }, [state?.front?.target, state?.indexOverview]);
 
   const components = {
     launchpad: <div>Launchpad</div>,
@@ -106,33 +109,33 @@ export const CVOverview = () => {
   let infos = [
     {
       btn: "Missions",
-      table: _table_missions(state?.owner?.details),
+      table: _table_missions(state?.profile?.details),
       head: HEAD_table_missions,
       setState: stateMission,
-
+      url: "#section2",
       // btns: MENUS_EDIT.mission,
     },
     {
       btn: "Jobs",
-      table: _table_features(state?.owner?.details?.jobs),
+      table: _table_features(state?.profile?.details?.jobs),
       head: HEAD_table_features,
       setState: stateFeature,
-      arr: state?.owner?.datas?.proposals,
+      arr: state?.profile?.datas?.proposals,
       // btns: MENUS_EDIT.feature,
     },
     {
       btn: "Launchpads",
-      table: _table_launchpad(state?.owner?.details?.launchpads),
+      table: _table_launchpad(state?.profile?.details?.launchpads),
       head: HEAD_table_launchpads,
-      arr: state?.owner?.datas?.launchpads,
+      arr: state?.profile?.datas?.launchpads,
       setState: stateLaunchpad,
       // btns: MENUS_EDIT.invite,
     },
     {
       btn: "Invites",
-      table: _table_invites(state?.owner?.details?.invites),
+      table: _table_invites(state?.profile?.details?.invites),
       head: HEAD_table_invites,
-      arr: state?.owner?.details?.invites,
+      arr: state?.profile?.details?.invites,
       setState: stateFeature,
       editBtns: [
         {
@@ -176,72 +179,109 @@ export const CVOverview = () => {
   let fetch = async () => {
     let _state = state;
     let _infos = infos;
-    let element = _infos?.[isClicked];
+    let element = _infos?.[state?.indexOverview];
 
     if (!element?.arr) {
       return;
     }
     let target = element.btn.toLowerCase();
-    if (!_state?.owner?.details?.[target]?.length >= 0) {
-      _state.owner.details[`${target}`] = [];
+    if (!_state?.profile?.details?.[target]?.length >= 0) {
+      _state.profile.details[`${target}`] = [];
     }
 
     for (let index = 0; index < element?.arr?.length; index++) {
       const id = element?.arr?.[index];
       let el = await element?.setState(id);
-      _state.owner.details[target].push(el);
+      _state.profile.details[target].push(el);
     }
 
     doStateTools(dispatch, _state);
   };
 
-  useEffect(() => {
-    let target = infos?.[isClicked]?.btn.toLowerCase();
-    if (!isLists?.[target] && state?.owner?.details && isInView) {
+  useMemo(() => {
+    let target = infos?.[state?.indexOverview]?.btn.toLowerCase();
+    if (!isLists?.[target] && state?.profile?.details && isInView) {
       console.log("Fetch CV Overview ...", state);
 
       fetch();
     }
-  }, [isClicked, isInView]);
+  }, [state?.indexOverview]);
 
   useEffect(() => {
-    let target = infos?.[isClicked]?.btn.toLowerCase();
+    let target = infos?.[state?.indexOverview]?.btn.toLowerCase();
 
     if (
       (!isLists?.[target] ||
         isLists?.[target]?.table?.length !== isLists?.[target]?.arr?.length) &&
-      state?.owner?.details?.[target]?.length >= 0 &&
-      isInView
+      state?.profile?.details?.[target]?.length >= 0
     ) {
       setIsLists({
         ...isLists,
-        [target]: infos?.[isClicked],
+        [target]: infos?.[state?.indexOverview],
       });
     }
-  }, [status, isClicked, isInView]);
+  }, [status, isInView]);
 
   return (
     <>
       {components?.[state?.front?.target] || (
-        <MyCard styles={"h-full"}>
+        <>
           <MyMenusTabs
-            setter={setIsClicked}
-            value={isClicked}
+            style={"w-full rounded-none bgprim"}
+            color={1}
+            setter={(i) =>
+              doStateTools(dispatch, { ...state, indexOverview: i })
+            }
+            value={state?.indexOverview}
             arr={infos}
             target={"btn"}
-          />
-          <div
-            ref={ref}
-            className="w-full h-full rounded-lg shadow backdrop-blur "
           >
-            <MyTable
-              list={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.table}
-              head={isLists?.[`${infos?.[isClicked].btn.toLowerCase()}`]?.head}
-              btns={infos?.[isClicked]?.btns}
-              editBtns={infos?.[isClicked]?.editBtns}
+            Gallery
+          </MyMenusTabs>
+          {state?.indexOverview >= 0 &&
+          isLists?.[`${infos?.[state?.indexOverview].btn.toLowerCase()}`]
+            ?.table ? (
+            <MyCard styles={"h-full  rounded-t-none w-full "}>
+              <div
+                ref={ref}
+                className="w-full h-full rounded-lg shadow backdrop-blur "
+              >
+                <MyTable
+                  list={
+                    isLists?.[
+                      `${infos?.[state?.indexOverview].btn.toLowerCase()}`
+                    ]?.table
+                  }
+                  head={
+                    isLists?.[
+                      `${infos?.[state?.indexOverview].btn.toLowerCase()}`
+                    ]?.head
+                  }
+                  btns={infos?.[state?.indexOverview]?.btns}
+                  editBtns={infos?.[state?.indexOverview]?.editBtns}
+                />
+              </div>
+            </MyCard>
+          ) : (
+            <MyModal
+              styles={{
+                btn: "btn-ghost ml-1 w-fit h-fit overflow-scroll hide-scrollbar",
+              }}
+              btn={
+                <ImagePin
+                  style={"h-[70vh] w-[35vw]"}
+                  CID={state?.profile?.metadatas?.attributes?.[0]?.cvImg}
+                />
+              }
+              modal={
+                <ImagePin
+                  style={"h-[90vh] w-[80vw] "}
+                  CID={state?.profile?.metadatas?.attributes?.[0]?.cvImg}
+                />
+              }
             />
-          </div>
-        </MyCard>
+          )}
+        </>
       )}
     </>
   );

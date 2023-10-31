@@ -8,7 +8,7 @@ import { MyBtnPost } from "../../btn/MyBtnPost";
 import { MyMainBtn1 } from "../btn/MyMainBtn";
 import { useToolsState } from "context/tools";
 import { useAuthState } from "context/auth";
-export const MyTableEl = ({ id, arr, index, editBtns, btns }) => {
+export const MyTableEl = ({ id, arr, index, editBtns, component, btns }) => {
   console.log(index, index % 2);
   let { cv } = useAuthState();
   let { state } = useToolsState();
@@ -56,6 +56,7 @@ export const MyTableEl = ({ id, arr, index, editBtns, btns }) => {
             ) : (
               btns
             )}
+            {component}
           </div>
         </th>
       </tr>

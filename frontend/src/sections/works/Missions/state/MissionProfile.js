@@ -3,6 +3,7 @@ import { AssetProfile } from "components/assets/AssetProfile";
 import { MissionName } from "components/inputs/inputsMission/MissionName";
 import { MyCard1, MyCardInfos } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMenus, MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyTable } from "components/myComponents/table/MyTable";
 import { ENUMS } from "constants/enums";
@@ -40,18 +41,11 @@ export const MissionProfile = ({ missionID }) => {
     {
       title: "Status",
       value: (
-        <div
-          className={
-            "flex items-center p-3   badge badge-outline badge-xs text-xs badge-" +
-            STATUS?.mission[isMission?.datas?.status]?.color
-          }
-        >
-          <Icon
-            icon={STATUS?.mission[isMission?.datas?.status]?.icon}
-            className="text-lg mr-4"
-          />
-          {STATUS?.mission[isMission?.datas?.status]?.status}
-        </div>
+        <MyStatus
+          status={isMission?.datas?.status}
+          target={"mission"}
+          padding={"px-2 py-1"}
+        />
       ),
     },
     {
@@ -117,8 +111,11 @@ export const MissionProfile = ({ missionID }) => {
     },
   ];
   return (
-    <div className="flex relative h-full">
-      <MyCardInfos style={"w-1/3 mr-3"} arr={infos}></MyCardInfos>
+    <div className="flex relative overflow-visible  h-full">
+      <MyCardInfos
+        style={"w-full rounded-t-none mr-[1px]"}
+        arr={infos}
+      ></MyCardInfos>
       <MyCardInfo
         header={{
           title: (
@@ -131,7 +128,7 @@ export const MissionProfile = ({ missionID }) => {
           image: isMission?.metadatas?.image,
         }}
         color={1}
-        styles={" w-full h-full  "}
+        styles={" w-full h-full overflow-visible "}
         noBtn={true}
         main={{
           text: isMission?.metadatas?.description,

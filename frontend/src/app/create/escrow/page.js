@@ -53,6 +53,7 @@ const PageCreateEscrow = () => {
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
   let { state } = useToolsState();
+  let tools = useToolsState();
   let [isState, setIsState] = useState(null);
   let stateInit = async () => {
     let jobs = await _apiGet("jobsOfCV", [cv]);
@@ -93,6 +94,7 @@ const PageCreateEscrow = () => {
     setIsState({ arr });
   };
 
+  console.log("tools", tools);
   useEffect(() => {
     if (!isState && cv > 0) {
       stateInit();

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   motion,
   useAnimation,
+  AnimatePresence,
   useInView,
   useIsPresent,
   usePresence,
@@ -46,7 +47,16 @@ function useParallax(value, distance) {
   return useTransform(value, [0, 1], [-distance, distance]);
 }
 
-export function Viewport({ index, side, particles, img, full, children, id }) {
+export function Viewport({
+  index,
+  side,
+  particles,
+  fixed,
+  img,
+  full,
+  children,
+  id,
+}) {
   const ref = useRef(null);
 
   const ref1 = useRef(null);
@@ -68,15 +78,36 @@ export function Viewport({ index, side, particles, img, full, children, id }) {
     }
   }, [isInView, isInView1]);
 
+  const images = [
+    "https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a26e_Background%20Hero.svg",
+
+    "https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f68133fc5cb4e29ed28fa_Get%20Started%20BG.svg",
+    "https://assets.website-files.com/646f65e37fe0275cfb808405/646f683b1e3793b739a1c34c_Pricing%20BG%20(1).svg",
+    "https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f68133fc5cb4e29ed28fa_Get%20Started%20BG.svg",
+    "https://assets.website-files.com/646f65e37fe0275cfb808405/646f683b1e3793b739a1c34c_Pricing%20BG%20(1).svg",
+  ];
+
   return (
     <>
       {particles && particles !== true && <Particle style={particles} />}
+
       <section
         // style={{ overflow: "scroll" }}
         id={`section${index}`}
         className="viewport -z-1  w-[100vw] flex flex-col  font2  h-[100vh] mb-10 carr-sec"
       >
-        {img && (
+        {img?.image
+          ? img?.image
+          : images?.[index] &&
+            !img?.no && (
+              <img
+                src={images?.[index]}
+                alt=""
+                className="absolute inset-[0%] -z-[5] inline-block h-full w-full object-cover"
+              />
+            )}
+
+        {img && !img?.image && (
           <div className="absolute top-0 left-0">
             <ImagePin
               CID={img}
@@ -87,13 +118,15 @@ export function Viewport({ index, side, particles, img, full, children, id }) {
         )}
 
         <div
-          className={` flex flex-col relative  mt-[10vh] max-w-[1200px] mx-auto h-[80vh] ${
-            full ? " w-[90vw]  " : "   w-[65vw]"
+          className={` flex  flex-col relative  mt-[10vh] max-w-[1600px] mx-auto  ${
+            full
+              ? " w-[90vw] h-full overflow-y-scroll hide-scrollbar "
+              : "   w-[65vw] h-[80vh] "
           } `}
         >
           <div ref={ref} className="absolute w-full py-1   top-0 "></div>
           <div ref={ref1} className="absolute  bottom-0 py-1 w-full"></div>
-          {children}
+          {!fixed ? children : undefined}
         </div>
         <motion.span className="position  absolute bottom-10 right-10">
           #00<span className="c2 ">{`${id}`}</span>
@@ -104,7 +137,21 @@ export function Viewport({ index, side, particles, img, full, children, id }) {
           </div>
         )}
       </section>
-      {particles && particles === true && <Particle />}
+
+      {fixed && (
+        <AnimatePresence>
+          <motion.div
+            className="h-screen z-100 w-screen fixed p-20 top-0 left-0"
+            key={v4()}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            // exit={{ y: -10, opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      )}
     </>
   );
 }

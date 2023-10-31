@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
+import { MyStatus } from "components/myComponents/item/MyStatus";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { doStateMission } from "context/hub/mission";
@@ -49,12 +50,6 @@ export let _table_launchpad = (launchpads, owner) => {
       </div>,
       <div className={` flex flex-col items-center text-[10px]`}>
         {el?.datas?.currentTier}/{el?.datas?.numberOfTier}
-        <span
-          className={` flex badge-xs  mb-1 text-[9px] badge badge-outline py-2  items-center badge-${status.color}`}
-        >
-          <Icon className="mr-2 " icon={status.icon} />
-          {status?.status}
-        </span>
       </div>,
       <>
         <MyCountdown size={10} timestamp={parseInt(el?.datas?.saleStart)} />
@@ -64,7 +59,17 @@ export let _table_launchpad = (launchpads, owner) => {
         ETH
       </p>,
     ];
-    list.push({ arr, id: parseInt(el?.launchpadID) });
+    list.push({
+      arr,
+      id: parseInt(el?.launchpadID),
+      component: (
+        <MyStatus
+          status={el?.datas?.status}
+          target={"launchpad"}
+          padding={"px-2 py-1 "}
+        />
+      ),
+    });
   }
   return list;
 };
@@ -73,7 +78,7 @@ export let HEAD_table_launchpads = [
   "",
   "Launchpad",
   "Tokens",
-  "Status",
+  "Rounds",
   "Temps Restants",
   <Icon className="ml-auto text-xl" icon={icfyETHER} />,
 ];

@@ -101,8 +101,8 @@ export let toMockProfile = ({ address, metadatas, cvID }) => {
     citizen: identity?.citizen,
     linkedin: attributes?.social?.linkedin,
     github: attributes?.social?.github,
-    facebook: attributes?.social?.twitter,
-    twitter: attributes?.social?.facebook,
+    facebook: attributes?.social?.facebook,
+    twitter: attributes?.social?.twitter,
     skills: attributes?.skills,
     domain: attributes?.domain,
     languages: attributes?.languages,
@@ -163,6 +163,7 @@ export let moock_create_feature = {
   target: "feature",
   ia: true,
   title: null,
+  price: 0,
   domain: null,
   image: null,
   description: null,
@@ -195,6 +196,7 @@ export let moock_create_launchpad = {
   tokenAddress: null,
   isAddress: null,
   tokenAllowance: null,
+  price: null,
   numberOfTier: null,
   maxCap: null, // bio
   minCap: null, // uri

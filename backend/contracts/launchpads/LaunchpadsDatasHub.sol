@@ -120,9 +120,17 @@ contract LaunchpadsDatasHub is Ownable {
         uint _tierID,
         uint _amount
     ) external onlyFromContract(_launchpadID) {
-        tierDetails[_launchpadID][_tierID].amountRaised = tierDetails[
-            _launchpadID
-        ][_tierID].amountRaised.add(_amount);
+        uint amountRaised = tierDetails[_launchpadID][_tierID].amountRaised;
+
+        require(
+            launchpadDatas[_launchpadID].numberOfTier > _tierID &&
+                tierDetails[_launchpadID][_tierID].maxTierCap >=
+                tierDetails[_launchpadID][_tierID].amountRaised.add(_amount),
+            "AddAmount: Error tier value"
+        );
+        tierDetails[_launchpadID][_tierID].amountRaised = amountRaised.add(
+            _amount
+        );
     }
 
     function _incrementLaunchpadUser(
@@ -157,7 +165,8 @@ contract LaunchpadsDatasHub is Ownable {
         uint256[] calldata _tokenPrice
     ) public onlyFromContract(_id) {
         require(
-            launchpadDatas[_id].saleStart > block.timestamp,
+            launchpadDatas[_id].saleStart > block.timestamp ||
+                msg.sender == _iAS.apiPost(),
             "Sale already started"
         );
         require(
@@ -216,17 +225,17 @@ contract LaunchpadsDatasHub is Ownable {
             "Tier out of range"
         );
 
-        require(
-            tierDetails[_launchpadID][_tierID].maxTierCap >=
-                tierDetails[_launchpadID][_tierID].amountRaised.add(_value),
-            "Value out of range for this tier"
-        );
+        // require(
+        //     tierDetails[_launchpadID][_tierID].maxTierCap + tierDetails[_launchpadID][] >=
+        //         tierDetails[_launchpadID][_tierID].amountRaised.add(_value),
+        //     "Value out of range for this tier"
+        // );
         uint256 _balanceOf = ILaunchpadsInvestorsHub(
             _iAS.launchpadsInvestorsHub()
         ).datasOf(_launchpadID, _cvID).investedAmount;
 
         require(
-            launchpadDatas[_launchpadID].minInvest <= _value &&
+            launchpadDatas[_launchpadID].minInvest <= _balanceOf.add(_value) &&
                 _balanceOf.add(_value) <=
                 launchpadDatas[_launchpadID].maxInvest,
             "Value not in range invest"

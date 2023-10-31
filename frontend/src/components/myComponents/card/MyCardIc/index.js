@@ -38,10 +38,10 @@ export const MyCardIc = ({
           <Avatar style="h-[38px] w-[38px]" CID={icon?.img} />
         )}
       </div>
-      <div className="flex mx-auto items-center flex-col">
+      <div className="flex mx-auto w-full items-center flex-col">
         <div className="title flex flex-col">{title}</div>
-        <div className="_text flex flex-col">
-          <div className="w-full">
+        <div className="_text w-full flex flex-col">
+          <div className=" px-5 w-full">
             {clickable
               ? childVisibility === "card_ic_clickable"
                 ? children

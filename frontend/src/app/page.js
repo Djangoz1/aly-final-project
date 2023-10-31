@@ -9,10 +9,10 @@ import { Layout } from "sections/Layout";
 import { MySection } from "components/myComponents/MySection";
 import { styles } from "styles/style";
 import { Icon } from "@iconify/react";
-import { LogoIc } from "components/Logo";
+import { Logo, LogoIc } from "components/Logo";
 import { LinearGradient } from "react-text-gradients";
 import { Hg, Hg1 } from "components/text/HeroGradient";
-import { icfy, icfyROCKET } from "icones";
+import { icfy, icfyARROWD, icfyCODE, icfyETHER, icfyROCKET } from "icones";
 import { MyCard } from "components/myComponents/card/MyCard";
 import {
   BtnGb1,
@@ -27,102 +27,84 @@ import { Viewport } from "components/myComponents/layout/MyViewport";
 import { Particle } from "components/myComponents/MyParticles";
 import Link from "next/link";
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
+import { useEffect, useState } from "react";
+import { _apiGet, _apiGetAt } from "utils/ui-tools/web3-tools";
+import { ADDRESSES } from "constants/web3";
+import { ethers } from "ethers";
+import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
+import { useToolsDispatch, useToolsState } from "context/tools";
+import { MyCardList } from "components/myComponents/card/MyCardList";
 
 export default function Home() {
   // const { address, isConnected } = useAccount();
   // const { cv } = useAuthState();
   // const dispatch = useAuthDispatch();
 
-  // const spans = ["community", "confidence", "efficiency"];
-  // const [isSpan, setIsSpan] = useState(0);
+  const [isState, setIsState] = useState(null);
+  const dispatch = useToolsDispatch();
+  const { state } = useToolsState();
+  console.log("state home", state);
+  useEffect(() => {
+    if (isState === null)
+      (async () => {
+        setIsState({
+          price: {
+            launchpad: ethers.utils.formatEther(
+              await _apiGetAt({
+                func: "launchpadPrice",
+                targetContract: "balancesHub",
+                address: ADDRESSES.balancesHub,
+              })
+            ),
+            mission: ethers.utils.formatEther(
+              await _apiGetAt({
+                func: "missionPrice",
+                targetContract: "balancesHub",
+                address: ADDRESSES.balancesHub,
+              })
+            ),
+          },
+          lengths: {
+            cv: await _apiGet("tokensLengthOf", [ADDRESSES["cvsHub"]]),
+            mission: await _apiGet("tokensLengthOf", [
+              ADDRESSES["missionsHub"],
+            ]),
+            launchpad: await _apiGet("tokensLengthOf", [
+              ADDRESSES["launchpadsHub"],
+            ]),
+            pub: await _apiGet("tokensLengthOf", [ADDRESSES["pubsHub"]]),
+            disputes: await _apiGet("tokensLengthOf", [
+              ADDRESSES["disputesHub"],
+            ]),
+          },
+        });
+      })();
+  }, []);
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setIsSpan(isSpan + 1 < spans.length ? isSpan + 1 : 0);
-  //   }, 5000);
-  // }, [isSpan]);
+  let [isPrices, setIsPrices] = useState(null);
 
-  // useEffect(() => {
-  //   if (cv) {
-  //     doAuthMission(dispatch, cv);
-  //   }
-  // }, [cv]);
-
-  // particlesJS("particles-js", {
-  //   particles: {
-  //     number: { value: 80, density: { enable: false, value_area: 800 } },
-  //     color: { value: "#ffffff" },
-  //     shape: {
-  //       type: "circle",
-  //       stroke: { width: 0, color: "#000000" },
-  //       polygon: { nb_sides: 5 },
-  //       image: { src: "img/github.svg", width: 100, height: 100 },
-  //     },
-  //     opacity: {
-  //       value: 0.5,
-  //       random: false,
-  //       anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false },
-  //     },
-  //     size: {
-  //       value: 3,
-  //       random: true,
-  //       anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
-  //     },
-  //     line_linked: {
-  //       enable: true,
-  //       distance: 150,
-  //       color: "#ffffff",
-  //       opacity: 0.4,
-  //       width: 1,
-  //     },
-  //     move: {
-  //       enable: true,
-  //       speed: 6,
-  //       direction: "none",
-  //       random: false,
-  //       straight: false,
-  //       out_mode: "out",
-  //       bounce: false,
-  //       attract: { enable: false, rotateX: 600, rotateY: 1200 },
-  //     },
-  //   },
-  //   interactivity: {
-  //     detect_on: "canvas",
-  //     events: {
-  //       onhover: { enable: true, mode: "repulse" },
-  //       onclick: { enable: true, mode: "push" },
-  //       resize: true,
-  //     },
-  //     modes: {
-  //       grab: { distance: 400, line_linked: { opacity: 1 } },
-  //       bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
-  //       repulse: { distance: 200, duration: 0.4 },
-  //       push: { particles_nb: 4 },
-  //       remove: { particles_nb: 2 },
-  //     },
-  //   },
-  //   retina_detect: true,
-  // });
-  // var count_particles, stats, update;
-  // stats = new Stats();
-  // stats.setMode(0);
-  // stats.domElement.style.position = "absolute";
-  // stats.domElement.style.left = "0px";
-  // stats.domElement.style.top = "0px";
-  // document.body.appendChild(stats.domElement);
-  // count_particles = document.querySelector(".js-count-particles");
-  // update = function () {
-  //   stats.begin();
-  //   stats.end();
-  //   if (
-  //     window.pJSDom[0].pJS.particles &&
-  //     window.pJSDom[0].pJS.particles.array
-  //   ) {
-  //     count_particles.innerText = window.pJSDom[0].pJS.particles.array.length;
-  //   }
-  //   requestAnimationFrame(update);
-  // };
-  // requestAnimationFrame(update);
+  useEffect(() => {
+    if (!isPrices) {
+      (async () => {
+        setIsPrices({
+          launchpad: ethers.utils.formatEther(
+            await _apiGetAt({
+              func: "launchpadPrice",
+              targetContract: "balancesHub",
+              address: ADDRESSES.balancesHub,
+            })
+          ),
+          mission: ethers.utils.formatEther(
+            await _apiGetAt({
+              func: "missionPrice",
+              targetContract: "balancesHub",
+              address: ADDRESSES.balancesHub,
+            })
+          ),
+        });
+      })();
+    }
+  }, []);
 
   return (
     <>
@@ -132,232 +114,404 @@ export default function Home() {
         <div id="stars3"></div>
       </div> */}
 
-      <MyLayoutApp>
+      <MyLayoutApp notLoad={true} initState={isState} url={`/`} target={"home"}>
         <>
-          <Particle style={"fixed z-0"} />
-
-          <Viewport full={true} id={"hero"} index={0}>
-            <div className="w-full h-full items-end relative  flex">
-              <div className="w-full flex flex-col   justify-end  ">
-                <LinearGradient
-                  className="w-fit text-xs font2 uppercase"
-                  gradient={[
-                    "to right",
-                    "rgba(201,78,21,0.92), rgba(201,21,103,1)",
-                  ]}
+          <Viewport
+            img={{
+              image: (
+                <div className="-z-1 h-screen w-screen top-0 left-0  absolute bg-[url(https://images.unsplash.com/photo-1604014237800-1c9102c219da?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80)] bg-cover bg-center bg-no-repeat">
+                  <div className="absolute inset-0  backdrop-blur-[1px] bg-black/75 from-black/95 to-black/25 ltr:bg-gradient-to-r rtl:sm:bg-gradient-to-l"></div>
+                </div>
+              ),
+            }}
+            full={true}
+            id={"hero"}
+          >
+            <div className="relative w-full px-4 py-32 sm:px-6 flex items-end lg:px-8 mt-auto">
+              <div className="max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
+                <h1
+                  className={
+                    "mb-6 pb-4 text-4xl font-light  md:text-6xl uppercase text-left"
+                  }
                 >
-                  Boost your startups from scratch
-                </LinearGradient>
-                <div className={"w-full " + styles.hero}>
+                  {/* <div className={"w-full " + styles.hero}> */}
                   Where
+                  {/* <br /> */}
                   <br />
                   <Hg>Blockchain</Hg>
                   <br />
                   meets Social
                   <br />
                   <Hg>Freelancing</Hg>
-                </div>
-                <p className="w-1/3 text-white/40 text-justify text-sm">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem
-                  autem iste fugiat atque rerum error in sequi harum. Magni
-                  velit praesentium doloremque libero aspernatur dolores eos
-                  temporibus voluptatibus, officia molestiae!
+                  {/* </div> */}
+                </h1>
+
+                <p className="mt-4 max-w-lg sm:text-xl/relaxed">
+                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                  Nesciunt illo tenetur fuga ducimus numquam ea!
                 </p>
+
+                <div className="mt-8 flex flex-wrap gap-4 text-center">
+                  <a
+                    href="#"
+                    className="block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500 sm:w-auto"
+                  >
+                    Get Started
+                  </a>
+
+                  <a
+                    href="#"
+                    className="block w-full rounded bg-white px-12 py-3 text-sm font-medium text-rose-600 shadow hover:text-rose-700 focus:outline-none focus:ring active:text-rose-500 sm:w-auto"
+                  >
+                    Learn More
+                  </a>
+                </div>
               </div>
-
-              {/* <img
-                src="/hero.jpeg"
-                className="h-fit w-[600px]  mask mask-hexagon rounded-lg"
-              /> */}
             </div>
           </Viewport>
-          {/* <Particle style={"absolute top-0 left-0 z-100"} /> */}
+          <Viewport full={true} id={"hero"} index={0}>
+            <header className="relative">
+              <div className="mx-auto w-full max-w-7xl px-5 py-16 md:px-10 md:py-24 lg:py-32">
+                <div className="mx-auto  flex flex-col items-center max-w-3xl text-center">
+                  <h1
+                    className={
+                      "mb-6 pb-4 text-4xl font-bold text-white md:text-6xl " +
+                      styles.hero
+                    }
+                  >
+                    {/* <div className={"w-full " + styles.hero}> */}
+                    Where <Hg>Blockchain</Hg>
+                    {/* <br /> */}
+                    <br />
+                    meets Social
+                    <br />
+                    <Hg>Freelancing</Hg>
+                    {/* </div> */}
+                  </h1>
+                  <LinearGradient
+                    className="mx-auto mb-5 w-full text-xl text-[#636262] lg:mb-8   font2 uppercase"
+                    gradient={[
+                      "to right",
+                      "rgba(201,78,21,0.92), rgba(201,21,103,1)",
+                    ]}
+                  >
+                    Boost your startups from scratch
+                  </LinearGradient>
 
-          <Viewport full={true} id={"presentation1"} index={1}>
-            <div
-              className="presentation   my-auto flex flex-col justify-center "
-              id="freelance-presentation"
-            >
-              <h2 className={`text-center font-light text-[34px]`}>
-                Contribute to <Hg>innovative</Hg> and <Hg>challenging</Hg>{" "}
-                projects
-              </h2>
+                  <a
+                    href="#"
+                    className="inline-block btn w-fit rounded-full bg-[#c9fd02] px-8 py-4 text-center font-bold text-black transition hover:border-black hover:bg-white"
+                  >
+                    Get Started
+                  </a>
+                </div>
 
-              <ul className="m-0 p-0">
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.person.team} className="icons" />
-                    <Hg style={"font-light"}>Collaborative Project Building</Hg>
+                <div className="mx-auto mt-16 grid max-w-[1040px] grid-cols-2 gap-8 py-20 sm:grid-cols-3 sm:gap-12 md:grid-cols-5">
+                  <div className="mx-auto">
+                    <img
+                      src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a267_Microsoft%20Logo.svg"
+                      alt=""
+                      className="inline-block"
+                    />
                   </div>
-                  <div className="subtitle hover:text-white">
-                    Join projects where your opinion matters and become an
-                    integral part of a team
+                  <div className="mx-auto">
+                    <img
+                      src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a26a_PayPal%20Logo.svg"
+                      alt=""
+                      className="inline-block"
+                    />
                   </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.ux.experiment} className="icons" />
-                    <Hg style={"font-light"}>
-                      Exciting and Innovative Projects
-                    </Hg>
+                  <div className="mx-auto">
+                    <img
+                      src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a268_Google%20Logo.svg"
+                      alt=""
+                      className="inline-block"
+                    />
                   </div>
-                  <div className="subtitle hover:text-white">
-                    Discover a variety of new interesting and cutting-edge
-                    projects
+                  <div className="mx-auto">
+                    <img
+                      src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a269_Chase%20Logo.svg"
+                      alt=""
+                      className="inline-block"
+                    />
                   </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.ux.mediation} className="icons" />
-                    <Hg style={"font-light"}>Efficient Mediation System</Hg>
+                  <div className="mx-auto">
+                    <img
+                      src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a26b_Walmart%20Logo.svg"
+                      alt=""
+                      className="inline-block"
+                    />
                   </div>
-                  <div className="subtitle hover:text-white">
-                    Count on our reliable mediation system, ensuring effective
-                    conflict resolution and seamless communication
+                </div>
+              </div>
+            </header>
+          </Viewport>
+          <Viewport full={true} id={"hero"} index={1}>
+            <section className="relative text-white">
+              <div className="mx-auto w-full max-w-7xl px-5 py-16 md:px-10 md:py-24 lg:py-32">
+                <div className="mx-auto mb-8 max-w-3xl text-center md:mb-12 lg:mb-16">
+                  <h1
+                    className={
+                      "mb-6 pb-4 text-4xl font-bold text-white md:text-5xl " +
+                      styles.hero
+                    }
+                  >
+                    Backed <Hg>up</Hg> by real <Hg>data</Hg>
+                    <br />
+                  </h1>
+                  <p className="mx-auto mt-4 max-w-[528px] text-[#636262]">
+                    Lorem ipsum dolor sit amet consectetur adipiscing elit ut
+                    aliquam,purus sit amet luctus magna fringilla urna
+                  </p>
+                </div>
+
+                <div className="py- lg:grid-cols-48 mx-auto grid w-full max-w-[960px] grid-cols-1 gap-5 px-16 sm:grid-cols-2 md:grid-cols-3 md:gap-12 lg:grid-cols-4">
+                  <div className="flex flex-col items-center gap-4">
+                    <p>Accounts</p>
+                    <h2 className="mb-4 mt-6 text-3xl font-extrabold md:text-5xl">
+                      {parseInt(state?.lengths?.cv)}
+                      <span className="text-[#c9fd02]">+</span>
+                    </h2>
                   </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.eye.open} className="icons" />
-                    <Hg style={"font-light"}>Enhanced Visibility</Hg>
+
+                  <div className="flex flex-col items-center gap-4">
+                    <p>Posts</p>
+                    <h2 className="mb-4 mt-6 text-3xl font-extrabold md:text-5xl">
+                      {parseInt(state?.lengths?.pub)}
+                      <span className="text-[#c9fd02]">+</span>
+                    </h2>
                   </div>
-                  <div className="subtitle hover:text-white">
-                    Increase your professional visibility and connect with a
-                    wider range of clients and opportunities
+
+                  <div className="flex flex-col items-center gap-4">
+                    <p>Missions</p>
+                    <h2 className="mb-4 mt-6 text-3xl font-extrabold md:text-5xl">
+                      {parseInt(state?.lengths?.mission)}
+                      <span className="text-[#c9fd02]">+</span>
+                    </h2>
                   </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfyROCKET} className="icons" />
-                    <Hg style={"font-light"}>Simplified Onboarding</Hg>
+
+                  <div className="flex flex-col items-center gap-4">
+                    <p>Escrow Tickets</p>
+                    <h2 className="mb-4 mt-6 text-3xl font-extrabold md:text-5xl">
+                      {parseInt(state?.lengths?.disputes)}
+                      <span className="text-[#c9fd02]">+</span>
+                    </h2>
                   </div>
-                  <div className="subtitle hover:text-white">
-                    Getting started is a breeze, thanks to our user-friendly and
-                    straightforward onboarding process
-                  </div>
-                </li>
-              </ul>
+                  <div className=""></div>
+                </div>
+              </div>
+            </section>
+          </Viewport>
+
+          <Viewport full={true} id={"hero"} index={2}>
+            <div className="mx-auto  w-full max-w-7xl  ">
+              <div className="mx-auto mb-8 max-w-3xl text-center md:mb-12 lg:mb-16">
+                <div className="mx-auto ">
+                  <h1
+                    className={
+                      styles.hero +
+                      " mb-6 pb-4 text-4xl font-bold text-white md:text-5xl w-fit text-center  "
+                    }
+                  >
+                    {/* <div className={"w-full " + styles.hero}> */}
+                    Create &amp;
+                    <br />
+                    <Hg>challenging</Hg> projects
+                    {/* <br />
+                    meets Social
+                    <br /> */}
+                    {/* </div> */}
+                  </h1>
+                  <p className="text-[#636262]">
+                    Simple &amp; fixed pricing. 30 days money-back guarantee
+                  </p>
+                </div>
+              </div>
+              <MyCardList
+                color={1}
+                style={"mx-auto "}
+                url={"/create/launchpad"}
+                btn={{
+                  title: "Create launchpad",
+                  info: "30 days money-back guarantee",
+                }}
+                arr={[
+                  { icon: icfy.work.casual, title: "Simplified Onboarding" },
+                  { icon: icfyCODE, title: "Enhanced Visibility" },
+                  { icon: icfy.ux.mediation, title: "Manage workflow" },
+                  { icon: icfy.court.injustice, title: "Decentralization" },
+                  { icon: icfy.bank.bag, title: "Community funding" },
+                ]}
+                price={state?.price?.launchpad}
+              ></MyCardList>
             </div>
           </Viewport>
-          <Viewport full={true} id={"presentation2"} index={2}>
-            <div className="  font2">
-              <h6 className={` font-light  text-[45px]  `}>Our Services</h6>
-              <p className="text-white/40 w-1/3 text-xs mb-[6vh]">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa
-                fugiat aperiam similique voluptatum illo exercitationem
-                explicabo distinctio sint ratione, recusandae voluptates officia
-                natus adipisci ab soluta in unde dolor earum!
-              </p>
-
-              <div className="flex justify-evenly">
-                <MyCardIc
-                  icon={icfy.work.casual}
-                  title={"Freelance protocole"}
-                  btn={"create mission"}
+          <Viewport full={true} id={"hero"} index={3}>
+            <div className=" w-full     ">
+              <div className="flex  flex-col items-center">
+                <div className="mb-8 max-w-3xl text-center md:mb-12 lg:mb-16">
+                  <h1
+                    className={
+                      "mb-6 pb-4 text-4xl font-bold text-white md:text-5xl " +
+                      styles.hero
+                    }
+                  >
+                    <span className="capitalize">Our</span> <Hg>protocoles</Hg>
+                  </h1>
+                  <div className="mx-auto mt-4 max-w-[528px]">
+                    <p className="c4">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      At voluptas dolores voluptatem a mollitia deleniti nihil.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid  w-full grid-cols-1 gap-8 md:grid-cols-4 md:gap-1">
+                  <MyCardPrice
+                    style={"mx-auto"}
+                    color={2}
+                    lists={[
+                      {
+                        title: "Open for all",
+                        check: true,
+                      },
+                      {
+                        title: "Earn token ERC20",
+                        check: true,
+                      },
+                      {
+                        title: "Protect by protocole",
+                        check: false,
+                      },
+                      {
+                        title: "Token ERC20 accept",
+                        check: false,
+                      },
+                    ]}
+                    url={"/create/launchpad"}
+                    price={state?.price?.launchpad}
+                    badge={{ title: "Launchpad", icon: icfyROCKET }}
+                  />
+                  <MyCardPrice
+                    style={"mx-auto"}
+                    color={3}
+                    active={true}
+                    lists={[
+                      {
+                        title: "Open for all",
+                        check: true,
+                      },
+                      {
+                        title: "Earn token ERC20",
+                        check: true,
+                      },
+                      {
+                        title: "Protect by protocole",
+                        check: true,
+                      },
+                      {
+                        title: "Token ERC20 accept",
+                        check: true,
+                      },
+                    ]}
+                    url={"/create/mission"}
+                    price={state?.price?.mission}
+                    badge={{ title: "Freelance", icon: icfy.work.casual }}
+                  />
+                  <MyCardPrice
+                    style={"mx-auto"}
+                    color={1}
+                    lists={[
+                      {
+                        title: "Open for all",
+                        check: false,
+                      },
+                      {
+                        title: "Earn token ERC20",
+                        check: true,
+                      },
+                      {
+                        title: "Protect protocole",
+                        check: true,
+                      },
+                      {
+                        title: "Token ERC20 accept",
+                        check: true,
+                      },
+                    ]}
+                    badge={{ title: "Escrow", icon: icfy.court.injustice }}
+                  />
+                  <MyCardPrice
+                    style={"mx-auto"}
+                    color={0}
+                    lists={[
+                      {
+                        title: "Open for all",
+                        check: true,
+                      },
+                      {
+                        title: "Earn token ERC20",
+                        check: true,
+                      },
+                      {
+                        title: "Protect by protocole",
+                        check: false,
+                      },
+                      {
+                        title: "Token ERC20 accept",
+                        check: false,
+                      },
+                    ]}
+                    badge={{ title: "Social", icon: icfy.msg.chat }}
+                  />
+                </div>
+              </div>
+            </div>
+          </Viewport>
+          <Viewport full={true} id={"hero"} index={4}>
+            <div className="mx-auto  w-full max-w-7xl  ">
+              <div className="rounded-[60px] px-12  text-white ">
+                <div className="mx-auto mb-8 max-w-3xl text-center md:mb-12 lg:mb-16">
+                  <div className="mx-auto ">
+                    <h1
+                      className={
+                        styles.hero +
+                        " mb-6 pb-4 text-4xl font-bold text-white md:text-5xl w-fit text-center  "
+                      }
+                    >
+                      {/* <div className={"w-full " + styles.hero}> */}
+                      build &amp; <Hg>work</Hg>
+                      <br />
+                      <Hg>with</Hg> community
+                    </h1>
+                    <p className="text-[#636262]">
+                      Simple &amp; fixed pricing. 30 days money-back guarantee
+                    </p>
+                  </div>
+                </div>
+                <MyCardList
+                  color={0}
+                  style={"mx-auto "}
                   url={"/create/mission"}
-                />
-                <MyCardIc
-                  icon={icfy.msg.chat}
-                  title={"Social protocole"}
-                  url={"/create/profile"}
-                  btn={"Create account"}
-                />
-                <MyCardIc
-                  icon={icfyROCKET}
-                  title={"Launchpad protocole"}
-                  btn={"Create launchpad"}
-                  url={"/create/launchpad"}
-                />
-                <MyCardIc
-                  icon={icfy.court.hammer}
-                  btn={"Declare dispute"}
-                  url={"/create/escrow"}
-                  title={"Escrow protocole"}
-                />
+                  btn={{
+                    title: "Create mission",
+                    info: "30 days money-back guarantee",
+                  }}
+                  arr={[
+                    { icon: icfy.work.casual, title: "Create mission" },
+                    { icon: icfyCODE, title: "Hire worker" },
+                    { icon: icfy.ux.mediation, title: "Manage workflow" },
+                    { icon: icfy.court.injustice, title: "Declare dispute" },
+                    {
+                      icon: icfy.court.hammer,
+                      title: "Integrate court",
+                      description: "Finish job to integrate court",
+                    },
+                  ]}
+                  price={state?.price?.mission}
+                ></MyCardList>
               </div>
             </div>
           </Viewport>
-
-          <Viewport full={true} id={"presentation3"} index={3}>
-            <div
-              className="presentation  my-[10vh] "
-              id="project-owner-presentation"
-            >
-              <h2 className={`text-center font-light text-[34px]`}>
-                Empowering the <Hg1>next</Hg1> generation of{" "}
-                <Hg1>Innovators</Hg1>
-              </h2>
-
-              <ul className="m-0 p-0">
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.ux.star} className="icons" />
-                    <Hg1 style={"font-light"}>Launch your Dreams</Hg1>
-                  </div>
-                  <div className="subtitle hover:text-white">
-                    We're here to support community innitiative for help to
-                    launch your projects into the stratosphere.
-                  </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.bank.bag} className="icons" />
-                    <Hg1 style={"font-light"}>Community Funding</Hg1>
-                  </div>
-                  <div className="subtitle hover:text-white">
-                    Discover a variety of new interesting and cutting-edge
-                    projects
-                  </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.domain.blockchain} className="icons" />
-                    <Hg1 style={"font-light"}>Decentralization</Hg1>
-                  </div>
-                  <div className="subtitle hover:text-white">
-                    Count on our reliable mediation system, ensuring effective
-                    conflict resolution and seamless communication
-                  </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfy.eye.open} className="icons" />
-                    <Hg1 style={"font-light"}>Enhanced Visibility</Hg1>
-                  </div>
-                  <div className="subtitle hover:text-white">
-                    Increase your professional visibility and connect with a
-                    wider range of clients and opportunities
-                  </div>
-                </li>
-                <li>
-                  <div className="title">
-                    <Icon icon={icfyROCKET} className="icons" />
-                    <Hg1 style={"font-light"}>Simplified Onboarding</Hg1>
-                  </div>
-                  <div className="subtitle hover:text-white">
-                    Getting started is a breeze, thanks to our user-friendly and
-                    straightforward onboarding process
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </Viewport>
-
-          <LogoIc
-            styles={
-              "absolute text-[600px] top-1/2 left-1/2 -z-10 opacity-[0.6%] -translate-y-1/2 -translate-x-1/2"
-            }
-          />
-
-          {/* <Hero />
-
-          <div className="w-[90%] h-screen flex flex-col justify-evenly mx-auto">
-            <h6 className="text-white text-center text-[35px] font-prim font-bold">
-              Wwwork with{" "}
-              <span className="font-black text-primary">{spans[isSpan]}</span>
-            </h6>
-          </div>
-          <Missions /> */}
         </>
       </MyLayoutApp>
     </>

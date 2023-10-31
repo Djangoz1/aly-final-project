@@ -22,7 +22,7 @@ export const FormCreateMission1 = () => {
         ]}
       />
       <MyInputsFile
-        styles={margin}
+        styles={margin + " mr-5"}
         inputs={[
           { label: "Image", target: "image" },
           { label: "Bannière", target: "banniere" },

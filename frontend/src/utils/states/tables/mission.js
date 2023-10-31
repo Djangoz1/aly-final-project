@@ -1,4 +1,6 @@
 import { Icon } from "@iconify/react";
+import { MyStatus } from "components/myComponents/item/MyStatus";
+import { MySub } from "components/myComponents/text/MySub";
 
 import { ENUMS } from "constants/enums";
 
@@ -35,18 +37,28 @@ export let _table_missions = (details) => {
       <span className={`text-white`}>{el?.datas?.features?.length}</span>,
       <span className={`text-white`}>{el?.datas?.pubs?.length}</span>,
 
-      <div className="text-right">
-        <span className={`text-white mr-2`}>{el?.datas?.amount}</span>
-        ETH
-        <span
-          className={` flex badge-xs  mt-2 text-[9px] badge badge-outline py-2  items-center badge-${status.color}`}
-        >
-          <Icon className="mr-2 text-xl" icon={status.icon} />
-          {status.status}
+      <div className="text-right flex flex-col items-end">
+        <span className={`text-white text-lg `}>
+          {el?.datas?.amount}
+          <MySub style={"c4 ml-1"}>ETH</MySub>
         </span>
       </div>,
     ];
-    list.push({ arr, id: parseInt(el?.missionID) });
+    list.push({
+      arr,
+      id: parseInt(el?.missionID),
+      component: (
+        <MyStatus
+          status={el?.datas?.status}
+          target={"mission"}
+          padding={"px-2 py-1 "}
+          style={` mt-2 text-[8px] p-0`}
+        >
+          <Icon className="mr-2 text-xl" icon={status.icon} />
+          {status.status}
+        </MyStatus>
+      ),
+    });
   }
   return list;
 };

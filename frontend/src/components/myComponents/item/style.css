@@ -1,0 +1,63 @@
+.pulse-status {
+  border-radius: 50%;
+}
+
+.pulse-status.info {
+  background-color: #69dcff;
+  animation: 1.5s pulse-info infinite ease-in-out;
+}
+
+@keyframes pulse-info {
+  0% {
+    box-shadow: 0 0 0 0 #69dcff39;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px #69ffa800;
+  }
+}
+
+.pulse-status.warning {
+  background-color: #fffa69;
+  animation: 1.5s pulse-warning infinite ease-in-out;
+}
+
+@keyframes pulse-warning {
+  0% {
+    box-shadow: 0 0 0 0 #fffa698d;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px #69ffa800;
+  }
+}
+
+.pulse-status.error {
+  background-color: #ff6969;
+  animation: 1.5s pulse-error infinite ease-in-out;
+}
+
+@keyframes pulse-error {
+  0% {
+    box-shadow: 0 0 0 0 #ff696952;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px #69ffa800;
+  }
+}
+
+.pulse-status.success {
+  background-color: #69ffa8;
+  animation: 1.5s pulse-success infinite ease-in-out;
+}
+
+@keyframes pulse-success {
+  0% {
+    box-shadow: 0 0 0 0 #69ffa832;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px #69ffa800;
+  }
+}

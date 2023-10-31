@@ -43,6 +43,6 @@ const Child = ({ stateInit, children }) => {
       });
       console.log("Anormal ! Init layout form ...", stateInit);
     }
-  }, [stateInit, isConnected, modal]);
+  }, [stateInit, stateInit?.allowed, isConnected, modal]);
   return <>{children}</>;
 };
