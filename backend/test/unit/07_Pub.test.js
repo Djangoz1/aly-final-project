@@ -45,12 +45,14 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     it("should have no pub", async () => {
-      expect(await apiGet.lengthOfPubs()).to.be.equal(0);
+      expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(0);
     });
     it("should create pub", async () => {
-      const length = await apiGet.lengthOfPubs();
+      const length = await apiGet.tokensLengthOf(contract.target);
       await apiPost.createPub("tokenURI");
-      expect(await apiGet.lengthOfPubs()).to.be.equal(parseInt(length) + 1);
+      expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(
+        parseInt(length) + 1
+      );
     });
 
     describe("NOT WORKS", () => {
@@ -62,13 +64,42 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
+  describe("Payable pub", () => {
+    beforeEach(async () => {});
+
+    it("should have 0 pub", async () => {
+      expect(await apiGet.pubsPayableLength()).to.be.equal(0);
+      await apiPost.createPub("tokenURI");
+
+      expect(await apiGet.pubsPayableLength()).to.be.equal(0);
+    });
+
+    it("should create payable pub", async () => {
+      expect(await apiGet.pubsPayableLength()).to.be.equal(0);
+      await apiPost.createPubPayable(200, "tokenURI");
+      expect(await apiGet.pubsPayableLength()).to.be.equal(1);
+    });
+
+    describe("NOT WORKS", () => {
+      it("should NOT like pub without pubsHub bindings", async () => {
+        await expect(contract.mint(1, "tokenURI", true)).to.be.revertedWith(
+          "Must call function with proxy bindings"
+        );
+      });
+      it("should NOT work if amount === 0", async () => {
+        await expect(
+          apiPost.createPubPayable(0, "tokenURI")
+        ).to.be.revertedWith("Must have a value");
+      });
+    });
+  });
   describe("Like pub", () => {
     beforeEach(async () => {
       await apiPost.createPub("tokenURI");
     });
 
     it("should have 1 pub", async () => {
-      expect(await apiGet.lengthOfPubs()).to.be.equal(1);
+      expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
     });
 
     it("ownerOf(like) should be work", async () => {
@@ -202,9 +233,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("Pub Answer", () => {
       it("addPubAnswer : should update pubs length", async () => {
-        let prevLength = await apiGet.lengthOfPubs();
+        let prevLength = await apiGet.tokensLengthOf(contract.target);
         await apiPost.createPubAnswer(1, "tokenURI");
-        let length = await apiGet.lengthOfPubs();
+        let length = await apiGet.tokensLengthOf(contract.target);
         expect(length).to.be.equal(parseInt(prevLength) + 1);
       });
 
@@ -251,9 +282,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       describe("WORKS", () => {
         it("AddPubMission : should update pubs length", async () => {
-          let prevLength = await apiGet.lengthOfPubs();
+          let prevLength = await apiGet.tokensLengthOf(contract.target);
           await apiPost.createPubMission(1, "tokenURI");
-          let length = await apiGet.lengthOfPubs();
+          let length = await apiGet.tokensLengthOf(contract.target);
           expect(length).to.be.equal(parseInt(prevLength) + 1);
         });
 

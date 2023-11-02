@@ -63,6 +63,8 @@ export const MissionFeatures = ({ featureID, index }) => {
     setIsTabs(i);
   };
 
+  console.log("ok", isState);
+  console.log("index", index);
   let components = [
     <FeatureInformations feature={isState?.feature} />,
 
@@ -81,23 +83,28 @@ export const MissionFeatures = ({ featureID, index }) => {
   return (
     <>
       <div ref={ref} className="flex h-full w-full  ">
-        <MyMenusTabs
-          template={1}
-          color={4}
-          styleOrigin={"bg-white/5 h-full  backdrop-blur-[1px] p-0"}
-          arr={[
-            "Informations",
-            "Notifications",
-            "Description",
-            "Gallery",
-            state?.features?.[index]?.datas?.dispute && "Disputes",
-          ]}
-          value={isTabs}
-          setter={handleChangeMenu}
-        />
-        <div className=" w-full h-full relative flex">{components[isTabs]}</div>
-        <div className="w-fit overflow-y-scroll backdrop-blur-[1px]">
+        <div className=" overflow-y-scroll w-1/5 backdrop-blur-[1px]">
           <MissionMenusDropdown />
+        </div>
+        <div className="flex flex-col w-full">
+          <MyMenusTabs
+            template={2}
+            color={1}
+            style={"  bgprim w-full justify-end p-2 mb-[1px] "}
+            styleOrigin={"ml-auto"}
+            arr={[
+              "Informations",
+              "Notifications",
+              "Description",
+              "Gallery",
+              state?.features?.[index]?.datas?.dispute && "Disputes",
+            ]}
+            value={isTabs}
+            setter={handleChangeMenu}
+          />
+          <div className=" w-full h-full relative flex">
+            {components[isTabs]}
+          </div>
         </div>
       </div>
     </>

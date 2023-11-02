@@ -1,11 +1,9 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { CreateFeature } from "sections/works/Features/form/create/CreateFeature";
 import { MyHeader } from "components/myComponents/MyHeader";
 import { ENUMS } from "constants/enums";
 import { MENUS, MENUS_ID } from "constants/menus";
 import { STATUS } from "constants/status";
-import { useMissionState } from "context/hub/mission";
 import {
   icfyETHER,
   icfyGAMING,

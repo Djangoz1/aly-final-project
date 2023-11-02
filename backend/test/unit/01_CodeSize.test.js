@@ -23,13 +23,14 @@ describe(`TEST CODE SIZE`, () => {
     afterEach(async () => {
       await codeSize(contracts.systems.accessControl.target);
       await codeSize(contracts.systems.apiPost.target);
+      await codeSize(contracts.systems.apiPostPayable.target);
       await codeSize(contracts.systems.apiGet.target);
       await codeSize(contracts.systems.factory.target);
       await codeSize(contracts.systems.balancesHub.target);
       await codeSize(contracts.systems.addressSystem.target);
     });
 
-    it(`AccessControl | APIPost | APIGet | Factory | BalancesHub | AddressSystem`, () => {});
+    it(`AccessControl | APIPost | APIPostPayable | APIGet | Factory | BalancesHub | AddressSystem`, () => {});
   });
   describe("Works contracts", () => {
     afterEach(async () => {

@@ -44,6 +44,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     it("Should have 0 address for each contracts", async () => {
       expect(await contract.apiPost()).to.equal(ZERO_ADDRESS);
+      expect(await contract.apiPostPayable()).to.equal(ZERO_ADDRESS);
       expect(await contract.accessControl()).to.equal(ZERO_ADDRESS);
       expect(await contract.missionsHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.factory()).to.equal(ZERO_ADDRESS);

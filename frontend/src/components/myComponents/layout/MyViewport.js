@@ -12,36 +12,11 @@ import {
   useTransform,
   useViewportScroll,
 } from "framer-motion";
-import { AuthProvider, useAuthState } from "context/auth";
-import { Layout } from "sections/Layout";
-import {
-  doStateMission,
-  useMissionDispatch,
-  useMissionState,
-} from "context/hub/mission";
+
 import { v4 } from "uuid";
-import { AssetJob } from "components/assets/AssetJob";
-import { AssetProfile } from "components/assets/AssetProfile";
-import { MyMenus1, MyMenus2 } from "components/myComponents/menu/MyMenus";
-import {
-  ToolsProvider,
-  doPointerTools,
-  doStateTools,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
-import { LayoutTools } from "sections/Layout/LayoutTools";
-import { fetchMission } from "utils/works";
-import {
-  stateDetailsCV,
-  stateFeature,
-  stateMission,
-} from "utils/ui-tools/state-tools";
-import { MyCountdown } from "components/myComponents/MyCountdown";
-import { Icon } from "@iconify/react";
-import { icfyETHER } from "icones";
+
+import { doPointerTools, useToolsDispatch, useToolsState } from "context/tools";
 import { ImagePin } from "components/Image/ImagePin";
-import { Particle } from "../MyParticles";
 
 function useParallax(value, distance) {
   return useTransform(value, [0, 1], [-distance, distance]);
@@ -89,8 +64,6 @@ export function Viewport({
 
   return (
     <>
-      {particles && particles !== true && <Particle style={particles} />}
-
       <section
         // style={{ overflow: "scroll" }}
         id={`section${index}`}

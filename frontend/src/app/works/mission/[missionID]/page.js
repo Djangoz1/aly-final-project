@@ -25,6 +25,7 @@ import {
   icfyGITHUB2,
   icfyLINKEDIN,
   icfyTWITTER,
+  icsystem,
 } from "icones";
 
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
@@ -50,13 +51,15 @@ import { MyMenusDropdown } from "components/myComponents/menu/MyMenus";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyFunMenus } from "components/myComponents/menu/MyFunMenus";
-import { Avatar } from "components/profile/ProfileAvatar";
+import { Avatar, ProfileAvatar } from "components/profile/ProfileAvatar";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { BtnFollow } from "components/btn/BtnsSocial/BtnFollow";
 import { MissionMenusDropdown } from "sections/works/Missions/state/MissionMenusDropdown";
 import { MyLoader } from "components/myComponents/layout/MyLoader";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 import { MySub } from "components/myComponents/text/MySub";
+import { v4 } from "uuid";
+import { ENUMS } from "constants/enums";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -81,29 +84,35 @@ function App({ params }) {
     }
   }, [missionID]);
 
-  let closeMission = async () => {
-    await _apiPost("closeMission", [parseInt(missionID)]);
-    await doStateMissionTools(dispatch, parseInt(missionID));
-  };
-
   let askToJoin = async (featureID) => {
+    console.log("askToJoin", askToJoin);
     await _apiPost("askToJoin", [parseInt(featureID)]);
     await doStateMissionTools(dispatch, parseInt(featureID));
   };
   console.log(state);
   return (
     <MyLayoutDashboard
+      // setter={askToJoin}
       id={missionID}
-      template={1}
+      allowed={
+        cv == state?.mission?.datas?.owner &&
+        state?.mission?.datas?.status === 0
+      }
+      refresh={() => doStateMissionTools(dispatch, state?.mission?.missionID)}
+      template={[0, 1, 1, 1, 1, 1]?.[pointer]}
       isLoading={loading}
       header={state?.mission?.metadatas?.title}
-      statusObj={{ current: state?.mission?.datas?.status }}
+      statusObj={{
+        current: state?.mission?.datas?.status,
+        to: 1,
+      }}
       price={state?.mission?.datas?.amount || 0}
       owner={{ ...state?.owner?.metadatas, cvID: state?.owner?.cvID }}
       url={`/works/mission/${missionID}`}
       btn={{
         title: "Ask to join",
         info: <>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</>,
+        url: "#section2",
       }}
       // ownerProfile={
       //   loading ? null : <AssetProfileCard />
@@ -117,35 +126,93 @@ function App({ params }) {
       lists={[
         {
           icon: icfyCODE,
-          title: "Nombre de tâches",
+          title: "Contract",
           description: (
             <>
+              <MySub style={"mr-2"}>On work</MySub>
               {tools?.state?.mission?.datas?.workers}
               {tools?.state?.mission?.datas?.workers > 0 && (
                 <> / {tools?.state?.mission?.datas?.features?.length}</>
               )}
+              <Icon icon={icsystem.mission} className="ml-2 mr-4" />
             </>
           ),
         },
         {
-          icon: icfyETHER,
-          title: "Total wadge",
+          title: "Specifications",
+          image: "/worker.png",
           description: (
-            <div className="flex items-center">
-              {tools?.state?.mission?.datas?.amount}
-              <MySub style={"ml-2"}>ETH</MySub>
-            </div>
+            <>
+              <Icon icon={icsystem.feature} className=" mr-2" />
+              {state?.mission?.details?.badges?.map((el, i) => (
+                <Icon
+                  icon={ENUMS.courts?.[el]?.badge}
+                  className={`w-[34px] h-[34px] _hover rounded-full ${
+                    i > 0 && "-ml-5 hover:ml-0"
+                  }`}
+                  key={v4()}
+                />
+              ))}
+            </>
           ),
+          url: `#section1`,
+        },
+        {
+          title: "Workers",
+
+          description: (
+            <>
+              <Icon icon={icsystem.profile} className=" mr-2" />
+              {state?.features?.map((el, i) => (
+                <ProfileAvatar
+                  onlyAvatar={true}
+                  style={`w-[44px] h-[44px] _hover rounded-full ${
+                    i > 0 && "-ml-5 hover:ml-0"
+                  }`}
+                  cvID={el?.datas?.cvWorker}
+                  key={v4()}
+                />
+              ))}
+            </>
+          ),
+          url: `#section1`,
+        },
+        {
+          title: "Social",
+          description: (
+            <>
+              <Icon icon={icsystem.social} className=" mr-2" />
+              {state?.mission?.datas?.pubs?.length || 0}
+            </>
+          ),
+          url: `#section1`,
+        },
+        {
+          title: "Escrow",
+
+          description: (
+            <>
+              <Icon icon={icsystem.escrow} className=" mr-2" />
+              {state?.mission?.datas?.disputes || 0}
+            </>
+          ),
+          url: `#section1`,
+        },
+        {
+          title: "Notifications",
+
+          description: <>to do</>,
+          url: `#section1`,
         },
       ]}
       menus={
         loading
           ? []
           : [
-              { title: "Profile", url: "#section0" },
-              { title: "Agendas", url: "#section1" },
-              { title: "Features", url: "#section2" },
-              { title: "Pubs", url: "#section3" },
+              { icon: icfy.ux.admin, title: "Profile", url: "#section0" },
+              { icon: icfy.ux.admin, title: "Agendas", url: "#section1" },
+              { icon: icfy.ux.admin, title: "Features", url: "#section2" },
+              { icon: icfy.ux.admin, title: "Pubs", url: "#section3" },
             ]
       }
       target={"mission"}
@@ -161,6 +228,7 @@ function App({ params }) {
         {/* */}
         {
           [
+            <div className=""></div>,
             <MissionProfile />,
             <AgendasMission />,
             <MissionFeatures index={tools?.state?.front?.props} />,

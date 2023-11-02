@@ -11,6 +11,7 @@ export const icfy = {
     phone: "ph:phone-duotone",
     filter: "ion:filter-outline",
     arrow: "line-md:arrow-up",
+    workflow: "octicon:workflow-24",
     admin: "mdi:administrator-outline",
     key: "iconoir:key-alt-back",
     mediation: "material-symbols:mediation",
@@ -74,6 +75,7 @@ export const icfy = {
     check: "mdi:bank-check",
     bag: "healthicons:money-bag-outline",
     coin: "ph:coins-light",
+    dollars: "ph:currency-dollar-duotone",
   },
   court: {
     justice: "mdi:bank-check",

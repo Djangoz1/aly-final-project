@@ -18,7 +18,7 @@ import {
 } from "utils/ui-tools/state-tools";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icsystem } from "icones";
+import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
 
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { _table_features } from "utils/states/tables/feature";
@@ -54,6 +54,7 @@ import { doStateFormPointer } from "context/form";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 import { STATUS } from "constants/status";
 import { MySub } from "components/myComponents/text/MySub";
+import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -81,6 +82,7 @@ function App({ params }) {
   return (
     <MyLayoutDashboard
       isLoading={isLoading}
+      template={[0, 1, 1, 1, 1]?.[pointer]}
       id={cvID}
       btn={{
         title: "Invite worker",
@@ -95,100 +97,116 @@ function App({ params }) {
         to: state?.profile?.metadatas?.attributes?.[0]?.visibility ? 1 : 0,
       }}
       header={state?.profile?.metadatas?.username}
-      side={
-        pointer === 2 ? (
-          <CVMenusDropdown style={"  shadowh _hover bgprim w-full"} />
-        ) : undefined
-      }
       lists={[
+        {
+          title: "Enterprise",
+          description: (
+            <>
+              {state?.profile?.datas?.missions?.length}{" "}
+              <Icon icon={icsystem.mission} className="ml-2 mr-4" />
+              {state?.profile?.datas?.features}{" "}
+              <Icon icon={icsystem.feature} className="ml-2 mr-4" />
+              {state?.profile?.details?.wadge}{" "}
+              <Icon icon={icfyETHER} className="ml-2 mr-4" />
+            </>
+          ),
+          url: `#section2`,
+        },
+        {
+          title: "Worker",
+          description: (
+            <>
+              {state?.profile?.details?.arbitrators?.length}{" "}
+              <Icon icon={icfy.court.hammer} className="ml-2 mr-4" />
+              {state?.profile?.datas?.proposals?.length}{" "}
+              <Icon icon={icsystem.feature} className="ml-2 mr-4" />
+              {state?.profile?.details?.wadge}{" "}
+              <Icon icon={icfyETHER} className="ml-2 mr-4" />
+            </>
+          ),
+          url: `#section2`,
+        },
+        {
+          title: "Launchpad",
+          description: (
+            <>
+              {state?.profile?.datas?.launchpads?.length}{" "}
+              <Icon icon={icsystem.launchpad} className="ml-2 mr-4" />
+              {state?.profile?.details?.launchpads?.totalRaised}{" "}
+              <Icon icon={icfyETHER} className="ml-2 mr-4" />
+            </>
+          ),
+          url: `#section2`,
+        },
+
         {
           title: "Social",
           description: (
-            <div className="flex flex-col items-start c3">
-              <div className="flex items-center">
-                {state?.pubs?.length}
-
-                <MySub style={"c4 ml-2 mr-4"}>post(s)</MySub>
-              </div>
-
-              <div className="flex items-center">
-                {state?.profile?.datas?.followers}
-                <MySub style={"c4 ml-2 mr-4"}>follower(s)</MySub>
-              </div>
-
-              <div className="flex items-center">
-                {state?.profile?.datas?.follows}
-
-                <MySub style={"c4 ml-2 "}>follow(s)</MySub>
-              </div>
-            </div>
+            <>
+              {state?.profile?.datas?.missions?.length}{" "}
+              <Icon icon={icsystem.mission} className="ml-2 mr-4" />
+              {state?.profile?.datas?.features}{" "}
+              <Icon icon={icsystem.feature} className="ml-2 mr-4" />
+              {state?.profile?.details?.wadge}{" "}
+              <Icon icon={icfyETHER} className="ml-2 mr-4" />
+            </>
           ),
-          icon: icsystem.social,
+          url: `#section1`,
         },
         {
-          title: "Wadge",
+          title: "Notifications",
           description: (
-            <span className="flex items-center c3">
-              <MySub size={"12"} style={"c4  mr-2"}>
-                TJM:{" "}
-              </MySub>
-              0<MySub style=" c4 ml-3">ETH</MySub>
-            </span>
+            <>
+              {state?.profile?.datas?.invitation?.length}{" "}
+              <Icon icon={icfySEND} className="ml-2 rotate-180 mr-4" />
+              {state?.profile?.details?.invites?.length}{" "}
+              <Icon icon={icfySEND} className="ml-2 mr-4" />
+            </>
           ),
-          icon: icfyETHER,
-        },
-        {
-          title: "Spécialité",
-          description: (
-            <span className="capitalize">
-              {
-                ENUMS.domain[state?.profile?.metadatas?.attributes?.[0]?.domain]
-                  ?.name
-              }
-            </span>
-          ),
-          icon: ENUMS.domain[state?.profile?.metadatas?.attributes?.[0]?.domain]
-            ?.icon,
+          url: `#section2`,
         },
       ]}
       menus={[
         {
           title: "Profile",
-          url: "#section0",
-          icon: icfy.ux.admin,
-        },
-        {
-          title: "Informations",
           url: "#section1",
           icon: icfy.ux.admin,
         },
-
         {
-          title: "Overview",
+          title: "Dashboard",
           url: "#section2",
+          icon: icfy.ux.mediation,
+        },
+        {
+          title: "Informations",
+          url: "#section3",
           icon: icfy.ux.admin,
         },
-        {
-          title: "Settings",
-          url: "#section3",
-          icon: icfy.tools.casual,
-        },
+
+        cv == cvID
+          ? {
+              title: "Settings",
+              url: "#section4",
+              icon: icfy.tools.casual,
+            }
+          : undefined,
       ]}
       target={"profile"}
-      // initState={isState}
     >
       <>
-        {console.log("state", state)}
+        {
+          [
+            <></>,
+            <CVProfile />,
+            <div className="flex h-full w-full">
+              <CVMenusDropdown style={"   backdrop-blur mr-[1px] w-1/5"} />
 
-        {pointer === 0 ? (
-          <CVProfile />
-        ) : pointer === 1 ? (
-          <CVInfos />
-        ) : pointer === 2 ? (
-          <CVOverview />
-        ) : pointer === 3 ? (
-          <EditProfile />
-        ) : undefined}
+              <CVOverview />
+            </div>,
+            <CVInfos />,
+            cv == cvID ? <EditProfile /> : undefined,
+          ]?.[pointer]
+        }
 
         {/* 
 
@@ -198,10 +216,7 @@ function App({ params }) {
             </Viewport>
           )}
           <div className="fixed z-100 bottom-20  flex flex-col items-end right-10">
-            <CreatePub
-              style={"  c2  mb-4"}
-              btn={<Icon icon={icfy?.msg?.chat} className="text-6xl m-2" />}
-            />
+           
             {state?.profile?.cvID != cv &&
               state?.profile?.metadatas?.attributes?.[0]?.visibility && (
                 <EditWorker styles={"c2"} />

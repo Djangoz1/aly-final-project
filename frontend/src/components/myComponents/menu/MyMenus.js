@@ -4,15 +4,6 @@ import {
   useFormState,
 } from "context/form";
 
-import {
-  motion,
-  useAnimation,
-  useSpring,
-  useTransform,
-  useViewportScroll,
-} from "framer-motion";
-
-import { useMissionState } from "context/hub/mission";
 import React, { useEffect, useState } from "react";
 import { v4 } from "uuid";
 import {
@@ -83,12 +74,49 @@ export const MyMenusTabs = ({
       hover: "c1 ",
       bg: "bg-warning/30",
     },
+
     {
       color: "c1",
-      border: "bc3",
+      border: "bc1",
       hover: "text-white/60",
       bg: "gb1 g1",
       bg1: "bg2",
+    },
+    {
+      color: "c1",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "bg-warning/30",
+    },
+    {
+      color: "c1",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "g1 gb1",
+    },
+    {
+      color: "c1",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "g1 gb2",
+    },
+    {
+      color: "c1",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "g1 gb3",
+    },
+    {
+      color: "c1",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "g1 gr1",
+    },
+    {
+      color: "c1",
+      border: "bc2",
+      hover: "c1 ",
+      bg: "g1 gr2",
     },
   ];
   return (
@@ -98,10 +126,12 @@ export const MyMenusTabs = ({
       } ${style}`}
     >
       <div
-        className={`-mb-px flex  hidden-scrollbar   ${
-          ["overflow-x-scroll ", "overflow-y-scroll flex-col h-full w-fit "]?.[
-            template || 0
-          ]
+        className={`-mb-px flex   hidden-scrollbar   ${
+          [
+            "overflow-x-scroll ",
+            "overflow-y-scroll flex-col h-full w-full ",
+            " w-fit",
+          ]?.[template || 0]
         }  ${styleOrigin}`}
       >
         {children ? (
@@ -110,112 +140,181 @@ export const MyMenusTabs = ({
             key={v4()}
             href={"#section" + pointer}
             as={"#section" + pointer}
-            className={`inline-flex  ${
-              ["items-center  rounded-tr-lg", "items-end rounded-b-lg"]?.[
-                template || 0
-              ]
-            } gap-2 border-b-4  px-3 py-4 text-sm font-medium   ${
-              value === null
-                ? ` ${colors[color || 0].bg} c ${colors[color || 0]}`
-                : ` border-transparent hover:border-gray-300 hover:${
-                    colors[color || 0].hover
-                  }`
-            }`}
-          >
-            <Icon icon={icfy.ux.plus} className="text-lg" />
-
-            {children}
-          </Link>
-        ) : undefined}
-        {arr?.map((el, i) => (
-          <Link
-            onClick={() => setter(i)}
-            key={v4()}
-            href={el?.url || "#section" + pointer}
-            as={el?.url || "#section" + pointer}
-            className={` relative  min-w-[70px]     rounded-t-lg overflow-hidden  border-b-4  px-3   text-sm    
+            className={` relative  min-w-[70px]      overflow-hidden       text-sm    
             ${
               [
-                "items-center gap-2 inline-flex justify-center h-full text-center py-4 rounded-tr-lg",
-                `flex items-center justify-between min-h-[100px] py-2 text-left rounded-b-lg shadowh _hover ${
-                  i == value && "shadow1"
+                "rounded-t-lg items-center gap-2 px-3 inline-flex justify-center h-full text-center border-b-4 py-2 rounded-tr-lg",
+                `rounded-t-lg flex items-center    w-full px-3  py-2 text-left  bg-transparent rounded-b-lg `,
+                `rounded-t-lg flex items-center  py-1 px-5 mr-2 text-xs bg-black/5 w-fit text-left rounded-b-lg border-b-4 hover:-mb-1 ${
+                  null == value &&
+                  `${colors?.[color || 0]?.bg || "bg-black/20"}`
+                }`,
+                `flex items-center    px-5 mr-2 text-xs bg-black/5 py-2 w-fit text-left rounded-b-lg border-b-2 hover:-mb-1 ${
+                  null == value &&
+                  `${"bg-white/5"} ${colors?.[color]?.color} ${
+                    colors?.[color]?.border
+                  } `
                 }`,
               ]?.[template || 0]
             }
             
             ${
-              value === i
-                ? ` font-bold ${colors[color || 0]?.border} ${
-                    colors[color || 0]?.color
-                  }  `
+              value === null
+                ? ` font-bold ${
+                    [
+                      `${colors[color || 0]?.border} ${
+                        colors[color || 0]?.color
+                      }`,
+                      "border border-white/10 shadow1 c3 bg-neutral-800",
+                      `${colors[color || 0]?.border} ${
+                        colors[color || 0]?.color
+                      }`,
+                      ` `,
+                    ]?.[template || 0]
+                  }   `
                 : `c4 border-transparent  font-medium hover:border-gray-300 hover:text-gray-600 hover:bg-black/5`
             }`}
           >
-            {
+            {[true, true, false][template || 0] === true && (
               <>
                 <span
                   className={`h-full w-full  top-0 right-0 -z-1 absolute  ${
-                    value === i && colors?.[color]?.bg1
+                    value === null && colors?.[color]?.bg1
                       ? colors[color]?.bg1
-                      : "bg-black/50"
+                      : ["bg-black/50", "", "bg-black/5"]?.[template || 0]
                   }`}
                 />
                 <span
                   className={`h-full  ${
                     [
                       "top-0 rounded-tr-full left-0",
-                      "-top-10 -right-10 mask mask-hexagon ",
+                      "-top-0  -right-0 rotate-90 ",
                     ]?.[template || 0]
                   }   absolute transition-all ${
-                    value === i ? "w-full" : " w-0"
+                    value === null
+                      ? ["w-full", "w-[44px]", "w-full"]?.[template || 0]
+                      : " w-0"
                   }  ${colors[color || 0]?.bg}`}
+                  style={
+                    [
+                      undefined,
+                      { borderRadius: "0% 100% 0% 100% / 0% 100% 0% 100%" },
+                    ]?.[template]
+                  }
                 />
               </>
-            }
-            {el?.icon ? (
-              <Icon
-                icon={el?.icon}
-                className={
-                  [
-                    "text-lg",
-                    `text-2xl absolute right-2 top-2 ${
-                      i != value && "opacity-0"
-                    }`,
-                  ]?.[template || 0]
-                }
-              />
-            ) : undefined}
-            <span className="flex items-center my-auto relative">
-              {target ? el?.[target] : el}
+            )}
+
+            <Icon
+              icon={icfy.ux.plus}
+              className={
+                ["text-lg", `text-2xl  mr-2`, `text-2xl `]?.[template || 0]
+              }
+            />
+
+            <span
+              className={`flex items-center my-auto relative ${
+                ["", "", "mx-3"]?.[template || 0]
+              }`}
+            >
+              {children}
             </span>
           </Link>
-        ))}
+        ) : undefined}
+        {arr?.map(
+          (el, i) =>
+            el && (
+              <Link
+                onClick={() => setter(i)}
+                key={v4()}
+                href={el?.url || "#section" + pointer}
+                as={el?.url || "#section" + pointer}
+                className={` relative  min-w-[70px]      overflow-hidden       text-sm    
+            ${
+              [
+                "rounded-t-lg items-center gap-2 px-3 inline-flex justify-center h-full text-center border-b-4 py-2 rounded-tr-lg",
+                `rounded-t-lg flex items-center    w-full px-3  py-2 text-left  bg-transparent rounded-b-lg `,
+                `rounded-t-lg flex items-center  py-1 px-5 mr-2 text-xs bg-black/5 w-fit text-left rounded-b-lg border-b-4 hover:-mb-1 ${
+                  i == value && `${colors?.[color || 0]?.bg || "bg-black/20"}`
+                }`,
+                `flex items-center    px-5 mr-2 text-xs bg-black/5 py-2 w-fit text-left rounded-b-lg border-b-2 hover:-mb-1 ${
+                  i == value &&
+                  `${"bg-white/5"} ${colors?.[color]?.color} ${
+                    colors?.[color]?.border
+                  } `
+                }`,
+              ]?.[template || 0]
+            }
+            
+            ${
+              value === i
+                ? ` font-bold ${
+                    [
+                      `${colors[color || 0]?.border} ${
+                        colors[color || 0]?.color
+                      }`,
+                      "border border-white/10 shadow1 c3 bg-neutral-800",
+                      `${colors[color || 0]?.border} ${
+                        colors[color || 0]?.color
+                      }`,
+                      ` `,
+                    ]?.[template || 0]
+                  }   `
+                : `c4 border-transparent  font-medium hover:border-gray-300 hover:text-gray-600 hover:bg-black/5`
+            }`}
+              >
+                {[true, true, false][template || 0] === true && (
+                  <>
+                    <span
+                      className={`h-full w-full  top-0 right-0 -z-1 absolute  ${
+                        value === i && colors?.[color]?.bg1
+                          ? colors[color]?.bg1
+                          : ["bg-black/50", "", "bg-black/5"]?.[template || 0]
+                      }`}
+                    />
+                    <span
+                      className={`h-full  ${
+                        [
+                          "top-0 rounded-tr-full left-0",
+                          "-top-0  -right-0 rotate-90 ",
+                        ]?.[template || 0]
+                      }   absolute transition-all ${
+                        value === i
+                          ? ["w-full", "w-[44px]", "w-full"]?.[template || 0]
+                          : " w-0"
+                      }  ${colors[color || 0]?.bg}`}
+                      style={
+                        [
+                          undefined,
+                          { borderRadius: "0% 100% 0% 100% / 0% 100% 0% 100%" },
+                        ]?.[template]
+                      }
+                    />
+                  </>
+                )}
+
+                {el?.icon ? (
+                  <Icon
+                    icon={el?.icon}
+                    className={
+                      ["text-lg", `text-2xl  mr-2`, `text-2xl `]?.[
+                        template || 0
+                      ]
+                    }
+                  />
+                ) : undefined}
+                <span
+                  className={`flex items-center my-auto relative ${
+                    ["", "", "mx-3"]?.[template || 0]
+                  }`}
+                >
+                  {target ? el?.[target] : el}
+                </span>
+              </Link>
+            )
+        )}
       </div>
     </div>
-
-    // <div className="tabs flex-nowrap  overflow-x-scroll hide-scrollbar transition-all  mb-3">
-    //   {children && (
-    //     <button
-    //       onClick={() => setter(null)}
-    //       className={`px-4 py-2 text-xs    mr-3 rounded-lg   ${
-    //         value === null
-    //           ? "tab-active shadow2  text-white"
-    //           : "shadow1 text-white/40 backdrop-blur"
-    //       }`}
-    //     >
-    //       {children}
-    //     </button>
-    //   )}
-    //   {arr?.map(
-    //     (el, i) =>
-    //       el && (
-    //         <button
-
-    //         >
-    //         </button>
-    //       )
-    //   )}
-    // </div>
   );
 };
 
@@ -378,11 +477,11 @@ export const MyMenusDropdown = ({ children, funcs, isFolders }) => {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full border-t-white/5 border-transparent border  ">
       {children && (
         <button
           onClick={refresh}
-          className={`w-full py-3 px2 border-b-1 border border-x-0 border-t-0   ${
+          className={`w-1/3 text-left py-3 px-2 border-y-1 border border-x-0 border-t-0   ${
             isIndexes[0] === null
               ? " text-white border-white/40"
               : "text-white/50 border-white/5"

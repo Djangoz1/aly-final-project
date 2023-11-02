@@ -280,6 +280,10 @@ contract APIGet {
     // *********** PUBS *********** //
     // *********** ---- *********** //
 
+    function pubsPayableLength() external view returns(uint){
+        return IPubsHub(_iAS.pubsHub()).pubsPayableLength();
+    }
+
     function answersOfPub(uint _pubID) external view returns (uint[] memory) {
         return IPubsDatasHub(_iAS.pubsDatasHub()).answersOfPub(_pubID);
     }

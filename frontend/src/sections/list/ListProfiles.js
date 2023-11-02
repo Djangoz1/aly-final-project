@@ -48,9 +48,9 @@ export const ListProfiles = ({ bool }) => {
   }, [bool]);
 
   return (
-    <div className="flex   justify-center w-fit  flex-wrap ">
+    <div className="  justify-between w-full  grid grid-cols-4 grid-rows-4 gap-4 ">
       {isList?.map((el) => (
-        <AssetFreelancer style={"m-2"} key={v4()} owner={el} />
+        <AssetFreelancer style={"  w-full "} key={v4()} owner={el} />
       ))}
     </div>
   );

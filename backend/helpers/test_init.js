@@ -157,12 +157,17 @@ let _testInitSystemsContracts = async (addressSystem) => {
   const apiPost = await ethers.deployContract("APIPost", [addressSystem]);
   await apiPost.waitForDeployment();
   expect(await _iAS.apiPost()).to.be.equal(apiPost.target);
+  const apiPostPayable = await ethers.deployContract("APIPostPayable", [
+    addressSystem,
+  ]);
+  await apiPost.waitForDeployment();
   return {
     apiGet,
     balancesHub,
     accessControl,
     factory,
     apiPost,
+    apiPostPayable,
   };
 };
 

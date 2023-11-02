@@ -10,6 +10,7 @@ import { ENUMS } from "constants/enums";
 import { DEV_DOMAIN } from "constants/languages";
 import { ADDRESSES } from "constants/web3";
 import { useAuthState } from "context/auth";
+import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 import React, { useEffect, useState } from "react";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { fetchMissionsOfCV } from "utils/works";
@@ -45,18 +46,21 @@ export const FormCreateFeature1 = () => {
 export const FormCreateFeature2 = () => {
   let { cv } = useAuthState();
   let [isMissions, setIsMissions] = useState(null);
-
+  const { state } = useToolsState();
+  const dispatch = useToolsDispatch();
+  console.log("state", state);
   let fetchMissions = async () => {
     let missions = await fetchMissionsOfCV(cv, true);
     let arr = [];
+
     for (let index = 0; index < missions.length; index++) {
       const mission = missions[index];
-      arr.push(mission.metadatas.title);
+      arr.push({ title: mission.metadatas.title, id: mission?.datas?.id });
     }
-    setIsMissions(arr);
+    doStateTools(dispatch, { ...state, missions: arr });
   };
   useEffect(() => {
-    if (cv > 0 && !isMissions) {
+    if (cv > 0 && !state?.missions) {
       fetchMissions();
     }
   }, [cv]);
@@ -69,7 +73,7 @@ export const FormCreateFeature2 = () => {
           {
             label: "Mission",
             target: "missionID",
-            arr: isMissions,
+            arr: state?.missions?.map((el) => el?.title),
           },
           {
             label: "Specification",

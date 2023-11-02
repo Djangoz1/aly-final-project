@@ -9,7 +9,6 @@ import {
 } from "context/auth";
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { MissionProvider } from "context/hub/mission";
 import { ImagePin } from "components/Image/ImagePin";
 
 export const Layout = ({ children, banniere }) => {

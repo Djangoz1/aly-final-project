@@ -42,9 +42,11 @@ export const MyTextArea = ({ label, target, setter, styles }) => {
 
   return (
     <div className={`flex w-full flex-col  ${form?.[target] && "text-white"}`}>
-      <label className="text-light font-light text-xs mb-1 uppercase ">
-        {label || target} {checked?.[pointer]?.includes(target) && " *"}
-      </label>
+      {!label?.no && (
+        <label className="text-light font-light text-xs mb-1 uppercase ">
+          {label || target} {checked?.[pointer]?.includes(target) && " *"}
+        </label>
+      )}
       <div className="w-full h-full relative">
         <textarea
           onChange={(e) => handleChange(e.target.value)}
@@ -56,12 +58,14 @@ export const MyTextArea = ({ label, target, setter, styles }) => {
           }  ${styles || "min-h-[10vh] max-h-[30vh]"}`}
           placeholder={placeholders?.[target]}
         ></textarea>
-        <MyBtnLoading
-          setter={() => setter(form?.[target], target)}
-          style={"absolute top-0 right-0 btn btn-ghost  text-2xl c2"}
-        >
-          <Icon icon={icfySEND} />
-        </MyBtnLoading>
+        {setter ? (
+          <MyBtnLoading
+            setter={() => setter(form?.[target], target)}
+            style={"absolute top-0 right-0 btn btn-ghost  text-2xl c2"}
+          >
+            <Icon icon={icfySEND} />
+          </MyBtnLoading>
+        ) : undefined}
       </div>
     </div>
   );

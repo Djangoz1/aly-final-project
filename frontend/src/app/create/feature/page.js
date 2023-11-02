@@ -13,11 +13,7 @@ import {
   moock_create_feature,
   moock_create_feature_placeholders,
 } from "constants/moock";
-import {
-  doStateMission,
-  useMissionDispatch,
-  useMissionState,
-} from "context/hub/mission";
+
 import { createURIFeature } from "utils/ui-tools/pinata-tools";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { ethers } from "ethers";
@@ -30,11 +26,14 @@ import {
   FormCreateFeature1,
   FormCreateFeature2,
 } from "sections/works/Features/form/create/FormCreateFeature";
+import { useToolsState } from "context/tools";
+import { useRouter } from "next/navigation";
 const PageCreateFeature = () => {
   let { datas, metadatas, cv } = useAuthState();
   let account = useAuthState();
 
-  let { missionID, mission } = useMissionState();
+  let { state } = useToolsState();
+  let router = useRouter();
   let form = _form_create_feature;
   form[0].title = (
     <>
@@ -48,16 +47,26 @@ const PageCreateFeature = () => {
     ) : undefined;
 
   form[0].error = datas?.missions?.length == 0 ? true : undefined;
-  let dispatch = useMissionDispatch();
 
+  console.log("state", state);
   let submitForm = async (form) => {
-    console.log("form", form);
+    let missionID = state?.missions[parseInt(form?.missionID)]?.id;
+
     let uri = await createURIFeature(form);
-    let missionID = parseInt(form?.missionID);
     let estimatedDays = parseInt(form?.estimatedDays);
 
+    console.log("form./wazfe", form?.wadge);
     if (missionID > 0 && estimatedDays > 0) {
+      console.log("form./111", estimatedDays);
+      console.log("form./111", form?.onlyInvite);
+      console.log("form./111", uri);
+      console.log(
+        "---------------formkezrlflz---------------",
+        form?.specification
+      );
       let value = await ethers.utils.parseEther(form?.wadge);
+      console.log("form./111", value);
+
       await _apiPost(
         "createFeature",
         [
@@ -70,10 +79,10 @@ const PageCreateFeature = () => {
         value._hex
       );
     }
-    doStateMission(dispatch, missionID);
+
+    router.push("/works/mission/" + missionID + "#section2");
   };
 
-  moock_create_feature.missionID = missionID;
   console.log("datas", account);
   return (
     <MyLayoutApp

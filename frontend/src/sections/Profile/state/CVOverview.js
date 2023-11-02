@@ -47,6 +47,14 @@ import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { MyModal } from "components/myComponents/modal/MyModal";
 import { ImagePin } from "components/Image/ImagePin";
+import { LayoutForm } from "sections/Form/LayoutForm";
+import { MyInputFile } from "components/myComponents/form/MyInputsFile";
+import {
+  createImageCIDOnPinata,
+  createURI,
+  createURICv,
+} from "utils/ui-tools/pinata-tools";
+import { ADDRESSES } from "constants/web3";
 
 export const CVOverview = () => {
   let { state, index, status } = useToolsState();
@@ -106,6 +114,8 @@ export const CVOverview = () => {
     ),
   };
 
+  console.log("osdpopsoodosposdpo stats", state?.profile);
+
   let infos = [
     {
       btn: "Missions",
@@ -121,6 +131,7 @@ export const CVOverview = () => {
       head: HEAD_table_features,
       setState: stateFeature,
       arr: state?.profile?.datas?.proposals,
+      url: "#section2",
       // btns: MENUS_EDIT.feature,
     },
     {
@@ -129,12 +140,14 @@ export const CVOverview = () => {
       head: HEAD_table_launchpads,
       arr: state?.profile?.datas?.launchpads,
       setState: stateLaunchpad,
+      url: "#section2",
       // btns: MENUS_EDIT.invite,
     },
     {
       btn: "Invites",
       table: _table_invites(state?.profile?.details?.invites),
       head: HEAD_table_invites,
+      url: "#section2",
       arr: state?.profile?.details?.invites,
       setState: stateFeature,
       editBtns: [
@@ -160,6 +173,8 @@ export const CVOverview = () => {
       table: _table_arbitrators(isArbitratorsState),
       head: HEAD_table_arbitrators,
       arr: isArbitratorsState,
+      url: "#section2",
+
       setState: stateDispute,
       editBtns: [
         {
@@ -198,8 +213,11 @@ export const CVOverview = () => {
     doStateTools(dispatch, _state);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     let target = infos?.[state?.indexOverview]?.btn.toLowerCase();
+    console.log("test -----------frazz---", isLists?.[target]);
+    console.log("test -----------bool---", isInView);
+
     if (!isLists?.[target] && state?.profile?.details && isInView) {
       console.log("Fetch CV Overview ...", state);
 
@@ -215,19 +233,21 @@ export const CVOverview = () => {
         isLists?.[target]?.table?.length !== isLists?.[target]?.arr?.length) &&
       state?.profile?.details?.[target]?.length >= 0
     ) {
+      console.log("test -----------frazz---", isLists?.[target]);
+
       setIsLists({
         ...isLists,
         [target]: infos?.[state?.indexOverview],
       });
     }
   }, [status, isInView]);
-
   return (
     <>
       {components?.[state?.front?.target] || (
-        <>
+        <div className="flex flex-col p-2 bgprim w-full ">
           <MyMenusTabs
-            style={"w-full rounded-none bgprim"}
+            template={2}
+            style={" ml-auto rounded-none pb-5 "}
             color={1}
             setter={(i) =>
               doStateTools(dispatch, { ...state, indexOverview: i })
@@ -238,9 +258,7 @@ export const CVOverview = () => {
           >
             Gallery
           </MyMenusTabs>
-          {state?.indexOverview >= 0 &&
-          isLists?.[`${infos?.[state?.indexOverview].btn.toLowerCase()}`]
-            ?.table ? (
+          {state?.indexOverview != null || state?.indexOverview != undefined ? (
             <MyCard styles={"h-full  rounded-t-none w-full "}>
               <div
                 ref={ref}
@@ -263,25 +281,95 @@ export const CVOverview = () => {
               </div>
             </MyCard>
           ) : (
-            <MyModal
-              styles={{
-                btn: "btn-ghost ml-1 w-fit h-fit overflow-scroll hide-scrollbar",
-              }}
-              btn={
-                <ImagePin
-                  style={"h-[70vh] w-[35vw]"}
-                  CID={state?.profile?.metadatas?.attributes?.[0]?.cvImg}
-                />
-              }
-              modal={
-                <ImagePin
-                  style={"h-[90vh] w-[80vw] "}
-                  CID={state?.profile?.metadatas?.attributes?.[0]?.cvImg}
-                />
-              }
-            />
+            <div className="flex">
+              <MyModal
+                styles={{
+                  btn: "btn-ghost  w-fit h-fit overflow-scroll hide-scrollbar",
+                }}
+                btn={
+                  <ImagePin
+                    style={"h-[70vh] w-[35vw]"}
+                    CID={state?.profile?.metadatas?.attributes?.[0]?.cvImg}
+                  />
+                }
+                modal={
+                  <ImagePin
+                    style={"h-[90vh] w-[80vw] "}
+                    CID={state?.profile?.metadatas?.attributes?.[0]?.cvImg}
+                  />
+                }
+              />
+              <div className="flex w-full flex-wrap">
+                {state?.profile?.metadatas?.attributes?.[0]?.gallery?.map(
+                  (el) => (
+                    <MyModal
+                      key={v4()}
+                      styles={{
+                        btn: "btn-ghost  w-fit h-fit ",
+                      }}
+                      btn={
+                        <ImagePin
+                          styleImg={"w-fit max-w-[110px] absolute "}
+                          style={" w-[110px] relative  "}
+                          CID={el}
+                        />
+                      }
+                      modal={<ImagePin style={"h-[90vh] w-[80vw] "} CID={el} />}
+                    />
+                  )
+                )}
+                <LayoutForm
+                  stateInit={{
+                    allowed: true,
+                    form: { image: null, target: "galleryImg" },
+                  }}
+                >
+                  <MyInputFile
+                    style={"mt-auto ml-auto"}
+                    target={"image"}
+                    label={"Add image"}
+                    setter={async (fileURI) => {
+                      let gallery;
+                      console.log("fileURI", fileURI);
+                      if (
+                        state?.profile?.metadatas?.attributes?.[0]?.gallery
+                          ?.length >= 0
+                      ) {
+                        gallery =
+                          state?.profile?.metadatas?.attributes?.[0]?.gallery;
+                        gallery?.push(fileURI);
+                      } else {
+                        gallery = [fileURI];
+                      }
+                      if (fileURI) {
+                        let uri = await createURI({
+                          id: cv,
+                          title: "CV",
+                          metadatas: {
+                            ...state?.profile?.metadatas,
+                            attributes: [
+                              {
+                                ...state?.profile?.metadatas?.attributes?.[0],
+                                gallery: gallery,
+                              },
+                            ],
+                          },
+                        });
+                        console.log('gallery !!!!!"é"!', gallery);
+                        await _apiPost("setTokenURIOf", [
+                          parseInt(cv),
+                          uri,
+                          ADDRESSES["cvsHub"],
+                        ]);
+                        await doStateProfileTools({ dispatch, cvID: cv });
+                      }
+                    }}
+                  ></MyInputFile>
+                </LayoutForm>
+              </div>
+            </div>
           )}
-        </>
+        </div>
       )}
     </>
   );

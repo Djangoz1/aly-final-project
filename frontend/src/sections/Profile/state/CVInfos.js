@@ -218,10 +218,11 @@ export const CVInfos = () => {
       : []),
   ];
   return (
-    <>
+    <div className="flex-col font2 w-full h-full">
       <MyMenusTabs
         color={1}
-        style={"w-full bgprim"}
+        template={3}
+        style={"w-full uppercase font-light font2 bgprim"}
         value={isTabs}
         setter={setIsTabs}
         arr={["On chain", "Off chain"]}
@@ -260,6 +261,6 @@ export const CVInfos = () => {
           ][isTabs]
         }
       </div>
-    </>
+    </div>
   );
 };

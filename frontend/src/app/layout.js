@@ -3,7 +3,7 @@ import "../styles/global.css";
 import "../styles/star-background.css";
 
 import { AccountProvider } from "context/account";
-import { MissionProvider } from "context/hub/mission";
+
 import { CVProvider } from "context/hub/cv";
 import { FormProvider } from "context/form";
 import { LayoutTools } from "sections/Layout/LayoutTools";
@@ -44,14 +44,12 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <ToolsProvider>
               <CVProvider>
-                <MissionProvider>
-                  {/* <div className="bg-animation">
+                {/* <div className="bg-animation">
                     <div id="stars"></div>
                     <div id="stars2"></div>
                     <div id="stars3"></div>
                   </div> */}
-                  {children}
-                </MissionProvider>
+                {children}
               </CVProvider>
             </ToolsProvider>
           </AuthProvider>

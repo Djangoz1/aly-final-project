@@ -5,7 +5,7 @@ export const ImagePin = ({ CID, style, styleImg }) => {
     <div className={style || "w-full h-full"}>
       <img
         className={styleImg || "w-full h-full"}
-        src={CID ? pinataGateway + CID : "/profile.jpeg"}
+        src={CID ? pinataGateway + CID : "/default.jpeg"}
         alt="Pinata Image"
       />
     </div>

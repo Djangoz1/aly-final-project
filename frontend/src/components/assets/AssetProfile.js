@@ -92,84 +92,17 @@ export const AssetProfile = ({
 
   return (
     <div ref={ref} className={style || " w-[23%] h-fit" + " min-w-[200px]"}>
-      <MyCardInfo
-        styles={"w-full h-full"}
-        color={color || 1}
-        header={{
-          title: <CVName cvID={cvID} metadata={isElement?.metadatas} />,
-          image: isElement?.metadatas?.image,
-        }}
-        main={{
-          title: "Languages skills",
-          text: (
-            <>
-              <div className="flex">
-                {isElement?.details?.badges?.length > 0 ? (
-                  isElement?.details?.badges?.map((badgeID) => (
-                    <Icon
-                      key={v4()}
-                      icon={ENUMS.courts?.[badgeID]?.badge}
-                      className="mr-3 text-lg"
-                    />
-                  ))
-                ) : (
-                  <p className="text-xs text-center ">Junior</p>
-                )}
-              </div>
-              <div className="text-white/10 my-2">Wadge average</div>
-              <p className="flex items-center  mb-2">
-                <Icon icon={icfyETHER} className="text-lg mr-2" />
-                {isElement?.details?.wadge} ETH
-              </p>
-
-              <div className="text-white/10 my-2">Speciality</div>
-              <Icon
-                className="flex items-center  capitalize mb-2"
-                icon={
-                  ENUMS.domain?.[isElement?.metadatas?.attributes?.[0]?.domain]
-                    ?.icon
-                }
-              ></Icon>
-            </>
-          ),
-        }}
-        btn={
-          noBtn
-            ? { component: <></> }
-            : isElement?.cvID != cv
-            ? {
-                component: (
-                  <div className="flex items-center mt-2 join">
-                    {isElement?.cvID !== state?.worker?.cvID && (
-                      <BtnGb1
-                        style={
-                          "flex btn-xs w-1/2 join-item items-center text-[8px]"
-                        }
-                      >
-                        <Icon icon={icfy.ux.mediation} className="text-xs" />
-                        <p>Invite worker</p>
-                      </BtnGb1>
-                    )}
-                    <div
-                      className={
-                        "flex btn-xs w-1/2 c2 btn btn-outline  join-item items-center text-[9px]"
-                      }
-                    >
-                      <Icon
-                        icon={icfy.person.friend}
-                        className="mr-3 text-sm"
-                      />
-                      <p>Follow</p>
-                    </div>
-                  </div>
-                ),
-                style: "flex items-center justify-between",
-              }
-            : {
-                title: "Edit profile",
-              }
-        }
-      />
+      <div className="flex items-center">
+        <ImagePin
+          styleImg={"w-[48px] h-[48px] mask-squircle mask "}
+          CID={isElement?.metadatas?.image}
+        />
+        <CVName
+          cvID={isElement?.cvID}
+          styles={"font-bold uppercase text-lg"}
+          metadata={isElement?.metadatas}
+        />
+      </div>
     </div>
   );
 };
@@ -181,6 +114,8 @@ export const AssetFreelancer = ({ owner, style }) => {
     if (!isImages && owner?.metadatas) {
       let images = [];
       owner?.metadatas?.image && images.push(owner?.metadatas?.image);
+      owner?.metadatas?.attributes[0].cvImg &&
+        images.push(owner?.metadatas?.attributes?.[0]?.cvImg);
       owner?.metadatas?.attributes?.[0]?.banniere &&
         images.push(owner?.metadatas?.attributes?.[0]?.banniere);
       setIsImages(images);
@@ -197,8 +132,10 @@ export const AssetFreelancer = ({ owner, style }) => {
     }
   };
   return (
-    <MyCard styles={`   h-[430px] min-h-[430px] w-[300px] ${style}`}>
-      <div className=" absolute h-1/2 top-0 left-0 w-full   flex flex-col">
+    <MyCard
+      styles={`relative  flex items-end h-[430px] min-h-[430px] w-[300px] ${style}`}
+    >
+      <div className="absolute   h-1/2 top-0 left-0 w-full   flex flex-col">
         <div className="mt-auto bg-gradient-to-br px-5 from-black/10  c3  via-black/20 to-black/30 transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col z-10">
           <CVName
             styles="text-xl"
@@ -241,7 +178,7 @@ export const AssetFreelancer = ({ owner, style }) => {
           className="absolute right-1 top-1/2 -translate-y-1/2 -rotate-90 opacity-50 hover:opacity-100 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
         />
         <MyStatus
-          style={`absolute top-3  py-2 px-2  text-white left-3 z-1 `}
+          style={`absolute top-3  py-1  px-2 text-xs left-3 z-1 `}
           target={"visibility"}
           status={owner?.metadatas?.attributes?.[0]?.visibility ? 0 : 1}
         />
@@ -257,7 +194,7 @@ export const AssetFreelancer = ({ owner, style }) => {
           />
         </div>
       </div>
-      <div className="absolute bottom-0 h-1/2 flex flex-col pt-10 pb-4 left-0 w-full px-2 ">
+      <div className=" bottom-0 h-1/2 flex flex-col pt-10 pb-4 left-0 w-full px-2 ">
         <div className="flex overflow-y-scroll  hide-scrollbar pb-3 flex-wrap w-full ">
           {owner?.details?.badges?.map(
             (el, i) =>

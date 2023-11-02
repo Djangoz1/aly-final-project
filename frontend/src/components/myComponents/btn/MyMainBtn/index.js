@@ -5,14 +5,31 @@ import { MyBtnPost } from "components/btn/MyBtnPost";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { icfy } from "icones";
-export const MyMainBtn = ({ children, setter, url, disabled, style }) => {
+import { useFormState } from "context/form";
+import { useToolsState } from "context/tools";
+export const MyMainBtn = ({
+  children,
+  template,
+  form,
+  setter,
+  url,
+  disabled,
+  style,
+}) => {
   let [isLoading, setIsLoading] = useState(null);
+  let formState = form ? useFormState() : undefined;
 
+  let { pointer } = useToolsState();
   let router = useRouter();
+
   let handleClick = async () => {
     if (setter) {
       setIsLoading(true);
-      await setter();
+      if (form) {
+        await setter(formState?.form);
+      } else {
+        await setter();
+      }
       setIsLoading(false);
       router.refresh();
     }
@@ -22,13 +39,26 @@ export const MyMainBtn = ({ children, setter, url, disabled, style }) => {
       href={url || "#"}
       onClick={handleClick}
       disabled={disabled}
-      className={`${style} w-fit flex  max-w-full grid-cols-2 flex-row items-center  shadowh _hover px-8 py-2 font-semibold text-white transition [box-shadow:rgb(171,_196,_245)_-8px_8px] hover:[box-shadow:rgb(171,_196,_245)_0px_0px] bg1`}
+      className={`${
+        style || "c3"
+      } w-fit flex   flex-row items-center   font-semibold  transition  ${
+        [
+          "hover:[box-shadow:rgb(171,_196,_245)_0px_0px] max-w-full grid-cols-2 bg1 shadowh _hover px-8 py-2 [box-shadow:rgb(171,_196,_245)_-8px_8px] ",
+          " btn-outline  bg-gradient-to-l shadowh _hover  to-info/40 from-info/20 btn ",
+        ]?.[template || 0]
+      } `}
     >
       {isLoading ? (
         <span className="loading  loading-bars mx-10 loading-xs"></span>
       ) : (
         <>
-          <p className="mr-6 font-bold btn btn-ghost uppercase">{children}</p>
+          <p
+            className={` ${
+              ["mr-6 btn btn-ghost", ""]?.[template || 0]
+            } font-bold  uppercase`}
+          >
+            {children}
+          </p>
         </>
       )}
       <Icon

@@ -38,7 +38,6 @@ export const CodeEditor = ({ target, value, style, isForm }) => {
   return (
     <div className={"w-full   " + style}>
       <CodeMirror
-        className=" "
         value={value ? value : formState?.form?.[target]}
         onBeforeChange={handleCodeChange}
         options={{

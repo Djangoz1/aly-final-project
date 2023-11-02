@@ -189,9 +189,16 @@ export const statePub = async (pubID) => {
 
     let uri = await _apiGet("tokenURIOf", [pubID, ADDRESSES["pubsHub"]]);
     let metadata = await fetchJSONByCID(uri);
+
+    let datas = await _apiGet("datasOfPub", [pubID]);
+    if (datas?.answers > 0) {
+      datas.answers = await _apiGet("answersOfPub", [pubID]);
+    } else {
+      datas.answers = [];
+    }
     return {
       pubID,
-      datas: await _apiGet("datasOfPub", [pubID]),
+      datas: datas,
       metadata,
       owner: await _apiGet("cvOf", [_owner]),
     };

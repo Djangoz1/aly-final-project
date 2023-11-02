@@ -92,8 +92,8 @@ export const MyCardInfo = ({
         </div>
         {header?.image && (
           <ImagePin
-            styleImg={"w-[68px] h-[68px] mask-hexagon mask "}
-            style={` p-2 absolute absolute p-1 rounded-full top-0 bg-zinc-800 shadow1 backdrop-blur  -right-4  -translate-y-1/3  `}
+            styleImg={"w-[68px] h-[68px] rounded-full"}
+            style={` p-[2px] absolute absolute p-1 rounded-full -top-3 bg-zinc-800 shadow1 backdrop-blur  -right-4    `}
             CID={header?.image}
           />
         )}

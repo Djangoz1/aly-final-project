@@ -1,55 +1,19 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useAnimation,
-  useInView,
-  useIsPresent,
-  usePresence,
-  useSpring,
-  useTransform,
-  useViewportScroll,
-} from "framer-motion";
-import { AuthProvider, useAuthState } from "context/auth";
-import { Layout } from "sections/Layout";
-import {
-  doStateMission,
-  useMissionDispatch,
-  useMissionState,
-} from "context/hub/mission";
-import { v4 } from "uuid";
-import { AssetJob } from "components/assets/AssetJob";
-import { AssetProfile } from "components/assets/AssetProfile";
-import { MyMenus1, MyMenus2 } from "components/myComponents/menu/MyMenus";
-import {
-  ToolsProvider,
-  doStateTools,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
-import { LayoutTools } from "sections/Layout/LayoutTools";
-import { fetchMission } from "utils/works";
-import {
-  stateDetailsCV,
-  stateFeature,
-  stateMission,
-  stateTools,
-} from "utils/ui-tools/state-tools";
-import { MyCountdown } from "components/myComponents/MyCountdown";
-import { Icon } from "@iconify/react";
-import { icfyETHER } from "icones";
-import { Viewport } from "./MyViewport";
-import { MyCard1 } from "../card/MyCard";
-import { Logo, LogoIc } from "components/Logo";
-import { MyHeader } from "../MyHeader";
-import { Header } from "sections/Layout/Header";
-import { MyProgress } from "./MyProgress";
-import { Particle } from "../MyParticles";
+import { motion, useAnimation, useViewportScroll } from "framer-motion";
 
-function useParallax(value, distance) {
-  return useTransform(value, [0, 1], [-distance, distance]);
-}
+import { v4 } from "uuid";
+import { MyMenus1 } from "components/myComponents/menu/MyMenus";
+import { useToolsDispatch, useToolsState } from "context/tools";
+import { LayoutTools } from "sections/Layout/LayoutTools";
+
+import { stateTools } from "utils/ui-tools/state-tools";
+import { Viewport } from "./MyViewport";
+
+import { Logo, LogoIc } from "components/Logo";
+
+import { Particle } from "../MyParticles";
 
 export let MyLayoutApp = ({
   id,

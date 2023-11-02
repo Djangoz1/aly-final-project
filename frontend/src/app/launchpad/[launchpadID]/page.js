@@ -9,7 +9,7 @@ import {
   useToolsState,
 } from "context/tools";
 
-import { icfy, icfyETHER, icfyTIME } from "icones";
+import { icfy, icfyETHER, icfyTIME, icsystem } from "icones";
 
 import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
@@ -44,6 +44,8 @@ import { StateLaunchpadInfos } from "sections/Launchpad/state/StateLaunchpadInfo
 import { StateLaunchpadForm } from "sections/Launchpad/state/StateLaunchpadForm";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
+import { Icon } from "@iconify/react";
+import { MySub } from "components/myComponents/text/MySub";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -67,6 +69,7 @@ function App({ params }) {
 
   return (
     <MyLayoutDashboard
+      template={[0, 1, 1, 0]?.[pointer]}
       price={state?.launchpad?.datas?.amountRaised || 0}
       owner={state?.owner}
       btn={{
@@ -110,155 +113,165 @@ function App({ params }) {
       }
       lists={[
         {
+          title: "Contract",
+          description: (
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <MySub style={"mr-3"}>allowed</MySub>
+                {state?.launchpad?.datas?.allowance}
+                <Icon icon={icfy.bank.bag} className="ml-2 mr-4" />
+              </div>
+
+              <div className="flex items-center">
+                <MySub style={"mr-3"}>Raised</MySub>
+                {state?.launchpad?.datas?.amountRaised}
+                <Icon icon={icfyETHER} className="ml-2 mr-4" />
+              </div>
+            </div>
+          ),
+          icon: icfy.bank.coin,
+        },
+        {
+          title: "Owner",
+          description: (
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <MySub style={"mr-1"}>{state?.owner?.username}</MySub>
+
+                <Icon icon={icfy.person.team} className="ml-2 mr-4" />
+              </div>
+              <div className="flex items-center">
+                <MySub style={"mr-3"}>balance</MySub>
+                {state?.launchpad?.datas?.balanceOwner}
+                <Icon icon={icfy.bank.bag} className="ml-2 mr-4" />
+              </div>
+            </div>
+          ),
+          icon: icfy.bank.coin,
+        },
+
+        {
           title: "Investors",
           description: (
-            <>
-              <span className="text-xs uppercase mr-2">Total users</span>
-              {parseInt(state?.launchpad?.datas?.totalUser)}
-            </>
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <MySub style={"mr-2"}>Total users</MySub>
+                {parseInt(state?.launchpad?.datas?.totalUser)}
+              </div>
+              <div className="flex items-center mt-1">
+                <MySub style={" mr-1"}>Nombres de rounds</MySub>
+                {parseInt(state?.launchpad?.datas?.tiersDatas?.length)}
+                <MySub style={"ml-2 mr-1"}>Round actuel</MySub>
+                {parseInt(state?.launchpad?.datas?.currentTier)}
+              </div>
+            </div>
           ),
           icon: icfy.person.team,
         },
         {
-          title: "Token allowed left",
+          title: "Tokens",
           description: (
-            <>
-              <span className="text-xs uppercase mr-2">Round</span>
-              {state?.launchpad?.datas?.currentTier + 1}
-            </>
+            <div className="flex flex-col">
+              <div className="flex items-center mb-1">
+                <MySub style={"mr-3"}>current price</MySub>
+                {ethers?.utils?.formatEther(
+                  state?.launchpad?.datas?.tiersDatas?.[
+                    state?.launchpad?.datas?.currentTier
+                  ]?.tokenPrice || 0
+                )}
+                <Icon icon={icfy.bank.dollars} className="ml-2 mr-4" />
+                {/* <Icon icon={icsystem.feature} className="ml-2 mr-4" /> */}
+                <span className="text-xs uppercase mr-2">Round</span>
+                {state?.launchpad?.datas?.currentTier + 1}
+              </div>
+              <div className="flex items-center">
+                <Icon icon={icfyETHER} className="mr-2" />
+                <MySub style={"mr-4 "}>
+                  max cap{" "}
+                  {parseInt(
+                    ethers.utils.formatEther(
+                      `${state?.launchpad?.datas?.maxCap || 0}`
+                    )
+                  ).toFixed(5)}
+                </MySub>
+                <MySub style={" "}>
+                  min{" "}
+                  {parseInt(
+                    ethers.utils.formatEther(
+                      `${state?.launchpad?.datas?.minCap || 0}`
+                    )
+                  ).toFixed(5)}
+                </MySub>
+              </div>
+            </div>
           ),
           icon: icfy.bank.coin,
         },
+
         {
-          title: "Allowance",
-          description: (
-            <>
-              {state?.launchpad?.datas?.allowance}
-              <span className="text-xs ml-2 uppercase">tokens</span>
-            </>
-          ),
-          icon: icfy.bank.coin,
-        },
-        {
-          title: "Fundraising goal",
-          description: (
-            <>
-              {parseInt(
-                ethers.utils.formatEther(
-                  `${state?.launchpad?.datas?.maxCap || 0}`
-                )
-              ).toFixed(5)}
-              <span className="text-xs ml-2">ETH</span>
-            </>
-          ),
-          icon: icfy.bank.coin,
-        },
-        {
-          title: "Token price",
-          description: (
-            <>
-              {ethers?.utils?.formatEther(
-                state?.launchpad?.datas?.tiersDatas?.[
-                  state?.launchpad?.datas?.currentTier
-                ]?.tokenPrice || 0
-              )}
-              <span className="text-xs ml-2">ETH</span>
-            </>
-          ),
-          icon: icfyETHER,
-        },
-        {
-          icon: icfyTIME,
+          image: "/time.png",
           title:
             state?.launchpad?.datas?.status === 1 ? "Sale start" : "Sale end",
           description: (
-            <MyCountdown
-              style={"mt-2 c2"}
-              size={10}
-              startDate={Math.floor(Date.now() / 1000)}
-              check={
-                Math.floor(Date.now() / 1000) < state?.launchpad?.datas?.endDate
-              }
-              timestamp={parseInt(
-                state?.launchpad?.datas?.status === 1
-                  ? state?.launchpad?.datas?.saleEnd
-                  : state?.launchpad?.datas?.saleStart
-              )}
-            />
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <Icon icon={icfyTIME} className="mr-2" />
+                <MyCountdown
+                  style={"mt-2 "}
+                  size={10}
+                  startDate={Math.floor(Date.now() / 1000)}
+                  check={
+                    Math.floor(Date.now() / 1000) <
+                    state?.launchpad?.datas?.endDate
+                  }
+                  timestamp={parseInt(
+                    state?.launchpad?.datas?.status === 1
+                      ? state?.launchpad?.datas?.saleEnd
+                      : state?.launchpad?.datas?.saleStart
+                  )}
+                />
+              </div>
+            </div>
           ),
-        },
-        {
-          icon: STATUS.launchpad[state?.launchpad?.datas?.status]?.icon,
         },
       ]}
       menus={[
-        { title: "Rules", url: "#section0", icon: icfy.ux.admin },
+        { title: "Rules", url: "#section1", icon: icfy.ux.admin },
         {
           title: "Description",
-          url: "#section1",
+          url: "#section2",
           icon: icfy.ux.admin,
         },
 
         {
           title: "Form",
-          url: "#section2",
+          url: "#section3",
           icon: icfy.ux.admin,
         },
       ]}
       id={launchpadID}
       target={"launchpad"}
     >
-      {/* <Viewport full={true} id={"missions"} index={0}>
-        <div ref={ref} className="h-full  w-[1000px]">
-          <div className="flex w-full justify-between  mb-10">
-            <MyCard styles={"min-w-[300px] overflow-hidden  "}>
-              <div className="flex items-center justify-between w-full">
-                {(state?.launchpad?.datas?.saleStart >
-                  Math.floor(Date.now() / 1000) &&
-                  state?.launchpad?.datas?.status == 1) ||
-                state?.launchpad?.datas?.saleEnd >
-                  Math.floor(Date.now() / 1000) ? (
-                  <div className="absolute shadow2 px-3 pt-1  pb-1  rounded-bl-xl  -top-0 -right-0 flex flex-col items-end text-xs text-white/40">
-                    {state?.launchpad?.datas?.status == 1 &&
-                    state?.launchpad?.datas?.saleStart <
-                      Math.floor(Date.now() / 1000)
-                      ? "Ended"
-                      : "Started"}
-                    <MyCountdown
-                      style={"mt-1"}
-                      size={10}
-                      startDate={Math.floor(Date.now() / 1000)}
-                      timestamp={parseInt(
-                        state?.launchpad?.datas?.status == 1 &&
-                          state?.launchpad?.datas?.saleStart <
-                            Math.floor(Date.now() / 1000)
-                          ? state?.launchpad?.datas?.saleEnd
-                          : state?.launchpad?.datas?.saleStart
-                      )}
-                    />
-                  </div>
-                ) : undefined}
-              </div>
-            </MyCard>
-          </div>
-        </div>
-      </Viewport> */}
+      {
+        [
+          undefined,
+          <StateLaunchpadInfos />,
 
-      {/* {isConnected && <Viewport id={"admin"} index={2}></Viewport>}
-      <Viewport fixed={true} id={"description"} index={1}>
-        <AssetLaunchpad
-          
-         
-          btn={"Mint token"}
-          state={{ ...state?.launchpad, owner: state?.owner }}
-        > */}
-      {pointer === 0 ? (
-        <StateLaunchpadInfos />
-      ) : pointer === 2 ? (
-        <StateLaunchpadForm />
-      ) : undefined}
-      {/* </AssetLaunchpad>
-      </Viewport> */}
+          <>
+            <>
+              <h6 className="font-bold uppercase  mb-4 underline">
+                Description
+              </h6>
+              <article className="text-xs  hover:text-black my-3 text-justify whitespace-break-spaces font-light">
+                {state?.launchpad?.metadatas?.description}
+              </article>
+            </>
+          </>,
+          <StateLaunchpadForm />,
+          <StateLaunchpadInfos />,
+          <StateLaunchpadInfos />,
+        ]?.[pointer]
+      }
     </MyLayoutDashboard>
   );
 }

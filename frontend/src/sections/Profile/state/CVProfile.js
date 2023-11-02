@@ -6,7 +6,15 @@ import { Avatar } from "components/profile/ProfileAvatar";
 
 import { useToolsState } from "context/tools";
 
-import { icfy, icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
+import {
+  icfy,
+  icfyCODE,
+  icfyCODER,
+  icfyFB,
+  icfyGITHUB2,
+  icfyLINKEDIN,
+  icfyTWITTER,
+} from "icones";
 
 import React, { useEffect, useRef, useState } from "react";
 
@@ -22,12 +30,13 @@ import {
 } from "framer-motion";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { BtnsSocial } from "components/btn/BtnsSocial";
+import { CreatePub } from "sections/Pub/form/create/CreatePub";
 
 export const CVProfile = ({}) => {
   let { state, pointer } = useToolsState();
 
   let [isTabs, setIsTabs] = useState(0);
-
+  let [isAllowed, setIsAllowed] = useState(null);
   const bools = (pub) => {
     if (
       isTabs === 0 ||
@@ -40,176 +49,56 @@ export const CVProfile = ({}) => {
     }
   };
 
+  useEffect(() => {}, [isTabs]);
   const divRef = useRef(null);
 
   return (
-    <div className="flex w-full  relative flex-col">
-      <div className="flex   relative   overflow-scroll hide-scrollbar  flex-wrap ">
-        {/* <div className="relative  flex items-end justify-between    w-full h-[26vh]">
-          <div className="overflow-hidden rounded-xl h-[26vh] absolute w-full">
-            <ImagePin
-              CID={state?.profile?.metadatas?.attributes?.[0]?.banniere}
-              style={"w-full z-0 top-0 absolute opacity-80"}
+    <>
+      <div className="flex w-full h-full relative flex-col">
+        <div className="flex   relative h-full   overflow-scroll hide-scrollbar  flex-wrap ">
+          <div className="flex w-full h-full">
+            <MyMenusTabs
+              template={1}
+              style={"  w-1/6 bg-white/5 backdrop-blur-[1px] "}
+              color={8}
+              target={"value"}
+              value={isTabs}
+              setter={setIsTabs}
+              arr={[
+                { value: "All", icon: icfy.ux.plus },
+                { value: "Posts", icon: icfy.msg.opened },
+                { value: "Codes", icon: icfyCODE },
+                { value: "Publish", icon: icfy.msg.chat },
+              ]}
             />
-            <div className="z-100 w-full h-full bottom-0 absolute   flex flex-col">
-              <BtnsSocial />
-            </div>
-          </div>
-          <div className="z-100 relative px-5 py-5  flex flex-col">
-            
-          </div>
-          <div className="absolute left-1  top-1 flex ml-auto  z-10"></div>
-        </div> */}
-        <MyMenusTabs
-          style={" w-full  bgprim "}
-          color={1}
-          value={isTabs}
-          setter={setIsTabs}
-          arr={["All", "Posts", "Codes"]}
-        />
 
-        <motion.div className="w-full bgprim c3 rounded-b-lg  flex flex-col     overflow-y-scroll hide-scrollbar">
-          {state?.pubs?.length > 0 ? (
-            state?.pubs?.map(
-              (pub, index) =>
-                bools(pub) && (
-                  <Pub
-                    _owner={state?.profile?.metadatas}
-                    id={pub}
-                    styles={{ size: "10px", clamp: "none" }}
-                    key={v4()}
-                  />
-                )
-            )
-          ) : (
-            <p className="text-center text-white/40 my-auto">No pubs found</p>
-          )}
-        </motion.div>
+            {isTabs <= 2 ? (
+              <motion.div className="w-full bgprim c3 rounded-b-lg  flex flex-col     overflow-y-scroll hide-scrollbar">
+                {state?.pubs?.length > 0 ? (
+                  state?.pubs?.map((pub, index) => (
+                    <Pub
+                      _owner={state?.profile?.metadatas}
+                      id={pub}
+                      bools={bools}
+                      styles={{ size: "10px", clamp: "none" }}
+                      key={v4()}
+                    />
+                  ))
+                ) : (
+                  <p className="text-center text-white/40 my-auto">
+                    No pubs found
+                  </p>
+                )}
+              </motion.div>
+            ) : (
+              <CreatePub
+                style={"  c2  mb-4"}
+                btn={<Icon icon={icfy?.msg?.chat} className="text-6xl m-2" />}
+              />
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
-// import { Icon } from "@iconify/react";
-// import { ImagePin } from "components/Image/ImagePin";
-// import { Pub } from "components/Pub";
-
-// import { Avatar } from "components/profile/ProfileAvatar";
-
-// import { useToolsState } from "context/tools";
-
-// import { icfy, icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
-
-// import React, { useEffect, useRef, useState } from "react";
-
-// import { _table_features } from "utils/states/tables/feature";
-// import { _table_invites } from "utils/works/feature";
-// import { v4 } from "uuid";
-
-// import {
-//   motion,
-//   AnimatePresence,
-//   useAnimation,
-//   useInView,
-// } from "framer-motion";
-// import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
-// import { BtnsSocial } from "components/btn/BtnsSocial";
-
-// export const CVProfile = ({}) => {
-//   let { state, pointer } = useToolsState();
-
-//   let [isTabs, setIsTabs] = useState(0);
-
-//   const bools = (pub) => {
-//     if (
-//       isTabs === 0 ||
-//       (isTabs === 1 && !pub?.metadata?.attributes?.[0]?.code) ||
-//       (isTabs === 2 && pub?.metadata?.attributes?.[0]?.code)
-//     ) {
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   };
-
-//   const divRef = useRef(null);
-
-//   return (
-//     <div className="flex w-full  relative flex-col">
-//       <div className="flex  h-[80vh]  relative border border-1 border-white/5 rounded-t-lg overflow-scroll hide-scrollbar  flex-wrap ">
-//         <div className="relative  flex items-end justify-between    w-full h-[26vh]">
-//           <div className="overflow-hidden rounded-xl h-[26vh] absolute w-full">
-//             <ImagePin
-//               CID={state?.profile?.metadatas?.attributes?.[0]?.banniere}
-//               style={"w-full z-0 top-0 absolute opacity-80"}
-//             />
-//             <div className="z-100 w-full h-full bottom-0 absolute   flex flex-col">
-//               <BtnsSocial />
-//             </div>
-//           </div>
-//           <div className="z-100 relative px-5 py-5  flex flex-col">
-//             {/* <Avatar CID={state?.profile?.metadatas?.image} />
-//             <h6 className="text-white text-lg">
-//               {state?.profile?.metadatas?.username}
-//             </h6>
-//             <span className="text-white text-xs">
-//               {state?.profile?.metadatas?.description}
-//             </span> */}
-//           </div>
-//           <div className="absolute left-1  top-1 flex ml-auto  z-10"></div>
-//         </div>
-
-//         <motion.div
-//           ref={divRef}
-//           className={`rounded-lg w-full  flex backdrop-blur-2xl items-center  my-2 `}
-//         >
-//           <MyMenusTabs
-//             value={isTabs}
-//             setter={setIsTabs}
-//             arr={["All", "Posts", "Codes"]}
-//           />
-//           <div className="stats_social   bg-zinc-900  py-2 items-center  flex-auto justify-evenly flex   text-xs">
-//             <div className="flex  border border-r-1 h-fit border-l-0 border-y-0 border-white/30  items-center">
-//               {state?.profile?.datas?.followers}
-//               <Icon
-//                 icon={icfy.person.friend}
-//                 className="ml-1 text-lg text-white/80"
-//               />
-//             </div>
-//             <div className="flex   border border-r-1 h-fit border-l-0 border-y-0 border-white/30 flex-row items-center">
-//               {state?.profile?.datas?.follows}
-//               <Icon
-//                 icon={icfy.person.team}
-//                 className="ml-1 text-lg text-white/80"
-//               />
-//             </div>
-//             <div className="flex flex-row border-r-0 border-white/0 items-center">
-//               {state?.profile?.datas?.pubs}
-//               <Icon
-//                 icon={icfy.msg.chat}
-//                 className="ml-1 text-lg text-white/80"
-//               />
-//             </div>
-//           </div>
-//         </motion.div>
-
-//         <motion.div className="w-full  rounded-lg backdrop-blur   flex flex-col     overflow-y-scroll hide-scrollbar">
-//           {state?.pubs?.length > 0 ? (
-//             state?.pubs?.map(
-//               (pub, index) =>
-//                 bools(pub) && (
-//                   <Pub
-//                     _owner={state?.profile?.metadatas}
-//                     id={pub}
-//                     styles={{ size: "10px", clamp: "none" }}
-//                     key={v4()}
-//                   />
-//                 )
-//             )
-//           ) : (
-//             <p className="text-center text-white/40 my-auto">No pubs found</p>
-//           )}
-//         </motion.div>
-//       </div>
-//     </div>
-//   );
-// };

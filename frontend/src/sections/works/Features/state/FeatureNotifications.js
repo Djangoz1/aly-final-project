@@ -4,7 +4,7 @@ import {
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { STATUS } from "constants/status";
 import { Icon } from "@iconify/react";
@@ -15,12 +15,15 @@ import { MyBtnPost } from "components/btn/MyBtnPost";
 
 import { useAuthState } from "context/auth";
 import { Avatar } from "components/profile/ProfileAvatar";
+import { useInView } from "framer-motion";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 
 export const FeatureNotifications = ({ feature }) => {
   let { state, index } = useToolsState();
-
+  console.log("tesd", feature);
   let { cv } = useAuthState();
-
+  const ref = useRef(null);
+  const isInView = useInView(ref);
   let dispatch = useToolsDispatch();
 
   let handlePost = async (func, id, id2) => {
@@ -40,8 +43,9 @@ export const FeatureNotifications = ({ feature }) => {
     } else if (state?.features?.[index]) {
       setIsFeature(state?.features?.[index]);
     }
-  }, [feature, index]);
+  }, [feature, isInView, index]);
 
+  console.log("isFeature", isFeature);
   let [isInfos, setIsInfos] = useState(null);
 
   useEffect(() => {
@@ -58,7 +62,9 @@ export const FeatureNotifications = ({ feature }) => {
           ),
           value: (
             <>
-              <MyBtnPost
+              <MyMainBtn
+                template={1}
+                url={"#section2"}
                 setter={() =>
                   handlePost("signWorker", isFeature?.featureID, profile?.cvID)
                 }
@@ -67,7 +73,7 @@ export const FeatureNotifications = ({ feature }) => {
                 }
               >
                 Sign
-              </MyBtnPost>
+              </MyMainBtn>
             </>
           ),
         });
@@ -78,15 +84,15 @@ export const FeatureNotifications = ({ feature }) => {
     if (!isFeature?.details?.demands) {
       setIsInfos(null);
     }
-  }, [state, index]);
+  }, [state, index, isInView]);
 
   return (
     <>
-      <div className="flex w-full">
+      <div ref={ref} className="flex w-full">
         <MyCardInfos
           title={"Worker demands"}
           arr={isInfos}
-          style={"mr-3 w-1/3 rounded-tl-none "}
+          style={"mr-3 w-full rounded-tl-none "}
         ></MyCardInfos>
       </div>
     </>

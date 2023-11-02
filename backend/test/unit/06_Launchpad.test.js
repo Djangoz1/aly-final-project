@@ -21,7 +21,7 @@ const { _createFeature } = require("../../utils/web3-tools");
 
 const CONTRACT_NAME = "LaunchpadHub";
 
-describe.only(`Contract ${CONTRACT_NAME} `, () => {
+describe(`Contract ${CONTRACT_NAME} `, () => {
   let apiPost;
   let apiGet;
   let addressSystem;
@@ -457,7 +457,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe.only("Buy Token: Launchpad", () => {
+  describe("Buy Token: Launchpad", () => {
     let token;
     let datas;
     let price;

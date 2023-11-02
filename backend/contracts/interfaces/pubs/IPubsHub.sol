@@ -8,10 +8,13 @@ interface IPubsHub {
 
     function mint(
         uint _cvID,
-        string calldata _tokenURI
+        string calldata _tokenURI,
+        bool _isPayable
     ) external returns (uint);
 
     function likePub(uint _cvID, uint _id) external;
+
+    function pubsPayableLength() external view returns (uint);
 
     function unlikePub(uint _cvID, uint _id) external;
 }

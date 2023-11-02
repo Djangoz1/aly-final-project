@@ -141,6 +141,7 @@ library DataTypes {
         uint likes;
         uint answers;
         uint missionID;
+        bool isPayable;
     }
     /**
      *    @param id

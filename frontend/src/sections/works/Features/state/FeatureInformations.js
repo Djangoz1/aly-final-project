@@ -112,34 +112,46 @@ export const FeatureInformations = ({ feature }) => {
     <div className="flex w-full">
       <MyCardInfos
         arr={infos}
-        style={"mr-[1px] w-full rounded-tl-none "}
-      ></MyCardInfos>
-      <MyCardInfos arr={infos1} style={"mr-[1px] w-full rounded-tl-none "}>
-        <div className="flex mt-auto">
+        style={"mr-[1px] flex flex-col w-full rounded-tl-none "}
+      >
+        <div className="flex justify-between mt-auto">
           {(isFeature?.datas?.status === 0 || isFeature?.datas?.status === 1) &&
             (isFeature?.datas?.owner == cv ||
               isFeature?.datas?.cvWorker === cv) && (
-              <MyMainBtn style={"text-error mr-2"} url={"/create/escrow"}>
+              <MyMainBtn
+                template={1}
+                style={"text-error flex-row-reverse mr-2"}
+                url={"/create/escrow"}
+              >
                 Contest
               </MyMainBtn>
             )}
           {(isFeature?.datas?.status === 0 || isFeature?.datas?.status === 1) &&
             (isFeature?.datas?.owner == cv ||
               isFeature?.datas?.cvWorker == cv) && (
-              <MyBtnPost
+              <MyMainBtn
+                template={1}
                 style={"mr-2 c2"}
                 setter={() => handlePost("validFeature", isFeature?.featureID)}
               >
                 Validate
-              </MyBtnPost>
+              </MyMainBtn>
             )}
+        </div>
+      </MyCardInfos>
+      <MyCardInfos
+        arr={infos1}
+        style={"mr-[1px] flex flex-col w-full rounded-tl-none "}
+      >
+        <div className="flex mt-auto">
           {isFeature?.datas?.startedAt == 0 &&
             !isFeature?.datas?.isInviteOnly && (
-              <MyBtnPost
+              <MyMainBtn
+                template={1}
                 setter={() => handlePost("askToJoin", isFeature?.featureID)}
               >
                 Ask to join
-              </MyBtnPost>
+              </MyMainBtn>
             )}
           <MyFormModal
             stateInit={{

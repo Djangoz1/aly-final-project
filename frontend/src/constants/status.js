@@ -46,6 +46,12 @@ export const _STATUS = async ({ state, to, target }) => {
         }
       },
     ],
+    mission: [
+      undefined,
+      async () => {
+        await _apiPost("closeMission", [parseInt(state?.mission?.missionID)]);
+      },
+    ],
   };
 
   await funcs[target][to]();

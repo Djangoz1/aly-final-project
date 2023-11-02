@@ -5,7 +5,13 @@ import React, { useEffect, useState } from "react";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
-export const ProfileAvatar = ({ cvID, component, metadatas }) => {
+export const ProfileAvatar = ({
+  cvID,
+  onlyAvatar,
+  component,
+  metadatas,
+  style,
+}) => {
   const [isMetadatas, setIsMetadatas] = useState(null);
   let state = async () => {
     if (metadatas) {
@@ -22,10 +28,14 @@ export const ProfileAvatar = ({ cvID, component, metadatas }) => {
     if (!isMetadatas) state();
   }, [cvID]);
 
-  return (
+  return onlyAvatar ? (
+    <>
+      <Avatar style={style} CID={isMetadatas?.image} />
+    </>
+  ) : (
     <div className="flex items-end">
       <div className="avatar h-fit">
-        <Avatar CID={isMetadatas?.image} />
+        <Avatar style={style} CID={isMetadatas?.image} />
       </div>
       <div className=" ml-3">
         <CVName metadata={isMetadatas} styles={"text-xs"} />

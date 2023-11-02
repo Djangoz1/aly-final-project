@@ -3,13 +3,14 @@ import { Hg, Hg1 } from "components/text/HeroGradient";
 import React, { useState } from "react";
 import { v4 } from "uuid";
 import { MySub } from "../text/MySub";
+import { icfy } from "icones";
 
 export const MyCard = ({ head, children, icon, styles }) => {
   return (
     <div
       className={`${
         styles || "p-8 h-fit w-full flex   flex-col items-start"
-      }  shadowh hover:-translate-y-[2px] _hover w-fit relative transition-transform   rounded-md bg-[#131313]  c3`}
+      }  shadowh hover:-translate-y-[2px] _hover w-fit cursor-default relative transition-transform   rounded-md bgprim  c3`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">
@@ -100,7 +101,14 @@ export const MyCardInfos = ({ style, arr, title, children }) => {
               key={v4()}
               className="flex items-center relative text-left text-[10px] border py-4  border-t-0 border-x-0 border-white/10  justify-between"
             >
-              <MySub size={"9"} style="w-1/2 c4 hover:text-neutral-200 ">
+              <MySub
+                size={"9"}
+                style="w-1/2 flex items-center c4 hover:text-neutral-200 "
+              >
+                <Icon
+                  icon={el?.icon || icfy.ux.admin}
+                  className="mr-2 text-lg"
+                />
                 {el?.title}
               </MySub>
               <div className="w-1/2 flex items-center  ">{el?.value}</div>

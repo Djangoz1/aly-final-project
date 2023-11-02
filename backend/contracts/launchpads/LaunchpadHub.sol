@@ -38,7 +38,8 @@ contract LaunchpadHub is Ownable {
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(_iAS.apiPost()),
+            msg.sender == address(_iAS.apiPost()) ||
+                msg.sender == address(_iAS.apiPostPayable()),
             "Must call function with proxy bindings"
         );
         _;

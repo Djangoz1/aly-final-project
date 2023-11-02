@@ -116,10 +116,10 @@ export const AgendasMission = () => {
   }, [state?.events, isInView]);
   console.log("isinfos", isInfos);
   return (
-    <div className="w-full mt-[1px] flex" ref={ref}>
+    <div className="w-full mt-[1px] h-full flex" ref={ref}>
       <MyMenusTabs
         template={1}
-        style={"backdrop-blur-[1px] bg-neutral-50/10"}
+        style={"backdrop-blur-[1px] w-1/6 bg-neutral-50/10"}
         color={2}
         styleOrigin={"  c2  "}
         setter={setIsClicked}
@@ -129,11 +129,11 @@ export const AgendasMission = () => {
         All
       </MyMenusTabs>
       <div className="flex w-full justify-between ">
-        <MyCardInfos style={"rounded-tl-none w-full mr-3"} arr={isInfos}>
+        <MyCardInfos style={"rounded-none w-full mr-[1px]"} arr={isInfos}>
           coucou
         </MyCardInfos>
 
-        <div className={"ml-auto backdrop-blur-[2px] w-full"} color={1}>
+        <div className={" backdrop-blur-[2px] p-0  w-full"} color={1}>
           <MyCalendar
             events={
               isClicked !== null

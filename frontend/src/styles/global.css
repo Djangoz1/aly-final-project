@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "satoshi.css";
+@font-face {
+  font-family: "Satoshi";
+  /* src: url("/frontend/public/Satoshi_Complete/Fonts/WEB/css/satoshi.css") format("otf"); */
+}
+
 @import url("https://fonts.googleapis.com/css2?family=Lato&family=Montserrat:wght@500&family=Open+Sans:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap");
 body {
   width: 100vw;
@@ -26,7 +32,8 @@ body {
   transition: all 0.4s ease-in-out;
 }
 
-.card-shadow._hover {
+.card-shadow._hover,
+._hover {
   transition: all 0.4s ease-in-out;
 }
 
@@ -63,7 +70,7 @@ body {
 }
 
 .font2 {
-  font-family: "Exo", sans-serif;
+  font-family: "Satoshi-Variable", "exo", sans-serif;
 }
 
 .text-shadow {

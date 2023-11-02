@@ -1,5 +1,4 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { CreateFeature } from "sections/works/Features/form/create/CreateFeature";
 import { icfy } from "icones";
 import { styles } from "styles/style";
 import { EditTokenLaunchpad } from "sections/Launchpad/form/EditLockToken";

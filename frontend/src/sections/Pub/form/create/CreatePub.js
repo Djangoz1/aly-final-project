@@ -21,6 +21,9 @@ import { moock_create_post } from "constants/moock";
 import { ENUMS } from "constants/enums";
 import { doInitStateForm } from "context/form";
 import { MyInput } from "components/myComponents/form/MyInput";
+import { MyForm } from "components/myComponents/form/MyForm";
+import { LayoutForm } from "sections/Form/LayoutForm";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 
 export const CreatePub = ({ answerID, missionID, style, btn }) => {
   const { cv, metadatas } = useAuthState();
@@ -31,8 +34,16 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
   let dispatch = useAuthDispatch();
   let dispatchTools = useToolsDispatch();
   let inputs = [
-    <MyTextArea label={<></>} styles={"min-h-[30vh]"} target={"description"} />,
-    <CodeEditor style={"min-h-[55vh]"} isForm={true} target={"description"} />,
+    <MyTextArea
+      label={{ no: true }}
+      styles={"min-h-[30vh] w-full"}
+      target={"description"}
+    />,
+    <CodeEditor
+      style={" max-h-[30vh] mb-[40vh]"}
+      isForm={true}
+      target={"description"}
+    />,
   ];
 
   let types = ["Post", "Code"];
@@ -41,13 +52,16 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
 
   let dispatchAuth = useAuthDispatch();
   let submitForm = async (form) => {
+    if (!isConnected && !form?.description) {
+      throw new Error("Error create post: Missing value");
+    }
     if (isConnected) {
       console.log("form", form);
 
+      form = { ...form, code: false };
+
       if (isClicked === 1) {
         form.code = true;
-      } else {
-        form.code = false;
       }
       form.owner = metadatas;
 
@@ -72,8 +86,9 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
   moock.reference = answerID ? 2 : missionID ? 1 : 0;
 
   return (
-    isConnected && (
-      <MyFormModal
+    // isConnected && (
+    true && (
+      <LayoutForm
         submit={submitForm}
         btns={{
           btn: btn,
@@ -90,6 +105,7 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
           </span>
         }
         stateInit={{
+          allowed: true,
           form: moock,
           checked: [["description"]],
           placeholders: {
@@ -104,35 +120,48 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
           modal: "w-fit",
         }}
       >
-        <div className="">
-          <div className="w-full ">
-            <>
-              <MySelects
-                styles={"my-2"}
-                selects={[
-                  {
-                    label: "Language",
-                    target: "language",
-                    arr: ["Javascript", "Python", "C++"],
-                  },
-                  {
-                    label: "reference",
-                    target: "reference",
-                    placeholder: "Reference",
-                    arr: ["Public", "Mission", "Answer"],
-                  },
-                ]}
-                arr={types}
-                value={isClicked}
-                setter={setIsClicked}
-              />
-            </>
-
-            <MyMenusTabs arr={types} value={isClicked} setter={setIsClicked} />
+        <div className="w-full bgprim  h-full p-10">
+          <div className="flex w-full items-center ">
+            <MySelects
+              styles={"my-2"}
+              selects={[
+                {
+                  label: "Language",
+                  target: "language",
+                  arr: ["Javascript", "Python", "C++"],
+                },
+                {
+                  label: "reference",
+                  target: "reference",
+                  placeholder: "Reference",
+                  arr: ["Public", "Mission", "Answer"],
+                },
+              ]}
+              arr={types}
+              value={isClicked}
+              setter={setIsClicked}
+            />
+            <MyMenusTabs
+              template={2}
+              color={1}
+              arr={types}
+              value={isClicked}
+              setter={setIsClicked}
+            />
+          </div>
+          <div className=" relative w-full ">
             {inputs?.[isClicked]}
+            <MyMainBtn
+              form={true}
+              style={"mt-8 absolute bottom-0 right-0 "}
+              setter={submitForm}
+              url={"#section1"}
+            >
+              Post
+            </MyMainBtn>
           </div>
         </div>
-      </MyFormModal>
+      </LayoutForm>
     )
   );
 };

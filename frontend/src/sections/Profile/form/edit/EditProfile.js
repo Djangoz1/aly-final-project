@@ -48,7 +48,7 @@ export const EditProfile = ({ styles }) => {
   let moock = toMockProfile({ address, metadatas, cvID: cv });
 
   return (
-    <div className="bgprim  min-h-[60vh] h-full">
+    <div className="bgprim  min-h-[60vh] w-full flex h-full">
       <LayoutForm
         stateInit={{
           allowed: true,
@@ -57,11 +57,12 @@ export const EditProfile = ({ styles }) => {
         }}
       >
         <MyMenusTabs
+          template={1}
           value={state?.indexSettings || 0}
           target={"title"}
           color={1}
           setter={(i) => doStateTools(dispatch, { ...state, indexSettings: i })}
-          style={" w-full rounded-none "}
+          style={" w-1/5 rounded-none "}
           arr={MENUS.profile?.edit}
         />
         <div className="  px-3 py-5 h-full">

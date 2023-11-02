@@ -485,23 +485,16 @@ contract APIPost is Ownable {
     // ************* Pubs ************* //
     // ************* ---- ************* //
 
-    /**
-     * @notice Binding for create pub
-     * @param _tokenURI is for pinataCRUD by exemple
-     * @dev this function trigger PubsHub contract
-     * msg.sender == ownerOfCV(x)
-     * Permet de poster une publication
-     */
-
     function createPub(string calldata _tokenURI) external {
-        _createPub(_cvOf(msg.sender), _tokenURI);
+        _createPub(_cvOf(msg.sender), _tokenURI, false);
     }
 
     function _createPub(
         uint _cvID,
-        string calldata _tokenURI
+        string calldata _tokenURI,
+        bool _isPayable
     ) internal returns (uint) {
-        return IPubsHub(_pubsHub).mint(_cvID, _tokenURI);
+        return IPubsHub(_pubsHub).mint(_cvID, _tokenURI, _isPayable);
     }
 
     /**
@@ -513,7 +506,7 @@ contract APIPost is Ownable {
      * Permet de poster une réponse à une publication
      */
     function createPubAnswer(uint _pubID, string calldata _tokenURI) external {
-        uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI);
+        uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI, false);
         require(newPubID != 0, "Error create pub");
         IPubsDatasHub(_pubsDatasHub).addPubAnswer(newPubID, _pubID, _tokenURI);
     }
@@ -530,7 +523,7 @@ contract APIPost is Ownable {
         uint _missionID,
         string calldata _tokenURI
     ) external {
-        uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI);
+        uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI, false);
         IPubsDatasHub(_pubsDatasHub).addPubMission(
             newPubID,
             _missionID,

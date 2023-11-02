@@ -236,6 +236,7 @@ export let createURICv = async (form) => {
         languages: form.languges,
         skills: form.skills,
         domain: form.domain,
+        gallery: [],
       },
     ],
   };

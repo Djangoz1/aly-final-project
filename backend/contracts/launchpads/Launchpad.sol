@@ -40,7 +40,8 @@ contract Launchpad is Ownable {
 
     modifier onlyProxy() {
         require(
-            msg.sender == address(_iAS.apiPost()) ||
+            msg.sender == address(_iAS.apiPostPayable()) ||
+                msg.sender == address(_iAS.apiPost()) ||
                 msg.sender == _iAS.launchpadsInvestorsHub(),
             "Must call function with proxy bindings"
         );

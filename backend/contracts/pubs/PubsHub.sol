@@ -15,6 +15,7 @@ import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
 contract PubsHub is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIDs;
+    Counters.Counter private _tokenPayableIDs;
     IAddressSystem _iAS;
 
     /**
@@ -23,6 +24,7 @@ contract PubsHub is ERC721URIStorage, Ownable {
      * @notice array of index publications for each publisher
      */
     mapping(uint => uint[]) indexers;
+    mapping(uint => mapping(uint => bytes)) indexersPayable;
 
     modifier onlyProxy() {
         require(
@@ -42,6 +44,10 @@ contract PubsHub is ERC721URIStorage, Ownable {
         return _tokenIDs.current();
     }
 
+    function pubsPayableLength() external view returns (uint) {
+        return _tokenPayableIDs.current();
+    }
+
     /**
      * @param _cvID address is address of cv publisher
      * @return uint [] ids of publication
@@ -52,14 +58,23 @@ contract PubsHub is ERC721URIStorage, Ownable {
 
     function mint(
         uint _cvID,
-        string calldata _tokenURI
+        string memory _tokenURI,
+        bool _isPayable
     ) external onlyProxy returns (uint) {
         address cvAddr = Bindings.ownerOf(_cvID, _iAS.cvsHub());
-        _tokenIDs.increment();
-        uint newPubID = _tokenIDs.current();
-        indexers[_cvID].push(newPubID);
-        _mint(cvAddr, newPubID);
-        _setTokenURI(newPubID, _tokenURI);
+        uint newPubID;
+        if (!_isPayable) {
+            _tokenIDs.increment();
+            newPubID = _tokenIDs.current();
+            _mint(cvAddr, newPubID);
+            _setTokenURI(newPubID, _tokenURI);
+            indexers[_cvID].push(newPubID);
+        } else {
+            _tokenPayableIDs.increment();
+            newPubID = _tokenPayableIDs.current();
+            _mint(cvAddr, newPubID);
+            indexersPayable[_cvID][newPubID] = bytes(_tokenURI);
+        }
         return newPubID;
     }
 }
