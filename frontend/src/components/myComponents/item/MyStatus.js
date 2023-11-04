@@ -22,10 +22,9 @@ export const MyStatus = ({
   const { state } = useToolsState();
 
   let handleClick = async () => {
-    console.log(toStatus);
     if (allowed && status != toStatus) {
       setIsLoading(true);
-      console.log("refdsfsssre", refresh);
+
       if (setter) {
         await setter();
       } else {
@@ -47,8 +46,8 @@ export const MyStatus = ({
         className={` ${style || "  text-xs  "}
           ${
             allowed && status != toStatus
-              ? `w-fit  g1 ${["gb1", "gr1"]?.[status]} rounded-lg  text-warning`
-              : ""
+              ? `p-0 super-btn   overflow-hidden `
+              : "uppercase"
           }
         `}
       >
@@ -60,12 +59,12 @@ export const MyStatus = ({
                 : status
             ]?.bg
           }
-uppercase font-semibold
+ font-semibold
            ${padding || "py-2 px-5"}
          backdrop-blur
         ${
           allowed && status != toStatus
-            ? "hover:bg-zinc-900 cursor-pointer"
+            ? "hover:bg-zinc-900 h-full cursor-pointer"
             : "cursor-default"
         }
           `}
@@ -89,7 +88,7 @@ uppercase font-semibold
                   className={` pulse-status w-[10px] h-[10px] mr-3  ${STATUS?.[target]?.[status]?.color}`}
                 ></div>
               )}
-
+              {console.log(status)}
               {
                 STATUS?.[target]?.[
                   status != toStatus && allowed && toStatus && isHovered

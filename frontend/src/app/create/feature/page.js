@@ -15,7 +15,7 @@ import {
 } from "constants/moock";
 
 import { createURIFeature } from "utils/ui-tools/pinata-tools";
-import { _apiPost } from "utils/ui-tools/web3-tools";
+import { _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
 import { ethers } from "ethers";
 import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 import Link from "next/link";
@@ -48,26 +48,16 @@ const PageCreateFeature = () => {
 
   form[0].error = datas?.missions?.length == 0 ? true : undefined;
 
-  console.log("state", state);
   let submitForm = async (form) => {
     let missionID = state?.missions[parseInt(form?.missionID)]?.id;
 
     let uri = await createURIFeature(form);
     let estimatedDays = parseInt(form?.estimatedDays);
 
-    console.log("form./wazfe", form?.wadge);
     if (missionID > 0 && estimatedDays > 0) {
-      console.log("form./111", estimatedDays);
-      console.log("form./111", form?.onlyInvite);
-      console.log("form./111", uri);
-      console.log(
-        "---------------formkezrlflz---------------",
-        form?.specification
-      );
       let value = await ethers.utils.parseEther(form?.wadge);
-      console.log("form./111", value);
 
-      await _apiPost(
+      await _apiPostPayable(
         "createFeature",
         [
           missionID,
@@ -83,7 +73,6 @@ const PageCreateFeature = () => {
     router.push("/works/mission/" + missionID + "#section2");
   };
 
-  console.log("datas", account);
   return (
     <MyLayoutApp
       url={"/create/feature"}

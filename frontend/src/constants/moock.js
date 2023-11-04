@@ -9,9 +9,11 @@ export let moock_create_post = {
   description: null,
   image: null,
   code: null,
+  file: null,
   missionID: null,
   answerID: null,
   reference: null,
+  amount: null,
   language: null,
   tags: null,
 };

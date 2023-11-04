@@ -5,7 +5,7 @@ import { MySelects } from "components/myComponents/form/MySelects";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { MyFormModal } from "components/myComponents/form/MyFormModal";
 import { Icon } from "@iconify/react";
-import { icfy, icfySEND } from "icones";
+import { icfy, icfyETHER, icfyINFO, icfySEND } from "icones";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { createURIPub } from "utils/ui-tools/pinata-tools";
@@ -13,6 +13,7 @@ import { useAccount } from "wagmi";
 import { CodeEditor } from "components/myComponents/MyEditor";
 import {
   doStateProfileTools,
+  doStateTools,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
@@ -24,13 +25,16 @@ import { MyInput } from "components/myComponents/form/MyInput";
 import { MyForm } from "components/myComponents/form/MyForm";
 import { LayoutForm } from "sections/Form/LayoutForm";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyInputFile } from "components/myComponents/form/MyInputsFile";
+import { ethers } from "ethers";
 
-export const CreatePub = ({ answerID, missionID, style, btn }) => {
+export const CreatePub = ({ answerID, refresh, missionID, style, btn }) => {
   const { cv, metadatas } = useAuthState();
   let moock = moock_create_post;
+
   let [isClicked, setIsClicked] = useState(0);
   let { address, isConnected } = useAccount();
-  let { state } = useToolsState();
+  let { state, pointer } = useToolsState();
   let dispatch = useAuthDispatch();
   let dispatchTools = useToolsDispatch();
   let inputs = [
@@ -55,6 +59,7 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
     if (!isConnected && !form?.description) {
       throw new Error("Error create post: Missing value");
     }
+
     if (isConnected) {
       console.log("form", form);
 
@@ -63,12 +68,21 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
       if (isClicked === 1) {
         form.code = true;
       }
+      if (state?.form?.payable) {
+        form.payable = true;
+      }
+
       form.owner = metadatas;
 
-      let uri = await createURIPub(form);
-      console.log(uri);
+      let { uri, uriPayable } = await createURIPub(form);
 
-      if (answerID > 0) {
+      if (uriPayable) {
+        await _apiPost("createPayablePub", [
+          uri,
+          ethers.utils.parseEther(form?.amount)?._hex,
+          uriPayable,
+        ]);
+      } else if (answerID > 0) {
         await _apiPost("createPubAnswer", [answerID, uri]);
       } else if (missionID > 0) {
         await _apiPost("createPubMission", [missionID, uri]);
@@ -77,7 +91,11 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
       }
 
       await doAuthCV(dispatchAuth, address);
-      await doStateProfileTools({ dispatch: dispatchTools, cvID: cv });
+      if (refresh) {
+        await refresh();
+      } else {
+        await doStateProfileTools({ dispatch: dispatchTools, cvID: cv });
+      }
     }
   };
 
@@ -113,6 +131,7 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
             description: "Hey ! What's new ?",
             reference: "For who ?",
             language: "Wich technology ?",
+            amount: "Price of pub",
           },
         }}
         styles={{
@@ -121,7 +140,44 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
         }}
       >
         <div className="w-full bgprim  h-full p-10">
-          <div className="flex w-full items-center ">
+          <div className="flex mb-5 w-full  ">
+            <MyMenusTabs
+              style={" ml-auto flex-row "}
+              template={2}
+              // styleOrigin={
+              //   // "bg-black rounded-full overflow-hidden text-white py-3"
+              // }
+              color={"no"}
+              arr={types}
+              value={isClicked}
+              setter={setIsClicked}
+            />
+
+            <MyMainBtn
+              template={state?.form?.payable ? 2 : 1}
+              color={1}
+              padding={!state?.form?.payable ? "btn-xs px-2 py-2" : "px-2 py-2"}
+              url={"#section1"}
+              setter={() =>
+                doStateTools(
+                  dispatchTools,
+                  {
+                    ...state,
+                    form: { ...state?.form, payable: !state?.form?.payable },
+                  },
+                  pointer
+                )
+              }
+              style={" rounded-full text-[10px] "}
+              icon={{ no: true }}
+            >
+              {state?.form?.payable ? "Payable pub" : "Free pub"}
+            </MyMainBtn>
+          </div>
+          {state?.form?.payable && (
+            <MyInput icon={icfyINFO} styles={"mb-5"} target={"title"}></MyInput>
+          )}
+          <div className="flex w-full  ">
             <MySelects
               styles={"my-2"}
               selects={[
@@ -137,23 +193,30 @@ export const CreatePub = ({ answerID, missionID, style, btn }) => {
                   arr: ["Public", "Mission", "Answer"],
                 },
               ]}
-              arr={types}
-              value={isClicked}
-              setter={setIsClicked}
             />
-            <MyMenusTabs
-              template={2}
-              color={1}
-              arr={types}
-              value={isClicked}
-              setter={setIsClicked}
-            />
+          </div>
+          <div className="flex items-center my-5 ">
+            <MyInputFile
+              style={"justify-end mr-5  "}
+              target={state?.form?.payable ? "preview" : "image"}
+            ></MyInputFile>
+            {state?.form?.payable && (
+              <>
+                <MyInputFile
+                  style={"justify-end mr-5  "}
+                  target={"file"}
+                ></MyInputFile>
+                <MyInput type={"number"} icon={icfyETHER} target={"amount"} />
+              </>
+            )}
           </div>
           <div className=" relative w-full ">
             {inputs?.[isClicked]}
             <MyMainBtn
               form={true}
-              style={"mt-8 absolute bottom-0 right-0 "}
+              template={1}
+              color={1}
+              style={"mt-8 btn-sm absolute bottom-0 right-0 "}
               setter={submitForm}
               url={"#section1"}
             >

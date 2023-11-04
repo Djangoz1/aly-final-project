@@ -16,6 +16,7 @@ import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 
 import { MySub } from "../text/MySub";
+import { MyNum } from "../text/MyNum";
 
 export const MyDashboard = ({
   setter,
@@ -36,7 +37,6 @@ export const MyDashboard = ({
 
   let price1 = parseInt(price);
   let price2 = parseInt(parseFloat(price).toFixed(2).toString().split(".")[1]);
-
   return (
     <>
       <MyCardList
@@ -47,19 +47,7 @@ export const MyDashboard = ({
         style={"h-full w-full rounded-xl  overflow-hidden mx-5 my-5 mb-20"}
         price={
           <>
-            <span className="countdown">
-              <span
-                style={{
-                  "--value": price1 || 0,
-                }}
-              ></span>
-              .
-              <span
-                style={{
-                  "--value": price2 || 0,
-                }}
-              ></span>
-            </span>
+            <MyNum toFix={3} num={parseFloat(price)} />
           </>
         }
         url={btn?.url}

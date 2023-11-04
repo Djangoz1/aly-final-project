@@ -4,11 +4,13 @@ import Link from "next/link";
 import React from "react";
 import { v4 } from "uuid";
 import { MyCard } from "./MyCard";
+import { MyNum } from "../text/MyNum";
 
 export const MyCardPrice = ({
   price,
   url,
   btn,
+  size,
   style,
   badge,
   active,
@@ -25,7 +27,10 @@ export const MyCardPrice = ({
   ];
 
   return (
-    <MyCard styles={`${style && style} px-8 pt-4 pb-8  min-w-[322px]`}>
+    <MyCard
+      styles={`${style && style} px-8 pt-4 pb-8 ${size || " min-w-[282px]"}`}
+      template={1}
+    >
       <div
         className={`mb-4 rounded-lg ${
           colors[color || 0].bg

@@ -3,8 +3,17 @@ import { MySub } from "../text/MySub";
 import { Icon } from "@iconify/react";
 import { icfy } from "icones";
 import Link from "next/link";
-
-export const MyCardFolder = ({ style, title, url, children, color, image }) => {
+import "./style.css";
+import { MyTitle } from "../text/MyTitle";
+export const MyCardFolder = ({
+  style,
+  hoverable,
+  title,
+  url,
+  children,
+  color,
+  image,
+}) => {
   let colors = [
     { bg: "bgprim", color: "c3" },
     { bg: "bg-sky-950", color: "c3" },
@@ -17,10 +26,16 @@ export const MyCardFolder = ({ style, title, url, children, color, image }) => {
     { bg: "bg2", color: "c1" },
     { bg: "gr1 g1", color: "c3" },
   ];
+  color = color >= colors.length ? color % colors.length : color;
+
   return (
-    <div className={"flex flex-col _hover hover:-translate-y-1 " + style}>
+    <div
+      className={`flex flex-col  _hover hover:-translate-y-1 ${
+        hoverable ? "card-folder" : undefined
+      } ${style}`}
+    >
       <div
-        className={`h-[180px] round relative   z-1 shadow1 rounded-2xl overflow-hidden  w-[330px] ${
+        className={`h-[180px] round relative   z-1 shadow1 rounded-2xl overflow-hidden  md:w-[250px] w-[330px] ${
           colors?.[color || 0]?.bg
         } `}
       >
@@ -34,11 +49,9 @@ export const MyCardFolder = ({ style, title, url, children, color, image }) => {
           className={`flex  px-3 justify-between relative shadow1 text-neutral-300 hover:text-white h-1/2 ${colors?.[color]?.bg} `}
         >
           <div className={`flex flex-col`}>
-            <h6
-              className={`font-light uppercase text-xl ${colors?.[color]?.color}`}
-            >
+            <MyTitle style={` uppercase text-xl ${colors?.[color]?.color}`}>
               {title}
-            </h6>
+            </MyTitle>
             <MySub size={"12"} style={"flex items-center "}>
               {children}
             </MySub>

@@ -33,7 +33,7 @@ import { MyLoader } from "./MyLoader";
 import { CVMenusDropdown } from "sections/Profile/state/CVMenusDropdown";
 import { MyCardFolder } from "../card/MyCardFolder";
 import { MySub } from "../text/MySub";
-import { MyDashboard } from "../card/MyDashboad";
+import { MyDashboard } from "./MyDashboad";
 import { AssetProfile1 } from "components/assets/AssetProfile";
 
 export const MyLayoutDashboard = ({
@@ -48,23 +48,28 @@ export const MyLayoutDashboard = ({
   allowed,
   target,
   header,
+  noMenu,
   refresh,
   menus,
   template,
+  initState,
   children,
   btn,
   isLoading,
 }) => {
   let dispatch = useToolsDispatch();
   let { state, pointer } = useToolsState();
-  menus = [
-    {
-      title: "Overview",
-      url: "#section0",
-      icon: icfy.ux.checkList,
-    },
-    ...menus,
-  ];
+  menus =
+    menus && !noMenu
+      ? [
+          {
+            title: "Overview",
+            url: "#section0",
+            icon: icfy.ux.checkList,
+          },
+          ...menus,
+        ]
+      : menus;
   useEffect(() => {
     if (pointer === 0) {
       template = 0;
@@ -74,22 +79,31 @@ export const MyLayoutDashboard = ({
   let url = `/${target}/${id}`;
 
   return (
-    <MyLayoutApp id={id} url={url} target={target}>
-      {menus
-        ?.filter((el) => el?.title)
-        ?.map(
-          (el, i) =>
-            el?.title !== undefined &&
-            i < menus?.length - 1 && (
-              <Viewport key={v4()} id={el?.title} index={i}></Viewport>
-            )
-        )}
+    <MyLayoutApp
+      initState={initState}
+      template={template}
+      id={id}
+      url={url}
+      target={target}
+    >
+      {template !== 2 &&
+        menus
+          ?.filter((el) => el?.title)
+          ?.map(
+            (el, i) =>
+              el?.title !== undefined &&
+              i < menus?.length - 1 && (
+                <Viewport key={v4()} id={el?.title} index={i}></Viewport>
+              )
+          )}
 
       <Viewport
-        fixed={true}
+        fixed={template !== 2 ? true : false}
         key={v4()}
-        id={menus?.[pointer]?.title}
-        index={menus?.length - 1}
+        full={template === 2 ? true : undefined}
+        background={template === 2 ? true : undefined}
+        id={template === 2 ? 0 : menus?.[pointer]?.title}
+        index={template === 2 ? 0 : menus?.length - 1}
       >
         {!isLoading ? (
           <>
@@ -109,6 +123,7 @@ export const MyLayoutDashboard = ({
                   btn={{
                     title: btn?.title,
                     info: btn?.info,
+                    url: btn?.url,
                   }}
 
                   // arr={lists}
@@ -116,17 +131,19 @@ export const MyLayoutDashboard = ({
                   {pointer === 0 ? (
                     <div className="flex flex-col  c1 w-full  max-h-[60vh]  mb-auto ">
                       <div className="grid grid-cols-3 mt-10 grid-rows-2 gap-4">
-                        {lists?.map((el, i) => (
-                          <MyCardFolder
-                            key={v4()}
-                            image={el?.image || `/${el?.title}.png`}
-                            title={el?.title}
-                            url={el?.url}
-                            color={i}
-                          >
-                            {el?.description}
-                          </MyCardFolder>
-                        ))}
+                        {lists?.map((el, i) =>
+                          el?.title ? (
+                            <MyCardFolder
+                              key={v4()}
+                              image={el?.image || `/${el?.title}.png`}
+                              title={el?.title}
+                              url={el?.url}
+                              color={i}
+                            >
+                              {el?.description}
+                            </MyCardFolder>
+                          ) : undefined
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -140,14 +157,16 @@ export const MyLayoutDashboard = ({
 
                 <div className="w-full flex flex-col  h-full">
                   <div className="flex w-full relative">
-                    <MyMenusTabs
-                      style={"w-full"}
-                      color={color || 1}
-                      target={"title"}
-                      arr={menus}
-                      value={pointer}
-                      setter={(index) => doPointerTools(dispatch, index)}
-                    />
+                    {!noMenu ? (
+                      <MyMenusTabs
+                        style={"w-full"}
+                        color={color || 1}
+                        target={"title"}
+                        arr={menus}
+                        value={pointer}
+                        setter={(index) => doPointerTools(dispatch, index)}
+                      />
+                    ) : undefined}
                     {statusObj ? (
                       <MyStatus
                         allowed={allowed}
@@ -166,6 +185,7 @@ export const MyLayoutDashboard = ({
                     {children}
                   </div>
                 </div>,
+                <div className="w-full h-full  ">{children} </div>,
               ][template || 0]
             }
           </>

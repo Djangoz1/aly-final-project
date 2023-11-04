@@ -19,6 +19,7 @@ import {
   _apiGetAt,
   _apiPost,
   _apiPostAt,
+  _apiPostPayable,
 } from "utils/ui-tools/web3-tools";
 import { useAuthDispatch, useAuthState } from "context/auth";
 import { createURILaunchpad } from "utils/ui-tools/pinata-tools";
@@ -88,7 +89,7 @@ const PageCreateProfile = () => {
         tiersDatas.push(tierDatas);
       }
 
-      await _apiPost(
+      await _apiPostPayable(
         "createLaunchpad",
         [launchpadData, tiersDatas, tokenURI],
         `${ethers?.utils?.parseEther(form?.price)}`

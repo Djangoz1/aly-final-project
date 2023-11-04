@@ -12,8 +12,12 @@ export const MyMainBtn = ({
   template,
   form,
   setter,
+  padding,
   url,
+  color,
+  rotate,
   disabled,
+  icon,
   style,
 }) => {
   let [isLoading, setIsLoading] = useState(null);
@@ -40,11 +44,20 @@ export const MyMainBtn = ({
       onClick={handleClick}
       disabled={disabled}
       className={`${
-        style || "c3"
-      } w-fit flex   flex-row items-center   font-semibold  transition  ${
+        style || (template != 1 && "c3")
+      } w-fit flex   flex-row items-center     transition  ${
         [
-          "hover:[box-shadow:rgb(171,_196,_245)_0px_0px] max-w-full grid-cols-2 bg1 shadowh _hover px-8 py-2 [box-shadow:rgb(171,_196,_245)_-8px_8px] ",
-          " btn-outline  bg-gradient-to-l shadowh _hover  to-info/40 from-info/20 btn ",
+          "font-semibold  hover:[box-shadow:rgb(171,_196,_245)_0px_0px] max-w-full grid-cols-2 bg1 shadowh _hover px-8 py-2 [box-shadow:rgb(171,_196,_245)_-8px_8px] ",
+          `font-semibold ${
+            [
+              "text-white hover:text-black hover:bg-gradient-to-r hover:from-white/10 hover:to-white   bg-black border-white/40",
+              "text-black hover:text-white   bg-white border-zinc-800/40 hover:bg-gradient-to-l hover:from-black/10 hover:to-black",
+              "text-black bg-lime-400     border-black  hover:bg-white",
+            ]?.[color || 0]
+          }    ${
+            padding || "px-5"
+          }  h-fit  border-x-1 border-y-1 btn btn-circle`,
+          `super-btn h-fit font-light  ${padding || "px-4  py-3"}`,
         ]?.[template || 0]
       } `}
     >
@@ -52,21 +65,33 @@ export const MyMainBtn = ({
         <span className="loading  loading-bars mx-10 loading-xs"></span>
       ) : (
         <>
-          <p
-            className={` ${
-              ["mr-6 btn btn-ghost", ""]?.[template || 0]
-            } font-bold  uppercase`}
-          >
-            {children}
-          </p>
+          {children ? (
+            <p
+              className={` ${
+                [
+                  `${!icon?.no && "mr-6"} btn btn-ghost uppercase`,
+                  " ",
+                  `${!icon?.no && "mr-2"} `,
+                ]?.[template || 0]
+              }   `}
+            >
+              {children}
+            </p>
+          ) : undefined}
         </>
       )}
-      <Icon
-        icon={icfy.ux.arrow}
-        className={`h-4 w-4 flex-none transition-all ${
-          !isLoading ? " rotate-90" : "-rotate-90"
-        }`}
-      />
+      {!icon?.no && (
+        <Icon
+          icon={icon || icfy.ux.arrow}
+          className={` flex-none transition-all ${
+            icon
+              ? undefined
+              : !isLoading && !rotate
+              ? " rotate-90"
+              : "-rotate-90"
+          }`}
+        />
+      )}
     </Link>
   );
 };

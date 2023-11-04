@@ -27,7 +27,7 @@ import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 
 export const FeatureInformations = ({ feature }) => {
-  let { state, index } = useToolsState();
+  let { state, index, pointer } = useToolsState();
   let { cv } = useAuthState();
 
   let dispatch = useToolsDispatch();
@@ -147,6 +147,7 @@ export const FeatureInformations = ({ feature }) => {
           {isFeature?.datas?.startedAt == 0 &&
             !isFeature?.datas?.isInviteOnly && (
               <MyMainBtn
+                url={`#section${pointer}`}
                 template={1}
                 setter={() => handlePost("askToJoin", isFeature?.featureID)}
               >

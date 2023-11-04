@@ -94,7 +94,6 @@ const PageCreateEscrow = () => {
     setIsState({ arr });
   };
 
-  console.log("tools", tools);
   useEffect(() => {
     if (!isState && cv > 0) {
       stateInit();
@@ -117,7 +116,7 @@ const PageCreateEscrow = () => {
       description: form.description,
       attributes: [{}],
     };
-    console.log("form", form);
+
     let uri = await createURI({ id, title: "Escrow", images, metadatas });
     if (form?.appeal > 0 && form?.arbitrators >= 3) {
       let hash = await _apiPost("contestFeature", [
@@ -126,11 +125,10 @@ const PageCreateEscrow = () => {
         parseInt(form?.arbitrators),
         uri,
       ]);
-      console.log(hash);
+
       let disputeID = await _apiGet("disputeOfFeature", [id]);
-      console.log("disputeID", disputeID);
+
       hash = await _apiPost("initDispute", [disputeID]);
-      console.log(hash);
     }
   };
 

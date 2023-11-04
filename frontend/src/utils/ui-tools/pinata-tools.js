@@ -253,6 +253,12 @@ export let createURIPub = async (form) => {
   if (form?.image) {
     images.push({ target: "image", image: form.image });
   }
+  if (!form?.file && form?.payable && !form?.preview) {
+    throw new Error("Missing file or preview");
+  }
+  if (form?.payable) {
+    images.push({ target: "preview", attributes: true, image: form?.preview });
+  }
 
   let uri = await createURI({
     id,
@@ -265,6 +271,7 @@ export let createURIPub = async (form) => {
         {
           owner: form?.owner,
           missionID: form?.missionID,
+
           answerID: form?.answerID,
           language: form?.language,
           tags: form?.tags,
@@ -273,7 +280,16 @@ export let createURIPub = async (form) => {
       ],
     },
   });
-  return uri;
+  let uriPayable;
+  if (form?.payable) {
+    uriPayable = await createURI({
+      id,
+      title: "Payable pub",
+      images: [{ target: "file", image: form?.file }],
+      metadatas: { attributes: [{ pubID: id }] },
+    });
+  }
+  return { uri, uriPayable };
 };
 
 export let createURIFeature = async (form) => {

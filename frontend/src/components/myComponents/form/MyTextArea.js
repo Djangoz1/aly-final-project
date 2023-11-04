@@ -53,7 +53,7 @@ export const MyTextArea = ({ label, target, setter, styles }) => {
           value={value || undefined}
           onBlur={handleBlur}
           onFocus={handleFocus}
-          className={`textarea font2 bg-zinc-900   font-light ${
+          className={`textarea font2 bg-zinc-900 w-full   font-light ${
             !isFocus ? "" : "shadow1"
           }  ${styles || "min-h-[10vh] max-h-[30vh]"}`}
           placeholder={placeholders?.[target]}

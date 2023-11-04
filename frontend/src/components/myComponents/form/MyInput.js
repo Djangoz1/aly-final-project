@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import "./style.css";
 import { Icon } from "@iconify/react";
-import { icfy } from "icones";
+import { icfy, icfySEND } from "icones";
 export let MyInput = ({
   target,
   min,
@@ -123,7 +123,7 @@ export let MyInput = ({
             isFocus && "border-success/20"
           }   appearance-none input-ghost input-xs input font-light  py-1 h-fit `}
         />
-        {icon && setter ? (
+        {setter ? (
           <div
             onClick={handlePost}
             className="btn btn-ghost btn-xs px-2 py-0 c2    w-fit h-fit"
@@ -132,7 +132,7 @@ export let MyInput = ({
               <span className="loading  loading-bars  loading-xs "></span>
             ) : (
               <>
-                <Icon icon={icon} className="text-[14px] " />
+                <Icon icon={icon || icfySEND} className="text-[14px] " />
               </>
             )}
           </div>

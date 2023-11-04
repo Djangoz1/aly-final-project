@@ -271,6 +271,7 @@ export const IcShieldCheck = () => (
 export const icsystem = {
   escrow: icfy.court.injustice,
   launchpad: icfyROCKET,
+  court: icfy.court.hammer,
   feature: icfyCODE,
   mission: icfy.work.casual,
   profile: icfy.person.team,

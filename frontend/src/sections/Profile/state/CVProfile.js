@@ -4,7 +4,7 @@ import { Pub } from "components/Pub";
 
 import { Avatar } from "components/profile/ProfileAvatar";
 
-import { useToolsState } from "context/tools";
+import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 
 import {
   icfy,
@@ -13,6 +13,7 @@ import {
   icfyFB,
   icfyGITHUB2,
   icfyLINKEDIN,
+  icfySEND,
   icfyTWITTER,
 } from "icones";
 
@@ -31,17 +32,30 @@ import {
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { BtnsSocial } from "components/btn/BtnsSocial";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 
 export const CVProfile = ({}) => {
   let { state, pointer } = useToolsState();
 
-  let [isTabs, setIsTabs] = useState(0);
-  let [isAllowed, setIsAllowed] = useState(null);
+  let setTabs = (index) => {
+    doStateTools(
+      dispatch,
+      {
+        ...state,
+        indexers: { ...state?.indexers, profile: index },
+      },
+      pointer
+    );
+  };
+
+  let dispatch = useToolsDispatch();
   const bools = (pub) => {
     if (
-      isTabs === 0 ||
-      (isTabs === 1 && !pub?.metadata?.attributes?.[0]?.code) ||
-      (isTabs === 2 && pub?.metadata?.attributes?.[0]?.code)
+      state?.indexers?.profile === 0 ||
+      state?.indexers?.profile === undefined ||
+      (state?.indexers?.profile === 1 &&
+        !pub?.metadata?.attributes?.[0]?.code) ||
+      (state?.indexers?.profile === 2 && pub?.metadata?.attributes?.[0]?.code)
     ) {
       return true;
     } else {
@@ -49,9 +63,7 @@ export const CVProfile = ({}) => {
     }
   };
 
-  useEffect(() => {}, [isTabs]);
-  const divRef = useRef(null);
-
+  console.log("state cvProfile", state);
   return (
     <>
       <div className="flex w-full h-full relative flex-col">
@@ -62,8 +74,8 @@ export const CVProfile = ({}) => {
               style={"  w-1/6 bg-white/5 backdrop-blur-[1px] "}
               color={8}
               target={"value"}
-              value={isTabs}
-              setter={setIsTabs}
+              value={state?.indexers?.profile || 0}
+              setter={(i) => setTabs(i)}
               arr={[
                 { value: "All", icon: icfy.ux.plus },
                 { value: "Posts", icon: icfy.msg.opened },
@@ -72,8 +84,20 @@ export const CVProfile = ({}) => {
               ]}
             />
 
-            {isTabs <= 2 ? (
-              <motion.div className="w-full bgprim c3 rounded-b-lg  flex flex-col     overflow-y-scroll hide-scrollbar">
+            {state?.indexers?.profile <= 2 ||
+            state?.indexers?.profile === undefined ? (
+              <motion.div className="w-full bgprim c3 rounded-b-lg  flex relative flex-col     overflow-y-scroll hide-scrollbar">
+                <MyMainBtn
+                  setter={() => setTabs(3)}
+                  padding={"px-4 py-1"}
+                  template={1}
+                  url={"#section1"}
+                  icon={icfySEND}
+                  style={"top-2 absolute btn-xs right-2"}
+                  color={1}
+                >
+                  Publish
+                </MyMainBtn>
                 {state?.pubs?.length > 0 ? (
                   state?.pubs?.map((pub, index) => (
                     <Pub

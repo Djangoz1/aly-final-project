@@ -29,6 +29,7 @@ export function Viewport({
   fixed,
   img,
   full,
+  background,
   children,
   id,
 }) {
@@ -48,6 +49,7 @@ export function Viewport({
 
   useEffect(() => {
     if (isInView && isInView1 && status !== "pointer" && pointer != index) {
+      console.log("isInView pointer ...", index);
       doPointerTools(dispatch, index);
       console.log("isInView pointer ...", index);
     }
@@ -69,16 +71,25 @@ export function Viewport({
         id={`section${index}`}
         className="viewport -z-1  w-[100vw] flex flex-col  font2  h-[100vh] mb-10 carr-sec"
       >
-        {img?.image
+        {!background
           ? img?.image
-          : images?.[index] &&
-            !img?.no && (
-              <img
-                src={images?.[index]}
-                alt=""
-                className="absolute inset-[0%] -z-[5] inline-block h-full w-full object-cover"
-              />
-            )}
+            ? img?.image
+            : images?.[index] &&
+              !img?.no && (
+                <img
+                  src={images?.[index]}
+                  alt=""
+                  className="absolute inset-[0%] -z-[5] inline-block h-full w-full object-cover"
+                />
+              )
+          : undefined}
+        {background ? (
+          <div
+            src={images?.[index]}
+            alt=""
+            className=" bg-black absolute inset-[0%] -z-[5] inline-block h-full w-full object-cover"
+          />
+        ) : undefined}
 
         {img && !img?.image && (
           <div className="absolute top-0 left-0">
@@ -91,10 +102,10 @@ export function Viewport({
         )}
 
         <div
-          className={` flex  flex-col relative  mt-[10vh] max-w-[1600px] mx-auto  ${
+          className={` flex  flex-col relative  mt-[10vh]   ${
             full
-              ? " w-[90vw] h-full overflow-y-scroll hide-scrollbar "
-              : "   w-[65vw] h-[80vh] "
+              ? " w-screen  h-screen overflow-y-scroll overflow-x-hidden hide-scrollbar px-10"
+              : "  max-w-[1600px] w-[65vw] h-[80vh] mx-auto  "
           } `}
         >
           <div ref={ref} className="absolute w-full py-1   top-0 "></div>

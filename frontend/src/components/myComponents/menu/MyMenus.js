@@ -18,7 +18,7 @@ import { ENUMS } from "constants/enums";
 import { Icon } from "@iconify/react";
 import { icfy, icfyARROWD, icfyGITHUB, icsystem } from "icones";
 import { Avatar } from "components/profile/ProfileAvatar";
-import { MyMainBtn1 } from "../btn/MyMainBtn";
+import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
 
 export const MyMenus = ({ menus, styles, setter }) => {
   let dispatch = useFormDispatch();
@@ -232,12 +232,15 @@ export const MyMenusTabs = ({
                 className={` relative  min-w-[70px]      overflow-hidden       text-sm    
             ${
               [
-                "rounded-t-lg items-center gap-2 px-3 inline-flex justify-center h-full text-center border-b-4 py-2 rounded-tr-lg",
-                `rounded-t-lg flex items-center    w-full px-3  py-2 text-left  bg-transparent rounded-b-lg `,
-                `rounded-t-lg flex items-center  py-1 px-5 mr-2 text-xs bg-black/5 w-fit text-left rounded-b-lg border-b-4 hover:-mb-1 ${
-                  i == value && `${colors?.[color || 0]?.bg || "bg-black/20"}`
+                "hover:border-gray-300 hover:text-gray-600 hover:bg-black/5 rounded-t-lg items-center gap-2 px-3 inline-flex justify-center h-full text-center border-b-4 py-2 rounded-tr-lg",
+                `hover:border-gray-300 hover:text-gray-600 hover:bg-black/5 rounded-t-lg flex items-center    w-full px-3  py-2 text-left  bg-transparent rounded-b-lg `,
+                `rounded border border-white/5   flex items-center    py-2 px-5 mr-2 text-xs bg-black/20 w-fit text-left  border-b-1 hover:text-white ${
+                  i == value &&
+                  `${colors?.[color || 0]?.bg || "bg-black"} ${
+                    colors?.[color || 0]?.border || "border-b-white/70"
+                  }  border-l-whsite  text-white`
                 }`,
-                `flex items-center    px-5 mr-2 text-xs bg-black/5 py-2 w-fit text-left rounded-b-lg border-b-2 hover:-mb-1 ${
+                `hover:border-gray-300 hover:text-gray-600 hover:bg-black/5 flex items-center    px-5 mr-2 text-xs bg-black/5 py-2 w-fit text-left rounded-b-lg border-b-2 hover:-mb-1 ${
                   i == value &&
                   `${"bg-white/5"} ${colors?.[color]?.color} ${
                     colors?.[color]?.border
@@ -253,14 +256,14 @@ export const MyMenusTabs = ({
                       `${colors[color || 0]?.border} ${
                         colors[color || 0]?.color
                       }`,
-                      "border border-white/10 shadow1 c3 bg-neutral-800",
+                      "border border-white/10 shadow c3 bg-gradient-to-l hover:from-white/10 hover:to-black/30 _hover from-white/5 to-black/20",
                       `${colors[color || 0]?.border} ${
                         colors[color || 0]?.color
                       }`,
                       ` `,
                     ]?.[template || 0]
                   }   `
-                : `c4 border-transparent  font-medium hover:border-gray-300 hover:text-gray-600 hover:bg-black/5`
+                : `c4 border-transparent  font-medium `
             }`}
               >
                 {[true, true, false][template || 0] === true && (
@@ -276,7 +279,7 @@ export const MyMenusTabs = ({
                       className={`h-full  ${
                         [
                           "top-0 rounded-tr-full left-0",
-                          "-top-0  -right-0 rotate-90 ",
+                          "-top-0 opacity-10 -right-0 rotate-90 ",
                         ]?.[template || 0]
                       }   absolute transition-all ${
                         value === i
@@ -310,6 +313,13 @@ export const MyMenusTabs = ({
                 >
                   {target ? el?.[target] : el}
                 </span>
+                {value === i && template === 1 ? (
+                  <MyMainBtn
+                    template={2}
+                    style={"rounded-full shadow1 ml-auto"}
+                    padding={" p-2"}
+                  ></MyMainBtn>
+                ) : undefined}
               </Link>
             )
         )}

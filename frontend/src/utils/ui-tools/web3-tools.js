@@ -31,6 +31,21 @@ export const _apiPost = async (func, args, value) => {
     console.log("error", error);
   }
 };
+export const _apiPostPayable = async (func, args, value) => {
+  console.log("func ", func);
+  console.log("args ", args);
+  console.log("value ", value);
+  try {
+    return await _apiPostAt({
+      targetContract: "apiPostPayable",
+      func,
+      args,
+      value,
+    });
+  } catch (error) {
+    console.log("error", error);
+  }
+};
 export const _apiPostAt = async ({
   targetContract,
   func,
@@ -54,17 +69,24 @@ export const _apiPostAt = async ({
   }
 };
 
-export const _apiGet = async (func, args) => {
+export const _apiGet = async (func, args, walletClient) => {
   try {
+    let account;
+    if (walletClient) {
+      account = walletClient.account;
+    }
     const res = await readContract({
       address: ADDRESSES["apiGet"],
       args: args,
       abi: ABI_API_G,
       functionName: func,
+      account,
     });
+
     return res;
   } catch (error) {
     let _error = { error };
+    console.error("error", { error });
     return _error.details;
   }
 };
@@ -76,7 +98,6 @@ export const _apiGetAt = async ({ func, args, targetContract, address }) => {
       abi: ABIs[targetContract],
       functionName: func,
     });
-    console.log("ress", res);
     return res;
   } catch (error) {
     let _error = { error };

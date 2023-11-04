@@ -68,9 +68,6 @@ export let _form_create_escrow_intro = {
         confirme 😄
         <br />
       </span>
-      <MyToggle style={"text-error mt-5"} target={"ia"}>
-        <span className="text-error">Désactiver</span>
-      </MyToggle>
     </>
   ),
 };

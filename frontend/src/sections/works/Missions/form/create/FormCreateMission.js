@@ -30,7 +30,7 @@ export const FormCreateMission1 = () => {
       />
 
       <MyTextArea
-        styles={margin}
+        styles={margin + " h-full w-full min-h-[30vh] "}
         label={"description"}
         target={"description"}
       />

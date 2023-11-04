@@ -60,7 +60,7 @@ export const MyCardList = ({
               el?.title ? (
                 <div
                   key={v4()}
-                  className="flex flex-col mb-8 px-10 items-center sm:flex-row"
+                  className="flex flex-col my-6 px-10 items-center sm:flex-row"
                 >
                   <div
                     className={`mr-4 flex h-12 w-12 flex-none flex-col items-center justify-center rounded-full  shadow1 bg1 ${colors[0]?.bg}`}

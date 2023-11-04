@@ -30,12 +30,16 @@ export const ProfileAvatar = ({
 
   return onlyAvatar ? (
     <>
-      <Avatar style={style} CID={isMetadatas?.image} />
+      <Avatar style={style} metadatas={isMetadatas} CID={isMetadatas?.image} />
     </>
   ) : (
     <div className="flex items-end">
       <div className="avatar h-fit">
-        <Avatar style={style} CID={isMetadatas?.image} />
+        <Avatar
+          style={style}
+          metadatas={isMetadatas}
+          CID={isMetadatas?.image}
+        />
       </div>
       <div className=" ml-3">
         <CVName metadata={isMetadatas} styles={"text-xs"} />
@@ -47,13 +51,26 @@ export const ProfileAvatar = ({
   );
 };
 
-export const Avatar = ({ CID, style }) => {
-  return (
-    <ImagePin
-      style={`mask mask-squircle border-zinc-800 border border-3 ${
-        style || "w-16"
-      }`}
-      CID={CID}
-    />
+export const Avatar = ({ CID, metadatas, noCircle, style }) => {
+  return metadatas && !CID ? (
+    <div className="avatar placeholder">
+      <div
+        className={"bg-neutral-focus text-neutral-content rounded-full w-16"}
+      >
+        <span className="text-xl">{metadatas?.username[0]}</span>
+      </div>
+    </div>
+  ) : (
+    <div className="avatar">
+      <ImagePin
+        style={`rounded-full ${
+          !noCircle
+            ? "ring ring-primary ring-offset-base-100 ring-offset-2"
+            : null
+        } ${style || "w-16"}`}
+        CID={CID}
+        defaultImage={"/defaultprofile.png"}
+      />
+    </div>
   );
 };

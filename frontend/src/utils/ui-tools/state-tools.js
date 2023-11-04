@@ -49,7 +49,10 @@ export const stateDetailsCV = async (cvID) => {
         feature?.datas?.specification,
       ]);
       if (!_arbitrators.includes(arbitration)) {
-        _arbitrators.push(arbitration);
+        _arbitrators.push({
+          arbitratorID: arbitration,
+          courtID: feature?.datas?.specification,
+        });
       }
     }
     if (feature?.datas?.dispute) {
@@ -68,15 +71,15 @@ export const stateDetailsCV = async (cvID) => {
     });
   }
 
-  for (let index = 0; index < _arbitrators.length; index++) {
+  for (let index = 0; index < _arbitrators?.length; index++) {
     let arbitrator = {
-      arbitratorID: _arbitrators?.[index],
-
+      arbitratorID: _arbitrators[index]?.arbitratorID,
+      courtID: _arbitrators[index]?.courtID,
       disputes: [],
     };
 
     let disputes = await _apiGet("indexerOfToken", [
-      _arbitrators[index],
+      _arbitrators[index]?.arbitratorID,
       ADDRESSES["disputesDatasHub"],
     ]);
 
@@ -91,9 +94,9 @@ export const stateDetailsCV = async (cvID) => {
     }
     arbitrators.push(arbitrator);
 
-    // let arbitrator = await _apiGet("datasOfArbitrator", [_arbitrators[index]]);
+    // let arbitrator = await _apiGet("datasOfArbitrator", [_arbitrators[index]?.arbitratorID]);
     // let disputes = await _apiGet("indexerOfToken", [
-    //   _arbitrators[index],
+    //   _arbitrators[index]?.arbitratorID,
     //   ADDRESSES["disputesDatasHub"],
     // ]);
     // let _disputes = [];
@@ -109,14 +112,14 @@ export const stateDetailsCV = async (cvID) => {
     //   dispute.title = await metadatas?.title;
     //   dispute.allowance = await _apiGet("allowanceOfArbitrator", [
     //     dispute?.id,
-    //     _arbitrators[index],
+    //     _arbitrators[index]?.arbitratorID,
     //   ]);
     //   _disputes.push(dispute);
     // }
 
     // arbitrators.arr.push({
     //   court: arbitrator?.courtID,
-    //   arbitratorID: _arbitrators[index],
+    //   arbitratorID: _arbitrators[index]?.arbitratorID,
     //   disputes: _disputes,
     // });
 
@@ -181,7 +184,7 @@ export const stateMission = async (missionID) => {
   }
 };
 
-export const statePub = async (pubID) => {
+export const statePub = async (pubID, walletClient) => {
   if (pubID?.pubID) {
     return pubID;
   } else if (pubID && pubID > 0) {
@@ -196,9 +199,22 @@ export const statePub = async (pubID) => {
     } else {
       datas.answers = [];
     }
+    let payable = {
+      datas: null,
+      metadatas: null,
+    };
+    if (datas?.isPayable) {
+      payable.datas = await _apiGet("datasOfPayablePub", [pubID], walletClient);
+      if (payable?.datas?.tokenURI !== "") {
+        payable.metadatas = await fetchJSONByCID(payable?.datas?.tokenURI);
+      }
+    } else {
+      payable = undefined;
+    }
     return {
       pubID,
       datas: datas,
+      payable: payable,
       metadata,
       owner: await _apiGet("cvOf", [_owner]),
     };

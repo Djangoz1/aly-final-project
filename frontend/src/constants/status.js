@@ -67,6 +67,21 @@ export const STATUS = {
     },
   },
 
+  court: [
+    {
+      icon: icfy.ux.check.casual,
+      status: "On court",
+      color: "success",
+      bg: " border-success/40 bg-success/10 ",
+    },
+    {
+      icon: icfy.ux.check.uncheck,
+      status: "Not on court",
+      color: "error",
+      bg: " border-error/40 bg-error/10 ",
+    },
+  ],
+
   profile: [
     {
       icon: icfy.eye.open,

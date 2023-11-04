@@ -279,21 +279,6 @@ export let MyLayoutApp = ({
           </div>
         </footer>
       </Viewport>
-      {(ownerProfile || subMenus || side) && (
-        <div className="fixed -z-1  top-[10vh] flex flex-col  w-[16vw]  max-w-[230px]  right-[2vw]">
-          {ownerProfile && ownerProfile}
-          {subMenus && <MyMenus1 arr={subMenus} />}
-          {side && (
-            <div className=" backdrop-blur mt-4 bg-white/5  rounded-lg shadow flex flex-col  w-full justify-between  items-end ">
-              {/* <div className="whiteglass rounded-2xl h-fit"></div> */}
-              <div className="whiteglass-text p-5 flex flex-col w-full justify-end ">
-                {/* <MyMenus2 arr={menus} /> */}
-                {side}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </LayoutTools>
   );
 };

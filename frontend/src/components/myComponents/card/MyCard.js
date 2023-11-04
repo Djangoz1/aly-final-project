@@ -5,12 +5,18 @@ import { v4 } from "uuid";
 import { MySub } from "../text/MySub";
 import { icfy } from "icones";
 
-export const MyCard = ({ head, children, icon, styles }) => {
+export const MyCard = ({ head, children, template, icon, styles }) => {
   return (
     <div
       className={`${
         styles || "p-8 h-fit w-full flex   flex-col items-start"
-      }  shadowh hover:-translate-y-[2px] _hover w-fit cursor-default relative transition-transform   rounded-md bgprim  c3`}
+      }   hover:-translate-y-[2px] _hover w-fit cursor-default relative transition-transform   rounded-md ${
+        [
+          `shadowh bg-gradient-to-l backdrop-blur-[2px] bgprim`,
+          "bg-transparent border border-white/5 backdrop-blur hover:bg-white/5",
+          `shadowh bg-gradient-to-l backdrop-blur-[2px] from-zinc-950 via-zinc-950 to-white/5`,
+        ]?.[template || 0]
+      }   c3`}
     >
       {head && (
         <h6 className="text-white text-lg items-center mb-3 flex">
@@ -90,7 +96,10 @@ export const MyCard1 = ({
 
 export const MyCardInfos = ({ style, arr, title, children }) => {
   return (
-    <MyCard styles={style + " cursor-default px-5 py-3 "}>
+    <MyCard
+      template={1}
+      styles={style + " cursor-default flex flex-col px-5 py-3 "}
+    >
       {title && (
         <div className="w-full uppercase font-light c2 text-sm ">{title}</div>
       )}

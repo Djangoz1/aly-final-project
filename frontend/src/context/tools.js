@@ -186,6 +186,67 @@ export const doStateLaunchpadTools = async (dispatch, launchpadID) => {
   }
 };
 
+export const doStateCourtTools = async (dispatch, courtID) => {
+  dispatch({ status: "pending" });
+
+  try {
+    let arr = await _apiGet("indexerOfCourt", [courtID]);
+
+    let arbitrators = [];
+
+    for (let index = 0; index < arr.length; index++) {
+      const arbitratorID = arr[index];
+      arbitrators.push(await _apiGet("datasOfArbitrator", [arbitratorID]));
+    }
+
+    let _state = {
+      datas: {
+        balance: await _apiGet("balanceOfCourt", [courtID]),
+        arbitrators: arbitrators,
+      },
+    };
+
+    dispatch({
+      status: "success",
+      state: _state,
+    });
+    return _state;
+  } catch (error) {
+    dispatch({
+      status: "error",
+      error: { error },
+    });
+  }
+};
+
+export const doStatePubsTools = async (dispatch, state, walletClient) => {
+  dispatch({ status: "pending" });
+  try {
+    let arr = [];
+    let length = await _apiGet("tokensLengthOf", [ADDRESSES["pubsHub"]]);
+
+    for (let index = 1; index <= length; index++) {
+      let pub = await statePub(index, walletClient);
+      if (pub?.payable) {
+        arr.push(pub);
+      }
+    }
+
+    dispatch({
+      status: "success",
+      state: {
+        ...state,
+        pubs: { arr },
+      },
+    });
+  } catch (error) {
+    dispatch({ status: "error", error: { error } });
+  }
+
+  // let _state = await doStateProfileTools({ dispatch, cvID });
+  // setIsState(_state);
+};
+
 export const doStateTools = async (dispatch, state, pointer) => {
   dispatch({ status: "pending" });
   if (state?.state) {

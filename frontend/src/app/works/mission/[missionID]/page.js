@@ -93,6 +93,7 @@ function App({ params }) {
   return (
     <MyLayoutDashboard
       // setter={askToJoin}
+
       id={missionID}
       allowed={
         cv == state?.mission?.datas?.owner &&
@@ -110,9 +111,9 @@ function App({ params }) {
       owner={{ ...state?.owner?.metadatas, cvID: state?.owner?.cvID }}
       url={`/works/mission/${missionID}`}
       btn={{
-        title: "Ask to join",
+        title: cv == state?.owner?.cvID ? "New feature" : "Ask to join",
         info: <>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</>,
-        url: "#section2",
+        url: cv == state?.owner?.cvID ? "/create/feature" : "#section2",
       }}
       // ownerProfile={
       //   loading ? null : <AssetProfileCard />
@@ -209,10 +210,10 @@ function App({ params }) {
         loading
           ? []
           : [
-              { icon: icfy.ux.admin, title: "Profile", url: "#section0" },
-              { icon: icfy.ux.admin, title: "Agendas", url: "#section1" },
-              { icon: icfy.ux.admin, title: "Features", url: "#section2" },
-              { icon: icfy.ux.admin, title: "Pubs", url: "#section3" },
+              { icon: icfy.ux.admin, title: "Profile", url: "#section1" },
+              { icon: icfy.ux.admin, title: "Agendas", url: "#section2" },
+              { icon: icfy.ux.admin, title: "Features", url: "#section3" },
+              { icon: icfy.ux.admin, title: "Pubs", url: "#section4" },
             ]
       }
       target={"mission"}

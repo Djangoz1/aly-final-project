@@ -15,7 +15,7 @@ body {
   --c1: #202361;
   --c2: #a8e061;
 
-  --background: var(--red);
+  --background: var(--black);
   --accent: var(--white);
 
   margin: 0;
@@ -37,6 +37,70 @@ body {
 
 .bg2 {
   background-color: #a8e061;
+}
+
+.super-btn {
+  --border-radius: 13px;
+  --border-width: 2px;
+  appearance: none;
+  position: relative;
+
+  border: 0;
+  background-color: #212121;
+  border-radius: var(--border-radius);
+
+  color: #fff;
+  z-index: 2;
+}
+
+.super-btn::after {
+  --m-i: linear-gradient(#000, #000);
+  --m-o: content-box, padding-box;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: var(--border-width);
+  border-radius: var(--border-radius);
+  background-image: conic-gradient(
+    #ff9f0e,
+    #b5178d,
+    #655adc,
+    #09957e,
+    #b5178d,
+    #ff9f0e
+  );
+  -webkit-mask-image: var(--m-i), var(--m-i);
+  mask-image: var(--m-i), var(--m-i);
+  -webkit-mask-origin: var(--m-o);
+  mask-origin: var(--m-o);
+  -webkit-mask-clip: var(--m-o);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  filter: hue-rotate(0);
+  animation: rotate-hue linear 500ms infinite;
+  animation-play-state: paused;
+}
+
+.super-btn:hover::after {
+  animation-play-state: running;
+}
+
+@keyframes rotate-hue {
+  to {
+    filter: hue-rotate(1turn);
+  }
+}
+
+.super-btn::after,
+.super-btn::after {
+  box-sizing: border-box;
+}
+
+.super-btn:active {
+  --border-width: 2px;
 }
 
 /* 

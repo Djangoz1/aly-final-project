@@ -6,7 +6,7 @@ import { _form_create_profile } from "utils/ux-tools/form/profile";
 
 import { useAccount } from "wagmi";
 
-import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
+import { _apiGet, _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
 import { useAuthDispatch } from "context/auth";
 
 import { Icon } from "@iconify/react";
@@ -96,7 +96,7 @@ const PageCreateProfile = () => {
     };
     let uri = await createURI({ id, title: "Mission", images, metadatas });
 
-    await _apiPost(
+    await _apiPostPayable(
       "createMission",
       [uri],
       ethers?.utils?.parseEther(form?.price)

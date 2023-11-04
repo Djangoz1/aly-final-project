@@ -4,6 +4,7 @@ import abi_addr_s from "../../../backend/artifacts/contracts/system/AddressSyste
 import abi_api_g from "../../../backend/artifacts/contracts/system/APIGet.sol/APIGet.json";
 import abi_cvh from "../../../backend/artifacts/contracts/cv/CVsHub.sol/CVsHub.json";
 import abi_api_p from "../../../backend/artifacts/contracts/system/APIPost.sol/APIPost.json";
+import abi_api_p_p from "../../../backend/artifacts/contracts/system/APIPostPayable.sol/APIPostPayable.json";
 import abi_bh from "../../../backend/artifacts/contracts/system/BalancesHub.sol/BalancesHub.json";
 import abi_l from "../../../backend/artifacts/contracts/launchpads/Launchpad.sol/Launchpad.json";
 // import abi_erc20 from "../../../backend/artifacts/contracts/ERC20/ERC20Token.sol/ERC20Token.json";
@@ -11,13 +12,16 @@ import abi_erc20 from "../../../backend/artifacts/@openzeppelin/contracts/token/
 export const ABI_ADDRESS_SYSTEM = abi_addr_s.abi;
 export const ABI_API_G = abi_api_g.abi;
 export const ABI_API_P = abi_api_p.abi;
+export const ABI_API_P_P = abi_api_p_p.abi;
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const ABIs = {
   cvsHub: abi_cvh.abi,
   balancesHub: abi_bh.abi,
+  apiGet: abi_api_g.abi,
   launchpad: abi_l.abi,
+  apiPostPayable: abi_api_p_p.abi,
   erc20: abi_erc20.abi,
 };
 

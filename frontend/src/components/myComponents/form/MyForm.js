@@ -300,6 +300,7 @@ let Child1 = ({ components, sideImg, title, arr, submit, editer }) => {
 
                   {(editer || pointer === components?.length) && (
                     <MyMainBtn
+                      template={1}
                       style={
                         "ml-auto bg1 flex w-fit items-center text-white hover:border-[#202361] shadow hover:bg-transparent hc1"
                       }
@@ -308,7 +309,6 @@ let Child1 = ({ components, sideImg, title, arr, submit, editer }) => {
                       // className="btn btn-xs btn-outline h-fit  btn-info "
                     >
                       {editer || "Submit"}
-                      <Icon icon={icfy.ux.enter} className="text-lg" />
                     </MyMainBtn>
                   )}
                   {pointer < components?.length && !arr?.[pointer]?.error && (
