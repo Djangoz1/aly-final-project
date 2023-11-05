@@ -58,7 +58,7 @@ export const HeaderProfile = ({ path }) => {
   let menus = MENUS_ID(cvID, cv, cvID).profile;
 
   if (
-    metadatas?.attributes?.[0]?.visibility === true &&
+    metadatas?.visibility === true &&
     cv != cvID &&
     authState?.datas?.missions > 1
   ) {
@@ -84,7 +84,7 @@ export const HeaderProfile = ({ path }) => {
           <p className="mt-2 text-xs font-light text-white/30 ">
             Depuis le
             <span className="text-white/70 ml-2">
-              {fromTimestamp(metadatas?.attributes?.[0]?.createdAt)}
+              {fromTimestamp(metadatas?.created)}
             </span>
           </p>
           <span className="text-xs text-white/60 my-1">

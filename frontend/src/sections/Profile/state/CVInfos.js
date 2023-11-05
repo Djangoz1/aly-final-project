@@ -21,17 +21,13 @@ export const CVInfos = () => {
         <MyStatus
           style={"text-[8px]"}
           target={"profile"}
-          status={
-            state?.profile?.metadatas?.attributes?.[0]?.visibility ? 0 : 1
-          }
+          status={state?.profile?.metadatas?.visibility ? 0 : 1}
         ></MyStatus>
       ),
     },
     {
       title: "Created at",
-      value: fromTimestamp(
-        state?.profile?.metadatas?.attributes?.[0]?.createdAt
-      ),
+      value: fromTimestamp(state?.profile?.metadatas?.created),
     },
 
     {
@@ -149,25 +145,23 @@ export const CVInfos = () => {
       title: "Identité",
       value: (
         <>
-          {state?.profile?.metadatas?.attributes?.[0]?.identity?.citizen}{" "}
-          {state?.profile?.metadatas?.attributes?.[0]?.identity?.firstName}{" "}
-          {state?.profile?.metadatas?.attributes?.[0]?.identity?.lastName}
+          {state?.profile?.metadatas?.identity?.citizen}{" "}
+          {state?.profile?.metadatas?.identity?.firstName}{" "}
+          {state?.profile?.metadatas?.identity?.lastName}
         </>
       ),
     },
     {
       title: "Email",
-      value: <>{state?.profile?.metadatas?.attributes?.[0]?.identity?.email}</>,
+      value: <>{state?.profile?.metadatas?.identity?.email}</>,
     },
     {
       title: "Phone",
-      value: <>{state?.profile?.metadatas?.attributes?.[0]?.identity?.phone}</>,
+      value: <>{state?.profile?.metadatas?.identity?.phone}</>,
     },
     {
       title: "Date of birth",
-      value: (
-        <>{state?.profile?.metadatas?.attributes?.[0]?.identity?.dateOfBirth}</>
-      ),
+      value: <>{state?.profile?.metadatas?.identity?.dateOfBirth}</>,
     },
   ];
   let infoOffChaindatas = [
@@ -177,18 +171,11 @@ export const CVInfos = () => {
         <p className="flex items-center capitalize">
           <Icon
             className={`text-${
-              ENUMS.domain[state?.profile?.metadatas?.attributes?.[0]?.domain]
-                ?.color
+              ENUMS.domain[state?.profile?.metadatas?.domain]?.color
             } text-lg mr-1`}
-            icon={
-              ENUMS.domain[state?.profile?.metadatas?.attributes?.[0]?.domain]
-                ?.icon
-            }
+            icon={ENUMS.domain[state?.profile?.metadatas?.domain]?.icon}
           />
-          {
-            ENUMS.domain[state?.profile?.metadatas?.attributes?.[0]?.domain]
-              ?.name
-          }
+          {ENUMS.domain[state?.profile?.metadatas?.domain]?.name}
         </p>
       ),
     },
@@ -198,7 +185,7 @@ export const CVInfos = () => {
         <div className="flex flex-col">
           Skills off chain
           <div className="flex mt-1">
-            {state?.profile?.metadatas?.attributes?.[0]?.skills?.map((id) => (
+            {state?.profile?.metadatas?.skills?.map((id) => (
               <Icon
                 key={v4()}
                 icon={ENUMS.courts?.[id]?.badge}
@@ -210,8 +197,8 @@ export const CVInfos = () => {
       ),
     },
 
-    ...(Array.isArray(state?.profile?.metadatas?.attributes?.[0]?.languages)
-      ? state?.profile?.metadatas?.attributes?.[0]?.languages.map((el) => ({
+    ...(Array.isArray(state?.profile?.metadatas?.languages)
+      ? state?.profile?.metadatas?.languages.map((el) => ({
           title: el?.langue,
           value: ENUMS.languagesLevel[el?.level],
         }))

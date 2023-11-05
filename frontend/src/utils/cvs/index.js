@@ -7,16 +7,15 @@ import { fetchStatOfMission } from "utils/works";
 export let fetchCV = async (cvID) => {
   if (cvID && cvID > 0) {
     let length = await _apiGet("tokensLengthOf", [ADDRESSES["cvsHub"]]);
-    if (cvID > length) {
+    if (cvID > length || !cvID) {
       throw new Error("Error fetchCV: Invalid tokenID");
     }
     let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
 
     let json = await fetchJSONByCID({ id: uri, table: "accounts" });
     console.log("json", json);
-    json.cvID = cvID;
-
-    return json;
+    const result = { ...json, cvID: cvID };
+    return result;
   }
 };
 

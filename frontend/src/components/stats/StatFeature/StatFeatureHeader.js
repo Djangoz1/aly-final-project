@@ -28,7 +28,7 @@ export const StatFeatureHeader = ({ obj, feature }) => {
           <p className=" text-xs">
             Oppened At :{" "}
             <span className="text-white">
-              {parseTimestamp(feature?.createdAt)}
+              {parseTimestamp(feature?.created)}
             </span>
           </p>
           {feature?.assignedWorker !== zeroAddress && (

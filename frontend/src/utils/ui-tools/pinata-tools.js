@@ -74,13 +74,13 @@ export let refreshURI = async ({
         name: "Work3 - Img " + title + "#" + id,
       });
       if (element?.attributes) {
-        metadatas.attributes[0][element?.target] = uri;
+        metadatas[element?.target] = uri;
       } else {
         metadatas[element.target] = uri;
       }
     } else {
       if (element?.attributes) {
-        metadatas.attributes[0][element?.target] = element?.image;
+        metadatas[element?.target] = element?.image;
       } else {
         metadatas[element.target] = element?.image;
       }
@@ -152,13 +152,13 @@ export let createURI = async ({ id, title, images, metadatas }) => {
         name: "Work3 - Img " + title + "#" + id,
       });
       if (element?.attributes) {
-        metadatas.attributes[0][element?.target] = uri;
+        metadatas[element?.target] = uri;
       } else {
         metadatas[element.target] = uri;
       }
     } else {
       if (element?.attributes) {
-        metadatas.attributes[0][element?.target] = element?.image;
+        metadatas[element?.target] = element?.image;
       } else {
         metadatas[element.target] = element?.image;
       }
@@ -166,8 +166,7 @@ export let createURI = async ({ id, title, images, metadatas }) => {
   }
 
   metadatas.name = pinataMetadata.name;
-  metadatas.attributes[0].createdAt =
-    metadatas?.attributes?.[0]?.createdAt || Date.now();
+  metadatas.createdAt = metadatas?.attributes?.[0]?.createdAt || Date.now();
   console.log("metadatas create uri ", metadatas);
   console.log("metadatas create azeuri ", pinataMetadata);
   console.log("metadatas create uridqsd ", pinataGateway);

@@ -10,15 +10,15 @@ import Link from "next/link";
 
 export let _table_missions = (details) => {
   let list = [];
-
   for (let index = 0; index < details?.missions?.length; index++) {
     const el = details?.missions?.[index];
 
+    console.log(el);
     let status = STATUS.mission[el?.datas?.status];
-    let domain = ENUMS.domain?.[el?.metadatas?.attributes?.[0]?.domain];
+    let domain = ENUMS.domain?.[el?.metadatas?.domain];
     let arr = [
       <div className="flex items-center space-x-3">
-        <Icon icon={domain.icon} className="text-[30px]" />
+        <Icon icon={domain?.icon} className="text-[30px]" />
         <div>
           <div className="font-bold text-xs whitespace-nowrap">
             <Link href={`/works/mission/${el?.datas?.id}`}>
@@ -30,7 +30,7 @@ export let _table_missions = (details) => {
       </div>,
 
       <span className="text-white capitalize">
-        {ENUMS.experience?.[el?.metadatas?.attributes?.[0]?.experience]?.name}
+        {ENUMS.experience?.[el?.metadatas?.experience]?.name}
       </span>,
 
       <span className={`text-white`}>{el?.datas?.workers}</span>,

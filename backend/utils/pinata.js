@@ -187,7 +187,7 @@ const createURIPub = async ({ userID, description, img, title }) => {
     throw new Error("Missing owner pub value");
   }
 
-  moock.userID = userID;
+  moock.userID =userID;
   if (description) {
     moock.description = description;
   }

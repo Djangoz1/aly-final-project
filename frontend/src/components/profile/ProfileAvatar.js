@@ -20,7 +20,7 @@ export const ProfileAvatar = ({
     }
     if (cvID && cvID > 0) {
       let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
-      let _metadatas = await fetchJSONByCID(uri);
+      let _metadatas = await fetchJSONByCID({ id: uri, table: "accounts" });
       setIsMetadatas(_metadatas);
     }
   };

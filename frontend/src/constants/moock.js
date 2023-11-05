@@ -38,7 +38,7 @@ export let moock_create_profile = {
   facebook: null,
   twitter: null,
   github: null,
-  createdAt: Date.now(),
+
   skills: [],
   domain: null,
   languages: [],
@@ -83,8 +83,8 @@ export let moock_edit_profile = {
 };
 
 export let toMockProfile = ({ address, metadatas, cvID }) => {
-  let attributes = metadatas?.attributes?.[0];
-  let identity = attributes?.identity;
+  let attributes = metadatas;
+  let identity = metadatas?.identity;
   let moock = {
     target: "Profile",
     id: cvID,
@@ -108,7 +108,7 @@ export let toMockProfile = ({ address, metadatas, cvID }) => {
     skills: attributes?.skills,
     domain: attributes?.domain,
     languages: attributes?.languages,
-    createdAt: attributes?.createdAt,
+    created: attributes?.created,
   };
 
   return moock;
@@ -215,7 +215,7 @@ export let moock_create_launchpad = {
   facebook: null,
   twitter: null,
   github: null,
-  createdAt: Date.now(),
+
   title: null,
   description: null,
   image: null,
@@ -294,7 +294,6 @@ export let moock_create_launchpad_placeholder = {
 
   twitter: "URL twitter",
   github: "URL Github",
-  createdAt: Date.now(),
   title: "Title project",
   description: "Write your description project ...",
   domain: "What's domain of project",

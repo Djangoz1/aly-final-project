@@ -44,7 +44,7 @@ export const doStateMission = async (dispatch, missionID) => {
     mission?.datas?.owner,
     ADDRESSES["cvsHub"],
   ]);
-  let owner = await fetchJSONByCID(uri);
+  let owner = await fetchJSONByCID({ id: uri, table: "accounts" });
 
   if (!mission?.error) {
     dispatch({

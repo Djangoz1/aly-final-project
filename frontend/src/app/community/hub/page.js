@@ -177,19 +177,16 @@ function App({ params }) {
                 }`}
                 key={v4()}
               >
-                <ImagePin
-                  style={`mb-2`}
-                  CID={el?.metadata?.attributes?.[0]?.preview}
-                />
+                <ImagePin style={`mb-2`} CID={el?.metadata?.preview} />
                 <div className="flex w-full text-xs items-center">
                   <Avatar
                     noCircle={true}
-                    CID={el?.metadata?.attributes?.[0]?.owner?.image}
-                    metadatas={el?.metadata?.attributes?.[0]?.owner}
+                    CID={el?.metadata?.owner?.image}
+                    metadatas={el?.metadata?.owner}
                     style={"w-8 mr-3"}
                   />
                   <p className="font-light text-white">
-                    {el?.metadata?.attributes?.[0]?.owner?.username}{" "}
+                    {el?.metadata?.owner?.username}{" "}
                   </p>
                   <div className="flex flex-col ml-auto items-end">
                     <div className="flex items-center text-xs">
@@ -253,7 +250,7 @@ function App({ params }) {
                         title: "Owner",
                         value:
                           state?.pubs?.arr?.[state?.front?.index]?.metadata
-                            ?.attributes?.[0]?.owner?.username,
+                            ?.owner?.username,
                       },
                       {
                         title: "Buyers",
@@ -277,7 +274,7 @@ function App({ params }) {
                         value: parseTimestamp(
                           Math.floor(
                             state?.pubs?.arr?.[state?.front?.index]?.metadata
-                              ?.attributes?.[0]?.createdAt / 1000
+                              ?.created / 1000
                           )
                         ),
                       },
@@ -315,8 +312,7 @@ function App({ params }) {
                   <ImagePin
                     style={"w-3/5  max-h-[50vh] "}
                     CID={
-                      state?.pubs?.arr?.[state?.front?.index]?.metadata
-                        ?.attributes?.[0]?.preview
+                      state?.pubs?.arr?.[state?.front?.index]?.metadata?.preview
                     }
                   />
                 </div>

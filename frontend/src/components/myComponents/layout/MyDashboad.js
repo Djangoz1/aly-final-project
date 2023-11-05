@@ -69,9 +69,7 @@ export const MyDashboard = ({
                     <p className="font-light  text-xs">
                       Créer le
                       <span className="ml-2 font-semibold">
-                        {fromTimestamp(
-                          parseInt(owner?.attributes?.[0]?.createdAt)
-                        )}
+                        {fromTimestamp(parseInt(owner?.created))}
                       </span>
                     </p>
                   </div>
@@ -89,9 +87,9 @@ export const MyDashboard = ({
                   <MySub style={"items-center flex"}>
                     <Icon
                       className="text-lg mr-2"
-                      icon={ENUMS?.domain[owner?.attributes?.[0]?.domain]?.icon}
+                      icon={ENUMS?.domain[owner?.domain]?.icon}
                     />
-                    {ENUMS?.domain[owner?.attributes?.[0]?.domain]?.name}
+                    {ENUMS?.domain[owner?.domain]?.name}
                   </MySub>
                 </div>
               </div>

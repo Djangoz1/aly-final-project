@@ -88,7 +88,7 @@ export const MyStatus = ({
                   className={` pulse-status w-[10px] h-[10px] mr-3  ${STATUS?.[target]?.[status]?.color}`}
                 ></div>
               )}
-              {console.log(status)}
+
               {
                 STATUS?.[target]?.[
                   status != toStatus && allowed && toStatus && isHovered

@@ -16,7 +16,10 @@ export let fetchMissionsOfCV = async (cvID, withMeta, stop) => {
       let _id = parseInt(_missions?.[index]);
       let datas = await fetchMission(_id);
       if (withMeta) {
-        let metadatas = await fetchJSONByCID(datas?.uri);
+        let metadatas = await fetchJSONByCID({
+          id: datas?.uri,
+          table: "missions",
+        });
         result.push({ datas, metadatas });
       } else {
         result.push(datas);

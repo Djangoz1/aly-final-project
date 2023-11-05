@@ -24,11 +24,11 @@ export const MissionMenusDropdown = ({}) => {
       for (let index = 0; index < state?.features?.length; index++) {
         const feature = state?.features?.[index];
         feature.index = index;
-        if (!object[feature?.metadatas?.attributes?.[0]?.domain].arr?.length) {
-          object[feature?.metadatas?.attributes?.[0]?.domain].arr = [];
+        if (!object[feature?.metadatas?.domain].arr?.length) {
+          object[feature?.metadatas?.domain].arr = [];
         }
-        if (feature?.metadatas?.attributes?.[0]?.domain >= 0) {
-          object[feature?.metadatas?.attributes?.[0]?.domain].arr.push({
+        if (feature?.metadatas?.domain >= 0) {
+          object[feature?.metadatas?.domain].arr.push({
             target: "feature",
             props: [index],
             name: feature?.metadatas?.title,

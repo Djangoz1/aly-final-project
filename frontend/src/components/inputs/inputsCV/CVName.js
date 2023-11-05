@@ -19,7 +19,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
       return;
     } else if (cvID && cvID > 0) {
       let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
-      let data = await fetchJSONByCID(uri);
+      let data = await fetchJSONByCID({ id: uri, table: "accounts" });
       setIsName(data?.username);
       console.log("fetch cvName ...", data?.username);
     }

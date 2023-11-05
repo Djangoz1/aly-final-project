@@ -1,5 +1,6 @@
 import { icfy, icfyCODE, icfyCODER, icfyGITHUB } from "icones";
 import {
+  clientPocket,
   createURI,
   createURICv,
   refreshURI,
@@ -12,38 +13,23 @@ export const _STATUS = async ({ state, to, target }) => {
     profile: [
       async () => {
         let metadatas = { ...state?.profile?.metadatas };
-        metadatas.attributes[0].visibility = true;
+        metadatas.visibility = true;
 
-        let uri = await createURI({
-          title: "CV",
-          id: state?.profile?.cvID,
-          metadatas: metadatas,
-        });
-        if (uri) {
-          _apiPost("setTokenURIOf", [
-            parseInt(`${state?.profile?.cvID}`),
-            uri,
-            ADDRESSES["cvsHub"],
-          ]);
-        }
+        let uri = await clientPocket.records.update(
+          "accounts",
+          metadatas?.id,
+          metadatas
+        );
       },
       async () => {
         let metadatas = { ...state?.profile?.metadatas };
-        metadatas.attributes[0].visibility = false;
+        metadatas.visibility = false;
 
-        let uri = await createURI({
-          title: "CV",
-          id: state?.profile?.cvID,
-          metadatas: metadatas,
-        });
-
-        if (uri) {
-          let hash = await _apiPost("setTokenURIOf", [
-            parseInt(state?.profile?.cvID),
-            uri,
-            ADDRESSES["cvsHub"],
-          ]);
-        }
+        let uri = await clientPocket.records.update(
+          "accounts",
+          metadatas?.id,
+          metadatas
+        );
       },
     ],
     mission: [

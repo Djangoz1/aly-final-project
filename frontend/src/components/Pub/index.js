@@ -50,7 +50,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
           pub?.owner,
           ADDRESSES["cvsHub"],
         ]);
-        owner = await fetchJSONByCID(uriOwner);
+        owner = await fetchJSONByCID({ id: uriOwner, table: "accounts" });
       } else {
         owner = _owner;
       }
@@ -95,9 +95,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
             </div>
 
             <span className={`text-xs whitespace-nowrap  mt-3`}>
-              {fromTimestamp(
-                isDatas?.pub?.metadata?.attributes?.[0]?.createdAt
-              )}
+              {fromTimestamp(isDatas?.pub?.metadata?.created)}
             </span>
           </div>
 
@@ -114,7 +112,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
               cvID={isDatas?.pub?.owner}
             />
 
-            {!isDatas?.pub?.metadata?.attributes?.[0]?.code ? (
+            {!isDatas?.pub?.metadata?.code ? (
               <p
                 className={`text-[${styles?.size}] line-clamp-${
                   isClicked ? "none" : styles?.clamp
@@ -131,9 +129,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                   <h6 className="flex mb-2 items-center">
                     <Icon
                       icon={
-                        ENUMS?.courts?.[
-                          isDatas?.pub?.metadata?.attributes?.[0]?.language
-                        ]?.badge
+                        ENUMS?.courts?.[isDatas?.pub?.metadata?.language]?.badge
                       }
                       className="mr-5 text-2xl"
                     />{" "}

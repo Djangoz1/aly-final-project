@@ -92,8 +92,8 @@ function App({ params }) {
       price={state?.profile?.datas?.amount}
       allowed={cv == cvID}
       statusObj={{
-        current: state?.profile?.metadatas?.attributes?.[0]?.visibility ? 0 : 1,
-        to: state?.profile?.metadatas?.attributes?.[0]?.visibility ? 1 : 0,
+        current: state?.profile?.metadatas?.visibility ? 0 : 1,
+        to: state?.profile?.metadatas?.visibility ? 1 : 0,
       }}
       header={state?.profile?.metadatas?.username}
       lists={[
@@ -217,7 +217,7 @@ function App({ params }) {
           <div className="fixed z-100 bottom-20  flex flex-col items-end right-10">
            
             {state?.profile?.cvID != cv &&
-              state?.profile?.metadatas?.attributes?.[0]?.visibility && (
+              state?.profile?.metadatas?.visibility && (
                 <EditWorker styles={"c2"} />
               )}
           </div> */}

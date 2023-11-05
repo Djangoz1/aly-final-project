@@ -43,10 +43,7 @@ export const FormEditProfile1 = () => {
     console.log("metadatas", metadatas?.[target]);
     console.log("value", target);
 
-    if (
-      metadatas[target] == value ||
-      metadatas.attributes[0][target] == value
-    ) {
+    if (metadatas[target] == value || metadatas?.[target] == value) {
       throw new Error("Error: Same value");
     }
 
@@ -57,9 +54,9 @@ export const FormEditProfile1 = () => {
     ) {
       metadatas[target] = value;
     } else if (target === "phone") {
-      metadatas.attributes[0].identity[target] = value;
+      metadatas.identity[target] = value;
     } else if (target === "banniere") {
-      metadatas.attributes[0][target] = value;
+      metadatas[target] = value;
     }
 
     let uri = await createURI({
@@ -145,14 +142,11 @@ export const FormEditProfile2 = () => {
     console.log("metadatas", metadatas?.[target]);
     console.log("value", target);
 
-    if (
-      metadatas[target] == value ||
-      metadatas.attributes[0][target] == value
-    ) {
+    if (metadatas[target] == value || metadatas?.[target] == value) {
       throw new Error("Error: Same value");
     }
 
-    metadatas.attributes[0].social[target] = value;
+    metadatas.social[target] = value;
 
     let uri = await createURI({
       id: state?.profile?.cvID,

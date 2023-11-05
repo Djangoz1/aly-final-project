@@ -14,8 +14,7 @@ export const HeaderMission = ({ path, owner }) => {
   let state = useMissionState();
   let datas = state?.mission?.datas;
   let metadatas = state?.mission?.metadatas;
-  let domain = ENUMS.domain[metadatas?.attributes?.[0]?.domain];
-  let attributes = metadatas?.attributes?.[0];
+  let domain = ENUMS.domain[metadatas?.domain];
 
   let menus = MENUS_ID(datas?.id).mission;
 
@@ -29,7 +28,7 @@ export const HeaderMission = ({ path, owner }) => {
       menus={menus}
       img={metadatas?.image}
       name={metadatas?.title}
-      desc1={<p>Créer le {fromTimestamp(attributes?.createdAt)}</p>}
+      desc1={<p>Créer le {fromTimestamp(metadatas?.created)}</p>}
       desc2={<CVName metadata={owner} />}
       details={[
         {
