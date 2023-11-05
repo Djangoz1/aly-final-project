@@ -1,5 +1,6 @@
 require("dotenv").config();
 const key = process.env.PINATA_KEY;
+import PocketBase from "pocketbase";
 const secret = process.env.PINATA_SECRET;
 
 import axios from "axios";
@@ -7,20 +8,21 @@ import { ADDRESSES } from "constants/web3";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
+export const clientPocket = new PocketBase("http://127.0.0.1:8090");
+
 export const pinataGateway =
   "https://copper-immense-nightingale-374.mypinata.cloud/ipfs/";
 
-export const fetchJSONByCID = async (CID) => {
+export const fetchJSONByCID = async ({ id, table, expand }) => {
+  if (!id || !table) {
+    throw new Error("Error fetch datas: Missing pocketbase config");
+  }
   try {
-    const response = await axios.get(
-      `https://copper-immense-nightingale-374.mypinata.cloud/ipfs/${CID}`
-    );
+    const record = await clientPocket.records.getOne(table, id, {
+      expand,
+    });
 
-    if (response.data.name) {
-      return response.data;
-    } else {
-      return JSON.parse(response.data);
-    }
+    return record;
   } catch (error) {
     console.error("Erreur lors de la récupération de l'objet JSON :", error);
     return null;

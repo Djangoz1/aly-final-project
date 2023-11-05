@@ -12,7 +12,8 @@ export let fetchCV = async (cvID) => {
     }
     let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
 
-    let json = await fetchJSONByCID(uri);
+    let json = await fetchJSONByCID({ id: uri, table: "accounts" });
+    console.log("json", json);
     json.cvID = cvID;
 
     return json;

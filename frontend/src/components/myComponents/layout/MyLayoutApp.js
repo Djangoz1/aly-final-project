@@ -13,8 +13,6 @@ import { Viewport } from "./MyViewport";
 
 import { Logo, LogoIc } from "components/Logo";
 
-import { Particle } from "../MyParticles";
-
 export let MyLayoutApp = ({
   id,
   url,
@@ -83,7 +81,6 @@ export let MyLayoutApp = ({
         arr,
       }}
     >
-      {particles && <Particle style={"fixed w-screen top-0 left-0 h-screen"} />}
       {/* <MyHeader /> */}
       {background ? (
         <img
@@ -109,9 +106,9 @@ export let MyLayoutApp = ({
       >
         <footer className=" w-full h-full flex  ">
           <div className="mx-auto w-full  px-5 pt-16 md:px-10 md:pt-24 h-fit mt-auto lg:pt-32 ">
-            <a href="#" className="mb-12 inline-block max-w-full">
+            <div className="mb-12 inline-block max-w-full">
               <Logo />
-            </a>
+            </div>
             <div className="grid grid-cols-[auto_1fr] justify-between gap-10 sm:grid-cols-3 lg:grid-cols-[0.45fr_auto_auto_auto]">
               <div className="flex max-w-[400px] flex-col gap-8 max-[991px]:[grid-area:span_1/span_3/span_1/span_3] max-[479px]:[grid-area:span_1/span_2/span_1/span_2]">
                 <p className="text-[#636262]">

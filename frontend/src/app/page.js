@@ -24,7 +24,7 @@ import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
 import { Scene } from "spline/Scene";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { Viewport } from "components/myComponents/layout/MyViewport";
-import { Particle } from "components/myComponents/MyParticles";
+
 import Link from "next/link";
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
 import { useEffect, useState } from "react";

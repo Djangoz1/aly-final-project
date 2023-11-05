@@ -19,7 +19,6 @@ import { Icon } from "@iconify/react";
 import { icfy, icfyARROWD, icsystem } from "icones";
 import { MyCard1 } from "../card/MyCard";
 import { Viewport } from "../layout/MyViewport";
-import { Particle } from "../MyParticles";
 import { Hg, Hg1 } from "components/text/HeroGradient";
 import { useInView } from "framer-motion";
 import { v4 } from "uuid";

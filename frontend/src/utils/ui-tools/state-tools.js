@@ -160,8 +160,11 @@ export const stateDispute = async (disputeID) => {
   dispute.arbitrators = await _apiGet("arbitratorsOfDispute", [disputeID]);
   dispute.counters = await _apiGet("countersOfDispute", [disputeID]);
 
-  let metadatas = await fetchJSONByCID(dispute?.tokenURI);
-  let _metadatas = await fetchJSONByCID(uriFeature);
+  let metadatas = await fetchJSONByCID({
+    id: dispute?.tokenURI,
+    table: "escrows",
+  });
+  let _metadatas = await fetchJSONByCID({ id: uriFeature, table: "features" });
   metadatas.title = _metadatas?.title;
   return { datas: dispute, disputeID, metadatas };
 };
@@ -177,7 +180,7 @@ export const stateMission = async (missionID) => {
     let result = {
       missionID,
       datas,
-      metadatas: await fetchJSONByCID(datas?.uri),
+      metadatas: await fetchJSONByCID({ id: datas?.uri, table: "missions" }),
       details: details,
     };
     return result;
@@ -191,7 +194,7 @@ export const statePub = async (pubID, walletClient) => {
     let _owner = await _apiGet("ownerOfToken", [pubID, ADDRESSES["pubsHub"]]);
 
     let uri = await _apiGet("tokenURIOf", [pubID, ADDRESSES["pubsHub"]]);
-    let metadata = await fetchJSONByCID(uri);
+    let metadata = await fetchJSONByCID({ id: uri, table: "posts" });
 
     let datas = await _apiGet("datasOfPub", [pubID]);
     if (datas?.answers > 0) {
@@ -206,7 +209,10 @@ export const statePub = async (pubID, walletClient) => {
     if (datas?.isPayable) {
       payable.datas = await _apiGet("datasOfPayablePub", [pubID], walletClient);
       if (payable?.datas?.tokenURI !== "") {
-        payable.metadatas = await fetchJSONByCID(payable?.datas?.tokenURI);
+        payable.metadatas = await fetchJSONByCID({
+          id: payable?.datas?.tokenURI,
+          table: "payable_posts",
+        });
       }
     } else {
       payable = undefined;
@@ -236,7 +242,7 @@ export let stateFeature = async (featureID) => {
       featureID,
       ADDRESSES["featuresHub"],
     ]);
-    let metadatas = await fetchJSONByCID(uri);
+    let metadatas = await fetchJSONByCID({ id: uri, table: "features" });
 
     let details = await _apiGet("datasOfWork", [featureID]);
     if (details?.workerContest || details?.ownerContest) {
@@ -256,7 +262,10 @@ export let stateFeature = async (featureID) => {
         datas?.dispute,
       ]);
       details.dispute = {
-        metadatas: await fetchJSONByCID(disputeDatas?.tokenURI),
+        metadatas: await fetchJSONByCID({
+          id: disputeDatas?.tokenURI,
+          table: "escrows",
+        }),
         datas: disputeDatas,
       };
     }
@@ -274,7 +283,10 @@ export let stateFeature = async (featureID) => {
 export const stateLaunchpad = async (launchpadID) => {
   if (launchpadID > 0) {
     const datas = await _apiGet("datasOfLaunchpad", [launchpadID]);
-    let metadatas = await fetchJSONByCID(datas.tokenURI);
+    let metadatas = await fetchJSONByCID({
+      id: datas.tokenURI,
+      table: "launchpads",
+    });
     let tokenURI = await _apiGet("tokenURIOf", [
       launchpadID,
       ADDRESSES["launchpadsDatasHub"],
@@ -295,15 +307,6 @@ export const stateLaunchpad = async (launchpadID) => {
       targetContract: "erc20",
       address: datas?.tokenAddress,
     });
-
-    let _metadatas = await fetchJSONByCID(tokenURI);
-    metadatas.attributes[0].bio = _metadatas?.description;
-    metadatas.attributes[0].banniere = _metadatas?.attributes?.[0]?.banniere;
-    metadatas.attributes[0].facebook = _metadatas?.attributes?.[0]?.facebook;
-    metadatas.attributes[0].linkedin = _metadatas?.attributes?.[0]?.linkedin;
-    metadatas.attributes[0].twitter = _metadatas?.attributes?.[0]?.twitter;
-    metadatas.attributes[0].github = _metadatas?.attributes?.[0]?.github;
-    metadatas.image = _metadatas?.image;
 
     datas.tiersDatas = [];
     let tokenPrice = 0;

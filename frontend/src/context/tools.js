@@ -4,7 +4,6 @@ import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { ADDRESSES } from "constants/web3";
 import { createContext, useContext, useReducer } from "react";
-import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import {
   stateCV,
   stateDetailsCV,

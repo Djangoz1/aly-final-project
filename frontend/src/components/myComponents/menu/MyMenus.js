@@ -295,7 +295,6 @@ export const MyMenusTabs = ({
                     />
                   </>
                 )}
-
                 {el?.icon ? (
                   <Icon
                     icon={el?.icon}
@@ -313,13 +312,14 @@ export const MyMenusTabs = ({
                 >
                   {target ? el?.[target] : el}
                 </span>
-                {value === i && template === 1 ? (
+                {/* //! WTF */}
+                {/* {value === i && template === 1 ? (
                   <MyMainBtn
                     template={2}
                     style={"rounded-full shadow1 ml-auto"}
                     padding={" p-2"}
                   ></MyMainBtn>
-                ) : undefined}
+                ) : undefined} */}
               </Link>
             )
         )}

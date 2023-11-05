@@ -7,10 +7,10 @@ import {
 import { useEffect } from "react";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
-import { Controlled as CodeMirror } from "react-codemirror2";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/material.css";
-import "codemirror/mode/javascript/javascript";
+// import { Controlled as CodeMirror } from "react-codemirror2";
+// import "codemirror/lib/codemirror.css";
+// import "codemirror/theme/material.css";
+// import "codemirror/mode/javascript/javascript";
 
 export const CodeEditor = ({ target, value, style, isForm }) => {
   let formState = isForm && useFormState();
@@ -37,7 +37,8 @@ export const CodeEditor = ({ target, value, style, isForm }) => {
 
   return (
     <div className={"w-full   " + style}>
-      <CodeMirror
+      TO DO CODE MIRROR
+      {/* <CodeMirror
         value={value ? value : formState?.form?.[target]}
         onBeforeChange={handleCodeChange}
         options={{
@@ -46,7 +47,7 @@ export const CodeEditor = ({ target, value, style, isForm }) => {
           lineNumbers: true,
           readOnly: value ? true : false,
         }}
-      />
+      /> */}
     </div>
   );
 };

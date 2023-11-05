@@ -33,7 +33,6 @@ import { ImagePin } from "components/Image/ImagePin";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
 import { EditProfile } from "sections/Profile/form/edit/EditProfile";
-import { Particle } from "components/myComponents/MyParticles";
 import { AssetProfile1 } from "components/assets/AssetProfile";
 import { MyFModal } from "components/myComponents/modal/MyFramerModal";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
