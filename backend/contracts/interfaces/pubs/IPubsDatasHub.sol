@@ -8,7 +8,19 @@ interface IPubsDatasHub {
     // ********** LIKE ********** //
     // ********** ---- ********** //
 
-    function getTokenLength() external view returns (uint);
+    function buyPub(uint _cvID, uint _pubID) external returns (bool);
+
+    function isAllowed(uint _cvID, uint _pubID) external view returns (bool);
+
+    function mintPayablePub(
+        uint _pubID,
+        uint _amount,
+        string calldata _tokenURI
+    ) external returns (bool);
+
+    function datasOfPayablePub(
+        uint _pubID
+    ) external view returns (DataTypes.PubPayableData memory);
 
     function indexerOf(uint _id) external view returns (uint[] memory);
 

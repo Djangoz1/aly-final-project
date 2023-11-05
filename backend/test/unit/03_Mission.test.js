@@ -11,6 +11,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
   let apiGet;
   let apiPost;
+  let apiPostPayable;
   let balancesHub;
 
   beforeEach(async () => {
@@ -29,6 +30,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       CVsHub = await contracts.cvs.hub;
       apiGet = await contracts.systems.apiGet;
       apiPost = await contracts.systems.apiPost;
+      apiPostPayable = await contracts.systems.apiPostPayable;
       balancesHub = await contracts.systems.balancesHub;
       await apiPost.createCV("tokenURI");
       contract = await contracts.works.missionsHub;
@@ -74,35 +76,35 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("Works", () => {
       it("Should update ownership of mission ID", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
       });
 
       it("Should update balance of owner", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         expect(await contract.balanceOf(this.owner.address)).to.be.equal(1);
       });
 
       it("Should update tokens length", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
       });
 
       it("Should get token URI", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
       });
 
       it("Should update indexer", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         let cvID = await CVsHub.cvOf(this.owner.address);
@@ -112,7 +114,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update status", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         const datas = await apiGet.datasOfMission(1);
@@ -120,7 +122,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update id", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         const datas = await apiGet.datasOfMission(1);
@@ -128,7 +130,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should have 0 features", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: missionPrice,
         });
         const datas = await apiGet.datasOfMission(1);
@@ -147,7 +149,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should NOT create mission if under price", async () => {
         await expect(
-          apiPost.createMission("tokenURI", {
+          apiPostPayable.createMission("tokenURI", {
             value: "100000",
           })
         ).to.be.revertedWith("Mission price : Invalid value");
@@ -159,7 +161,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     beforeEach(async () => {
       let price = await balancesHub.missionPrice();
       let missionPrice = price.toString();
-      await apiPost.createMission("tokenURI", {
+      await apiPostPayable.createMission("tokenURI", {
         value: missionPrice,
       });
       await apiPost.connect(this.addr1).createCV("tokenURI");

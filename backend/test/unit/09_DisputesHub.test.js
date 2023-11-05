@@ -15,6 +15,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let addressSystem;
   let contract;
   let apiPost;
+  let apiPostPayable;
   let apiGet;
   let CVsHub;
   let featuresHub;
@@ -56,6 +57,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     contracts = await _testInitAll();
     addressSystem = contracts.systems.addressSystem;
     apiPost = contracts.systems.apiPost;
+    apiPostPayable = contracts.systems.apiPostPayable;
     apiGet = contracts.systems.apiGet;
     CVsHub = contracts.cvs.hub;
     featuresHub = contracts.works.featuresHub;

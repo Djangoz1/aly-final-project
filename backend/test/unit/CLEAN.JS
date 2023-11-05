@@ -22,7 +22,7 @@
 // const CONTRACT_NAME = "LaunchpadHub";
 
 // describe.only(`Contract ${CONTRACT_NAME} `, () => {
-//   let apiPost;
+//   let apiPost; let apiPostPayable;
 //   let apiGet;
 //   let addressSystem;
 
@@ -41,7 +41,7 @@
 //       this.addr7,
 //     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
 //     contracts = await _testInitAll();
-//     apiPost = contracts.systems.apiPost;
+//     apiPost =  contracts.systems.apiPost; apiPostPayable = contracts.systems.apiPostPayable;
 //     apiGet = contracts.systems.apiGet;
 //     addressSystem = contracts.systems.addressSystem;
 //     balancesHub = contracts.systems.balancesHub;

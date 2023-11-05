@@ -38,6 +38,7 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         require(
             msg.sender == _iAS.featuresHub() ||
                 msg.sender == _iAS.apiPost() ||
+                msg.sender == _iAS.apiPostPayable() ||
                 msg.sender == _iAS.disputesHub(),
             "Must call by proxy bindings"
         );
@@ -211,6 +212,12 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         return balancesCourt[_courtID];
     }
 
+    function indexerOf(
+        DataTypes.CourtIDs _courtID
+    ) external view returns (uint256[] memory) {
+        return indexersCourt[_courtID];
+    }
+
     function tokensLength() external view returns (uint256) {
         return _tokenIDs.current();
     }
@@ -228,6 +235,18 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
     ) external view returns (uint256) {
         require(indexersCV[_cvID][_courtID] > 0, "Arbitration not found");
         return indexersCV[_cvID][_courtID];
+    }
+
+    function acceptArbitration(
+        uint _cvID,
+        DataTypes.CourtIDs _courtID,
+        uint _disputeID
+    ) external onlyProxy {
+        require(
+            datas[indexersCV[_cvID][_courtID]].cvID == _cvID,
+            "AcceptArbitration: Not allowed"
+        );
+        datas[indexersCV[_cvID][_courtID]].disputes.push(_disputeID);
     }
 
     function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external {

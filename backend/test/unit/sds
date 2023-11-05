@@ -22,7 +22,7 @@ const { _createFeature } = require("../../utils/web3-tools");
 const CONTRACT_NAME = "LaunchpadHub";
 
 describe.only(`Contract ${CONTRACT_NAME} `, () => {
-  let apiPost;
+  let apiPost; let apiPostPayable;
   let apiGet;
   let addressSystem;
 
@@ -41,7 +41,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       this.addr7,
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
     contracts = await _testInitAll();
-    apiPost = contracts.systems.apiPost;
+    apiPost =  contracts.systems.apiPost; apiPostPayable = contracts.systems.apiPostPayable;
     apiGet = contracts.systems.apiGet;
     addressSystem = contracts.systems.addressSystem;
     balancesHub = contracts.systems.balancesHub;
@@ -102,7 +102,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           TIER_DATAS_EXEMPLE,
           TIER_DATAS_EXEMPLE,
         ];
-        await apiPost.createLaunchpad(datas, tierDatas, "tokenURI", {
+        await apiPostPayable.createLaunchpad(datas, tierDatas, "tokenURI", {
           value: `${price}`,
         });
       });
@@ -129,7 +129,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
     describe("With original value ", async () => {
       beforeEach(async () => {
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "tokenURI", {
+        await apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "tokenURI", {
           value: `${price}`,
         });
       });
@@ -218,7 +218,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
         it("Should  NOT mint launchpad if value < launchpadPrice", async () => {
           await expect(
-            apiPost.createLaunchpad(
+            apiPostPayable.createLaunchpad(
               LAUNCHPAD_DATAS_EXEMPLE,
               [TIER_DATAS_EXEMPLE],
               "pubURI",
@@ -231,7 +231,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
         it("Should  NOT mint launchpad without pubURI", async () => {
           await expect(
-            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], {
+            apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], {
               value: `${price}`,
             })
           ).to.be.revertedWith("Launchpad price : Invalid value");
@@ -241,7 +241,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           let datas = { ...LAUNCHPAD_DATAS_EXEMPLE };
           datas.saleStart = 300;
           await expect(
-            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+            apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
               value: `${price}`,
             })
           ).to.be.revertedWith("Invalid sale start");
@@ -252,7 +252,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           datas.saleStart = new Date().getTime();
           datas.saleEnd = 0;
           await expect(
-            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+            apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
               value: `${price}`,
             })
           ).to.be.revertedWith("Invalid sale end");
@@ -260,7 +260,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           datas.saleEnd = datas.saleStart - 1000;
 
           await expect(
-            apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+            apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
               value: `${price}`,
             })
           ).to.be.revertedWith("Missmatch sale time");
@@ -272,7 +272,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           _datas.tokenAddress = ZERO_ADDRESS;
 
           await expect(
-            apiPost.createLaunchpad(_datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+            apiPostPayable.createLaunchpad(_datas, [TIER_DATAS_EXEMPLE], "pubURI", {
               value: `${price}`,
             })
           ).to.be.revertedWith("Invalid address");
@@ -290,7 +290,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
         it("Should  NOT mint without tierDatas", async () => {
           await expect(
-            apiPost.createLaunchpad(datas, [], "pubURI", {
+            apiPostPayable.createLaunchpad(datas, [], "pubURI", {
               value: `${price}`,
             })
           ).to.be.revertedWith("Must have at least one tier");
@@ -298,7 +298,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
         it("Should  NOT mint with 6 tierDatas", async () => {
           await expect(
-            apiPost.createLaunchpad(
+            apiPostPayable.createLaunchpad(
               datas,
               [
                 TIER_DATAS_EXEMPLE,
@@ -1508,7 +1508,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       datas.saleEnd = timestamp + 100000;
       datas.tokenAddress = token.target;
       datas.saleStart = timestamp + 3000;
-      await apiPost.createLaunchpad(
+      await apiPostPayable.createLaunchpad(
         datas,
         [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE],
         "pubURI",
@@ -1551,7 +1551,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           .connect(this.addr1)
           .buyTokens(launchpadID, { value: datas.minInvest });
         await apiPost.setTierID(launchpadID);
-        await apiPost.buyTokens(launchpadID, { value: datas.minInvest });
+        await apiPostPayable.buyTokens(launchpadID, { value: datas.minInvest });
         await apiPost.setTierID(launchpadID);
 
         expect(await launchpad.status()).to.be.equal(3);
@@ -1631,7 +1631,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
           .connect(this.addr1)
           .buyTokens(launchpadID, { value: datas.minInvest });
         await apiPost.setTierID(launchpadID);
-        await apiPost.buyTokens(launchpadID, { value: datas.minInvest });
+        await apiPostPayable.buyTokens(launchpadID, { value: datas.minInvest });
         await apiPost.setTierID(launchpadID);
 
         await expect(apiPost.setTierID(launchpadID)).to.be.revertedWith(
@@ -1651,7 +1651,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         datas.saleEnd = timestamp + 100000;
         datas.tokenAddress = token.target;
         datas.saleStart = timestamp + 3000;
-        await apiPost.createLaunchpad(
+        await apiPostPayable.createLaunchpad(
           datas,
           [TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE, TIER_DATAS_EXEMPLE],
           "pubURI",
@@ -1696,7 +1696,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         datas.saleEnd = timestamp + 100000;
         datas.tokenAddress = token.target;
         datas.saleStart = timestamp + 3000;
-        await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+        await apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
           value: `${price}`,
         });
 
@@ -1754,7 +1754,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       datas.saleEnd = timestamp + 100000;
       datas.tokenAddress = token.target;
       datas.saleStart = timestamp + 3000;
-      await apiPost.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
+      await apiPostPayable.createLaunchpad(datas, [TIER_DATAS_EXEMPLE], "pubURI", {
         value: `${price}`,
       });
 
@@ -1803,7 +1803,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("createMissionLaunchpad should update datas mission", async () => {
-        await apiPost.createMissionLaunchpad(launchpadID, "tokenURI");
+        await apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI");
         let missions = await apiGet.missionsOfLaunchpad(launchpadID);
         let datas = await apiGet.datasOfMission(missions[0]);
         expect(datas.launchpad).to.be.equal(launchpadID);
@@ -1811,7 +1811,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should create mission with launchpad balance", async () => {
         let balance = await balancesHub.launchpadBalance(launchpadID);
-        await apiPost.createMissionLaunchpad(launchpadID, "tokenURI");
+        await apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI");
 
         let _balance = await balancesHub.launchpadBalance(launchpadID);
         expect(balance).to.equal(_balance + (await balancesHub.missionPrice()));
@@ -1823,14 +1823,14 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should create feature with launchpad balance", async () => {
-        await apiPost.createMissionLaunchpad(launchpadID, "tokenURI");
+        await apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI");
         let missions = await apiGet.missionsOfLaunchpad(launchpadID);
         let missionID = missions[0];
         let wadge = ethers.parseEther("0.4");
 
         let balance = await balancesHub.launchpadBalance(launchpadID);
 
-        await apiPost.createFeatureLaunchpad(
+        await apiPostPayable.createFeatureLaunchpad(
           wadge,
           missionID,
           30,
@@ -1844,13 +1844,13 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should create feature with full balance", async () => {
-        await apiPost.createMissionLaunchpad(launchpadID, "tokenURI");
+        await apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI");
         let missions = await apiGet.missionsOfLaunchpad(launchpadID);
         let missionID = missions[0];
 
         let balance = await balancesHub.launchpadBalance(launchpadID);
 
-        await apiPost.createFeatureLaunchpad(
+        await apiPostPayable.createFeatureLaunchpad(
           balance,
           missionID,
           30,
@@ -1874,7 +1874,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should not create feature if not the owner", async () => {
-        await apiPost.createMissionLaunchpad(launchpadID, "tokenURI");
+        await apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI");
         let missions = await apiGet.missionsOfLaunchpad(launchpadID);
         let missionID = missions[0];
 
@@ -1895,14 +1895,14 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should not create feature if mission wasn't linked to launchpad", async () => {
-        await apiPost.createMission("tokenURI", {
+        await apiPostPayable.createMission("tokenURI", {
           value: await balancesHub.missionPrice(),
         });
 
         let missionID = 1;
 
         await expect(
-          apiPost.createFeatureLaunchpad(
+          apiPostPayable.createFeatureLaunchpad(
             800,
             missionID,
             30,
@@ -1914,14 +1914,14 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should not create feature if launchpad balance < wadge", async () => {
-        await apiPost.createMissionLaunchpad(launchpadID, "tokenURI");
+        await apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI");
         let missions = await apiGet.missionsOfLaunchpad(launchpadID);
         let missionID = missions[0];
 
         let balance = await balancesHub.launchpadBalance(launchpadID);
 
         await expect(
-          apiPost.createFeatureLaunchpad(
+          apiPostPayable.createFeatureLaunchpad(
             balance + 1n,
             missionID,
             30,
@@ -1949,7 +1949,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         datas.saleEnd = timestamp + 100000;
         datas.tokenAddress = token.target;
         datas.saleStart = timestamp + 3000;
-        await apiPost.createLaunchpad(datas, [tierDatas], "pubURI", {
+        await apiPostPayable.createLaunchpad(datas, [tierDatas], "pubURI", {
           value: `${price}`,
         });
 
@@ -1983,7 +1983,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         await network.provider.send("evm_mine");
 
         await expect(
-          apiPost.createMissionLaunchpad(launchpadID, "tokenURI")
+          apiPostPayable.createMissionLaunchpad(launchpadID, "tokenURI")
         ).to.be.revertedWith("APIPost: Error create mission");
       });
     });

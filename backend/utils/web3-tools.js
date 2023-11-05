@@ -22,22 +22,14 @@ let _createCV = async (name, account, addressSystem) => {
   let apiGet = await getContractAt("APIGet", _addrG);
   let apiPost = await getContractAt("APIPost", _addrP);
 
-  let id = parseInt(await apiGet.tokensLengthOf(_addrCVH)) + 1;
   let tokenURI = await createURICV({
-    id,
     name,
   });
 
   await apiPost.connect(account).createCV(tokenURI);
 
   let _id = await apiGet.cvOf(account.address);
-  if (id != _id) {
-    result = await createURICV({
-      id: _id,
-      name,
-    });
-    console.log("Error ID -----", _id);
-  }
+
   return _id;
 };
 
@@ -56,6 +48,10 @@ let _createMission = async ({
 
   let apiGet = await getContractAt("APIGet", await _iAS.apiGet());
   let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
+  let apiPostPayable = await getContractAt(
+    "APIPostPayable",
+    await _iAS.apiPostPayable()
+  );
   let balancesHub = await getContractAt(
     "BalancesHub",
     await _iAS.balancesHub()
@@ -74,7 +70,7 @@ let _createMission = async ({
         datas.minCap > amount ||
         (datas.minCap == 0 && datas.maxCap > amountRaised)
       ) {
-        await apiPost
+        await apiPostPayable
           .connect(accounts[index])
           .buyTokens(launchpadID, { value: datas.minInvest });
         amount += datas.maxInvest;
@@ -83,15 +79,16 @@ let _createMission = async ({
     await apiPost.connect(account).setTierID(launchpadID);
   }
 
+  let cvID = await apiGet.cvOf(account.address);
+  let userID = await apiGet.tokenURIOf(cvID, await _iAS.cvsHub());
+
   let uri = await createURIMission({
-    id,
     title,
+    userID: userID,
     description,
-    attributes: social || reference ? [{ social, reference }] : null,
-    social,
   });
 
-  await apiPost.connect(account).createMission(uri, {
+  await apiPostPayable.connect(account).createMission(uri, {
     value: `${await balancesHub.missionPrice()}`,
   });
 
@@ -145,6 +142,10 @@ let _createFeature = async ({
 
   let apiGet = await getContractAt("APIGet", await _iAS.apiGet());
   let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
+  let apiPostPayable = await getContractAt(
+    "APIPostPayable",
+    await _iAS.apiPostPayable()
+  );
   let balancesHub = await getContractAt(
     "BalancesHub",
     await _iAS.balancesHub()
@@ -164,8 +165,10 @@ let _createFeature = async ({
 
   let featureID = parseInt(await apiGet.tokensLengthOf(_addrFH)) + 1;
   let moock = FEATURE_DATAS_EXEMPLE;
+  let cvID = await apiGet.cvOf(account.address);
+  let idMission = await apiGet.tokenURIOf(_missionID, await _iAS.missionsHub());
   let uri = await createURIFeature({
-    id: featureID,
+    missionID: idMission,
     title,
     description,
     attributes: [{ domain }],
@@ -185,7 +188,7 @@ let _createFeature = async ({
         specification || moock?.specification
       );
   } else {
-    await apiPost
+    await apiPostPayable
       .connect(account)
       .createFeature(
         _missionID,
@@ -224,7 +227,6 @@ let _createLaunchpad = async ({
   account,
   addressSystem,
   launchpadDatas,
-  metadatas,
   tiersDatas,
 }) => {
   let tokens = 3000000n;
@@ -236,12 +238,20 @@ let _createLaunchpad = async ({
   );
   let apiGet = await getContractAt("APIGet", await _iAS.apiGet());
   let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
+  let apiPostPayable = await getContractAt(
+    "APIPostPayable",
+    await _iAS.apiPostPayable()
+  );
+
+  let cvID = await apiGet.cvOf(account.address);
+  let userID = await apiGet.tokenURIOf(cvID, _iAS.cvsHub());
+
   let _addrLH = await _iAS.launchpadsHub();
   let moock = LAUNCHPAD_DATAS_EXEMPLE;
 
   let id = parseInt(await apiGet.tokensLengthOf(_addrLH)) + 1;
 
-  let { launchpadURI, tokenURI } = await createURILaunchpad({ id, metadatas });
+  let { launchpadURI, tokenURI } = await createURILaunchpad({ userID });
   const token = await _testInitToken(account, "Django", "DJN", tokens);
   let _tierDatas = tiersDatas || [
     TIER_DATAS_EXEMPLE,
@@ -252,7 +262,7 @@ let _createLaunchpad = async ({
   const currentTimestampSeconds = Math.floor(Date.now() / 1000);
 
   // Ajoutez 10 secondes
-  const saleStart = currentTimestampSeconds + 10;
+  const saleStart = currentTimestampSeconds + 100000;
   let _launchpadDatas = {
     id,
     tokenURI: launchpadURI,
@@ -269,8 +279,7 @@ let _createLaunchpad = async ({
     lockedTime: launchpadDatas?.lockedTime || moock.lockedTime,
     totalUser: launchpadDatas?.totalUser || moock.totalUser,
   };
-
-  await apiPost
+  await apiPostPayable
     .connect(account)
     .createLaunchpad(_launchpadDatas, _tierDatas, tokenURI, {
       value: await balancesHub.launchpadPrice(),
@@ -299,9 +308,12 @@ let _createPub = async ({
   let apiGet = await getContractAt("APIGet", await _iAS.apiGet());
   let apiPost = await getContractAt("APIPost", await _iAS.apiPost());
 
+  let cvID = await apiGet.cvOf(account.address);
+  let userID = await apiGet.tokenURIOf(cvID, _iAS.cvsHub());
+
   let id = parseInt(await apiGet.tokensLengthOf(_addrPH)) + 1;
   let uri = await createURIPub({
-    id,
+    userID,
     title,
     img,
     description,

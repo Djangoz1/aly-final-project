@@ -10,6 +10,7 @@ import {Bindings} from "../libraries/Bindings.sol";
 
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {IAPIPost} from "../interfaces/system/IAPIPost.sol";
+import {IAPIPostPayable} from "../interfaces/system/IAPIPostPayable.sol";
 import {IMissionsHub} from "../interfaces/works/IMissionsHub.sol";
 import {ICollectWorkInteraction} from "../interfaces/works/ICollectWorkInteraction.sol";
 import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
@@ -211,12 +212,14 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
 
         require(_datas[_featureID].cvWorker > 0, "Must have a worker");
         require(_datas[_featureID].startedAt > 0, "Feature not start");
-        IAPIPost iAPIPost = IAPIPost(_iAS.apiPost());
+        IAPIPostPayable iAPIPostPayable = IAPIPostPayable(
+            _iAS.apiPostPayable()
+        );
 
         uint amount = _datas[_featureID].wadge;
         // ! TO DO
 
-        bool success = iAPIPost.sendTransaction(_for, amount);
+        bool success = iAPIPostPayable.sendTransaction(_for, amount);
         require(success, "Transaction failed");
         _datas[_featureID].wadge = 0;
         _datas[_featureID].status = DataTypes.FeatureStatus.Validated;

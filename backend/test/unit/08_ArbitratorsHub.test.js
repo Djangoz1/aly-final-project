@@ -11,6 +11,7 @@ const CONTRACT_NAME = "ArbitratorsHub";
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let contract;
   let apiPost;
+  let apiPostPayable;
   let apiGet;
 
   let contracts;
@@ -29,6 +30,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     contracts = await _testInitAll();
 
     apiPost = contracts.systems.apiPost;
+    apiPostPayable = contracts.systems.apiPostPayable;
     apiGet = contracts.systems.apiGet;
     contract = contracts.escrows.arbitratorsHub;
 
@@ -159,7 +161,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("should NOT works if sender haven't place on indexersCourt ", async () => {
         await expect(
-          apiPost.investOnCourt(courtID, { value: `${price}` })
+          apiPostPayable.investOnCourt(courtID, { value: `${price}` })
         ).to.be.revertedWith("Arbitrator not found");
       });
 

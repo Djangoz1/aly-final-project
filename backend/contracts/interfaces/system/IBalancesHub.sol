@@ -18,5 +18,17 @@ interface IBalancesHub {
         uint _value
     ) external returns (bool);
 
+    function balanceOf(uint _cvID) external view returns (uint);
+
+    function addAccountBalance(
+        uint _cvID,
+        uint _amount
+    ) external returns (bool);
+
+    function withdrawAccountBalance(
+        uint _cvID,
+        uint _value
+    ) external returns (bool);
+
     // Ajoutez votre code ici
 }

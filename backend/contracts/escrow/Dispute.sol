@@ -106,7 +106,12 @@ contract Dispute is Ownable {
 
     function acceptArbitration(
         uint _cvID
-    ) external onlyProxy onlyStatus(DisputeRules.Status.Initial, true) {
+    )
+        external
+        onlyProxy
+        onlyStatus(DisputeRules.Status.Initial, true)
+        returns (bool)
+    {
         IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         DisputeDatas.Data memory data = _data();
 
@@ -118,6 +123,7 @@ contract Dispute is Ownable {
         if (_arbitratorsLength == data.nbArbitrators) {
             _startedVotePeriod();
         }
+        return true;
     }
 
     function refuseArbitration(

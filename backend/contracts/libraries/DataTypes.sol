@@ -44,6 +44,7 @@ library DataTypes {
         uint256 indexedAtCourt;
         uint256 balance;
         uint256 nbArbitrations;
+        uint256[] disputes;
     }
 
     struct EvidenceData {
@@ -142,6 +143,13 @@ library DataTypes {
         uint answers;
         uint missionID;
         bool isPayable;
+    }
+
+    struct PubPayableData {
+        uint amount;
+        uint viewers;
+        string tokenURI;
+        bool isAllowed;
     }
     /**
      *    @param id

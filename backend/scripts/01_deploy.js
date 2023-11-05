@@ -54,7 +54,12 @@ async function main() {
   console.log(`balancesHub deployed to ${balancesHub.target}`);
 
   const apiPost = contracts.systems.apiPost;
+
   console.log(`apiPost deployed to ${apiPost.target}`);
+
+  const apiPostPayable = contracts.systems.apiPostPayable;
+
+  console.log(`apiPostPayable deployed to ${apiPostPayable.target}`);
 
   const apiGet = contracts.systems.apiGet;
   console.log(`apiGet deployed to ${apiGet.target}`);
@@ -93,6 +98,7 @@ async function main() {
     disputesDatasHub: disputesDatasHub.target,
     balancesHub: balancesHub.target,
     apiPost: apiPost.target,
+    apiPostPayable: apiPostPayable.target,
     apiGet: apiGet.target,
     factory: factory.target,
     disputesHub: disputesHub.target,

@@ -175,6 +175,7 @@ const _testInitArbitrator = async (contracts, courtID, account) => {
   let arbitratorsHub = contracts.escrows.arbitratorsHub;
 
   let apiPost = contracts.systems.apiPost;
+  apiPostPayable = contracts.systems.apiPostPayable;
   let apiGet = contracts.systems.apiGet;
 
   let courtLength = await apiGet.lengthOfCourt(courtID);
@@ -316,11 +317,12 @@ const _testInitWorksContracts = async (addressSystem) => {
 /**
  * @notice La fonction vient mint un token erc721
  * @notice Payable function -- msg.value == balancesHub.missionPrice()
- * @dev La mission est créé par la fonction apiPost.createMission(_tokenURI)
+ * @dev La mission est créé par la fonction apiPostPayable.createMission(_tokenURI)
  */
 const _testInitMission = async (contracts, tokenURI, account) => {
   let missionsHub = contracts.works.missionsHub;
   let apiPost = contracts.systems.apiPost;
+  apiPostPayable = contracts.systems.apiPostPayable;
   let apiGet = contracts.systems.apiGet;
   let balancesHub = contracts.systems.balancesHub;
 
@@ -330,7 +332,7 @@ const _testInitMission = async (contracts, tokenURI, account) => {
       value: missionPrice.toString(),
     });
   } else {
-    await apiPost.createMission(tokenURI || "missionURI", {
+    await apiPostPayable.createMission(tokenURI || "missionURI", {
       value: missionPrice.toString(),
     });
   }
@@ -344,6 +346,7 @@ const _testInitMission = async (contracts, tokenURI, account) => {
 const _testInitFeature = async (contracts, datas, workerAccount, account) => {
   let featuresHub = contracts.works.featuresHub;
   let apiPost = contracts.systems.apiPost;
+  apiPostPayable = contracts.systems.apiPostPayable;
   let apiGet = contracts.systems.apiGet;
   let missionID = await _testInitMission(contracts, "missionURI");
   const cvWorker = await apiGet.cvOf(workerAccount.address);
@@ -364,7 +367,7 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
     newFeature = await featuresHub.tokensLength();
     await apiPost.connect(account).inviteWorker(cvWorker, newFeature);
   } else {
-    await apiPost.createFeature(
+    await apiPostPayable.createFeature(
       missionID,
       datas.estimatedDays || 1000,
       datas.isInviteOnly || true,

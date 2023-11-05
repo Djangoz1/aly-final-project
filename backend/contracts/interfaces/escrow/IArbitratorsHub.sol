@@ -8,11 +8,21 @@ interface IArbitratorsHub {
 
     function setArbitrator(uint _cvID, DataTypes.CourtIDs _courtID) external;
 
+    function acceptArbitration(
+        uint _cvID,
+        DataTypes.CourtIDs _courtID,
+        uint _disputeID
+    ) external;
+
     function investOnCourt(
         uint _cvID,
         uint _amount,
         DataTypes.CourtIDs _courtID
     ) external payable;
+
+    function indexerOf(
+        DataTypes.CourtIDs _courtID
+    ) external view returns (uint256[] memory);
 
     function withdrawFromCourt(
         uint _cvID,

@@ -53,6 +53,7 @@ contract APIPostPayable is Ownable {
         require(
             _disputesHub == msg.sender ||
                 _featuresHub == msg.sender ||
+                _iAS.apiPost() == msg.sender ||
                 _launchpadsHub == msg.sender,
             "Only callable by our contracts"
         );
@@ -102,16 +103,52 @@ contract APIPostPayable is Ownable {
         );
     }
 
+    function withdraw(uint _amount) external {
+        bool success = _iBalancesHub.withdrawAccountBalance(
+            _cvOf(msg.sender),
+            _amount
+        );
+        require(success, "APIPostPayable: Error withdraw");
+        success = _sendTransaction(msg.sender, _amount);
+        if (!success) {
+            _iBalancesHub.addAccountBalance(_cvOf(msg.sender), _amount);
+        }
+    }
+
     function sendTransaction(
         address _to,
         uint _value
     ) external payable onlySatteliteContracts returns (bool) {
+        // Transférer les ETH à l'adresse spécifiée
+
+        _sendTransaction(_to, _value);
+        return true;
+    }
+
+    function _sendTransaction(
+        address _to,
+        uint _value
+    ) internal returns (bool) {
         // Transférer les ETH à l'adresse spécifiée
         require(_to != address(0), "0 address");
         require(_value > 0, "Erorr value");
         (bool success, ) = _to.call{value: _value}("");
         require(success, "apiPost : Transaction failed");
         return true;
+    }
+
+    function buyPub(uint _pubID) external payable {
+        IPubsDatasHub iPDH = IPubsDatasHub(_pubsDatasHub);
+        require(
+            iPDH.datasOfPayablePub(_pubID).amount == msg.value,
+            "Error value"
+        );
+        bool success = iPDH.buyPub(_cvOf(msg.sender), _pubID);
+        require(success, "APIPostPayable: Error buy pub");
+        _iBalancesHub.addAccountBalance(
+            _cvOf(Bindings.ownerOf(_pubID, _iAS.pubsHub())),
+            msg.value
+        );
     }
 
     // ************* -------- ************* //
@@ -182,6 +219,14 @@ contract APIPostPayable is Ownable {
         require(newFeature > 0, "Error creation feature");
     }
 
+    /**
+     * @notice Binding for invest on court -- onlyArbitratorOnCourt(_courtID)
+     * @param _courtID must to have a slot in court
+     * @dev this function trigger ArbitratorsHub contract
+     * msg.sender == ownerOfCV(x) && onlyArbitratorOnCourt(_courtID)
+     * msg.value > 0
+     * Permet d'investir dans une court pour avoir une chance supplémentaire d'être désigné en tant qu'arbitre pour un litige
+     */
     function investOnCourt(DataTypes.CourtIDs _courtID) external payable {
         require(msg.value > 0, "Invalid value");
         IArbitratorsHub(_iAS.arbitratorsHub()).investOnCourt(

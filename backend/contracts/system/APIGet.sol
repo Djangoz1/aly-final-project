@@ -89,7 +89,7 @@ contract APIGet {
     // ************ -- ************ //
 
     function cvOf(address _for) external view returns (uint) {
-        return Bindings.cvOf(_for, _iAS.cvsHub());
+        return _cvOf(_for);
     }
 
     function followerOf(uint _cvID, uint _index) external view returns (uint) {
@@ -115,6 +115,12 @@ contract APIGet {
     // ---------------------------- //
     // ********** Escrows ********* //
     // ********* Arbitrator ******* //
+
+    function indexerOfCourt(
+        DataTypes.CourtIDs _courtID
+    ) external view returns (uint[] memory) {
+        return IArbitratorsHub(_iAS.arbitratorsHub()).indexerOf(_courtID);
+    }
 
     function lengthOfCourt(
         DataTypes.CourtIDs _courtID
@@ -153,10 +159,6 @@ contract APIGet {
 
     function disputeOfFeature(uint _featureID) external view returns (uint) {
         return IDisputesHub(_iAS.disputesHub()).disputeOf(_featureID);
-    }
-
-    function lengthOfDisputes() external view returns (uint) {
-        return Bindings.tokensLength(_iAS.disputesHub());
     }
 
     function datasOfDispute(
@@ -222,11 +224,11 @@ contract APIGet {
     function addressOfLaunchpad(
         uint _launchpadID
     ) external view returns (address) {
-        return ILaunchpadHub(_iAS.launchpadsHub()).addressOf(_launchpadID);
+        return _launchpadsHub().addressOf(_launchpadID);
     }
 
     function launchpadsOfCV(uint _cvID) external view returns (uint[] memory) {
-        return ILaunchpadHub(_iAS.launchpadsHub()).launchpadsOfCV(_cvID);
+        return _launchpadsHub().launchpadsOfCV(_cvID);
     }
 
     function datasOfLaunchpad(
@@ -240,9 +242,8 @@ contract APIGet {
 
     function currentTierIDOf(uint _launchpadID) external view returns (uint8) {
         return
-            ILaunchpad(
-                ILaunchpadHub(_iAS.launchpadsHub()).addressOf(_launchpadID)
-            ).getCurrentTierID();
+            ILaunchpad(_launchpadsHub().addressOf(_launchpadID))
+                .getCurrentTierID();
     }
 
     function tierOfLaunchpad(
@@ -259,10 +260,7 @@ contract APIGet {
     function statusOfLaunchpad(
         uint _launchpadID
     ) external view returns (DataTypes.LaunchpadStatus) {
-        return
-            ILaunchpad(
-                ILaunchpadHub(_iAS.launchpadsHub()).addressOf(_launchpadID)
-            ).status();
+        return ILaunchpad(_launchpadsHub().addressOf(_launchpadID)).status();
     }
 
     function datasOfInvestor(
@@ -280,30 +278,48 @@ contract APIGet {
     // *********** PUBS *********** //
     // *********** ---- *********** //
 
-    function pubsPayableLength() external view returns(uint){
-        return IPubsHub(_iAS.pubsHub()).pubsPayableLength();
+    function datasOfPayablePub(
+        uint _pubID
+    ) external view returns (DataTypes.PubPayableData memory) {
+        IPubsDatasHub iPDH = _pubsDatasHub();
+        DataTypes.PubPayableData memory datas = iPDH.datasOfPayablePub(_pubID);
+        require(datas.amount > 0, "Not payable pub");
+        if (Bindings.ownerOf(_pubID, _iAS.pubsHub()) == msg.sender) {
+            datas.isAllowed = true;
+        } else {
+            datas.isAllowed = iPDH.isAllowed(_cvOf(msg.sender), _pubID);
+        }
+        if (!datas.isAllowed) {
+            datas.tokenURI = "";
+        }
+
+        return datas;
+    }
+
+    function pubsPayableOf(uint _cvID) external view returns (uint[] memory) {
+        return IPubsHub(_iAS.pubsHub()).indexerPayableOf(_cvID);
     }
 
     function answersOfPub(uint _pubID) external view returns (uint[] memory) {
-        return IPubsDatasHub(_iAS.pubsDatasHub()).answersOfPub(_pubID);
+        return _pubsDatasHub().answersOfPub(_pubID);
     }
 
     function datasOfLike(
         uint _likeID
     ) external view returns (DataTypes.LikeData memory) {
-        return IPubsDatasHub(_iAS.pubsDatasHub()).dataOf(_likeID);
+        return _pubsDatasHub().dataOf(_likeID);
     }
 
     function datasOfPub(
         uint _pubID
     ) external view returns (DataTypes.PubData memory) {
-        return IPubsDatasHub(_iAS.pubsDatasHub()).dataOfPub(_pubID);
+        return _pubsDatasHub().dataOfPub(_pubID);
     }
 
     function pubsOfMission(
         uint _missionID
     ) external view returns (uint[] memory) {
-        return IPubsDatasHub(_iAS.pubsDatasHub()).pubsOfMission(_missionID);
+        return _pubsDatasHub().pubsOfMission(_missionID);
     }
 
     // ---------------------------- //
@@ -350,5 +366,17 @@ contract APIGet {
             ICollectWorkInteraction(_iAS.collectWorkInteraction()).dataOf(
                 _featureID
             );
+    }
+
+    function _cvOf(address _for) internal view returns (uint) {
+        return Bindings.cvOf(_for, _iAS.cvsHub());
+    }
+
+    function _pubsDatasHub() internal view returns (IPubsDatasHub) {
+        return IPubsDatasHub(_iAS.pubsDatasHub());
+    }
+
+    function _launchpadsHub() internal view returns (ILaunchpadHub) {
+        return ILaunchpadHub(_iAS.launchpadsHub());
     }
 }

@@ -16,6 +16,11 @@ const {
   LAUNCHPAD_DATAS_URI_EXEMPLE,
 } = require("../helpers/test_utils");
 
+require("cross-fetch/polyfill");
+const PocketBase = require("pocketbase/cjs");
+
+const pocketClient = new PocketBase("http://127.0.0.1:8090");
+
 const getAllPinnedFiles = async () => {
   let allPinnedFiles = [];
   let page = 1;
@@ -156,57 +161,45 @@ const createURIWorkerProposal = async ({ id, title, description, url }) => {
   }
 };
 
-const createURIFeature = async ({
-  id,
-  title,
-  description,
-  attributes,
-  image,
-}) => {
-  let moock = FEATURE_DATAS_URI_EXEMPLE;
-
+const createURIFeature = async ({ title, description, missionID }) => {
+  let moock = { ...FEATURE_DATAS_URI_EXEMPLE };
+  if (!missionID) {
+    throw new Error("Missing missionID feature value");
+  }
+  moock.missionID = missionID;
+  if (title) {
+    moock.title = title;
+  }
+  if (description) {
+    moock.description = description;
+  }
   try {
-    let images = [];
-    if (image) {
-      images.push({ img: image });
-    }
-    const metadatas = {
-      title: title || moock?.title,
-      description: description || moock?.description,
-      attributes: attributes?.domain ? attributes : [moock?.attributes],
-    };
-    let uri = await createURI({ id, title: "Feature", images, metadatas });
+    let uri = await createURI({ table: "features", metadatas: moock });
     return uri;
   } catch (err) {
     console.error("ERROR", err);
     return null;
   }
 };
-const createURIPub = async ({
-  id,
-  description,
-  img,
-  answerID,
-  missionID,
-  owner,
-}) => {
+const createURIPub = async ({ userID, description, img, title }) => {
   let moock = PUB_DATAS_URI_EXEMPLE;
+  if (!userID) {
+    throw new Error("Missing owner pub value");
+  }
 
-  let metadatas = {
-    description: description || moock.description,
-    attributes: [moock.attributes],
-  };
-  let images = [];
-  metadatas.attributes[0].missionID = missionID;
-  metadatas.attributes[0].answerID = answerID;
-  metadatas.attributes[0].owner = owner;
-
+  moock.userID = userID;
+  if (description) {
+    moock.description = description;
+  }
   if (img) {
-    images.push({ img, target: "image" });
+    moock.image = img;
+  }
+  if (title) {
+    moock.title = title;
   }
 
   try {
-    let uri = await createURI({ id, title: "Pub", images, metadatas });
+    let uri = await createURI({ table: "posts", metadatas: moock });
     return uri;
   } catch (err) {
     console.error("ERROR", err);
@@ -214,125 +207,46 @@ const createURIPub = async ({
   }
 };
 
-let createURI = async ({ id, title, images, metadatas, moock }) => {
-  const pinataMetadata = {
-    name: "Work3 - " + title + "#" + id,
-  };
-  const pinataOptions = {
-    cidVersion: 0,
-  };
-
-  for (let index = 0; index < images?.length; index++) {
-    const element = images[index];
-
-    if (element?.img) {
-      let uri = await createImageCIDOnPinata(element?.img, {
-        name: "Work3 - Img " + element?.target + title + "#" + id,
-      });
-      let target = "image";
-
-      if (element?.target) {
-        target = element.target;
-      }
-      if (element?.attributes) {
-        metadatas.attributes[0][target] = uri;
-      } else {
-        metadatas[target] = uri;
-      }
-    }
+let createURI = async ({ table, metadatas }) => {
+  if (!table?.length > 0) {
+    throw new Error("Missing table collection");
   }
-
-  const _options = {
-    pinataMetadata,
-    pinataOptions,
-  };
-
-  metadatas.name = pinataMetadata.name;
-  metadatas.attributes[0].createdAt = Date.now();
-  const json = await pinata.pinJSONToIPFS(metadatas, _options);
-
-  return json.IpfsHash;
+  const record = await pocketClient.records.create(table, metadatas);
+  return record.id;
 };
 
-const createURILaunchpad = async ({ id, metadatas }) => {
+const createURILaunchpad = async ({ userID }) => {
   let moock = LAUNCHPAD_DATAS_URI_EXEMPLE;
-  let _metadatas = {
-    title: metadatas?.title || moock?.title,
-    description: metadatas?.description || moock?.description,
-    attributes: [
-      {
-        domain: metadatas?.domain || moock?.attributes?.domain,
-      },
-    ],
-  };
+  if (!userID) {
+    throw new Error("Missing launchpad user value");
+  }
+  moock.userID = userID;
 
   let launchpadURI = await createURI({
-    id,
-    title: "Launchpad Datas",
-    metadatas: _metadatas,
-    moock,
-  });
-  let images = [
-    { img: metadatas?.image || moock?.image, target: "image" },
-    {
-      img: metadatas?.banniere || moock?.banniere,
-      target: "banniere",
-      attributes: true,
-    },
-  ];
-
-  _metadatas = {
-    title: `Profile ${metadatas?.title || moock?.title}`,
-    description: metadatas?.bio || null,
-    attributes: [
-      {
-        facebook: metadatas?.facebook || null,
-        github: metadatas?.github || null,
-        linkedin: metadatas?.linkedin || null,
-        twitter: metadatas?.twitter || null,
-      },
-    ],
-  };
-  let tokenURI = await createURI({
-    id,
-    title: "Launchpad Profile",
-    metadatas: _metadatas,
-    images,
-    moock,
+    table: "launchpads",
+    metadatas: moock,
   });
 
-  return { launchpadURI, tokenURI };
+  return { launchpadURI, tokenURI: launchpadURI }; //! TO delete useless uri
 };
 
-let createURICV = async ({ id, name, description, attributes, image }) => {
+let createURICV = async ({ name, description, image }) => {
   let moock = CV_DATAS_URI_EXEMPLE;
 
-  let _metadatas = {
-    username: name || moock?.username,
-    description: description || moock?.description,
-    attributes: attributes || moock?.attributes,
-  };
-
-  let images = [];
-
-  images.push({
-    img: attributes?.[0]?.cvImg || moock.cv,
-    target: "cvImg",
-    attributes: true,
-  });
-  images.push({
-    img: attributes?.[0]?.banniere || moock.banniere,
-    target: "banniere",
-    attributes: true,
-  });
-  images.push({ img: image || moock?.image, target: "image" });
+  if (name) {
+    moock.username = name;
+  }
+  if (description) {
+    moock.description = description;
+  }
+  if (image) {
+    moock.image = image;
+  }
 
   try {
     let uri = await createURI({
-      id,
-      title: "CV",
-      metadatas: _metadatas,
-      images,
+      table: "accounts",
+      metadatas: moock,
     });
     return uri;
   } catch (err) {
@@ -341,31 +255,24 @@ let createURICV = async ({ id, name, description, attributes, image }) => {
   }
 };
 
-const createURIMission = async ({
-  id,
-  title,
-  description,
-  attributes,
-  image,
-}) => {
-  let moock = MISSION_DATAS_URI_EXEMPLE;
-
-  let images = [
-    { img: image || moock?.image },
-    {
-      img: attributes?.banniere || moock.attributes.banniere,
-      target: "banniere",
-      attributes: true,
-    },
-  ];
-  const metadatas = {
-    title: title || moock.title,
-    description: description || moock.description,
-    attributes: attributes || [moock.attributes],
-  };
+const createURIMission = async ({ title, description, userID, image }) => {
+  if (!userID) {
+    throw new Error("Missing mission owner value");
+  }
+  let moock = { ...MISSION_DATAS_URI_EXEMPLE };
+  moock.userID = userID;
+  if (title) {
+    moock.title = title;
+  }
+  if (description) {
+    moock.description = description;
+  }
+  if (image) {
+    // moock.image = image;
+  }
 
   try {
-    let uri = await createURI({ id, title: "Mission", images, metadatas });
+    let uri = await createURI({ table: "missions", metadatas: moock });
     return uri;
   } catch (err) {
     console.error("ERROR", err);
@@ -383,4 +290,5 @@ module.exports = {
   createURILaunchpad,
   deletePinnedFile,
   deleteAllPinnedFiles,
+  pocketClient,
 };

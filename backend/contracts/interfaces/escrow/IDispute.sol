@@ -16,7 +16,7 @@ interface IDispute {
 
     function APPEAL_PERIOD() external view returns (uint);
 
-    function acceptArbitration(uint _cvID) external;
+    function acceptArbitration(uint _cvID) external returns (bool);
 
     function refuseArbitration(uint _cvID) external;
 

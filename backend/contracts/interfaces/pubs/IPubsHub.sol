@@ -14,7 +14,7 @@ interface IPubsHub {
 
     function likePub(uint _cvID, uint _id) external;
 
-    function pubsPayableLength() external view returns (uint);
+    function indexerPayableOf(uint _cvID) external view returns (uint[] memory);
 
     function unlikePub(uint _cvID, uint _id) external;
 }

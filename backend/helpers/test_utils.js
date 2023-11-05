@@ -11,51 +11,66 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 // *::::::::::::: WORK PROPOSAL :::::::::::::* //
 // *::::::::::::: ------------- :::::::::::::* //
 
+let transactionCost = async (tx) => {
+  const txReceipt = await ethers.provider.getTransactionReceipt(tx);
+
+  const gasUsed = txReceipt.gasUsed;
+  console.log(gasUsed);
+  return gasUsed;
+};
+
 const getAccount = (accounts, address) =>
   accounts.filter((el) => (el.address === address ? el : null));
 
 const CV_DATAS_URI_EXEMPLE = {
-  cv: "img/cv.jpeg",
-  title: "Work3 CV",
+  cvImg: "img/cv.jpeg",
   username: "Django",
   description: "CEO of deWork 🫅🏽",
   banniere: "img/banniere.png",
-  image: "img/profile.jpeg",
-  attributes: [
+  avatar: "img/profile.jpeg",
+  email: "jg.djangone@gmail.com",
+  visibility: true,
+
+  banniere: null,
+  identity: JSON.stringify(
     {
-      visibility: true,
-      cvImg: null,
-      banniere: null,
-      identity: {
-        firstName: "Julien",
-        lastName: "Djangone",
-        phone: "07 83 91 30 31",
-        email: "jg.djangone@gmail.com",
-        dateOfBirth: "02/10/1997",
-        citizen: "Mr",
-      },
-      social: {
-        linkedin: null,
-        facebook: null,
-        twitter: null,
-        github: null,
-      },
-      createdAt: Date.now(),
-      skills: [2, 4, 8, 10],
-      domain: 2,
-      languages: [
-        { langue: "Français", level: 3 },
-        { langue: "Anglais", level: 2 },
-      ],
+      firstName: "Julien",
+      lastName: "Djangone",
+      phone: "07 83 91 30 31",
+      dateOfBirth: "02/10/1997",
+      citizen: 0,
     },
-  ],
+    null,
+    2
+  ),
+  social: JSON.stringify(
+    {
+      linkedin: null,
+      facebook: null,
+      twitter: null,
+      github: null,
+    },
+    null,
+    2
+  ),
+  skills: JSON.stringify([2, 4, 8, 10], null, 2),
+  domain: 2,
+  languages: JSON.stringify(
+    [
+      { langue: "Français", level: 3 },
+      { langue: "Anglais", level: 2 },
+    ],
+    null,
+    2
+  ),
 };
 const PUB_DATAS_URI_EXEMPLE = {
   title: "Work3 Pub",
   description:
     "This is a part where content value stored. I can write everything I want to share at the community or missions community or private community.",
+  userID: null,
   image: "img/pub.jpeg",
-  attributes: { createdAt: Date.now(), tags: [] },
+  tags: JSON.stringify([]),
 };
 
 // *::::::::::::: ------- :::::::::::::* //
@@ -63,27 +78,29 @@ const PUB_DATAS_URI_EXEMPLE = {
 // *::::::::::::: ------- :::::::::::::* //
 
 const MISSION_DATAS_URI_EXEMPLE = {
-  id: 0,
   title: "Work3 Mission",
   description:
     "This is a part where content value stored. I can write everything I want to describe my mission. This description must provide a maximum of information about the mission. This is a kind of roadmap.",
-  image: "img/mission.png",
-  name: "Mission #",
-  // Other mission id
+  // image: "img/mission.png",
 
-  attributes: {
-    banniere: "img/banniere.png",
-    reference: null,
-    facebook: null,
-    evaluation: [],
-    experience: 0,
-    disponibilite: 0,
-    createdAt: Date.now(),
-    twitter: null,
-    linkedin: null,
-    github: null,
-    domain: 4,
-  },
+  // // Other mission id
+  // banniere: "img/banniere.png",
+  // reference: null,
+  // // social: JSON.stringify(
+  // //   {
+  // //     facebook: null,
+  // //     twitter: null,
+  // //     linkedin: null,
+  // //     github: null,
+  // //   },
+  // //   null,
+  // //   2
+  // // ),
+  // experience: 0,
+  // disponibilite: 0,
+  // userID: null,
+  // owner: null,
+  // domain: 4,
   // you can provide a link for more information about the mission like current website
 };
 
@@ -103,8 +120,9 @@ const FEATURE_DATAS_URI_EXEMPLE = {
   title: "Dev blockchain",
   description:
     "This is a part where content value stored. I can write everything I want to describe my feature. Once a worker join this feature, I must follow instruction of this content. In the end, if a litigation arrived between owner(me) and worker, this content will be shared on Kleros Court",
-  image: "https://picsum.photos/id/100/200",
-  attributes: { domain: 2 },
+  // image: "https://picsum.photos/id/100/200",
+  domain: 2,
+  missionID: null,
 };
 
 // *::::::::::::: ------------- :::::::::::::* //
@@ -165,16 +183,14 @@ Investissez dans les campagnes qui vous intéressent en utilisant vos tokens ERC
 Nous vous invitons à vous plonger dans le monde des tokens ERC-20 sur notre launchpad et à découvrir les opportunités d'investissement les plus prometteuses. Assurez-vous de bien gérer votre allowance pour participer en toute sécurité à nos campagnes passionnantes ! 🌐🔒`,
   image: "img/logo.png",
   banniere: "img/banniere.png",
+  domain: 2,
+  bio: null,
+  social: JSON.stringify(
+    { twitter: null, linkedin: null, github: null, facebook: null },
+    null,
+    2
+  ),
 
-  attributes: {
-    domain: 2,
-    createdAt: Date.now(),
-    bio: null,
-    twitter: null,
-    linkedin: null,
-    github: null,
-    facebook: null,
-  },
   // you can provide a link for more information about the mission like current website
 };
 
@@ -199,4 +215,5 @@ module.exports = {
   TIER_DATAS_EXEMPLE,
   LAUNCHPAD_DATAS_EXEMPLE,
   LAUNCHPAD_DATAS_URI_EXEMPLE,
+  transactionCost,
 };

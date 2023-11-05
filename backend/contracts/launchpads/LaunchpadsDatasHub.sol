@@ -30,6 +30,7 @@ contract LaunchpadsDatasHub is Ownable {
     modifier onlyFromContract(uint _id) {
         require(
             _iAS.apiPost() == msg.sender ||
+                _iAS.apiPostPayable() == msg.sender ||
                 address(_iLH) == msg.sender ||
                 address(_iAS.launchpadsInvestorsHub()) == msg.sender ||
                 _iLH.addressOf(_id) == msg.sender,

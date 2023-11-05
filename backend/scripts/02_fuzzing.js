@@ -29,6 +29,7 @@ async function main() {
   const mainDeploy = await deployMain();
 
   let addressSystem = mainDeploy.systems.addressSystem;
+  let apiPostPayable = mainDeploy.systems.apiPostPayable;
   let apiPost = mainDeploy.systems.apiPost;
   let apiGet = mainDeploy.systems.apiGet;
   let cvsHub = mainDeploy.cvs.hub;

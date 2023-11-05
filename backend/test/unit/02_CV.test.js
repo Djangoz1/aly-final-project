@@ -8,6 +8,8 @@ const CONTRACT_NAME = "CVsHub";
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let contract;
   let apiPost;
+  let apiPostPayable;
+
   let apiGet;
   let datasHub;
   beforeEach(async () => {
@@ -27,6 +29,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     contract = await contracts.cvs.hub;
     datasHub = await contracts.cvs.datas;
     apiPost = await contracts.systems.apiPost;
+    apiPostPayable = await contracts.systems.apiPostPayable;
+
     apiGet = await contracts.systems.apiGet;
   });
 

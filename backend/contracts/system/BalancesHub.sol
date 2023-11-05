@@ -13,13 +13,14 @@ contract BalancesHub is Ownable {
 
     modifier onlyProxy() {
         require(
-            _iAS.apiPost() == msg.sender,
+            _iAS.apiPost() == msg.sender || _iAS.apiPostPayable() == msg.sender,
             "Call this function with proxy bindings"
         );
         _;
     }
 
     mapping(uint => uint) _balanceLaunchpads;
+    mapping(uint => uint) _balanceAccounts;
 
     constructor(address _addressSystem) {
         _iAS = IAddressSystem(_addressSystem);
@@ -32,6 +33,31 @@ contract BalancesHub is Ownable {
 
     function launchpadBalance(uint _launchpadID) external view returns (uint) {
         return _balanceLaunchpads[_launchpadID];
+    }
+
+    function balanceOf(uint _cvID) external view returns (uint) {
+        return _balanceAccounts[_cvID];
+    }
+
+    function addAccountBalance(
+        uint _cvID,
+        uint _amount
+    ) external onlyProxy returns (bool) {
+        _balanceAccounts[_cvID] = _balanceAccounts[_cvID].add(_amount);
+        return true;
+    }
+
+    function withdrawAccountBalance(
+        uint _cvID,
+        uint _value
+    ) external onlyProxy returns (bool) {
+        require(
+            _balanceAccounts[_cvID] >= _value &&
+                _balanceAccounts[_cvID].sub(_value) >= 0,
+            "BalancesHub: Error value"
+        );
+        _balanceAccounts[_cvID] = _balanceAccounts[_cvID].sub(_value);
+        return true;
     }
 
     function addLaunchpadBalance(
