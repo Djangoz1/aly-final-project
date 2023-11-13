@@ -19,8 +19,9 @@ contract BalancesHub is Ownable {
         _;
     }
 
-    mapping(uint => uint) _balanceLaunchpads;
-    mapping(uint => uint) _balanceAccounts;
+    // Is balance of ETH
+
+    mapping(uint => uint) _balanceETHAccounts;
 
     constructor(address _addressSystem) {
         _iAS = IAddressSystem(_addressSystem);
@@ -31,19 +32,15 @@ contract BalancesHub is Ownable {
         );
     }
 
-    function launchpadBalance(uint _launchpadID) external view returns (uint) {
-        return _balanceLaunchpads[_launchpadID];
-    }
-
     function balanceOf(uint _cvID) external view returns (uint) {
-        return _balanceAccounts[_cvID];
+        return _balanceETHAccounts[_cvID];
     }
 
     function addAccountBalance(
         uint _cvID,
         uint _amount
     ) external onlyProxy returns (bool) {
-        _balanceAccounts[_cvID] = _balanceAccounts[_cvID].add(_amount);
+        _balanceETHAccounts[_cvID] = _balanceETHAccounts[_cvID].add(_amount);
         return true;
     }
 
@@ -52,36 +49,11 @@ contract BalancesHub is Ownable {
         uint _value
     ) external onlyProxy returns (bool) {
         require(
-            _balanceAccounts[_cvID] >= _value &&
-                _balanceAccounts[_cvID].sub(_value) >= 0,
+            _balanceETHAccounts[_cvID] >= _value &&
+                _balanceETHAccounts[_cvID].sub(_value) >= 0,
             "BalancesHub: Error value"
         );
-        _balanceAccounts[_cvID] = _balanceAccounts[_cvID].sub(_value);
-        return true;
-    }
-
-    function addLaunchpadBalance(
-        uint _launchpadID,
-        uint _value
-    ) external onlyProxy returns (bool) {
-        _balanceLaunchpads[_launchpadID] = _balanceLaunchpads[_launchpadID].add(
-            _value
-        );
-        return true;
-    }
-
-    function withdrawLaunchpadBalance(
-        uint _launchpadID,
-        uint _value
-    ) external onlyProxy returns (bool) {
-        require(
-            _balanceLaunchpads[_launchpadID] >= _value &&
-                _balanceLaunchpads[_launchpadID].sub(_value) >= 0,
-            "BalancesHub: Error value"
-        );
-        _balanceLaunchpads[_launchpadID] = _balanceLaunchpads[_launchpadID].sub(
-            _value
-        );
+        _balanceETHAccounts[_cvID] = _balanceETHAccounts[_cvID].sub(_value);
         return true;
     }
 }

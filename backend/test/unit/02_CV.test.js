@@ -60,6 +60,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         expect(await apiGet.lengthOfCVs()).to.be.equal(1);
       });
 
+      it("Should accept token", async () => {
+        await apiPost.connect(this.addr1).createCV("tokenURI");
+        expect(await apiGet.isAcceptToken(1)).to.be.equal(true);
+      });
       it("Should return true id", async () => {
         await apiPost.connect(this.addr1).createCV("tokenURI");
         expect(await apiGet.cvOf(this.addr1.address)).to.be.equal(1);

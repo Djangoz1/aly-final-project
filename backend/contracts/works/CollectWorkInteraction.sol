@@ -121,9 +121,10 @@ contract CollectWorkInteraction is Ownable {
 
     function declineJob(uint _cvID, uint _featureID) external onlyProxy {
         DataTypes.FeatureData memory featureData = _featureData(_featureID);
-        require(featureData.cvWorker == _cvID, "Not the worker");
+        require(featureToInvites[_featureID][_cvID] == true, "Not invited");
+
         require(featureData.startedAt == 0, "Feature already start");
-        featureData.cvWorker = 0;
+
         uint[] memory _newInvites;
         for (uint256 index = 0; index < cvsToInvites[_cvID].length; index++) {
             uint featureID_ = cvsToInvites[_cvID][index];
@@ -131,7 +132,9 @@ contract CollectWorkInteraction is Ownable {
                 _newInvites[index] = featureID_;
             }
         }
+
         cvsToInvites[_cvID] = _newInvites;
+        featureToInvites[_featureID][_cvID] = false;
         _setFeature(_featureID, featureData);
     }
 

@@ -80,7 +80,7 @@ function App({ params }) {
 
   return (
     <MyLayoutDashboard
-      isLoading={isLoading}
+      //! isLoading={isLoading}
       template={[0, 1, 1, 1, 1]?.[pointer]}
       id={cvID}
       btn={{

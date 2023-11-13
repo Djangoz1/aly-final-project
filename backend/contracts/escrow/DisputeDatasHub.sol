@@ -15,6 +15,7 @@ import {Bindings} from "../libraries/Bindings.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
 import {IDispute} from "../interfaces/escrow/IDispute.sol";
+import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 
 contract DisputesDatasHub is Ownable {
     IAddressSystem private _iAS;
@@ -160,6 +161,22 @@ contract DisputesDatasHub is Ownable {
         }
         _timers[_disputeID].talliedAt = block.timestamp;
         _rules[_disputeID].status = DisputeRules.Status.Tally;
+
+        for (
+            uint256 index = 0;
+            index < _disputesToArbitrators[_disputeID].length;
+            index++
+        ) {
+            if (
+                _rules[_disputeID].decision !=
+                _votes[_disputeID][_disputesToArbitrators[_disputeID][index]]
+            ) {
+                IArbitratorsHub(_iAS.arbitratorsHub()).incrementSuspectVote(
+                    _disputesToArbitrators[_disputeID][index]
+                );
+            }
+        }
+
         return winnerID;
     }
 

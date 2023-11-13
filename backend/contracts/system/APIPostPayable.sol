@@ -213,27 +213,11 @@ contract APIPostPayable is Ownable {
             _estimatedDays,
             _isInviteOnly,
             _tokenURI,
-            _specification
+            _specification,
+            false
         );
 
         require(newFeature > 0, "Error creation feature");
-    }
-
-    /**
-     * @notice Binding for invest on court -- onlyArbitratorOnCourt(_courtID)
-     * @param _courtID must to have a slot in court
-     * @dev this function trigger ArbitratorsHub contract
-     * msg.sender == ownerOfCV(x) && onlyArbitratorOnCourt(_courtID)
-     * msg.value > 0
-     * Permet d'investir dans une court pour avoir une chance supplémentaire d'être désigné en tant qu'arbitre pour un litige
-     */
-    function investOnCourt(DataTypes.CourtIDs _courtID) external payable {
-        require(msg.value > 0, "Invalid value");
-        IArbitratorsHub(_iAS.arbitratorsHub()).investOnCourt(
-            _cvOf(msg.sender),
-            msg.value,
-            _courtID
-        );
     }
 
     // ************* --------- ************* //
@@ -242,66 +226,69 @@ contract APIPostPayable is Ownable {
 
     function createLaunchpad(
         DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tierDatas,
         string memory _tokenURI
     ) external payable {
         uint cvID = _cvOf(msg.sender);
-
+        require(bytes(_tokenURI).length > 3, "Must have tokenURI");
         require(
-            msg.value == _iBalancesHub.launchpadPrice() &&
-                _datas.tokenAddress != address(0),
-            "APIPost: Error create launchpad"
+            msg.value == _iBalancesHub.launchpadPrice(),
+            "APIPostPayable: value must be equal to price"
         );
         //
-        _datas.maxCap = 0;
+        require(
+            _datas.maxCap > _datas.minCap,
+            "APIPostPayable: Invalid launchpad value"
+        );
+
         if (_datas.saleStart < block.timestamp) {
+            //! To switch to require on test
             _datas.saleStart = block.timestamp;
         }
-        _datas.minCap = 0;
 
-        uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
-        uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
-        uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
+        // uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
+        // uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
+        // uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
 
-        for (uint256 index = 0; index < _tierDatas.length; index++) {
-            DataTypes.TierData memory _tierData = _tierDatas[index];
-            _maxTierCaps[index] = _tierData.maxTierCap;
-            _minTierCaps[index] = _tierData.minTierCap;
-            _tokenPrice[index] = _tierData.tokenPrice;
-            _datas.maxCap += _tierData.maxTierCap;
-            _datas.minCap += _tierData.minTierCap;
-            require(
-                _tierData.tokenPrice < _datas.maxCap &&
-                    _tierData.tokenPrice < _datas.maxInvest &&
-                    _datas.minInvest <= _tierData.maxTierCap,
-                "LaunchpadHub: Missmatch value"
-            );
-        }
+        // for (uint256 index = 0; index < _tierDatas.length; index++) {
+        //     DataTypes.TierData memory _tierData = _tierDatas[index];
+        //     _maxTierCaps[index] = _tierData.maxTierCap;
+        //     _minTierCaps[index] = _tierData.minTierCap;
+        //     _tokenPrice[index] = _tierData.tokenPrice;
+        //     _datas.maxCap += _tierData.maxTierCap;
+        //     _datas.minCap += _tierData.minTierCap;
+        //     require(
+        //         _tierData.tokenPrice < _datas.maxCap &&
+        //             _tierData.tokenPrice < _datas.maxInvest &&
+        //             _datas.minInvest <= _tierData.maxTierCap,
+        //         "LaunchpadHub: Missmatch value"
+        //     );
+        // }
 
-        _datas.numberOfTier = uint8(_tierDatas.length);
+        // _datas.numberOfTier = uint8(_tierDatas.length);
 
         //
         uint newID = ILaunchpadHub(_launchpadsHub).mint(
             cvID,
-            _datas,
-            _tierDatas
+            _datas
+            // _tierDatas
         );
         require(newID > 0, "Invalid launchpad ID");
 
         //!>>
         _datas.id = newID;
+        _datas.amountRaised = 0;
 
         ILaunchpadsDatasHub cLD = ILaunchpadsDatasHub(
             _iAS.launchpadsDatasHub()
         );
-        cLD.setLaunchpadData(newID, msg.sender, _datas);
-        cLD._setTiers(
-            _tierDatas.length,
-            newID,
-            _maxTierCaps,
-            _minTierCaps,
-            _tokenPrice
-        );
+        cLD.setLaunchpadData(newID, _datas);
+        // cLD._setTiers(
+        //     _tierDatas.length,
+        //     newID,
+        //     _maxTierCaps,
+        //     _minTierCaps,
+        //     _tokenPrice
+        // );
         //
         // ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).setTokenURI(
         cLD.setTokenURI(msg.sender, newID, _tokenURI);
@@ -314,8 +301,10 @@ contract APIPostPayable is Ownable {
             _cvOf(msg.sender),
             msg.value
         );
-        require(success, "APIPost: Error buy tokens");
-        _iBalancesHub.addLaunchpadBalance(_launchpadID, msg.value);
+        // ! TO DO FEED TOKEN POOL AT 95%
+
+        // require(success, "APIPost: Error buy tokens");
+        // _iBalancesHub.addLaunchpadBalance(_launchpadID, msg.value);
     }
 
     function _cvOf(address _for) internal view returns (uint) {

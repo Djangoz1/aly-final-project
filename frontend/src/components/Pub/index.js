@@ -21,6 +21,7 @@ import { useInView } from "framer-motion";
 import { v4 } from "uuid";
 import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 import { useAuthState } from "context/auth";
+import { MyNum } from "components/myComponents/text/MyNum";
 
 export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
   const [isDatas, setIsDatas] = useState(null);
@@ -201,10 +202,15 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                           tools?.pointer
                         )
                       }
-                      className="btn btn-xs btn-ghost"
+                      className={`flex text-[9px] border border-white/5  bg-white/5 btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer normal-case`}
                     >
                       <Icon icon={icfyBUBBLE} className=" mr-1" />
-                      {isDatas?.pub?.datas?.answers?.length}
+                      Answers
+                      <MyNum
+                        toFix={0}
+                        num={isDatas?.pub?.datas?.answers?.length}
+                        style=" border-2 border-l-white/10 border-white/0 pl-2 "
+                      ></MyNum>
                     </Link>
                     <button
                       disabled={!cv}
@@ -228,7 +234,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                           tools?.pointer
                         )
                       }
-                      className="btn ml-10 btn-xs btn-ghost"
+                      className="btn ml-10 border border-white/5 text-[9px] normal-case btn-xs btn-ghost"
                     >
                       <Icon icon={icfySEND} className=" mr-1" />
                       Post
@@ -248,8 +254,8 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                 </div>
 
                 <button
-                  disabled={!isConnected}
-                  className={`flex btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer ${
+                  // disabled={!isConnected}
+                  className={`flex border border-white/5 bg-white/5 text-[9px] normal-case btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer ${
                     !isDatas?.likers?.includes(address)
                       ? "hover:text-secondary"
                       : "text-secondary hover:text-error"
@@ -262,8 +268,19 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                     )
                   }
                 >
-                  <Icon icon={icfyHEART} className={`text- mr-1 `} />
-                  {parseInt(isDatas?.pub?.datas?.likes)}
+                  {isDatas?.likers?.includes(address) ? (
+                    "Liked"
+                  ) : (
+                    <>
+                      <Icon icon={icfySEND} className={`text-lg mr-2 `} />
+                      Likes
+                    </>
+                  )}
+                  <MyNum
+                    toFix={0}
+                    num={parseInt(isDatas?.pub?.datas?.likes)}
+                    style=" border-2 border-l-white/10 border-white/0 pl-2 "
+                  ></MyNum>
                 </button>
                 {parseInt(isDatas?.pub?.datas?.missionID) > 0 ? (
                   <Link

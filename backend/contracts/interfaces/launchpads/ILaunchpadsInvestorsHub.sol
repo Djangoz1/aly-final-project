@@ -10,19 +10,17 @@ interface ILaunchpadsInvestorsHub {
     ) external view returns (DataTypes.InvestorData memory);
 
     /**
-     * @param _tierID is ID of current tier ID
      * @param _cvID is sender of value
      * @param _value is msg.value of sender
      */
     function _investOnLaunchpad(
-        uint _tierID,
+        // uint _tierID,
         uint _cvID,
         uint _value
     ) external payable returns (bool);
 
-
-    function withdrawTokens(
-        uint _cvID,
-        uint _launchpadID
-    ) external;
+    // function withdrawTokens(
+    //     uint _cvID,
+    //     uint _launchpadID
+    // ) external;
 }

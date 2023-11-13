@@ -10,9 +10,6 @@ import { MySection } from "components/myComponents/MySection";
 import { styles } from "styles/style";
 import { Scene } from "spline/Scene";
 
-import { spline } from "constants/spline";
-
-import { HeroLaunchpad } from "sections/Launchpad/HeroLaunchpad";
 import { ADDRESSES } from "constants/web3";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
@@ -29,6 +26,7 @@ import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { Viewport } from "components/myComponents/layout/MyViewport";
 import Link from "next/link";
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
+import { LinearGradient } from "react-text-gradients";
 
 const LaunchpadPage = () => {
   let [isList, setIsList] = useState(null);
@@ -54,8 +52,37 @@ const LaunchpadPage = () => {
   return (
     <>
       <MyLayoutApp styles={"flex font2 flex-col "}>
-        <Viewport particles={true} full={true} id={"hero"} index={0}>
-          <HeroLaunchpad />
+        <Viewport full={true} id={"hero"} index={0}>
+          <div className="mt-auto justify-end mb-10 flex flex-col">
+            <LinearGradient
+              className="text-xs w-fit leading-0 font2 uppercase"
+              gradient={[
+                "to right",
+                "rgba(201,78,21,0.92), rgba(201,21,103,1)",
+              ]}
+            >
+              Powered by community
+            </LinearGradient>
+            <h1
+              className={
+                styles.hero +
+                " text-4xl font-bold text-white md:text-5xl w-fit "
+              }
+            >
+              <LinearGradient
+                className="font-ligth"
+                gradient={["to left", "rgba(191,208,191,1), rgba(62,62,62,1)"]}
+              >
+                Growth your
+                <br />
+                <span className="font-semibold">startups</span>
+                <br />
+                right from
+                <br />
+                <span className="font-semibold">scratch</span>
+              </LinearGradient>
+            </h1>
+          </div>
         </Viewport>
         <Viewport id={"services"} full={true} index={1}>
           <div className="  my-auto font2">

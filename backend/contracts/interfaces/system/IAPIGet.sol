@@ -128,12 +128,12 @@ interface IAPIGet {
         uint _launchpadID
     ) external view returns (DataTypes.LaunchpadData memory);
 
-    function currentTierIDOf(uint _launchpadID) external view returns (uint);
+    // function currentTierIDOf(uint _launchpadID) external view returns (uint);
 
-    function tierOfLaunchpad(
-        uint _launchpadID,
-        uint _tierID
-    ) external view returns (DataTypes.TierData memory);
+    // function tierOfLaunchpad(
+    //     uint _launchpadID,
+    //     uint _tierID
+    // ) external view returns (DataTypes.TierData memory);
 
     function statusOfLaunchpad(
         uint _launchpadID

@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
+import {InteractionLogic} from "../libraries/InteractionLogic.sol";
+
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
@@ -90,16 +92,13 @@ contract LaunchpadHub is Ownable {
 
     function mint(
         uint _cvID,
-        DataTypes.LaunchpadData memory _datas,
-        DataTypes.TierData[] memory _tierDatas
+        DataTypes.LaunchpadData memory _datas
     ) external onlyProxy returns (uint) {
         _tokenIDs.increment();
         address owner = Bindings.ownerOf(_cvID, _iAS.cvsHub());
         uint newLaunchpadID = _tokenIDs.current();
-
-        // _datas.maxCap = 0;
-        // _datas.minCap = 0;
-        // _datas.id = newLaunchpadID;
+        bool success = InteractionLogic._checkLaunchpadData(_datas);
+        require(success, "Error launchpad datas");
 
         // require(_datas.tokenAddress != address(0), "Invalid address");
         // uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
@@ -126,15 +125,12 @@ contract LaunchpadHub is Ownable {
         Launchpad newLaunchpad = new Launchpad(
             address(_iAS),
             owner,
-            newLaunchpadID,
-            _datas.tokenAddress
+            newLaunchpadID
+            // _datas.tokenAddress
         );
         indexer[_cvID].push(newLaunchpadID);
         launchpads[newLaunchpadID] = address(newLaunchpad);
-        // ILaunchpadsDatasHub cLD = ILaunchpadsDatasHub(
-        //     _iAS.launchpadsDatasHub()
-        // );
-        // cLD.setLaunchpadData(newLaunchpadID, owner, _datas);
+
         // cLD._setTiers(
         //     _tierDatas.length,
         //     newLaunchpadID,

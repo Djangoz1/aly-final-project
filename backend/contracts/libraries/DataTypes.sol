@@ -39,10 +39,9 @@ library DataTypes {
 
     struct ArbitratorData {
         uint256 id;
-        uint256 cvID;
+        uint256 cvID; // ! To remove ? Doublon cvOf(ownerOf(arbitratorID))
         DataTypes.CourtIDs courtID;
         uint256 indexedAtCourt;
-        uint256 balance;
         uint256 nbArbitrations;
         uint256[] disputes;
     }
@@ -189,9 +188,9 @@ library DataTypes {
 
     struct FeatureInteractionData {
         uint[] workerDemand;
-        uint256 missionID;
-        uint256 signedWorker;
-        bool workerAcceptJob;
+        uint256 missionID; //! TO DELETE ? doublon featureData.missionID
+        uint256 signedWorker; //! TO delete ? doublon featureData.cvWorker
+        bool workerAcceptJob; //! TO delete ? doublon cvWorker
         bool workerContest;
         bool ownerContest;
     }
@@ -227,27 +226,11 @@ library DataTypes {
         uint256 startedAt;
         uint256 wadge;
         uint16 estimatedDays;
+        uint256 cvWorker;
         FeatureStatus status;
         CourtIDs specification;
         bool isInviteOnly;
-        uint256 cvWorker;
-    }
-
-    /**
-     * @notice title of feature metadata
-     * @notice content of feature metadata
-     * @notice devLanguage is requirement language wanted by owner for this feature
-     * @notice imgURI? if owner want assign an image to this feature
-     * @notice assignedWorker? if owner want assign an assigned worker on deployment feature
-     */
-
-    struct CreationFeatureData {
-        string title;
-        string content;
-        string devLanguage;
-        string imgURI;
-        uint256 wadge;
-        address assignedWorker;
+        bool payWithToken;
     }
 
     // *::::::::::::: ---------------- ::::::::::::: *//
@@ -308,34 +291,34 @@ library DataTypes {
 
     struct LaunchpadData {
         uint id;
-        address tokenAddress;
-        uint8 numberOfTier;
+        // address tokenAddress;
+        // uint8 numberOfTier;
         uint256 maxCap;
         uint256 minCap;
         uint256 minInvest;
         uint256 maxInvest;
         uint256 saleStart;
         uint256 saleEnd;
-        uint256 lockedTime;
+        uint amountRaised;
+        // uint256 lockedTime;
         uint256 totalUser;
-        string tokenURI;
     }
 
-    struct TierData {
-        uint256 maxTierCap;
-        uint256 minTierCap;
-        uint256 amountRaised;
-        uint256 tokenPrice;
-        uint256 users;
-    }
+    // struct TierData {
+    //     uint256 maxTierCap;
+    //     uint256 minTierCap;
+    //     uint256 amountRaised;
+    //     uint256 tokenPrice;
+    //     uint256 users;
+    // }
 
     /**
      * @notice tierLength must be equal to investedAmountLenght
      * @notice investedAmount[id] | id = tier[id]
      */
     struct InvestorData {
-        uint8[] tier;
+        // uint8[] tier;
         uint256 investedAmount;
-        uint256 lockedTokens;
+        // uint256 lockedTokens;
     }
 }

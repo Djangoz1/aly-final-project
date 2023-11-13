@@ -29,7 +29,7 @@ contract Launchpad is Ownable {
 
     uint public id;
 
-    IERC20 private iERC20;
+    // IERC20 private iERC20;
 
     DataTypes.LaunchpadStatus public status;
 
@@ -57,14 +57,13 @@ contract Launchpad is Ownable {
     constructor(
         address _addressSystem,
         address _owner,
-        uint256 id_,
-        address _tokenAddress
+        uint256 id_ // address _tokenAddress
     ) {
         transferOwnership(_owner);
         _iAS = IAddressSystem(_addressSystem);
         require(msg.sender == _iAS.launchpadsHub());
 
-        iERC20 = IERC20(_tokenAddress);
+        // iERC20 = IERC20(_tokenAddress);
         id = id_;
         require(
             _iAS.launchpadsDatasHub() != address(0) &&
@@ -74,30 +73,31 @@ contract Launchpad is Ownable {
 
         cLD = ILaunchpadsDatasHub(_iAS.launchpadsDatasHub());
         cLI = ILaunchpadsInvestorsHub(_iAS.launchpadsInvestorsHub());
+        status = DataTypes.LaunchpadStatus.Init;
     }
 
-    /**
-     * @notice check if contract have allowance to transfered that amount of token
-     * check if owner have enough funds
-     * it's call by collectLaunchpadInvestor after buyToken
-     * if not, the protocol paused automatically this contract
-     * @param _tokens is number of token that sender buy
-     */
-    function transferIfAllow(uint _tokens) external onlyProxy returns (bool) {
-        uint valueAllowed = iERC20.allowance(owner(), address(this));
+    // /**
+    //  * @notice check if contract have allowance to transfered that amount of token
+    //  * check if owner have enough funds
+    //  * it's call by collectLaunchpadInvestor after buyToken
+    //  * if not, the protocol paused automatically this contract
+    //  * @param _tokens is number of token that sender buy
+    //  */
+    // function transferIfAllow(uint _tokens) external onlyProxy returns (bool) {
+    //     uint valueAllowed = iERC20.allowance(owner(), address(this));
 
-        require(
-            iERC20.balanceOf(owner()) >= valueAllowed &&
-                valueAllowed >= _tokens &&
-                _tokens > 0 &&
-                valueAllowed > 0,
-            "Error value transfer"
-        );
+    //     require(
+    //         iERC20.balanceOf(owner()) >= valueAllowed &&
+    //             valueAllowed >= _tokens &&
+    //             _tokens > 0 &&
+    //             valueAllowed > 0,
+    //         "Error value transfer"
+    //     );
 
-        bool success = iERC20.transferFrom(owner(), address(this), _tokens);
-        require(success, "Error transfer token");
-        return true;
-    }
+    //     bool success = iERC20.transferFrom(owner(), address(this), _tokens);
+    //     require(success, "Error transfer token");
+    //     return true;
+    // }
 
     // *::::::::: ---------------- :::::::::* //
     // *::::::::: STATE MANAGEMENT :::::::::* //
@@ -111,32 +111,32 @@ contract Launchpad is Ownable {
     //     _unpause();
     // }
 
-    /**
-     * @notice must be call after ERC20.approve(address(this) amount)
-     * @notice protocol take 1% royalties
-     * @param _tokens must be equal of the allowance of contract for sender address
-     */
-    function lockTokens(
-        uint _cvID,
-        uint _tokens
-    ) external onlyStatus(DataTypes.LaunchpadStatus.Waiting) onlyProxy {
-        address sender = Bindings.ownerOf(_cvID, _iAS.cvsHub());
+    // /**
+    //  * @notice must be call after ERC20.approve(address(this) amount)
+    //  * @notice protocol take 1% royalties
+    //  * @param _tokens must be equal of the allowance of contract for sender address
+    //  */
+    // function lockTokens(
+    //     uint _cvID,
+    //     uint _tokens
+    // ) external onlyStatus(DataTypes.LaunchpadStatus.Waiting) onlyProxy {
+    //     address sender = Bindings.ownerOf(_cvID, _iAS.cvsHub());
 
-        require(sender == owner(), "Ownable: caller is not the owner");
-        require(
-            iERC20.balanceOf(sender) >= _tokens &&
-                iERC20.allowance(sender, address(this)) == _tokens,
-            "Invalid funds tokens"
-        );
-        uint royalties = _tokens.div(100);
-        bool success = iERC20.transferFrom(
-            sender,
-            address(ILaunchpadHub(_iAS.launchpadsHub()).owner()),
-            royalties
-        );
-        require(success, "Royalties can't be transferred");
-        status = DataTypes.LaunchpadStatus.Init;
-    }
+    //     require(sender == owner(), "Ownable: caller is not the owner");
+    //     require(
+    //         iERC20.balanceOf(sender) >= _tokens &&
+    //             iERC20.allowance(sender, address(this)) == _tokens,
+    //         "Invalid funds tokens"
+    //     );
+    //     uint royalties = _tokens.div(100);
+    //     bool success = iERC20.transferFrom(
+    //         sender,
+    //         address(ILaunchpadHub(_iAS.launchpadsHub()).owner()),
+    //         royalties
+    //     );
+    //     require(success, "Royalties can't be transferred");
+    //     status = DataTypes.LaunchpadStatus.Init;
+    // }
 
     function getCurrentTierID() external view returns (uint8) {
         return uint8(_tierID.current());
@@ -146,44 +146,44 @@ contract Launchpad is Ownable {
         return cLD.datasOf(id);
     }
 
-    function setTierID() external onlyProxy {
-        _setTierID();
-    }
+    // function setTierID() external onlyProxy {
+    //     _setTierID();
+    // }
 
-    function _setTierID() private onlyStatus(DataTypes.LaunchpadStatus.Init) {
-        DataTypes.LaunchpadData memory datas_ = _datas();
-        require(block.timestamp > datas_.saleStart, "Sale not started");
-        DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
-        require(
-            _tierID.current() != datas_.numberOfTier,
-            "Tier ID out of range"
-        );
-        uint tierID_ = _tierID.current().add(1);
-        require(
-            _tierData.minTierCap <= _tierData.amountRaised ||
-                datas_.saleEnd < block.timestamp,
-            "Must have minimum cap to set tierID"
-        );
+    // function _setTierID() private onlyStatus(DataTypes.LaunchpadStatus.Init) {
+    //     DataTypes.LaunchpadData memory datas_ = _datas();
+    //     require(block.timestamp > datas_.saleStart, "Sale not started");
+    //     DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
+    //     require(
+    //         _tierID.current() != datas_.numberOfTier,
+    //         "Tier ID out of range"
+    //     );
+    //     uint tierID_ = _tierID.current().add(1);
+    //     require(
+    //         _tierData.minTierCap <= _tierData.amountRaised ||
+    //             datas_.saleEnd < block.timestamp,
+    //         "Must have minimum cap to set tierID"
+    //     );
 
-        if (
-            (tierID_ == datas_.numberOfTier &&
-                _tierData.amountRaised >= _tierData.minTierCap) ||
-            datas_.saleEnd < block.timestamp
-        ) {
-            status = DataTypes.LaunchpadStatus.Closed;
-            return;
-        }
-        _tierID.increment();
-        _tierData = cLD.tierOf(id, _tierID.current());
+    //     if (
+    //         (tierID_ == datas_.numberOfTier &&
+    //             _tierData.amountRaised >= _tierData.minTierCap) ||
+    //         datas_.saleEnd < block.timestamp
+    //     ) {
+    //         status = DataTypes.LaunchpadStatus.Closed;
+    //         return;
+    //     }
+    //     _tierID.increment();
+    //     _tierData = cLD.tierOf(id, _tierID.current());
 
-        if (
-            _tierID.current() != datas_.numberOfTier - 1 &&
-            _tierData.maxTierCap == _tierData.amountRaised &&
-            _tierData.minTierCap < _tierData.amountRaised
-        ) {
-            _setTierID();
-        }
-    }
+    //     if (
+    //         _tierID.current() != datas_.numberOfTier - 1 &&
+    //         _tierData.maxTierCap == _tierData.amountRaised &&
+    //         _tierData.minTierCap < _tierData.amountRaised
+    //     ) {
+    //         _setTierID();
+    //     }
+    // }
 
     // *::::::::: ------------- :::::::::* //
     // *::::::::: USER BINDINGS :::::::::* //
@@ -205,85 +205,102 @@ contract Launchpad is Ownable {
     {
         // whenNotPaused
 
-        uint currentTier = _tierID.current();
-        DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
-        if (_tierData.amountRaised == _tierData.maxTierCap) {
-            _setTierID();
-        }
+        // uint currentTier = _tierID.current();
+        DataTypes.LaunchpadData memory _launchpadData = cLD.datasOf(id);
+        // DataTypes.TierData memory _tierData = cLD.tierOf(id, _tierID.current());
+        // if (_tierData.amountRaised == _tierData.maxTierCap) {
+        //     _setTierID();
+        // }
 
         // bool inRange = cLD._checkTierBalance(id, currentTier);
         // if (!inRange) {
         // }
 
-        if (_tierData.amountRaised.add(_value) > _tierData.maxTierCap) {
-            uint rest = _tierData.amountRaised.add(_value).sub(
-                _tierData.maxTierCap
-            );
-            revertIfUncheck(
-                cLD._checkAmount(id, _cvSender, currentTier, _value.sub(rest))
-            );
+        require(
+            _launchpadData.amountRaised.add(_value) <= _launchpadData.maxCap,
+            "Value out of range"
+        );
+        uint256 _balanceOf = ILaunchpadsInvestorsHub(
+            _iAS.launchpadsInvestorsHub()
+        ).datasOf(id, _cvSender).investedAmount;
 
-            // require(success, "Error on _checkAmount");
-            revertIfUncheck(
-                cLD._checkAmount(id, _cvSender, currentTier + 1, rest)
-            );
+        require(
+            _launchpadData.minInvest <= _balanceOf.add(_value) &&
+                _balanceOf.add(_value) <= _launchpadData.maxInvest,
+            "Value not in range invest"
+        );
 
-            // require(success, "Error on _checkAmount");
-            revertIfUncheck(
-                cLI._investOnLaunchpad(currentTier, _cvSender, _value.sub(rest))
-            );
+        // revertIfUncheck(
+        //     cLD._checkAmount(id, _cvSender, currentTier, _value.sub(rest))
+        // );
+        revertIfUncheck(cLI._investOnLaunchpad(_cvSender, _value));
 
-            // require(success, "Error invest on launchpad");
-            revertIfUncheck(
-                cLI._investOnLaunchpad(currentTier + 1, _cvSender, rest)
-            );
+        // if (_tierData.amountRaised.add(_value) > _tierData.maxTierCap) {
+        //     uint rest = _tierData.amountRaised.add(_value).sub(
+        //         _tierData.maxTierCap
+        //     );
 
-            // require(success, "Error invest on launchpad");
-            cLD._addAmountRaised(id, currentTier, _value.sub(rest));
+        //     // require(success, "Error on _checkAmount");
+        //     revertIfUncheck(
+        //         cLD._checkAmount(id, _cvSender, currentTier + 1, rest)
+        //     );
 
-            cLD._addAmountRaised(id, currentTier + 1, rest);
+        //     // require(success, "Error on _checkAmount");
 
-            _setTierID();
-        } else {
-            revertIfUncheck(
-                cLD._checkAmount(id, _cvSender, currentTier, _value)
-            );
-            revertIfUncheck(
-                cLI._investOnLaunchpad(currentTier, _cvSender, _value)
-            );
+        //     // require(success, "Error invest on launchpad");
+        //     revertIfUncheck(
+        //         cLI._investOnLaunchpad(currentTier + 1, _cvSender, rest)
+        //     );
 
-            cLD._addAmountRaised(id, currentTier, _value);
+        //     // require(success, "Error invest on launchpad");
+        cLD._addAmountRaised(id, _value);
+        _launchpadData = cLD.datasOf(id);
 
-            // inRange = cLD._checkTierBalance(id, currentTier);
-            // if (!inRange) {
-            // }
+        //     cLD._addAmountRaised(id, currentTier + 1, rest);
 
-            _tierData = cLD.tierOf(id, _tierID.current());
-            if (_tierData.amountRaised == _tierData.maxTierCap) {
-                _setTierID();
-            }
+        //     _setTierID();
+        // } else {
+        //     revertIfUncheck(
+        //         cLD._checkAmount(id, _cvSender, currentTier, _value)
+        //     );
+        //     revertIfUncheck(
+        //         cLI._investOnLaunchpad(currentTier, _cvSender, _value)
+        //     );
+
+        //     cLD._addAmountRaised(id, currentTier, _value);
+
+        //     // inRange = cLD._checkTierBalance(id, currentTier);
+        //     // if (!inRange) {
+        //     // }
+        if (_launchpadData.maxCap == _launchpadData.amountRaised) {
+            status = DataTypes.LaunchpadStatus.Closed;
         }
+        //     _tierData = cLD.tierOf(id, _tierID.current());
+        //     if (_tierData.amountRaised == _tierData.maxTierCap) {
+        //         _setTierID();
+        //     }
+        // }
         return true;
     }
 
-    function withdrawTokens(
-        uint _cvID
-    ) external onlyStatus(DataTypes.LaunchpadStatus.Closed) onlyProxy {
-        DataTypes.InvestorData memory investorData = cLI.datasOf(id, _cvID);
-        DataTypes.LaunchpadData memory datas = _datas();
+    // function withdrawTokens(
+    //     uint _cvID
+    // ) external onlyStatus(DataTypes.LaunchpadStatus.Closed) onlyProxy {
+    //     DataTypes.InvestorData memory investorData = cLI.datasOf(id, _cvID);
+    //     DataTypes.LaunchpadData memory datas = _datas();
 
-        require(investorData.lockedTokens > 0, "No funds found");
+    //     require(investorData.lockedTokens > 0, "No funds found");
 
-        require(
-            block.timestamp >= datas.lockedTime + datas.saleEnd,
-            "Wait release period"
-        ); //! Test value ! Change to days on production
-        uint tokens = investorData.lockedTokens;
-        cLI.withdrawTokens(_cvID, id);
-        bool success = iERC20.transfer(
-            Bindings.ownerOf(_cvID, _iAS.cvsHub()),
-            tokens
-        );
-        require(success, "Error withdraw");
-    }
+    //     require(
+    //         block.timestamp >= datas.lockedTime + datas.saleEnd,
+    //         "Wait release period"
+    //     ); //! Test value ! Change to days on production
+    //     uint tokens = investorData.lockedTokens;
+    //     cLI.withdrawTokens(_cvID, id);
+    //     bool success = iERC20.transfer(
+    //         Bindings.ownerOf(_cvID, _iAS.cvsHub()),
+    //         tokens
+    //     );
+    //     require(success, "Error withdraw");
+    // }
 }

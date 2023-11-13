@@ -7,6 +7,7 @@ import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/system/IAccessControl.sol";
 
 contract AddressSystem is Ownable {
+    address public token;
     address public apiPost;
     address public apiPostPayable;
     address public apiGet;
@@ -35,6 +36,7 @@ contract AddressSystem is Ownable {
     function _hasInit() internal {
         if (
             apiPost != address(0) &&
+            token != address(0) &&
             apiPostPayable != address(0) &&
             apiGet != address(0) &&
             accessControl != address(0) &&
@@ -58,6 +60,13 @@ contract AddressSystem is Ownable {
             IAccessControl iAC = IAccessControl(accessControl);
             iAC.initWorkflow();
         }
+    }
+
+    function setToken() external {
+        require(token == address(0), "Token already init");
+
+        token = msg.sender;
+        _hasInit();
     }
 
     // -------------------------------- //

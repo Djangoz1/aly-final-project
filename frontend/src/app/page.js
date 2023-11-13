@@ -129,9 +129,14 @@ export default function Home() {
             full={true}
             id={"hero"}
           >
-            <div className="relative w-full px-4 py-32 sm:px-6 flex items-end lg:px-8 mt-auto">
-              <div className="max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
-                <h1
+            <div className="  absolute top-1/2 left-1/2  justify-center -translate-x-1/2 -translate-y-full w-fit px-4  sm:px-6 flex items-center lg:px-8 ">
+              <div className=" mx-auto flex flex-col items-center justify-center text-center   ">
+                <Logo
+                  styleD={" mx-auto w-[200px] border-3 h-[150px] text-3xl"}
+                  style={"text-6xl"}
+                  style1={"text-8xl"}
+                />
+                {/* <h1
                   className={
                     "pb-4 text-4xl font-light  md:text-6xl uppercase text-left"
                   }
@@ -142,29 +147,13 @@ export default function Home() {
                       "to left",
                       "rgba(191,208,191,1), rgba(62,62,62,1)",
                     ]}
-                  >
-                    Where <span className="font-semibold">Blockchain</span>
-                    {/* <br /> */}
-                    <br />
-                    meets Social
-                    <br />
-                    <span className="font-semibold">Freeancing</span>
-                  </LinearGradient>
-                </h1>
+                  ></LinearGradient>
+                </h1> */}
 
-                <p className=" max-w-lg text-left">
+                {/* <p className=" max-w-lg text-left">
                   Lorem ipsum dolor sit amet consectetur, adipisicing elit.
                   Nesciunt illo tenetur fuga ducimus numquam ea!
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-4 text-center">
-                  <MyMainBtn icon={{ no: true }} template={1}>
-                    Learn More
-                  </MyMainBtn>
-                  <MyMainBtn template={1} color={1}>
-                    Get Started
-                  </MyMainBtn>
-                </div>
+                </p> */}
               </div>
             </div>
           </Viewport>
@@ -206,7 +195,7 @@ export default function Home() {
                     Boost your startups from scratch
                   </LinearGradient>
 
-                  <MyMainBtn color={2} template={1}>
+                  <MyMainBtn url={"/create/profile"} color={2} template={1}>
                     Get Started
                   </MyMainBtn>
                 </div>

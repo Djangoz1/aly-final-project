@@ -149,12 +149,12 @@ const LAUNCHPAD_DATAS_EXEMPLE = {
   maxCap: ethers.parseEther("25"),
   minCap: 10000000,
   minInvest: 300,
+  amountRaised: 0,
   maxInvest: ethers.parseEther("25"),
   saleStart: new Date().getTime(),
   saleEnd: new Date().getTime() + 80000000,
   lockedTime: 1,
   totalUser: 0,
-  tokenURI: "tokenURI",
 };
 
 // *::::::::::::: ------- :::::::::::::* //

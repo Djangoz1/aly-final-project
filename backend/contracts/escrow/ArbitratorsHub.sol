@@ -5,10 +5,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 // import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
+import {IToken} from "../interfaces/erc/IToken.sol";
+import {IDispute} from "../interfaces/escrow/IDispute.sol";
+import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
 import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 
@@ -16,17 +20,19 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     // We don't use  ERC721 standard for reducing gas cost
     Counters.Counter private _tokenIDs;
+    using SafeMath for uint256;
+
+    uint internal constant maxSuspectVote = 3;
 
     /**
      * @dev indexers is a mapping of each arbitrator ID to its data
      */
     mapping(uint256 => DataTypes.ArbitratorData) internal datas;
-
+    mapping(uint256 => uint8) internal _suspectVote;
     /**
      * @dev indexers is a mapping of each court ID to an array of arbitrator ID
      */
     mapping(DataTypes.CourtIDs => uint256[]) internal indexersCourt;
-    mapping(DataTypes.CourtIDs => uint256) internal balancesCourt;
 
     mapping(uint256 => mapping(DataTypes.CourtIDs => uint256))
         internal indexersCV;
@@ -71,32 +77,6 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         datas[newArbitrator.id] = newArbitrator;
         indexersCourt[_courtID].push(newArbitrator.id);
         indexersCV[_cvID][_courtID] = newArbitrator.id;
-    }
-
-    function investOnCourt(
-        uint _cvID,
-        uint _amount,
-        DataTypes.CourtIDs _courtID
-    ) external payable onlyProxy {
-        uint arbitratorID = indexersCV[_cvID][_courtID];
-        require(arbitratorID != 0, "Arbitrator not found");
-        datas[arbitratorID].balance += _amount;
-        balancesCourt[_courtID] += _amount;
-    }
-
-    function withdrawFromCourt(
-        uint _cvID,
-        uint _amount,
-        DataTypes.CourtIDs _courtID
-    ) external onlyProxy {
-        uint arbitratorID = indexersCV[_cvID][_courtID];
-        require(arbitratorID != 0, "Arbitrator not found");
-        require(datas[arbitratorID].courtID >= _courtID, "Missmatch court ID");
-        require(datas[arbitratorID].balance >= _amount, "No enough balance");
-        datas[arbitratorID].balance -= _amount;
-        balancesCourt[_courtID] -= _amount;
-
-        // ! REENTRENCY ?
     }
 
     function calculateWeight(uint256 balance) internal pure returns (uint256) {
@@ -147,7 +127,7 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         uint256 nbArbitrators = arbitrators.length;
         require(nbArbitrators > 0, "ArbitratorHub: No arbitrator");
 
-        uint totalBalance = balancesCourt[_courtID];
+        uint totalBalance = IToken(_iAS.token()).totalStaked();
 
         // Générez un nombre aléatoire pondéré en fonction des poids.
         uint256 random = uint256(
@@ -179,7 +159,9 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
                 ) % nbArbitrators)
             );
             randomID = randomID == 0 ? randomID + 1 : randomID;
-            cumulativeBalance += datas[randomID].balance;
+            cumulativeBalance += IToken(_iAS.token()).staked(
+                Bindings.ownerOf(randomID, _iAS.cvsHub())
+            );
             if (random < cumulativeBalance) {
                 resultID = arbitrators[randomID];
                 _rand++;
@@ -190,26 +172,10 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         return randomID;
     }
 
-    // function selectArbitrator(
-    //     DataTypes.CourtIDs _courtID,
-    //     uint _arbitratorID
-    // ) external view returns (uint256) {
-    //     uint256[] memory arbitrators = indexersCourt[_courtID];
-    //     uint256 nbArbitrators = arbitrators.length;
-    //     require(nbArbitrators > 0, "ArbitratorHub: No arbitrator");
-    //     return arbitrators[_arbitratorID];
-    // }
-
     function lengthOfCourt(
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256) {
         return indexersCourt[_courtID].length;
-    }
-
-    function balanceOfCourt(
-        DataTypes.CourtIDs _courtID
-    ) external view returns (uint256) {
-        return balancesCourt[_courtID];
     }
 
     function indexerOf(
@@ -227,6 +193,38 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
     ) external view returns (DataTypes.ArbitratorData memory) {
         require(_arbitratorID <= _tokenIDs.current(), "Invalid arbitrator ID");
         return datas[_arbitratorID];
+    }
+
+    /**
+     * @notice function called by disputesDatasHub._tallyFor
+     */
+    function incrementSuspectVote(uint256 _arbitratorID) external {
+        require(msg.sender == _iAS.disputesDatasHub(), "Not allowed");
+        _suspectVote[_cvOf(ownerOf(_arbitratorID))]++;
+    }
+
+    function isBanned(uint256 _cvID) external view returns (bool) {
+        require(
+            Bindings.tokensLength(_iAS.cvsHub()) >= _cvID,
+            "ID out of range"
+        );
+        return _suspectVote[_cvID] >= 3;
+    }
+
+    function suspectVoteOf(uint256 _cvID) external view returns (uint) {
+        require(
+            Bindings.tokensLength(_iAS.cvsHub()) >= _cvID,
+            "ID out of range"
+        );
+        return _suspectVote[_cvID];
+    }
+
+    function unbanned(uint256 _cvID) external onlyOwner {
+        require(
+            Bindings.tokensLength(_iAS.cvsHub()) >= _cvID,
+            "ID out of range"
+        );
+        _suspectVote[_cvID] = 0;
     }
 
     function arbitrationOfCV(
@@ -249,8 +247,16 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         datas[indexersCV[_cvID][_courtID]].disputes.push(_disputeID);
     }
 
+    /**
+     * @notice function called by dispute.vote()
+     */
     function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external {
-        // ! Faire un onlyDisputeHub
+        require(
+            IDisputesHub(_iAS.disputesHub()).addressOf(
+                IDispute(msg.sender).id()
+            ) == msg.sender,
+            "Not allowed"
+        );
         require(
             indexersCV[cvID][_courtID] > 0,
             "ArbitratorHub: Arbitration not found"

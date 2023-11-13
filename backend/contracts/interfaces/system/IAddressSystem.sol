@@ -11,6 +11,10 @@ interface IAddressSystem {
 
     function setCVsDatasHub() external;
 
+    function token() external view returns (address);
+
+    function setToken() external;
+
     // *********** WORKS *********** //
     function collectWorkInteraction() external view returns (address);
 

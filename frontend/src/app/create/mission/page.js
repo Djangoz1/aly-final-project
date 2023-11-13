@@ -39,12 +39,15 @@ import {
   FormCreateMission2,
 } from "sections/works/Missions/form/create/FormCreateMission";
 import { MyLoader } from "components/myComponents/layout/MyLoader";
+import PocketBase from "pocketbase";
+import { TextAI } from "components/myComponents/text/TextAI";
+import { FormResponseAI } from "sections/Form/FormResponseAI";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useAuthDispatch();
 
-  let [price, setPrice] = useState(null);
+  let [price, setPrice] = useState(0.5); // ! balancesHub.missionPrice()
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
 
@@ -54,53 +57,33 @@ const PageCreateProfile = () => {
     </>
   );
 
-  useEffect(() => {
-    if (!price)
-      (async () => {
-        let _price = await _apiGetAt({
-          func: "missionPrice",
-          targetContract: "balancesHub",
-        });
-        let eth = await ethers?.utils?.formatEther(`${_price}`);
-
-        setPrice(eth);
-      })();
-  }, [price]);
-
   let submitForm = async (form) => {
-    let id = parseInt(
-      await _apiGet("tokensLengthOf", [ADDRESSES["missionsHub"]])
-    );
-    let images = [];
-    if (form?.image) {
-      images.push({ image: form?.image, target: "image" });
-    }
-    if (form?.banniere) {
-      images.push({
-        image: form?.banniere,
-        target: "banniere",
-        attributes: true,
-      });
-    }
+    const client = new PocketBase("http://127.0.0.1:8090");
 
     let metadatas = {
       description: form?.description,
       title: form?.title,
-      attributes: [
-        {
-          reference: form?.reference,
-          launchpad: form?.launchpad,
-          domain: form?.domain,
-        },
-      ],
-    };
-    let uri = await createURI({ id, title: "Mission", images, metadatas });
+      image: form?.image,
+      banniere: form?.banniere,
+      reference: form?.reference ? parseInt(form?.reference) : undefined,
 
-    await _apiPostPayable(
-      "createMission",
-      [uri],
-      ethers?.utils?.parseEther(form?.price)
-    );
+      domain: parseInt(form?.domain),
+      owner: 1, // ! Change to cvID
+    };
+
+    console.log("metadatas, ,", metadatas);
+    const record = await client.records.create("missions", metadatas);
+    console.log("record, ,", record);
+
+    //   ! Recuperation de l'ID
+    let uri = record.id;
+
+    //   ! Decoment for create mission on blockchain
+    // await _apiPostPayable(
+    //   "createMission",
+    //   [uri],
+    //   ethers?.utils?.parseEther(form?.price)
+    // );
   };
 
   return (
@@ -143,6 +126,10 @@ const PageCreateProfile = () => {
           },
           {
             component: <FormCreateMission2 />,
+            label: "Dontkno",
+          },
+          {
+            component: <FormResponseAI />,
             label: "Dontkno",
           },
         ]}

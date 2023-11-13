@@ -20,36 +20,36 @@ interface ILaunchpad {
      */
     function transferIfAllow(uint _tokens) external returns (bool);
 
-    /**
-     * @notice must be call after ERC20.approve(address(this) amount)
-     * @notice protocol take 1% royalties
-     * @param _tokens must be equal of the allowance of contract for sender address
-     */
-    function lockTokens(uint _cvID, uint _tokens) external;
+    // /**
+    //  * @notice must be call after ERC20.approve(address(this) amount)
+    //  * @notice protocol take 1% royalties
+    //  * @param _tokens must be equal of the allowance of contract for sender address
+    //  */
+    // function lockTokens(uint _cvID, uint _tokens) external;
 
-    function getCurrentTierID() external view returns (uint8);
+    // function getCurrentTierID() external view returns (uint8);
 
     function dataOfs() external view returns (DataTypes.LaunchpadData memory);
 
     function setTimer(uint _saleEnd, uint _saleStart) external;
 
-    function getTokenSupply() external view returns (uint);
+    // function getTokenSupply() external view returns (uint);
 
-    function setTierID() external;
+    // function setTierID() external;
 
-    /**
-     * @notice LaunchpadsDatasHub documentation
-     * @param _tierIDs is length of tier set
-     * @param _maxTierCaps is an array of max tier caps value for each tier. Length must be equal at _tierIDs
-     * @param _minTierCaps is an array of min tier caps value for each tier. Length must be equal at _tierIDs
-     * @param _amountPerToken is an array of amount per token for each tier. Length must be equal at _tierIDs
-     */
-    function setTiers(
-        uint8 _tierIDs,
-        uint256[] calldata _maxTierCaps,
-        uint256[] calldata _minTierCaps,
-        uint256[] calldata _amountPerToken
-    ) external;
+    // /**
+    //  * @notice LaunchpadsDatasHub documentation
+    //  * @param _tierIDs is length of tier set
+    //  * @param _maxTierCaps is an array of max tier caps value for each tier. Length must be equal at _tierIDs
+    //  * @param _minTierCaps is an array of min tier caps value for each tier. Length must be equal at _tierIDs
+    //  * @param _amountPerToken is an array of amount per token for each tier. Length must be equal at _tierIDs
+    //  */
+    // function setTiers(
+    //     uint8 _tierIDs,
+    //     uint256[] calldata _maxTierCaps,
+    //     uint256[] calldata _minTierCaps,
+    //     uint256[] calldata _amountPerToken
+    // ) external;
 
     // *::::::::: ------------- :::::::::* //
     // *::::::::: USER BINDINGS :::::::::* //
@@ -57,5 +57,5 @@ interface ILaunchpad {
 
     function buyTokens(uint _cvSender, uint _value) external returns (bool);
 
-    function withdrawTokens(uint _cvID) external;
+    // function withdrawTokens(uint _cvID) external;
 }

@@ -14,34 +14,20 @@ interface IArbitratorsHub {
         uint _disputeID
     ) external;
 
-    function investOnCourt(
-        uint _cvID,
-        uint _amount,
-        DataTypes.CourtIDs _courtID
-    ) external payable;
-
     function indexerOf(
         DataTypes.CourtIDs _courtID
     ) external view returns (uint256[] memory);
-
-    function withdrawFromCourt(
-        uint _cvID,
-        uint _amount,
-        DataTypes.CourtIDs _courtID
-    ) external;
 
     function boostRandomlyArbitrator(
         DataTypes.CourtIDs _courtID,
         uint _rand
     ) external view returns (uint256);
 
+    function isBanned(uint256 _cvID) external view returns (bool);
+
     function randomlyArbitrator(
         DataTypes.CourtIDs _courtID,
         uint256 _randomID
-    ) external view returns (uint256);
-
-    function balanceOfCourt(
-        DataTypes.CourtIDs _courtID
     ) external view returns (uint256);
 
     function lengthOfCourt(
@@ -51,6 +37,8 @@ interface IArbitratorsHub {
     // function dataOf(
     //     uint256 _arbitratorID
     // ) external view returns (DataTypes.ArbitratorData memory);
+
+    function incrementSuspectVote(uint256 _arbitratorID) external;
 
     function incrementVote(uint cvID, DataTypes.CourtIDs _courtID) external;
 

@@ -45,6 +45,16 @@ const getProxy = async (accessControlAddr) => {
 };
 
 const _testInitAll = async () => {
+  [
+    this.owner,
+    this.addr1,
+    this.addr2,
+    this.addr3,
+    this.addr4,
+    this.addr5,
+    this.addr6,
+    this.addr7,
+  ] = await ethers.getSigners();
   let addressSystem = await _testInitaddressSystem();
   let cvs = await _testInitCVsContracts(addressSystem.target);
   let escrows = await _testInitEscrowsContracts(addressSystem.target);
@@ -53,7 +63,9 @@ const _testInitAll = async () => {
   let launchpads = await _testInitLaunchpadsContracts(addressSystem.target);
   let systems = await _testInitSystemsContracts(addressSystem.target);
   let accessControl = systems.accessControl;
+  let token = await ethers.deployContract("Token", [addressSystem.target]);
   systems.addressSystem = addressSystem;
+
   expect(await accessControl.workflow()).to.equal(1);
 
   // let contractCode = await ethers.provider.getCode(apiPost.target);
@@ -82,6 +94,8 @@ const _testInitAll = async () => {
     escrows,
     works,
     pubs,
+
+    token,
   };
 };
 
@@ -191,10 +205,6 @@ const _testInitArbitrator = async (contracts, courtID, account) => {
 
   expect(parseInt(courtLength) + 1).to.be.equal(_courtLength);
 
-  let value = 0.3 + 0.1;
-  let price = ethers.parseEther(`${value}`);
-
-  await apiPost.connect(account).investOnCourt(3, { value: `${price}` });
   let data = await apiGet.datasOfFeature(newFeature);
   expect(data.status).to.be.equal(2);
   return await arbitratorsHub.arbitrationOfCV(cvArbitrator, courtID);

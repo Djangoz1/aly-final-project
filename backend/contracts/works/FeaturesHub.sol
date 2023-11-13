@@ -119,7 +119,8 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         uint16 _estimatedDays,
         bool _isInviteOnly,
         string memory _tokenURI,
-        DataTypes.CourtIDs _specification
+        DataTypes.CourtIDs _specification,
+        bool _payWithToken
     ) external onlyProxy returns (uint) {
         address _addrMH = _iAS.missionsHub();
         IMissionsHub iMH = IMissionsHub(_addrMH);
@@ -142,6 +143,7 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         newFeature.estimatedDays = _estimatedDays;
         newFeature.isInviteOnly = _isInviteOnly;
         newFeature.specification = _specification;
+        newFeature.payWithToken = _payWithToken;
         uint cvID = _cvOf(_owner);
         _indexer[cvID].push(newFeatureID);
         _mint(_owner, newFeatureID);

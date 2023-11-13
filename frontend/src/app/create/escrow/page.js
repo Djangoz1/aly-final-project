@@ -34,7 +34,11 @@ import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 
 import { icfyETHER } from "icones";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { createURI, fetchJSONByCID } from "utils/ui-tools/pinata-tools";
+import {
+  clientPocket,
+  createURI,
+  fetchJSONByCID,
+} from "utils/ui-tools/pinata-tools";
 import { useCVState } from "context/hub/cv";
 import {
   FormCreateMission1,
@@ -108,17 +112,19 @@ const PageCreateEscrow = () => {
 
   let submitForm = async (form) => {
     let id = parseInt(state?.arr?.[parseInt(form?.feature)]?.id);
-    let images = [];
-    if (form?.image) {
-      images.push({ image: form?.image, target: "image" });
-    }
+    console.log("wshhh start");
     let metadatas = {
       description: form.description,
-      attributes: [{}],
+      image: form?.image,
     };
 
-    let uri = await createURI({ id, title: "Escrow", images, metadatas });
     if (form?.appeal > 0 && form?.arbitrators >= 3) {
+      const record = await clientPocket.records.create("escrows", metadatas);
+      let uri = record?.id;
+      console.log(
+        "r888888676454345345345345345345345345345345345345345345345345ecord",
+        record
+      );
       let hash = await _apiPost("contestFeature", [
         id,
         parseInt(form?.appeal),
@@ -129,6 +135,8 @@ const PageCreateEscrow = () => {
       let disputeID = await _apiGet("disputeOfFeature", [id]);
 
       hash = await _apiPost("initDispute", [disputeID]);
+    } else {
+      throw new Error("Missing escrow values");
     }
   };
 

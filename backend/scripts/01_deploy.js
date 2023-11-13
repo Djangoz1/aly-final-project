@@ -3,6 +3,9 @@ const fs = require("fs");
 const { promisify } = require("util");
 const writeFileAsync = promisify(fs.writeFile);
 
+const { router, weth } = require("../../fork/uni-periphery/addresses.json");
+const core = require("../../fork/uni-core/addresses.json");
+
 const {
   _testInitMissionsHub,
   _testInitFactoryCV,
@@ -17,7 +20,24 @@ const CONTRACT_NAME = "FactoryCV";
 
 // import ADDRS from "../../core/tasks/helpers/utils";
 async function main() {
+  // ! FORK UNI en local
+  [
+    this.owner,
+    this.addr1,
+    this.addr2,
+    this.addr3,
+    this.addr4,
+    this.addr5,
+    this.addr6,
+    this.addr7,
+  ] = await ethers.getSigners();
+  // const core = await deployFactory();
+  // console.log(core);
+  // const periphery = await deployRouter();
+  // console.log(periphery);
   const contracts = await _testInitAll();
+
+  let token = contracts.token;
 
   const accessControl = contracts.systems.accessControl;
   console.log(`Access control deployed to ${accessControl.target}`);
@@ -85,6 +105,11 @@ async function main() {
   console.log(`collecterLike deployed to ${pubsDatasHub.target}`);
 
   const jsonContent = {
+    weth,
+
+    token: token.target,
+    uniswapFactory: core.factory,
+    uniswapRouter: router,
     accessControl: accessControl.target,
     cvsHub: cvsHub.target,
     missionsHub: missionsHub.target,
@@ -107,6 +132,7 @@ async function main() {
     collectWorkInteraction: collectWorkInteraction.target,
     pubsDatasHub: pubsDatasHub.target,
   };
+  console.log(jsonContent);
   const jsonString = JSON.stringify(jsonContent, null, 2);
   await writeFileAsync("addresses.json", jsonString);
   console.log("JSON file created: addresses.json");

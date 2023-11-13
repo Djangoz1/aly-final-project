@@ -14,6 +14,8 @@ contract CVsHub is ERC721URIStorage {
 
     mapping(address => uint) private indexers;
 
+    mapping(uint => bool) private _acceptToken;
+
     IAddressSystem private _iAS;
 
     modifier onlyProxy() {
@@ -44,21 +46,25 @@ contract CVsHub is ERC721URIStorage {
         return indexers[_for];
     }
 
+    /**
+     * @notice cv accept token by default
+     */
     function mint(address _from, string calldata _tokenURI) external onlyProxy {
         require(balanceOf(_from) == 0, "CV already exist");
         _tokenIds.increment();
-        uint256 newItemId = _tokenIds.current();
-        _mint(_from, newItemId);
-        _setTokenURI(newItemId, _tokenURI);
-        indexers[_from] = newItemId;
+        uint256 newID = _tokenIds.current();
+        _mint(_from, newID);
+        _setTokenURI(newID, _tokenURI);
+        indexers[_from] = newID;
+        _acceptToken[newID] = true;
     }
 
-    function setTokenURI(
-        address _owner,
-        uint _cvID,
-        string calldata _tokenURI
-    ) external onlyProxy {
-        require(ownerOf(_cvID) == _owner, "Only owner");
-        _setTokenURI(_cvID, _tokenURI);
+    function setAcceptToken(uint _cvID) external onlyProxy {
+        _acceptToken[_cvID] = !_acceptToken[_cvID];
+    }
+
+    function isAcceptToken(uint _cvID) external view returns (bool) {
+        require(_cvID > 0 && _cvID <= _tokenIds.current(), "Invalid CV ID");
+        return _acceptToken[_cvID];
     }
 }

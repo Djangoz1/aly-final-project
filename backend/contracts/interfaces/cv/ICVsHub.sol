@@ -15,4 +15,8 @@ interface ICVsHub {
     function mint(address _from, string calldata _tokenURI) external;
 
     function ownerOf(uint256 tokenId) external view returns (address owner);
+
+    function setAcceptToken(uint _cvID) external;
+
+    function isAcceptToken(uint _cvID) external view returns (bool);
 }

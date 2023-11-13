@@ -13,6 +13,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let apiPost;
   let apiPostPayable;
   let balancesHub;
+  let token;
+  let cvID;
 
   beforeEach(async () => {
     [
@@ -32,8 +34,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       apiPost = await contracts.systems.apiPost;
       apiPostPayable = await contracts.systems.apiPostPayable;
       balancesHub = await contracts.systems.balancesHub;
+      token = contracts.token;
       await apiPost.createCV("tokenURI");
       contract = await contracts.works.missionsHub;
+      cvID = await CVsHub.cvOf(this.owner.address);
     } catch (error) {
       console.log("error", error);
     }
@@ -55,7 +59,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("NOT WORK", () => {
       it("Should NOT create mission out of bindings apiPost", async () => {
         await expect(
-          contract.mint(this.owner.address, "tokenURI")
+          contract.mint(this.owner.address, "tokenURI", 0)
         ).to.be.revertedWith("Must call function with proxy bindings");
       });
       it("Should NOT add feature out of bindings features hub", async () => {
@@ -74,85 +78,136 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       missionPrice = price.toString();
     });
 
-    describe("Works", () => {
-      it("Should update ownership of mission ID", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
+    describe("With ETHEREUM", () => {
+      describe("Works", () => {
+        it("Should update ownership of mission ID", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
         });
-        expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
+
+        it("Should update balance of owner", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          expect(await contract.balanceOf(this.owner.address)).to.be.equal(1);
+        });
+
+        it("Should update tokens length", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
+        });
+
+        it("Should get token URI", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
+        });
+
+        it("Should update indexer", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          let cvID = await CVsHub.cvOf(this.owner.address);
+          let indexer = await apiGet.indexerOfToken(cvID, contract.target);
+          expect(indexer.length).to.be.equal(1);
+          expect(indexer[0]).to.be.equal(1);
+        });
+
+        it("Should update status", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          const datas = await apiGet.datasOfMission(1);
+          expect(datas.status).to.be.equal(0);
+        });
+
+        it("Should update id", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          const datas = await apiGet.datasOfMission(1);
+          expect(datas.id).to.be.equal(1);
+        });
+
+        it("Should have 0 features", async () => {
+          await apiPostPayable.createMission("tokenURI", {
+            value: missionPrice,
+          });
+          const datas = await apiGet.datasOfMission(1);
+          expect(datas.features.length).to.be.equal(0);
+        });
       });
 
-      it("Should update balance of owner", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
+      describe("NOT WORK", () => {
+        it("Should NOT create mission if no CV", async () => {
+          await expect(
+            apiPost.connect(this.addr1).createMission("tokenURI")
+          ).to.be.revertedWith("CV not found");
         });
-        expect(await contract.balanceOf(this.owner.address)).to.be.equal(1);
-      });
 
-      it("Should update tokens length", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
+        it("Should NOT create mission if under price", async () => {
+          await expect(
+            apiPostPayable.createMission("tokenURI", {
+              value: "100000",
+            })
+          ).to.be.revertedWith("Mission price : Invalid value");
         });
-        expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
-      });
-
-      it("Should get token URI", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
-        });
-        expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
-      });
-
-      it("Should update indexer", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
-        });
-        let cvID = await CVsHub.cvOf(this.owner.address);
-        let indexer = await apiGet.missionsOfCV(cvID);
-        expect(indexer.length).to.be.equal(1);
-        expect(indexer[0]).to.be.equal(1);
-      });
-
-      it("Should update status", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
-        });
-        const datas = await apiGet.datasOfMission(1);
-        expect(datas.status).to.be.equal(0);
-      });
-
-      it("Should update id", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
-        });
-        const datas = await apiGet.datasOfMission(1);
-        expect(datas.id).to.be.equal(1);
-      });
-
-      it("Should have 0 features", async () => {
-        await apiPostPayable.createMission("tokenURI", {
-          value: missionPrice,
-        });
-        const datas = await apiGet.datasOfMission(1);
-        expect(datas.features.length).to.be.equal(0);
       });
     });
-
-    describe("NOT WORK", () => {
-      it("Should NOT create mission if no CV", async () => {
-        await expect(
-          apiPost.connect(this.addr1).createMission("tokenURI", {
-            value: missionPrice,
-          })
-        ).to.be.revertedWith("CV not found");
+    describe("With ERC20 Token", () => {
+      describe("Works", () => {
+        it("Should works like payable function", async () => {
+          await apiPost.createMission("tokenURI");
+          let indexer = await apiGet.indexerOfToken(cvID, contract.target);
+          const datas = await apiGet.datasOfMission(1);
+          expect(await contract.balanceOf(this.owner.address)).to.be.equal(1);
+          expect(await apiGet.tokensLengthOf(contract.target)).to.be.equal(1);
+          expect(await contract.tokenURI(1)).to.be.equal("tokenURI");
+          expect(indexer.length === 1 && indexer[0] == 1).to.be.equal(true);
+          expect(datas.status).to.be.equal(0);
+          expect(await contract.ownerOf(1)).to.be.equal(this.owner.address);
+          expect(datas.features.length).to.be.equal(0);
+        });
+        it("Should update balance of owner protocole", async () => {
+          await apiPost.connect(this.addr1).createCV("tokenURI");
+          let price = BigInt(missionPrice) * (await token.price()) + 1n;
+          await token.transfer(this.addr1.address, price);
+          let balance = await token.balanceOf(await contract.owner());
+          await apiPost.connect(this.addr1).createMission("tokenURI");
+          let _balance = await token.balanceOf(await contract.owner());
+          expect(_balance > balance).to.be.equal(true);
+          expect(_balance - price + 1n).to.be.equal(balance);
+        });
+        it("Should update balance of owner mission", async () => {
+          await apiPost.connect(this.addr1).createCV("tokenURI");
+          let price = BigInt(missionPrice) * (await token.price()) + 1n;
+          await token.transfer(this.addr1.address, price);
+          let balance = await token.balanceOf(this.addr1.address);
+          await apiPost.connect(this.addr1).createMission("tokenURI");
+          let _balance = await token.balanceOf(this.addr1.address);
+          expect(_balance < balance).to.be.equal(true);
+          expect(balance - price + 1n).to.be.equal(_balance);
+        });
       });
 
-      it("Should NOT create mission if under price", async () => {
-        await expect(
-          apiPostPayable.createMission("tokenURI", {
-            value: "100000",
-          })
-        ).to.be.revertedWith("Mission price : Invalid value");
+      describe("NOT WORK", () => {
+        it("Should NOT create mission if no CV", async () => {
+          await expect(
+            apiPost.connect(this.addr1).createMission("tokenURI")
+          ).to.be.revertedWith("CV not found");
+        });
+
+        it("Should NOT create mission if under price", async () => {
+          await apiPost.connect(this.addr1).createCV("tokenURI");
+          await expect(
+            apiPost.connect(this.addr1).createMission("tokenURI")
+          ).to.be.revertedWith("Not enough funds");
+        });
       });
     });
   });

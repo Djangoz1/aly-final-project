@@ -67,7 +67,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
   });
 
-  describe.only("Payable pub", () => {
+  describe("Payable pub", () => {
     beforeEach(async () => {
       await apiPost.connect(this.addr1).createCV("_tokenURI");
     });

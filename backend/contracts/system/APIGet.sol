@@ -20,6 +20,7 @@ import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
 import {ICVsDatasHub} from "../interfaces/cv/ICVsDatasHub.sol";
 import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 import {IDispute} from "../interfaces/escrow/IDispute.sol";
+import {IToken} from "../interfaces/erc/IToken.sol";
 
 import {IDisputesDatasHub} from "../interfaces/escrow/IDisputesDatasHub.sol";
 import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
@@ -50,6 +51,11 @@ contract APIGet {
     // ---------------------------- //
     // ************ GENERAL ************ //
     // ************ -- ************ //
+
+    function staked(uint _cvID) external view returns (uint) {
+        return
+            IToken(_iAS.token()).staked(Bindings.ownerOf(_cvID, _iAS.cvsHub()));
+    }
 
     function balanceOfToken(
         uint _cvID,
@@ -139,12 +145,6 @@ contract APIGet {
             );
     }
 
-    function balanceOfCourt(
-        DataTypes.CourtIDs _courtID
-    ) external view returns (uint) {
-        return IArbitratorsHub(_iAS.arbitratorsHub()).balanceOfCourt(_courtID);
-    }
-
     function datasOfArbitrator(
         uint _arbitratorID
     ) external view returns (DataTypes.ArbitratorData memory) {
@@ -157,6 +157,7 @@ contract APIGet {
         return IDisputesHub(_iAS.disputesHub()).addressOf(_disputeID);
     }
 
+    //! TO replace on datasFeature
     function disputeOfFeature(uint _featureID) external view returns (uint) {
         return IDisputesHub(_iAS.disputesHub()).disputeOf(_featureID);
     }
@@ -240,22 +241,22 @@ contract APIGet {
             );
     }
 
-    function currentTierIDOf(uint _launchpadID) external view returns (uint8) {
-        return
-            ILaunchpad(_launchpadsHub().addressOf(_launchpadID))
-                .getCurrentTierID();
-    }
+    // function currentTierIDOf(uint _launchpadID) external view returns (uint8) {
+    //     return
+    //         ILaunchpad(_launchpadsHub().addressOf(_launchpadID))
+    //             .getCurrentTierID();
+    // }
 
-    function tierOfLaunchpad(
-        uint _launchpadID,
-        uint _tierID
-    ) external view returns (DataTypes.TierData memory) {
-        return
-            ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).tierOf(
-                _launchpadID,
-                _tierID
-            );
-    }
+    // function tierOfLaunchpad(
+    //     uint _launchpadID,
+    //     uint _tierID
+    // ) external view returns (DataTypes.TierData memory) {
+    //     return
+    //         ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).tierOf(
+    //             _launchpadID,
+    //             _tierID
+    //         );
+    // }
 
     function statusOfLaunchpad(
         uint _launchpadID

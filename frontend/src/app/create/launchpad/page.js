@@ -22,7 +22,7 @@ import {
   _apiPostPayable,
 } from "utils/ui-tools/web3-tools";
 import { useAuthDispatch, useAuthState } from "context/auth";
-import { createURILaunchpad } from "utils/ui-tools/pinata-tools";
+import { clientPocket, createURILaunchpad } from "utils/ui-tools/pinata-tools";
 
 import {
   MENU_LAUNCHPAD,
@@ -47,7 +47,32 @@ const PageCreateProfile = () => {
   let [isPrice, setIsPrice] = useState(null);
   let submitForm = async (form) => {
     if (isConnected) {
-      let { launchpadURI, tokenURI } = await createURILaunchpad(form);
+      let metadatas = {
+        title: form?.title,
+        description: form?.description,
+        domain: form?.domain,
+        bio: form?.bio,
+        image: form?.image,
+        banniere: form?.banniere,
+        website: form?.website,
+        social: JSON.stringify(
+          {
+            facebook: form?.facebook,
+            github: form?.github,
+            linkedin: form?.linkedin,
+            twitter: form?.twitter,
+          },
+          null,
+          2
+        ),
+      };
+
+      console.log("meztadatas", metadatas);
+
+      const record = await clientPocket.records.create("launchpads", metadatas);
+
+      let launchpadURI = record.id;
+      let tokenURI = record.id; // ! USELESS to delete on blockchain
 
       let dateStart = new Date(form.saleStart);
       let saleStart = dateStart.getTime();

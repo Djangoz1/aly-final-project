@@ -4,10 +4,12 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAccessControl} from "../interfaces/system/IAccessControl.sol";
 import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
+import {DisputeDatas} from "../libraries/disputes/DisputeDatas.sol";
 import {Bindings} from "../libraries/Bindings.sol";
 
 import {IAPIGet} from "../interfaces/system/IAPIGet.sol";
@@ -27,9 +29,12 @@ import {ILaunchpadHub} from "../interfaces/launchpads/ILaunchpadHub.sol";
 import {ILaunchpadsDatasHub} from "../interfaces/launchpads/ILaunchpadsDatasHub.sol";
 import {ILaunchpad} from "../interfaces/launchpads/ILaunchpad.sol";
 import {IFeaturesHub} from "../interfaces/works/IFeaturesHub.sol";
+import {IToken} from "../interfaces/erc/IToken.sol";
 import {ICollectWorkInteraction} from "../interfaces/works/ICollectWorkInteraction.sol";
 
 contract APIPost is Ownable {
+    using SafeMath for uint256;
+
     IAddressSystem private _iAS;
     IAPIGet private _iAPIGet;
     IBalancesHub private _iBalancesHub;
@@ -114,6 +119,10 @@ contract APIPost is Ownable {
     // ************* CVs ************* //
     // ************* --- ************* //
 
+    function changeAcceptToken() external {
+        ICVsHub(_cvsHub).setAcceptToken(_cvOf(msg.sender));
+    }
+
     /**
      * @notice Binding for create a CV.
      * Each address could create only one cv
@@ -125,6 +134,7 @@ contract APIPost is Ownable {
         ICVsHub(_cvsHub).mint(msg.sender, _tokenURI);
     }
 
+    //! To replace with db
     /**
      * @notice Binding for follow cv.
      * Must have a cv for sender address & can't follow own cv.
@@ -141,6 +151,8 @@ contract APIPost is Ownable {
         );
         ICVsDatasHub(_cvsDatasHub).follow(cvFollower, _cvToFollow);
     }
+
+    //! To replace with db
 
     /**
      * @notice Binding for unfollow cv.
@@ -163,6 +175,20 @@ contract APIPost is Ownable {
     // ************* Missions ************* //
     // ************* -------- ************* //
 
+    function createMission(string calldata _tokenURI) external onlyCVOwner {
+        uint missionPrice = _iBalancesHub.missionPrice();
+        IToken _iToken = IToken(_iAS.token());
+        uint tokenPrice = _iToken.price();
+
+        bool success = _iToken.paid(
+            msg.sender,
+            owner(),
+            missionPrice * tokenPrice
+        ); // ! Refaire les calculs
+        require(success, "Error paid mission");
+        _createMission(_tokenURI, 0);
+    }
+
     /**
      * @notice Binding for create mission, it's payable.
      * @param _tokenURI is for pinataCRUD by exemple
@@ -176,23 +202,21 @@ contract APIPost is Ownable {
         string calldata _tokenURI
     ) external onlyCVOwner {
         address _launchpadAddr = _launchpadAddr(_launchpadID);
-
         uint missionPrice = _iBalancesHub.missionPrice();
-
+        IToken _iToken = IToken(_iAS.token());
+        uint tokenPrice = _iToken.price();
         require(
             Bindings.ownerOf(_launchpadID, _launchpadsHub) == msg.sender &&
                 _iAPIGet.statusOfLaunchpad(_launchpadID) ==
                 DataTypes.LaunchpadStatus.Closed &&
-                _iBalancesHub.launchpadBalance(_launchpadID) > missionPrice,
+                _iToken.balanceOf(_launchpadAddr) * tokenPrice > missionPrice,
             "APIPost: Error create mission"
         );
-
-        bool success = _iBalancesHub.withdrawLaunchpadBalance(
-            _launchpadID,
-            missionPrice
+        _iToken.transferFrom(
+            _launchpadAddr,
+            owner(),
+            missionPrice * tokenPrice
         );
-
-        require(success, "APIPost: Withdraw failed");
         _createMission(_tokenURI, _launchpadID);
     }
 
@@ -225,31 +249,58 @@ contract APIPost is Ownable {
     // ************* -------- ************* //
 
     function createFeatureLaunchpad(
-        uint _value,
+        uint256 _value,
         uint _missionID,
         uint16 _estimatedDays,
         bool _isInviteOnly,
         string calldata _tokenURI,
         DataTypes.CourtIDs _specification
-    ) external onlyCVOwner onlyOwnerOf(_missionID, msg.sender, _missionsHub) {
+    ) external onlyOwnerOf(_missionID, msg.sender, _missionsHub) {
         uint launchpadID = _iAPIGet.datasOfMission(_missionID).launchpad;
-        address _launchpadAddr = _launchpadAddr(launchpadID);
 
+        IToken _iToken = IToken(_iAS.token());
         require(
             launchpadID > 0 &&
                 Bindings.ownerOf(launchpadID, _launchpadsHub) == msg.sender &&
-                _iBalancesHub.launchpadBalance(launchpadID) >= _value &&
+                _iToken.balanceOf(_launchpadAddr(launchpadID)) >= _value &&
                 _iAPIGet.statusOfLaunchpad(launchpadID) ==
                 DataTypes.LaunchpadStatus.Closed,
             "APIPost: Error create feature"
         );
-        bool success = _iBalancesHub.withdrawLaunchpadBalance(
-            launchpadID,
+        uint value = _value;
+        bool success = _iToken.transferFrom(
+            _launchpadAddr(launchpadID),
+            owner(),
+            value
+        );
+        require(success, "Error transfer");
+        _createFeature(
+            _value,
+            _missionID,
+            _estimatedDays,
+            _isInviteOnly,
+            _tokenURI,
+            _specification
+        );
+    }
+
+    /**
+     * @notice creation feature on this contract it's payable with erc20 token
+     * @notice use apiPostPayable contract if you want to pay with ethereum
+     */
+    function createFeature(
+        uint256 _value,
+        uint _missionID,
+        uint16 _estimatedDays,
+        bool _isInviteOnly,
+        string calldata _tokenURI,
+        DataTypes.CourtIDs _specification
+    ) external onlyOwnerOf(_missionID, msg.sender, _missionsHub) {
+        bool success = IToken(_iAS.token()).paid(
+            msg.sender,
+            address(this),
             _value
         );
-
-        require(success, "APIPost: Error withdraw");
-
         _createFeature(
             _value,
             _missionID,
@@ -277,7 +328,8 @@ contract APIPost is Ownable {
             _estimatedDays,
             _isInviteOnly,
             _tokenURI,
-            _specification
+            _specification,
+            true
         );
 
         require(newFeature > 0, "Error creation feature");
@@ -308,6 +360,14 @@ contract APIPost is Ownable {
         uint _cvWorkerID,
         uint _featureID
     ) external onlyOwnerOf(_featureID, msg.sender, _featuresHub) {
+        bool payWithToken = IFeaturesHub(_featuresHub)
+            .dataOf(_featureID)
+            .payWithToken;
+        bool acceptToken = ICVsHub(_cvsHub).isAcceptToken(_cvWorkerID);
+        require(
+            !payWithToken || (payWithToken && acceptToken),
+            "Worker doesn't accept token"
+        );
         ICollectWorkInteraction(_collectWorkInteraction).inviteWorker(
             _cvOf(msg.sender),
             _cvWorkerID,
@@ -449,6 +509,8 @@ contract APIPost is Ownable {
         );
     }
 
+    // ! TO remove ? Can be db
+
     function createPub(string calldata _tokenURI) external {
         _createPub(_cvOf(msg.sender), _tokenURI, false);
     }
@@ -461,6 +523,7 @@ contract APIPost is Ownable {
         return IPubsHub(_pubsHub).mint(_cvID, _tokenURI, _isPayable);
     }
 
+    // ! TO remove ? Can be db
     /**
      * @notice Binding for create pub answer
      * @param _pubID must to be an existed ID
@@ -474,6 +537,8 @@ contract APIPost is Ownable {
         require(newPubID != 0, "Error create pub");
         IPubsDatasHub(_pubsDatasHub).addPubAnswer(newPubID, _pubID, _tokenURI);
     }
+
+    // ! TO remove ? Can be db
 
     /**
      * @notice Binding for create pub Mission
@@ -495,6 +560,8 @@ contract APIPost is Ownable {
         );
     }
 
+    // ! TO remove ? Can be db
+
     /**
      * @notice Binding for like pub
      * @param _pubID must to be an existed ID -- notLikedPub
@@ -506,6 +573,8 @@ contract APIPost is Ownable {
         IPubsDatasHub(_pubsDatasHub).like(_cvOf(msg.sender), _pubID);
     }
 
+    // ! TO remove ? Can be db
+
     /**
      * @notice Binding for unlike pub
      * @param _pubID must to be an existed ID -- onlyLikedPub
@@ -515,35 +584,6 @@ contract APIPost is Ownable {
      */
     function unlikePub(uint _pubID) external {
         IPubsDatasHub(_pubsDatasHub).unlike(_cvOf(msg.sender), _pubID);
-    }
-
-    // ************* ---------- ************* //
-    // ************* Arbitrator ************* //
-    // ************* ---------- ************* //
-
-    /**
-     * @notice Binding for withdraw on court -- onlyArbitratorOnCourt(_courtID)
-     * @param _amount must to be <= balanceOnCourt
-     * @param _courtID must to have a slot in court
-     * @dev this function trigger ArbitratorsHub contract
-     * msg.sender == ownerOfCV(x) && onlyArbitratorOnCourt(_courtID)
-     * Permet de récupéré une somme investi dans une court.
-     */
-    function withdrawFromCourt(
-        uint _amount,
-        DataTypes.CourtIDs _courtID
-    ) external {
-        require(_amount > 0, "Invalid value");
-        IArbitratorsHub(_iAS.arbitratorsHub()).withdrawFromCourt(
-            _cvOf(msg.sender),
-            _amount,
-            _courtID
-        );
-        bool success = IAPIPostPayable(_iAS.apiPostPayable()).sendTransaction(
-            msg.sender,
-            _amount
-        );
-        require(success, "Error tx");
     }
 
     // ************* ------- ************* //
@@ -613,6 +653,29 @@ contract APIPost is Ownable {
 
     function vote(uint _disputeID, DisputeRules.Vote _vote) external {
         IDispute(_disputeAddr(_disputeID)).vote(_cvOf(msg.sender), _vote);
+        DisputeRules.Data memory _rulesDispute = _iAPIGet.rulesOfDispute(
+            _disputeID
+        );
+
+        DataTypes.FeatureData memory _datas = _iAPIGet.datasOfFeature(
+            _iAPIGet.datasOfDispute(_disputeID).featureID
+        );
+        IToken _iToken = IToken(_iAS.token());
+        uint amount;
+        if (_datas.payWithToken) {
+            if (!_rulesDispute.appeal) {
+                amount = _datas.wadge.div(2);
+            } else {
+                amount = _datas.wadge.div(3);
+            }
+        } else {
+            if (!_rulesDispute.appeal) {
+                amount = _datas.wadge.div(2).div(_iToken.price());
+            } else {
+                amount = _datas.wadge.div(3).div(_iToken.price());
+            }
+        }
+        _iToken.mint(msg.sender, amount);
     }
 
     /**
@@ -641,26 +704,6 @@ contract APIPost is Ownable {
     // ************* --------- ************* //
     // ************* Launchpad ************* //
     // ************* --------- ************* //
-
-    function setTierID(
-        uint _launchpadID
-    ) external onlyOwnerOf(_launchpadID, msg.sender, _launchpadsHub) {
-        ILaunchpad(_launchpadAddr(_launchpadID)).setTierID();
-    }
-
-    function lockTokens(uint _launchpadID, uint _tokens) external {
-        require(_tokens > 0, "Invalid tokens quantity");
-        ILaunchpad(_launchpadAddr(_launchpadID)).lockTokens(
-            _cvOf(msg.sender),
-            _tokens
-        );
-    }
-
-    function withdrawTokens(uint _launchpadID) external {
-        ILaunchpad(_launchpadAddr(_launchpadID)).withdrawTokens(
-            _cvOf(msg.sender)
-        );
-    }
 
     function _cvOf(address _for) internal view returns (uint) {
         return _iAPIGet.cvOf(_for);

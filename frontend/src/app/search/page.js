@@ -21,6 +21,9 @@ import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 import { doPointerTools, useToolsDispatch, useToolsState } from "context/tools";
 import { MySub } from "components/myComponents/text/MySub";
+import { v4 } from "uuid";
+import { MyTitle } from "components/myComponents/text/MyTitle";
+import { MyBtns } from "components/myComponents/btn/MyBtns";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
   let { state, pointer } = useToolsState();
@@ -106,7 +109,7 @@ let Page = () => {
       <div
         id={1}
         className="flex relative   hide-scrollbar
-     flex-col h-full   w-full"
+      h-full   w-full"
       >
         <div className="flex  c1 absolute -translate-y-full -top-5 right-5 items-center">
           <LayoutForm
@@ -157,8 +160,6 @@ let Page = () => {
                 >
                   All
                 </MyMenusTabs>
-
-                <div className="flex flex-row"></div>
               </div>
 
               <div className="flex c1 flex-col w-full">
@@ -175,62 +176,59 @@ let Page = () => {
                   All
                 </MyMenusTabs>
 
+                <div className="flex mr-5 flex-col">
+                  <MySub style={"mt-2  mb-5 font-bold"}>Invite only</MySub>
+
+                  <MyMenusTabs
+                    template={2}
+                    color={0}
+                    setter={setIsInvite}
+                    value={isInvite}
+                    arr={[
+                      <div className="flex items-center">
+                        <Icon icon={icfyLOCK} className="mr-3 text-error" />
+                        Yes
+                      </div>,
+                      <div className="flex items-center">
+                        <Icon icon={icfyUNLOCK} className="mr-3 text-success" />
+                        No
+                      </div>,
+                    ]}
+                  >
+                    All
+                  </MyMenusTabs>
+                </div>
+                <div className="flex flex-col">
+                  <MySub style={"mt-2  mb-5 font-bold"}>Visibility</MySub>
+
+                  <MyMenusTabs
+                    setter={setIsInvite}
+                    value={isInvite}
+                    template={2}
+                    color={2}
+                    arr={[
+                      <div className="flex items-center">
+                        {" "}
+                        <Icon
+                          icon={icfy.eye.open}
+                          className="mr-3 text-success"
+                        />
+                        Disponible
+                      </div>,
+                      <div className="flex items-center">
+                        {" "}
+                        <Icon
+                          icon={icfy.eye.close}
+                          className="mr-3 text-error"
+                        />
+                        Indisponible
+                      </div>,
+                    ]}
+                  >
+                    All
+                  </MyMenusTabs>
+                </div>
                 <div className="flex flex-row">
-                  <div className="flex mr-5 flex-col">
-                    <MySub style={"mt-2  mb-5 font-bold"}>Invite only</MySub>
-
-                    <MyMenusTabs
-                      template={2}
-                      color={0}
-                      setter={setIsInvite}
-                      value={isInvite}
-                      arr={[
-                        <div className="flex items-center">
-                          <Icon icon={icfyLOCK} className="mr-3 text-error" />
-                          Yes
-                        </div>,
-                        <div className="flex items-center">
-                          <Icon
-                            icon={icfyUNLOCK}
-                            className="mr-3 text-success"
-                          />
-                          No
-                        </div>,
-                      ]}
-                    >
-                      All
-                    </MyMenusTabs>
-                  </div>
-                  <div className="flex flex-col">
-                    <MySub style={"mt-2  mb-5 font-bold"}>Visibility</MySub>
-
-                    <MyMenusTabs
-                      setter={setIsInvite}
-                      value={isInvite}
-                      template={2}
-                      color={2}
-                      arr={[
-                        <div className="flex items-center">
-                          {" "}
-                          <Icon
-                            icon={icfy.eye.open}
-                            className="mr-3 text-success"
-                          />
-                          Disponible
-                        </div>,
-                        <div className="flex items-center">
-                          {" "}
-                          <Icon
-                            icon={icfy.eye.close}
-                            className="mr-3 text-error"
-                          />
-                          Indisponible
-                        </div>,
-                      ]}
-                    >
-                      All
-                    </MyMenusTabs>
-                  </div>
                   <div className="flex flex-col ml-5">
                     <MySub style={"mt-2  mb-5 font-bold"}>experience</MySub>
 
@@ -262,6 +260,59 @@ let Page = () => {
         )}
         <div className="overflow-y-scroll pt-10 backdrop-blur">
           {lists?.[pointer]}
+        </div>
+
+        <div className="w-1/6  ml-auto overflow-y-scroll h-full  border border-white/5 border-r-white/0 border-b-white/0">
+          <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
+            <MyTitle style={"mt-2 mb-3 font-bold"}>Language techno</MyTitle>
+            <MyBtns
+              value={isCourt}
+              setter={setIsCourt}
+              arr={ENUMS.courts.map((el) => el?.court)}
+            >
+              All
+            </MyBtns>
+          </div>
+
+          <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
+            <MyTitle style={"mt-2  mb-5 font-bold w-full"}>Domaine</MyTitle>
+            <MyBtns
+              value={isDomain}
+              setter={setIsDomain}
+              arr={ENUMS.domain.map((el) => el?.name)}
+            >
+              All
+            </MyBtns>
+          </div>
+          <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
+            <MyTitle style={"mt-2 w-full mb-5 font-bold"}>Invite only</MyTitle>
+
+            <MyBtns setter={setIsInvite} value={isInvite} arr={["Yes", "No"]}>
+              All
+            </MyBtns>
+          </div>
+          <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
+            <MyTitle style={"mt-2  mb-5 font-bold w-full"}>Visibility</MyTitle>
+
+            <MyBtns
+              setter={setIsInvite}
+              value={isInvite}
+              arr={["Disponible", "Indisponible"]}
+            >
+              All
+            </MyBtns>
+          </div>
+          <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
+            <MySub style={"mt-2  mb-5 w-full font-bold"}>experience</MySub>
+
+            <MyBtns
+              setter={setIsStarted}
+              value={isStarted}
+              arr={["Junior", "Senior"]}
+            >
+              All
+            </MyBtns>
+          </div>
         </div>
         {/* <ListLaunchpads /> */}
         {/* <ListJobs /> */}

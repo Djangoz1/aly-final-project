@@ -17,6 +17,7 @@ import {DisputeTools} from "../libraries/disputes/DisputeTools.sol";
 import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
 import {DisputeCounters} from "../libraries/disputes/DisputeCounters.sol";
 
+import {IToken} from "../interfaces/erc/IToken.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 import {IDisputesDatasHub} from "../interfaces/escrow/IDisputesDatasHub.sol";
@@ -146,6 +147,7 @@ contract Dispute is Ownable {
         DisputeCounters.Data memory counters = _counters();
 
         uint256 arbitratorsSlot = data.nbArbitrators * 2;
+        /// @notice arbitratorID
         uint256 randomID;
         uint courtLength = _ArbitratorsHub.lengthOfCourt(data.courtID);
 
@@ -154,7 +156,7 @@ contract Dispute is Ownable {
                 break;
             }
 
-            if (_ArbitratorsHub.balanceOfCourt(data.courtID) > 0) {
+            if (IToken(_iAS.token()).totalStaked() > 0) {
                 randomID = _ArbitratorsHub.boostRandomlyArbitrator(
                     data.courtID,
                     randomID * arbitratorsSlot * index
@@ -172,7 +174,8 @@ contract Dispute is Ownable {
                 if (
                     _iDDH.allowanceOf(_tools.id, randomID) ==
                     DisputeArbitrators.Status.None &&
-                    !_checkCVLink(randomCV)
+                    !_checkCVLink(randomCV) &&
+                    !_ArbitratorsHub.isBanned(randomCV)
                 ) {
                     _iDDH.setAllowanceOf(
                         _tools.id,

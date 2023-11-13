@@ -17,7 +17,7 @@ import {
 
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { doAuthCV, useAuthDispatch } from "context/auth";
-import { createURICv } from "utils/ui-tools/pinata-tools";
+import { clientPocket, createURICv } from "utils/ui-tools/pinata-tools";
 import { Icon } from "@iconify/react";
 import { icfy, icfyCV } from "icones";
 import { styles } from "styles/style";
@@ -35,7 +35,47 @@ const PageCreateProfile = () => {
   let dispatch = useAuthDispatch();
   let submitForm = async (form) => {
     if (isConnected) {
-      let tokenURI = await createURICv(form);
+      let metadatas = {
+        username: form.username,
+        description: form.description,
+
+        visibility: form.visibility,
+        banniere: form.banniere,
+        email: form.email,
+
+        cvImg: form?.cvImg,
+        identity: JSON.stringify(
+          {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            phone: form.phone,
+            dateOfBirth: form.dateOfBirth,
+            citizen: form.citizen,
+          },
+          null,
+          2
+        ),
+        social: JSON.stringify(
+          {
+            linkedin: form.linkedin,
+            github: form.github,
+            twitter: form.twitter,
+            facebook: form.facebook,
+          },
+          null,
+          2
+        ),
+        languages: JSON.stringify(form.languges, null, 2),
+        skills: JSON.stringify(form.skills, null, 2),
+        domain: form.domain,
+      };
+
+      console.log("metadatas", metadatas);
+      const client = clientPocket;
+      const record = await client.records.create("accounts", metadatas);
+      console.log("record", record);
+
+      let tokenURI = record.id;
       await _apiPost("createCV", [tokenURI]);
       await doAuthCV(dispatch, address);
     }

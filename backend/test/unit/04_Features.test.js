@@ -8,7 +8,7 @@ const CONTRACT_NAME = "FeaturesHub";
 
 describe(`Contract ${CONTRACT_NAME} `, () => {
   let cvsHub;
-
+  let token;
   let disputesHub;
   let missionID = 1;
   let contract;
@@ -16,7 +16,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let apiPostPayable;
   let balancesHub;
   let apiGet;
-
+  let contracts;
   beforeEach(async () => {
     [
       this.owner,
@@ -28,8 +28,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       this.addr6,
       this.addr7,
     ] = await ethers.getSigners(); // owner == accounts[0] | addr1 == accounts[1] | addr2 == accounts[2]
-    const contracts = await _testInitAll();
-
+    contracts = await _testInitAll();
+    token = contracts.token;
     cvsHub = contracts.cvs.hub;
     apiPost = contracts.systems.apiPost;
     apiPostPayable = contracts.systems.apiPostPayable;
@@ -92,12 +92,21 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("NOT WORKS", () => {
       it("Should NOT create feature with wrong bindings", async () => {
         await expect(
-          contract.mint(this.owner.address, 1, 1000, 1000, true, "tokenURI", 2)
+          contract.mint(
+            this.owner.address,
+            1,
+            1000,
+            1000,
+            true,
+            "tokenURI",
+            2,
+            true
+          )
         ).to.be.revertedWith("Must call function with proxy bindings");
       });
       it("Should NOT create feature if not owner of mission", async () => {
         await expect(
-          apiPost
+          apiPostPayable
             .connect(this.addr1)
             .createFeature(missionID, 1000, true, "tokenURI", 3, {
               value: "10000000",
@@ -149,314 +158,399 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   });
 
   describe("Create Feature", () => {
-    describe("WORKS", () => {
-      it("Should update features length", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        expect(await apiGet.tokensLengthOf(contract.target)).to.equal(1);
+    describe("With ETHEREUM", () => {
+      describe("WORKS", () => {
+        it("Should update features length", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          expect(await apiGet.tokensLengthOf(contract.target)).to.equal(1);
+        });
+
+        it("Should give ownership of feature to owner", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          expect(await contract.ownerOf(1)).to.equal(this.owner.address);
+        });
+
+        it("Should get feature ID", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.id).to.equal(1);
+        });
+
+        it("Should get feature mission ID", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+
+          expect(data.missionID).to.equal(1);
+        });
+
+        it("Should get starter at 0", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.startedAt).to.equal(0);
+        });
+
+        it("Should get true wadge", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.wadge).to.equal(10000000);
+        });
+
+        it("Should get true estimated days", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.estimatedDays).to.equal(1000);
+        });
+
+        it("Should get status at 0", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+
+          expect(data.status).to.equal(0);
+        });
+
+        it("Should get good token URI", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+
+          expect(await contract.tokenURI(1)).to.equal("tokenURI");
+        });
+        it("Should get true specification", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+
+          expect(data.specification).to.equal(3);
+        });
+
+        it("Should set true is invite only", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.isInviteOnly).to.equal(true);
+        });
+
+        it("Should set false is invite only", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            false,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.isInviteOnly).to.equal(false);
+        });
+
+        it("Should get 0 cvWorker", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            false,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.cvWorker).to.equal(0);
+        });
+        it("Should update mission data", async () => {
+          let data = await apiGet.datasOfMission(1);
+          expect(data.features.length).to.equal(0);
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            false,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          data = await apiGet.datasOfMission(1);
+          expect(data.features.length).to.equal(1);
+          expect(data.features[0]).to.be.equal(1);
+        });
       });
 
-      it("Should give ownership of feature to owner", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        expect(await contract.ownerOf(1)).to.equal(this.owner.address);
-      });
+      describe("NOT WORKS", () => {
+        it("Should NOT create feature with wrong bindings", async () => {
+          await expect(
+            contract.mint(
+              this.owner.address,
+              1,
+              1000,
+              1000,
+              true,
+              "tokenURI",
+              3,
+              true
+            )
+          ).to.be.revertedWith("Must call function with proxy bindings");
+        });
+        it("Should NOT create feature if not owner of mission", async () => {
+          await expect(
+            apiPostPayable
+              .connect(this.addr1)
+              .createFeature(missionID, 1000, true, "tokenURI", 3, {
+                value: "10000000",
+              })
+          ).to.be.revertedWith("Not the owner");
+        });
 
-      it("Should get feature ID", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.id).to.equal(1);
-      });
+        it("Should NOT create feature for centralized court", async () => {
+          await expect(
+            apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 0, {
+              value: "10000000",
+            })
+          ).to.be.revertedWith("Unvalid specification");
+        });
 
-      it("Should get feature mission ID", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
+        it("Should NOT create feature for kleros court", async () => {
+          await expect(
+            apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 1, {
+              value: "10000000",
+            })
+          ).to.be.revertedWith("Unvalid specification");
+        });
+        it("Should NOT create feature for unknow court", async () => {
+          await expect(
+            apiPostPayable.createFeature(
+              missionID,
+              1000,
+              true,
+              "tokenURI",
+              72,
+              {
+                value: "10000000",
+              }
+            )
+          ).to.be.reverted;
+        });
 
-        expect(data.missionID).to.equal(1);
-      });
+        it("Should NOT create feature if no value", async () => {
+          await expect(
+            apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 3, {
+              value: "0",
+            })
+          ).to.be.revertedWith("Insuficient value");
+        });
 
-      it("Should get starter at 0", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.startedAt).to.equal(0);
-      });
+        it("Should NOT create feature for unknow mission ID", async () => {
+          await expect(
+            apiPostPayable.createFeature(4, 1000, true, "tokenURI", 3, {
+              value: "10000000",
+            })
+          ).to.be.revertedWith("ERC721: invalid token ID");
+        });
 
-      it("Should get true wadge", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.wadge).to.equal(10000000);
-      });
+        it("Should NOT create feature if no cv", async () => {
+          await expect(
+            apiPostPayable
+              .connect(this.addr4)
+              .createFeature(1, 1000, true, "tokenURI", 3, {
+                value: "10000000",
+              })
+          ).to.be.revertedWith("CV not found");
+        });
 
-      it("Should get true estimated days", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.estimatedDays).to.equal(1000);
-      });
-
-      it("Should get status at 0", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-
-        expect(data.status).to.equal(0);
-      });
-
-      it("Should get good token URI", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-
-        expect(await contract.tokenURI(1)).to.equal("tokenURI");
-      });
-      it("Should get true specification", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-
-        expect(data.specification).to.equal(3);
-      });
-
-      it("Should set true is invite only", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.isInviteOnly).to.equal(true);
-      });
-
-      it("Should set false is invite only", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          false,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.isInviteOnly).to.equal(false);
-      });
-
-      it("Should get 0 cvWorker", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          false,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        let data = await apiGet.datasOfFeature(1);
-        expect(data.cvWorker).to.equal(0);
-      });
-      it("Should update mission data", async () => {
-        let data = await apiGet.datasOfMission(1);
-        expect(data.features.length).to.equal(0);
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          false,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        data = await apiGet.datasOfMission(1);
-        expect(data.features.length).to.equal(1);
-        expect(data.features[0]).to.be.equal(1);
+        it("Should NOT create feature if mission closed", async () => {
+          await apiPost.closeMission(1);
+          await expect(
+            apiPostPayable.createFeature(1, 1000, true, "tokenURI", 3, {
+              value: "10000000",
+            })
+          ).to.be.revertedWith("Mission closed");
+        });
       });
     });
-
-    describe("NOT WORKS", () => {
-      it("Should NOT create feature with wrong bindings", async () => {
-        await expect(
-          contract.mint(this.owner.address, 1, 1000, 1000, true, "tokenURI", 3)
-        ).to.be.revertedWith("Must call function with proxy bindings");
+    describe("With ERC20 Token", () => {
+      let missionID;
+      let featureID = 1;
+      let balance = 100000;
+      beforeEach(async () => {
+        await apiPostPayable.connect(this.addr1).createMission("tokenURI", {
+          value: await balancesHub.missionPrice(),
+        });
+        missionID = await apiGet.tokensLengthOf(
+          contracts.works.missionsHub.target
+        );
+        await token.transfer(this.addr1, balance);
       });
-      it("Should NOT create feature if not owner of mission", async () => {
-        await expect(
-          apiPost
+      describe("WORKS", () => {
+        it("Should update features length", async () => {
+          expect(await apiGet.tokensLengthOf(contract.target)).to.equal(0);
+          await apiPost
             .connect(this.addr1)
-            .createFeature(missionID, 1000, true, "tokenURI", 3, {
-              value: "10000000",
-            })
-        ).to.be.revertedWith("Not the owner");
+            .createFeature(balance, missionID, 1000, true, "tokenURI", 3);
+          expect(await apiGet.tokensLengthOf(contract.target)).to.equal(1);
+        });
+        it("Should update payWithToken to true", async () => {
+          await apiPost
+            .connect(this.addr1)
+            .createFeature(balance, missionID, 1000, true, "tokenURI", 3);
+          let datas = await apiGet.datasOfFeature(featureID);
+          expect(datas.payWithToken).to.equal(true);
+        });
+
+        it("Should give ownership of feature to owner", async () => {
+          await apiPost
+            .connect(this.addr1)
+            .createFeature(balance, missionID, 1000, true, "tokenURI", 3);
+          expect(await contract.ownerOf(1)).to.equal(this.addr1.address);
+        });
+
+        it("Should get good datas", async () => {
+          let estimatedDays = 1000;
+          await apiPost
+            .connect(this.addr1)
+            .createFeature(
+              balance,
+              missionID,
+              estimatedDays,
+              true,
+              "tokenURI",
+              3
+            );
+          let data = await apiGet.datasOfFeature(1);
+          expect(data.id).to.equal(featureID);
+          expect(data.missionID).to.equal(missionID);
+          expect(data.startedAt).to.equal(0);
+          expect(data.wadge).to.equal(balance);
+          expect(data.estimatedDays).to.equal(estimatedDays);
+          expect(data.status).to.equal(0);
+          expect(await contract.tokenURI(1)).to.equal("tokenURI");
+          expect(data.isInviteOnly).to.equal(true);
+          expect(data.cvWorker).to.equal(0);
+          data = await apiGet.datasOfMission(missionID);
+          expect(data.features.length).to.equal(1);
+          expect(data.features[0]).to.be.equal(featureID);
+        });
       });
 
-      it("Should NOT create feature for centralized court", async () => {
-        await expect(
-          apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 0, {
-            value: "10000000",
-          })
-        ).to.be.revertedWith("Unvalid specification");
-      });
+      describe("NOT WORKS", () => {
+        it("Should NOT create feature if no value", async () => {
+          await expect(
+            apiPost
+              .connect(this.addr1)
+              .createFeature(0, missionID, 1000, true, "tokenURI", 3)
+          ).to.be.revertedWith("Insuficient value");
+        });
 
-      it("Should NOT create feature for kleros court", async () => {
-        await expect(
-          apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 1, {
-            value: "10000000",
-          })
-        ).to.be.revertedWith("Unvalid specification");
-      });
-      it("Should NOT create feature for unknow court", async () => {
-        await expect(
-          apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 72, {
-            value: "10000000",
-          })
-        ).to.be.reverted;
-      });
-
-      it("Should NOT create feature if no value", async () => {
-        await expect(
-          apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 3, {
-            value: "0",
-          })
-        ).to.be.revertedWith("Insuficient value");
-      });
-
-      it("Should NOT create feature for unknow mission ID", async () => {
-        await expect(
-          apiPostPayable.createFeature(4, 1000, true, "tokenURI", 3, {
-            value: "10000000",
-          })
-        ).to.be.revertedWith("ERC721: invalid token ID");
-      });
-
-      it("Should NOT create feature if no cv", async () => {
-        await expect(
-          apiPost
-            .connect(this.addr4)
-            .createFeature(1, 1000, true, "tokenURI", 3, {
-              value: "10000000",
-            })
-        ).to.be.revertedWith("CV not found");
-      });
-
-      it("Should NOT create feature if mission closed", async () => {
-        await apiPost.closeMission(1);
-        await expect(
-          apiPostPayable.createFeature(1, 1000, true, "tokenURI", 3, {
-            value: "10000000",
-          })
-        ).to.be.revertedWith("Mission closed");
+        it("Should NOT create feature if value > balance", async () => {
+          await expect(
+            apiPost
+              .connect(this.addr1)
+              .createFeature(balance + 1, missionID, 1000, true, "tokenURI", 3)
+          ).to.be.revertedWith("Not enough funds");
+        });
       });
     });
   });
 
   describe("Invite Worker", () => {
-    beforeEach(async () => {
-      await apiPostPayable.createFeature(missionID, 1000, true, "tokenURI", 3, {
-        value: "10000000",
-      });
-    });
-
-    it("Should invite worker", async () => {
-      await apiPost.inviteWorker(2, 1);
-      let data = await apiGet.datasOfFeature(1);
-      expect(data.cvWorker).to.be.equal(2);
-
-      const collecterData = await apiGet.datasOfWork(1);
-      expect(collecterData.missionID).to.be.equal(data.missionID);
-    });
-
-    describe("NOT WORKS", () => {
-      it("Should NOT invite worker if mission validated", async () => {
+    describe("For ETHEREUM feature", () => {
+      beforeEach(async () => {
         await apiPostPayable.createFeature(
           missionID,
           1000,
@@ -467,50 +561,98 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             value: "10000000",
           }
         );
+      });
+
+      it("Should invite worker", async () => {
         await apiPost.inviteWorker(2, 1);
-        await apiPost.connect(this.addr1).acceptJob(1);
-        await apiPost.validFeature(1);
-        await expect(apiPost.inviteWorker(2, 1)).to.be.revertedWith(
-          "Wrong feature status"
-        );
+        let data = await apiGet.datasOfFeature(1);
+        let invites = await apiGet.invitesOfCV(2);
+        expect(invites.length === 1 && invites[0] == 1).to.be.equal(true);
+
+        const collecterData = await apiGet.datasOfWork(1);
+        expect(collecterData.missionID).to.be.equal(data.missionID);
       });
 
-      it("Should NOT invite worker if not owner", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        await expect(
-          apiPost.connect(this.addr1).inviteWorker(2, 1)
-        ).to.be.revertedWith("Not the owner");
+      describe("NOT WORKS", () => {
+        it("Should NOT invite worker if mission validated", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          await apiPost.inviteWorker(2, 1);
+          await apiPost.connect(this.addr1).acceptJob(1);
+          await apiPost.validFeature(1);
+          await expect(apiPost.inviteWorker(2, 1)).to.be.revertedWith(
+            "Wrong feature status"
+          );
+        });
+
+        it("Should NOT invite worker if not owner", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          await expect(
+            apiPost.connect(this.addr1).inviteWorker(2, 1)
+          ).to.be.revertedWith("Not the owner");
+        });
+
+        it("Should NOT invite worker if feature didn't exist", async () => {
+          await expect(apiPost.inviteWorker(2, 2)).to.be.revertedWith(
+            "ERC721: invalid token ID"
+          );
+        });
+
+        it("Should NOT invite yourself for worker", async () => {
+          await apiPostPayable.createFeature(
+            missionID,
+            1000,
+            true,
+            "tokenURI",
+            3,
+            {
+              value: "10000000",
+            }
+          );
+          await expect(apiPost.inviteWorker(1, 1)).to.be.revertedWith(
+            "Can't assign yourself"
+          );
+        });
+      });
+    });
+    describe("For ERC20 feature", () => {
+      beforeEach(async () => {
+        await apiPost.createFeature(400, missionID, 1000, true, "tokenURI", 3);
+        await apiPost.connect(this.addr1).changeAcceptToken();
+
+        expect(await cvsHub.isAcceptToken(2)).to.be.equal(false);
+        expect(await cvsHub.isAcceptToken(3)).to.be.equal(true);
       });
 
-      it("Should NOT invite worker if feature didn't exist", async () => {
-        await expect(apiPost.inviteWorker(2, 2)).to.be.revertedWith(
-          "ERC721: invalid token ID"
-        );
+      it("Should invite worker", async () => {
+        await apiPost.inviteWorker(3, 1);
+        let data = await apiGet.invitesOfCV(3);
+        expect(data.length).to.be.equal(1);
       });
 
-      it("Should NOT invite yourself for worker", async () => {
-        await apiPostPayable.createFeature(
-          missionID,
-          1000,
-          true,
-          "tokenURI",
-          3,
-          {
-            value: "10000000",
-          }
-        );
-        await expect(apiPost.inviteWorker(1, 1)).to.be.revertedWith(
-          "Can't assign yourself"
-        );
+      describe("NOT WORKS", () => {
+        it("Should NOT invite worker if worker don't accept token", async () => {
+          await expect(apiPost.inviteWorker(2, 1)).to.be.revertedWith(
+            "Worker doesn't accept token"
+          );
+        });
       });
     });
   });
@@ -548,7 +690,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("NOT WORKS", () => {
       it("Should NOT accept job if not worker", async () => {
         await apiPost.inviteWorker(2, 1);
-        await expect(apiPost.acceptJob(1)).to.be.revertedWith("Not the worker");
+        await expect(apiPost.acceptJob(1)).to.be.revertedWith("Not invited");
       });
       it("Should NOT accept job if feature didn't exist", async () => {
         await expect(apiPost.acceptJob(2)).to.be.revertedWith(
@@ -564,16 +706,16 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         ).to.be.revertedWith("Feature already start");
       });
 
-      it("Should NOT accept if no worker assign", async () => {
+      it("Should NOT accept if no worker invited", async () => {
         await expect(
           apiPost.connect(this.addr1).acceptJob(1)
-        ).to.be.revertedWith("Not the worker");
+        ).to.be.revertedWith("Not invited");
       });
 
-      it("Should NOT decline if was no worker", async () => {
+      it("Should NOT decline if wasn't invited", async () => {
         await expect(
           apiPost.connect(this.addr2).declineJob(1)
-        ).to.be.revertedWith("Not the worker");
+        ).to.be.revertedWith("Not invited");
       });
 
       it("Should NOT decline after accept", async () => {
@@ -784,7 +926,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       it("Should update arbitrators length", async () => {
         await apiPost.validFeature(1);
 
-        let length = await apiGet.lengthOfArbitrators();
+        let length = await apiGet.tokensLengthOf(
+          contracts.escrows.arbitratorsHub.target
+        );
         expect(length).to.be.equal(1);
       });
     });

@@ -20,10 +20,10 @@ contract LaunchpadsDatasHub is Ownable {
     ILaunchpadHub private _iLH;
     IAddressSystem private _iAS;
     using Counters for Counters.Counter;
-    Counters.Counter private _tierIDs;
+    // Counters.Counter private _tierIDs;
 
     mapping(uint => DataTypes.LaunchpadData) internal launchpadDatas;
-    mapping(uint => mapping(uint => DataTypes.TierData)) internal tierDetails;
+    // mapping(uint => mapping(uint => DataTypes.TierData)) internal tierDetails;
 
     mapping(uint => bytes) internal _tokensURI;
 
@@ -68,12 +68,12 @@ contract LaunchpadsDatasHub is Ownable {
         return launchpadDatas[_id];
     }
 
-    function tierOf(
-        uint _launchpadID,
-        uint _tierID
-    ) external view returns (DataTypes.TierData memory) {
-        return tierDetails[_launchpadID][_tierID];
-    }
+    // function tierOf(
+    //     uint _launchpadID,
+    //     uint _tierID
+    // ) external view returns (DataTypes.TierData memory) {
+    //     return tierDetails[_launchpadID][_tierID];
+    // }
 
     function setTokenURI(
         address _sender,
@@ -98,40 +98,36 @@ contract LaunchpadsDatasHub is Ownable {
      */
     function setLaunchpadData(
         uint _launchpadID,
-        address _ownerOf,
-        DataTypes.LaunchpadData calldata _data
+        DataTypes.LaunchpadData memory _data
     ) external onlyFromContract(_launchpadID) {
-        if (launchpadDatas[_launchpadID].tokenAddress != address(0)) {
-            require(
-                launchpadDatas[_launchpadID].saleEnd < block.timestamp,
-                "Launchpad already finished"
-            );
-            require(
-                launchpadDatas[_launchpadID].saleStart > block.timestamp,
-                "Launchpad already started"
-            );
+        // require(
+        //     launchpadDatas[_launchpadID].saleEnd < block.timestamp,
+        //     "Launchpad already finished"
+        // );
+        if (launchpadDatas[_launchpadID].saleStart > block.timestamp) {
+            launchpadDatas[_launchpadID].saleStart = block.timestamp;
         }
-        bool verified = InteractionLogic._checkLaunchpadData(_ownerOf, _data);
+
+        bool verified = InteractionLogic._checkLaunchpadData(_data);
         require(verified, "Invalid launchpad data");
         launchpadDatas[_launchpadID] = _data;
     }
 
     function _addAmountRaised(
         uint _launchpadID,
-        uint _tierID,
+        // uint _tierID,
         uint _amount
     ) external onlyFromContract(_launchpadID) {
-        uint amountRaised = tierDetails[_launchpadID][_tierID].amountRaised;
+        uint amountRaised = launchpadDatas[_launchpadID].amountRaised;
 
         require(
-            launchpadDatas[_launchpadID].numberOfTier > _tierID &&
-                tierDetails[_launchpadID][_tierID].maxTierCap >=
-                tierDetails[_launchpadID][_tierID].amountRaised.add(_amount),
-            "AddAmount: Error tier value"
+            launchpadDatas[_launchpadID].maxCap >= amountRaised.add(_amount),
+            "AddAmount: Cap out of range"
         );
-        tierDetails[_launchpadID][_tierID].amountRaised = amountRaised.add(
-            _amount
-        );
+        launchpadDatas[_launchpadID].amountRaised = amountRaised.add(_amount);
+        // tierDetails[_launchpadID][_tierID].amountRaised = amountRaised.add(
+        //     _amount
+        // );
     }
 
     function _incrementLaunchpadUser(
@@ -142,120 +138,120 @@ contract LaunchpadsDatasHub is Ownable {
             .add(1);
     }
 
-    function _incrementTierUser(
-        uint _launchpadID,
-        uint _tierID
-    ) external onlyFromContract(_launchpadID) {
-        tierDetails[_launchpadID][_tierID].users = tierDetails[_launchpadID][
-            _tierID
-        ].users.add(1);
-    }
+    // function _incrementTierUser(
+    //     uint _launchpadID,
+    //     uint _tierID
+    // ) external onlyFromContract(_launchpadID) {
+    //     tierDetails[_launchpadID][_tierID].users = tierDetails[_launchpadID][
+    //         _tierID
+    //     ].users.add(1);
+    // }
 
-    /**
-     * @notice update tier datas will refresh your launchpad data for minCap, maxCap and tiersDetails
-     * @param _tierLength number of tiers you want to provide
-     * @param _maxTierCaps [] maximum amount of tokens that can be funded on this tier
-     * @param _maxTierCaps [] minimum amount of tokens that can be funded on this tier
-     * @param _tokenPrice [] amount of tokens per 1 token
-     */
-    function _setTiers(
-        uint256 _tierLength,
-        uint256 _id,
-        uint256[] calldata _maxTierCaps,
-        uint256[] calldata _minTierCaps,
-        uint256[] calldata _tokenPrice
-    ) public onlyFromContract(_id) {
-        require(
-            launchpadDatas[_id].saleStart > block.timestamp ||
-                msg.sender == _iAS.apiPost(),
-            "Sale already started"
-        );
-        require(
-            _tierLength == _maxTierCaps.length &&
-                _tierLength == _minTierCaps.length &&
-                _tokenPrice.length == _tierLength,
-            "Mismatch datas tier"
-        );
-        uint256 totalMinCap;
-        uint256 totalMaxCap;
-        for (uint256 i = 0; i < _tierLength; i++) {
-            require(
-                _maxTierCaps[i] >= _minTierCaps[i] &&
-                    _maxTierCaps[i] > 0 &&
-                    _minTierCaps[i] > 0,
-                "Mismatch data capitalization"
-            );
-            totalMinCap = totalMinCap.add(_minTierCaps[i]);
-            totalMaxCap = totalMaxCap.add(_maxTierCaps[i]);
-        }
+    // /**
+    //  * @notice update tier datas will refresh your launchpad data for minCap, maxCap and tiersDetails
+    //  * @param _tierLength number of tiers you want to provide
+    //  * @param _maxTierCaps [] maximum amount of tokens that can be funded on this tier
+    //  * @param _maxTierCaps [] minimum amount of tokens that can be funded on this tier
+    //  * @param _tokenPrice [] amount of tokens per 1 token
+    //  */
+    // function _setTiers(
+    //     uint256 _tierLength,
+    //     uint256 _id,
+    //     uint256[] calldata _maxTierCaps,
+    //     uint256[] calldata _minTierCaps,
+    //     uint256[] calldata _tokenPrice
+    // ) public onlyFromContract(_id) {
+    //     require(
+    //         launchpadDatas[_id].saleStart > block.timestamp ||
+    //             msg.sender == _iAS.apiPost(),
+    //         "Sale already started"
+    //     );
+    //     require(
+    //         _tierLength == _maxTierCaps.length &&
+    //             _tierLength == _minTierCaps.length &&
+    //             _tokenPrice.length == _tierLength,
+    //         "Mismatch datas tier"
+    //     );
+    //     uint256 totalMinCap;
+    //     uint256 totalMaxCap;
+    //     for (uint256 i = 0; i < _tierLength; i++) {
+    //         require(
+    //             _maxTierCaps[i] >= _minTierCaps[i] &&
+    //                 _maxTierCaps[i] > 0 &&
+    //                 _minTierCaps[i] > 0,
+    //             "Mismatch data capitalization"
+    //         );
+    //         totalMinCap = totalMinCap.add(_minTierCaps[i]);
+    //         totalMaxCap = totalMaxCap.add(_maxTierCaps[i]);
+    //     }
 
-        for (uint256 i = 0; i < _tierLength; i++) {
-            DataTypes.TierData memory _tierData;
-            _tierData.maxTierCap = _maxTierCaps[i];
-            _tierData.minTierCap = _minTierCaps[i];
-            _tierData.tokenPrice = _tokenPrice[i];
+    //     for (uint256 i = 0; i < _tierLength; i++) {
+    //         DataTypes.TierData memory _tierData;
+    //         _tierData.maxTierCap = _maxTierCaps[i];
+    //         _tierData.minTierCap = _minTierCaps[i];
+    //         _tierData.tokenPrice = _tokenPrice[i];
 
-            InteractionLogic._checkLaunchpadTierData(
-                _tierData,
-                i,
-                _iLH.maxTiers()
-            );
+    //         InteractionLogic._checkLaunchpadTierData(
+    //             _tierData,
+    //             i,
+    //             _iLH.maxTiers()
+    //         );
 
-            // fixed bug stack too large
-            uint id_ = _id;
-            tierDetails[id_][i] = _tierData;
-        }
-    }
+    //         // fixed bug stack too large
+    //         uint id_ = _id;
+    //         tierDetails[id_][i] = _tierData;
+    //     }
+    // }
 
-    /**
-     * @notice check if amount raised on tier is still on range
-     * @notice value must be < maxTierCap && > minInvest  && balance of sender < maxInvest
-     * @param _launchpadID id of invested launchpad
-     * @param _cvID sender of value
-     * @param _tierID is ID of current ID
-     * @param _value is msg.value of sender
-     */
-    function _checkAmount(
-        uint _launchpadID,
-        uint _cvID,
-        uint _tierID,
-        uint _value
-    ) external view returns (bool) {
-        require(
-            _tierID < launchpadDatas[_launchpadID].numberOfTier,
-            "Tier out of range"
-        );
+    // /**
+    //  * @notice check if amount raised on tier is still on range
+    //  * @notice value must be < maxTierCap && > minInvest  && balance of sender < maxInvest
+    //  * @param _launchpadID id of invested launchpad
+    //  * @param _cvID sender of value
+    //  * @param _tierID is ID of current ID
+    //  * @param _value is msg.value of sender
+    //  */
+    // function _checkAmount(
+    //     uint _launchpadID,
+    //     uint _cvID,
+    //     uint _tierID,
+    //     uint _value
+    // ) external view returns (bool) {
+    //     require(
+    //         _tierID < launchpadDatas[_launchpadID].numberOfTier,
+    //         "Tier out of range"
+    //     );
 
-        // require(
-        //     tierDetails[_launchpadID][_tierID].maxTierCap + tierDetails[_launchpadID][] >=
-        //         tierDetails[_launchpadID][_tierID].amountRaised.add(_value),
-        //     "Value out of range for this tier"
-        // );
-        uint256 _balanceOf = ILaunchpadsInvestorsHub(
-            _iAS.launchpadsInvestorsHub()
-        ).datasOf(_launchpadID, _cvID).investedAmount;
+    //     // require(
+    //     //     tierDetails[_launchpadID][_tierID].maxTierCap + tierDetails[_launchpadID][] >=
+    //     //         tierDetails[_launchpadID][_tierID].amountRaised.add(_value),
+    //     //     "Value out of range for this tier"
+    //     // );
+    //     uint256 _balanceOf = ILaunchpadsInvestorsHub(
+    //         _iAS.launchpadsInvestorsHub()
+    //     ).datasOf(_launchpadID, _cvID).investedAmount;
 
-        require(
-            launchpadDatas[_launchpadID].minInvest <= _balanceOf.add(_value) &&
-                _balanceOf.add(_value) <=
-                launchpadDatas[_launchpadID].maxInvest,
-            "Value not in range invest"
-        );
+    //     require(
+    //         launchpadDatas[_launchpadID].minInvest <= _balanceOf.add(_value) &&
+    //             _balanceOf.add(_value) <=
+    //             launchpadDatas[_launchpadID].maxInvest,
+    //         "Value not in range invest"
+    //     );
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    function _checkTierBalance(
-        uint _launchpadID,
-        uint _tierID
-    ) external returns (bool) {
-        if (
-            tierDetails[_launchpadID][_tierID].amountRaised >=
-            tierDetails[_launchpadID][_tierID].maxTierCap
-        ) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    // function _checkTierBalance(
+    //     uint _launchpadID,
+    //     uint _tierID
+    // ) external returns (bool) {
+    //     if (
+    //         tierDetails[_launchpadID][_tierID].amountRaised >=
+    //         tierDetails[_launchpadID][_tierID].maxTierCap
+    //     ) {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+    // }
 }

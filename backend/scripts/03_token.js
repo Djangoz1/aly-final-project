@@ -3,7 +3,8 @@ const fs = require("fs");
 const { promisify } = require("util");
 const writeFileAsync = promisify(fs.writeFile);
 
-const { _testInitToken } = require("../helpers/test_init");
+const ADDRESSES = require("../addresses.json");
+const { getContractAt } = require("../helpers/test_init");
 const CONTRACT_NAME = "FactoryCV";
 
 // import ADDRS from "../../core/tasks/helpers/utils";
@@ -18,13 +19,16 @@ async function main() {
     this.addr6,
     this.addr7,
   ] = await ethers.getSigners();
-  const token = await _testInitToken(
-    this.owner,
-    "Django",
-    "DJN",
-    30000000000000000000n
+  const token = await getContractAt("Token", ADDRESSES.token);
+  const factory = await getContractAt(
+    "UniswapV2Factory",
+    ADDRESSES.uniswapFactory
   );
-  console.log("Token ERC20 create on", token.target);
+  const router = await getContractAt(
+    "UniswapV2Router02.sol",
+    ADDRESSES.uniswapFactory
+  );
+  console.log(token, factory, router);
 }
 
 main().catch((error) => {

@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { LinearGradient } from "react-text-gradients";
 import { AnimatePresence, motion } from "framer-motion";
 import { v4 } from "uuid";
-export const Logo = () => {
+export const Logo = ({ style, style1, styleD }) => {
   const [pointer, setPointer] = useState(0);
 
   return (
@@ -22,17 +22,17 @@ export const Logo = () => {
         // initial={{ scale: 0.8, opacity: 0 }}
         // animate={{ scale: 1, opacity: 1 }}
         // transition={{ duration: 0.5 }}
-        className="flex  items-start"
+        className="flex  items-center"
       >
         <div
-          className="w-12 
-       border logoD leading-none  flex items-center justify-center  rounded-r-full h-[30px] font2 "
+          className={`${styleD || "w-12 text-lg h-[30px]"} 
+       border logoD leading-none  flex items-center justify-center  rounded-r-full  font2 `}
         >
-          <Icon icon={icfy.ux.key} className="text-lg text-white" />
+          <Icon icon={icfy.ux.key} className=" text-white" />
         </div>
-        <div className="flex">
-          <span className="text-lg my-auto ">e</span>W
-          <span className="text-lg my-auto ">ork</span>
+        <div className={`flex items-center ${style1}`}>
+          <span className={`${style || "text-lg"} my-auto `}>e</span>W
+          <span className={`${style || "text-lg"} my-auto `}>ork</span>
         </div>
         {/* {titles[pointer]} */}
       </motion.div>

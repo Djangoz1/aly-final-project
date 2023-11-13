@@ -11,7 +11,7 @@ const { ZERO_ADDRESS, getAccount } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "DisputesHub";
 
-describe(`Contract ${CONTRACT_NAME} `, () => {
+describe.only(`Contract ${CONTRACT_NAME} `, () => {
   let addressSystem;
   let contract;
   let apiPost;
@@ -20,10 +20,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   let CVsHub;
   let featuresHub;
   let collecter;
+  let token;
   let datasHub;
   let contracts;
   let featureID;
   let arbitratorsHub;
+  let tokenPrice;
 
   /**
    * @notice On viens créer les cv des arbitres
@@ -65,6 +67,8 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     contract = contracts.escrows.disputesHub;
     collecter = contracts.works.collectWorkInteraction;
     arbitratorsHub = contracts.escrows.arbitratorsHub;
+    token = contracts.token;
+    tokenPrice = await token.price();
     // return;
     await apiPost.createCV("_tokenURI");
     await apiPost.connect(this.addr1).createCV("_tokenURI");
@@ -81,7 +85,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         expect(featureID > 0).to.equal(true);
       });
       it("DisputesHub : should have 0 tokens", async () => {
-        expect(await apiGet.lengthOfDisputes()).to.equal(0);
+        expect(await apiGet.tokensLengthOf(contract.target)).to.equal(0);
       });
     });
     describe("NOT WORKS", () => {
@@ -132,7 +136,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             3,
             "tokenURI"
           );
-          let length = await apiGet.lengthOfDisputes();
+          let length = await apiGet.tokensLengthOf(contract.target);
           expect(length).to.equal(1);
         });
         it("contestFeature : should get address of new dispute", async () => {
@@ -142,7 +146,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             3,
             "tokenURI"
           );
-          let id = await apiGet.lengthOfDisputes();
+          let id = await apiGet.tokensLengthOf(contract.target);
           let address = await apiGet.addressOfDispute(id);
           expect(address).to.not.equal(ZERO_ADDRESS);
         });
@@ -153,7 +157,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
             3,
             "tokenURI"
           );
-          let id = await apiGet.lengthOfDisputes();
+          let id = await apiGet.tokensLengthOf(contract.target);
           let id2 = await apiGet.disputeOfFeature(featureID);
 
           expect(id).to.be.equal(id2);
@@ -199,13 +203,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
     });
 
-    describe("Dispute Contract", () => {
+    describe.only("Dispute Contract", () => {
       let dispute;
       let disputeID;
       let tokenURI = "disputesURI";
       let nbArbitrators = 4;
       let accounts;
-
       /**
        * @notice Le owner de la feature viens la contesté
        * Et on viens récupérer l'instance du contrat dispute créée
@@ -226,19 +229,11 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           this.addr13,
           this.addr14,
         ];
-
         for (let index = 0; index < accounts.length; index++) {
           const account = accounts[index];
           await apiPost.connect(account).createCV("_tokenURI");
 
           await _testInitArbitrator(contracts, 3, account);
-
-          let value = 0.3 * index + 0.1;
-          let price = ethers.parseEther(`${value}`);
-
-          await apiPost
-            .connect(account)
-            .investOnCourt(3, { value: `${price}` });
         }
 
         await apiPost.contestFeature(
@@ -247,8 +242,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           nbArbitrators,
           tokenURI
         );
-        disputeID = await apiGet.lengthOfDisputes();
+        disputeID = await apiGet.tokensLengthOf(contract.target);
         let address = await apiGet.addressOfDispute(disputeID);
+        token = contracts.token;
         expect(address).to.not.equal(ZERO_ADDRESS);
         dispute = await getContractAt("Dispute", address);
       });
@@ -283,7 +279,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
               nbArbitrators,
               tokenURI
             );
-            let _disputeID = await apiGet.lengthOfDisputes();
+            let _disputeID = await apiGet.tokensLengthOf(contract.target);
             let address = await apiGet.addressOfDispute(_disputeID);
             expect(address).to.not.equal(ZERO_ADDRESS);
             expect(address).to.not.equal(dispute.target);
@@ -350,7 +346,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
               nbArbitrators,
               tokenURI
             );
-            let _disputeID = await apiGet.lengthOfDisputes();
+            let _disputeID = await apiGet.tokensLengthOf(contract.target);
             let address = await apiGet.addressOfDispute(_disputeID);
 
             let _dispute = await getContractAt("Dispute", address);
@@ -363,7 +359,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         });
       });
 
-      describe("Scenario", () => {
+      describe.only("Scenario", () => {
         describe("Senario : With 4 arbitrators", () => {
           /**
            * @notice Test de l'init de la dispute
@@ -1026,6 +1022,78 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                     await expect(
                       apiPost.connect(account[0]).vote(disputeID, 3)
                     ).to.be.revertedWith("Already voted");
+                  });
+
+                  it("voter : Should receive token from feature ETHEREUM", async () => {
+                    let account = getAccount(accounts, addrs[1].addr);
+                    let balance = await token.balanceOf(account[0].address);
+                    let datas = await apiGet.datasOfDispute(disputeID);
+
+                    await apiPost.connect(account[0]).vote(disputeID, 3);
+                    let _balance = await token.balanceOf(account[0].address);
+
+                    expect(balance + datas.value / tokenPrice / 2n).to.be.equal(
+                      _balance
+                    );
+                    expect(_balance > balance).to.be.equal(true);
+                  });
+                  it("voter : Should receive token from ERC feature", async () => {
+                    await apiPost.createMission("tokenURI");
+                    await apiPost.createFeature(
+                      900,
+                      await apiGet.tokensLengthOf(
+                        await addressSystem.missionsHub()
+                      ),
+                      50,
+                      false,
+                      "tokenURI",
+                      3
+                    );
+                    let featureID = await apiGet.tokensLengthOf(
+                      await addressSystem.featuresHub()
+                    );
+                    await apiPost.inviteWorker(2, featureID);
+                    await apiPost.connect(this.addr1).acceptJob(featureID);
+                    await apiPost.contestFeature(featureID, 7, 3, "tokenURi");
+                    let _disputeID = await apiGet.tokensLengthOf(
+                      await addressSystem.disputesHub()
+                    );
+                    await apiPost.initDispute(_disputeID);
+                    let arbitratorID;
+                    let nbArbitrator = 0;
+                    for (let index = 1; index < 10; index++) {
+                      let bool = await apiGet.allowanceOfArbitrator(
+                        _disputeID,
+                        index
+                      );
+                      if (bool) {
+                        arbitratorID = index;
+                        let _account = getAccount(
+                          accounts,
+                          await apiGet.ownerOfToken(
+                            arbitratorID,
+                            await addressSystem.arbitratorsHub()
+                          )
+                        );
+                        _account = _account[0];
+
+                        await apiPost
+                          .connect(_account)
+                          .acceptArbitration(_disputeID);
+                        nbArbitrator++;
+                        if (nbArbitrator === 3) {
+                          datas = await apiGet.datasOfDispute(_disputeID);
+                          balance = await token.balanceOf(_account.address);
+                          await apiPost.connect(_account).vote(_disputeID, 2);
+                          _balance = await token.balanceOf(_account.address);
+                          expect(balance + datas.value / 2n).to.be.equal(
+                            _balance
+                          );
+
+                          break;
+                        }
+                      }
+                    }
                   });
 
                   it("vote : Should update counters votes length", async () => {

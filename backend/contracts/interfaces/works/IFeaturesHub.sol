@@ -18,7 +18,8 @@ interface IFeaturesHub {
         uint16 _estimatedDays,
         bool _isInviteOnly,
         string memory _tokenURI,
-        DataTypes.CourtIDs _specification
+        DataTypes.CourtIDs _specification,
+        bool _payWithToken
     ) external returns (uint);
 
     function dataOf(
