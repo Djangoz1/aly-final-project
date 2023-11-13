@@ -21,6 +21,14 @@ body {
   box-shadow: 0px 0px 38px 2px rgba(45, 255, 196, 0.28);
 }
 
+.on_hover:hover .on_hover_view {
+  opacity: 100;
+}
+
+.on_hover .on_hover_view {
+  opacity: 0;
+}
+
 .shadow1,
 .shadowh._hover:hover {
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 1),

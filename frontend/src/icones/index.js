@@ -6,6 +6,8 @@ export const icfy = {
     open: "ic:outline-remove-red-eye",
   },
   ux: {
+    edit: "line-md:edit-twotone-full",
+    refresh: "solar:refresh-bold-duotone",
     shop: "icon-park-twotone:shopping",
     medal: "noto:sports-medal",
     phone: "ph:phone-duotone",
@@ -269,6 +271,7 @@ export const IcShieldCheck = () => (
 );
 
 export const icsystem = {
+  ai: "eos-icons:ai-healing-outlined",
   escrow: icfy.court.injustice,
   launchpad: icfyROCKET,
   court: icfy.court.hammer,

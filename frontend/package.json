@@ -29,6 +29,7 @@
     "graphql": "^16.7.1",
     "moment": "^2.29.4",
     "next": "13.4.7",
+    "openai": "^4.17.4",
     "pocketbase": "^0.7.0",
     "react": "18.2.0",
     "react-big-calendar": "^1.8.4",
