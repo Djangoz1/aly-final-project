@@ -69,10 +69,11 @@ export const FormCreateMission2 = () => {
           },
         ]}
       />
-      <div className="flex items-center mt-3">
+      <div className="flex items-center my-3">
         <MyInput label={"Max budget"} type={"number"} target={"budget"} />
         <MyInput label={"Max task(s)"} type={"number"} target={"features"} />
       </div>
+      <MyInput label={"Company name"} target={"company"} />
     </div>
   );
 };

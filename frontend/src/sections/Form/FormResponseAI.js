@@ -45,7 +45,12 @@ export const FormResponseAI = () => {
             : ""
         },
         abstract: "I want the shortest description possible",
-        detail: "you must be precise on the details depending on the project that the client presents to you. Your response must be at least 20,000 characters long and more if necessary"
+        detail: "you must be precise on the details depending on the project that the client presents to you. Detail value must be have at least 20 000 characters long and more if necessary. ${
+          form?.company
+            ? `You must also mention the name of the customer's company which is ${form?.company}`
+            : ""
+        }
+
 
       }.
     I am a client who has come to see you to present the following project to you:" ${
