@@ -29,25 +29,21 @@ export const MyNum = ({ num, toFix, style, children }) => {
       setIsNums({ int: pairs, float: floatsPairs, ref: num });
     }
   }, [num]);
-
   return (
     <span ref={ref} className={`flex items-center ${style}`}>
-      {isNums?.int?.map(
-        (el, i) =>
-          (i > 0 && parseInt(el) > 0) ||
-          (i === 0 && (
-            <span
-              key={`int${i}`}
-              className="countdown w-fit m-0   leading-none p-0 tracking-[-0.5px]"
-            >
-              <span
-                style={{
-                  "--value": !isInView ? 0 : parseInt(el) || 0,
-                }}
-              ></span>
-            </span>
-          ))
-      )}
+      {isNums?.int?.map((el, i) => (
+        // (i > 0 && parseInt(el) > 0) ||
+        <span
+          key={`int${i}`}
+          className="countdown w-fit m-0   leading-none p-0 tracking-[-0.5px]"
+        >
+          <span
+            style={{
+              "--value": !isInView ? 0 : parseInt(el) || 0,
+            }}
+          ></span>
+        </span>
+      ))}
       {isNums?.float?.length > 0 && "."}
       {isNums?.float?.map((el, i) => (
         <span key={"float " + el + i} className="countdown">

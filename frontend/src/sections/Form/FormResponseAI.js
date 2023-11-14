@@ -13,6 +13,7 @@ import { icfy, icfyAI, icsystem } from "icones";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyLoader } from "components/myComponents/layout/MyLoader";
+import { ElementResponseAI } from "./ElementResponseAI";
 
 export const FormResponseAI = () => {
   const { form } = useFormState();
@@ -24,7 +25,50 @@ export const FormResponseAI = () => {
   let [isRotate, setIsRotate] = useState(0);
   let fetchAI = async () => {
     const data = {
-      mission: form?.description,
+      mission: `You are a project manager who has contributed to the creation of hundreds of companies, all in different fields, which allows you to have global expertise. You must respond by following these instructions, without obviously mentioning these instructions in your response. but you must follow all these instructions in your response. I remind you that your answer looks like this: {
+        name : string,
+         roles : [{role_name, skills_required:[]}],
+         abstract:string,
+         detail:string,
+          budget: {total: uint, roles_budget:[]}
+        }. 
+        Here are your instructions: {
+        roles_budget : "Don't forget to find a budget  & dispatch for each roles to roles_budget${
+          form?.budget > 0
+            ? `, my budget is ${form?.budget} dollars but If the budget seems much too low to you, you have the right to increase it only if necessary`
+            : ""
+        }",
+        roles_name : "add an emoticon for each roles_name",
+        roles: ${
+          form?.features > 0
+            ? `I want to create ${form?.features} roles but you can change it if necessary`
+            : ""
+        },
+        abstract: "I want the shortest description possible",
+        detail: "you must be precise on the details depending on the project that the client presents to you. Your response must be at least 20,000 characters long and more if necessary"
+
+      }.
+    I am a client who has come to see you to present the following project to you:" ${
+      form?.description
+    }".`,
+      //   mission: `You are a project manager ${
+      //     form?.description
+      //   }.  Your response must comply with the following instructions: {
+      //     roles_budget : "Don't forget to find a budget  & dispatch for each roles to roles_budget${
+      //       form?.budget > 0
+      //         ? `, my budget is ${form?.budget} dollars but If the budget seems much too low to you, you have the right to increase it only if necessary`
+      //         : ""
+      //     }",
+      //     roles_name : "add an emoticon for each roles_name",
+      //     roles: ${
+      //       form?.features > 0
+      //         ? `I want to create ${form?.features} roles but you can change it if necessary`
+      //         : ""
+      //     },
+      //     abstract: "I want the shortest description possible",
+      //     detail: "You must to be very specific about the detail  and the process of producing it. I expect at least 20000 characters for detail and more if necessary."
+
+      //   }  `,
     };
     setAiResponse(null);
     setIsLoading(true);
@@ -62,94 +106,124 @@ export const FormResponseAI = () => {
   console.log("airesponse :", aiResponse);
   return (
     <div className="bg-black overflow-y-scroll fixed px-4 h-[85vh] w-[95vw] bottom-[0] left-[2.5vw] rounded-lg  flex flex-col text-white">
-      <div className="w-full  flex justify-between">
-        <span className="flex items-center">
-          <Icon icon={icsystem.ai} className="text-primary text-6xl" />
-          <TextAI
-            style={"font-bold text-lg"}
-            text={"Let's see what I've cooked..."}
-          ></TextAI>
-        </span>
-        <MyMainBtn template={2} setter={() => fetchAI()} icon={{ no: true }}>
-          {isLoading ? (
-            <span className="loading loading-ring w-fit"></span>
-          ) : (
-            <Icon icon={icfy.ux.refresh} className={`rotate-${isRotate}`} />
-          )}
-        </MyMainBtn>
-      </div>
-
-      <div className="flex mt-5 w-full ">
-        <div className="flex flex-col w-1/3">
-          <div className="flex items-center relative on_hover w-full">
-            <button
-              className="right-0 absolute on_hover_view btn btn-xs btn-ghost top-0"
-              onClick={() =>
-                setAiResponse({ ...aiResponse, name: form?.title })
-              }
-            >
-              <Icon icon={icfy.ux.refresh} />
-            </button>
-            <TextAI style={"font-bold "} text={`🗂️ Project name :`}>
-              <TextAI
-                text={`- ${aiResponse?.name}`}
-                style={"mb-4 text-xs"}
-              ></TextAI>
-            </TextAI>
-          </div>
-          <div className="flex my-4 items-center">
-            <TextAI style={"font-bold"} text={"Abstract description :"}>
-              <TextAI
-                style={"text-xs text-lg"}
-                text={`${aiResponse?.abstract}`}
-              >
-                <span className="flex items-center text-[9px] text-warning">
-                  <Icon icon={icfy.ux.warning} className="text-lg" /> This
-                  description will appear on short description item
-                </span>
-              </TextAI>
-            </TextAI>
-          </div>
-          <div className="w-full flex flex-col on_hover relative">
-            <div className="absolute right-0 top-0 on_hover_view flex items-center">
-              <button
-                className="btn btn-xs btn-ghost "
-                onClick={() =>
-                  setAiResponse({ ...aiResponse, detail: form?.description })
-                }
-              >
-                <Icon icon={icfy.ux.edit} />
-              </button>
-              <button
-                className=" btn btn-xs btn-ghost "
-                onClick={() =>
-                  setAiResponse({ ...aiResponse, detail: form?.description })
-                }
-              >
-                <Icon icon={icfy.ux.refresh} />
-              </button>
+      <div className="flex  mt-5 w-full ">
+        <MyCard
+          template={1}
+          styles={"py-4"}
+          className="flex px-2 py-3 border rounded-lg border-white/5 flex-col w-1/3"
+        >
+          <div className="chat ml-4 mb-5 chat-start">
+            <div className="chat-image avatar">
+              <div className="w-10 rounded-full">
+                <img alt="Tailwind CSS chat bubble component" src="/ai.png" />
+              </div>
             </div>
-
-            <TextAI style={"font-bold "} text={`ℹ️ Details :`}>
+            <div className="chat-header">
+              Aly
+              {/* <span className="text-xs  opacity-50">Mission name</span> */}
+            </div>
+            <div className="chat-bubble">
               <TextAI
-                text={`- ${aiResponse?.detail}`}
-                style={"mb-4 text-xs"}
+                style={"font-bold text-xs"}
+                text={"Let's see what I've cooked..."}
               ></TextAI>
-            </TextAI>
+            </div>
           </div>
-        </div>
-        <div className="flex w-2/3 px-4 flex-col">
-          <h6 className="flex items-center justify-end">
-            Nombre de tâches :{" "}
-            <MyNum style={"ml-2"} num={aiResponse?.roles?.length || 0} />
-          </h6>
+          {aiResponse?.budget?.total &&
+          form?.budget != aiResponse?.budget?.total ? (
+            <div className="chat ml-4 mb-5 chat-start">
+              <div className="chat-image avatar">
+                <div className="w-10 rounded-full">
+                  <img alt="Tailwind CSS chat bubble component" src="/ai.png" />
+                </div>
+              </div>
+              <div className="chat-header">
+                Aly
+                {/* <span className="text-xs  opacity-50">Mission name</span> */}
+              </div>
+              <div className="chat-bubble text-xs flex items-center">
+                I advise you to opt for a budget of {aiResponse?.budget?.total}
+                <span className="line-through text-error mx-2">
+                  {form?.budget}
+                </span>{" "}
+                $
+              </div>
+            </div>
+          ) : undefined}
+          {aiResponse?.budget?.roles_budget?.length !==
+            aiResponse?.roles?.length && (
+            <div className="chat ml-4 mb-5 chat-start">
+              <div className="chat-image avatar">
+                <div className="w-10 rounded-full">
+                  <img alt="Tailwind CSS chat bubble component" src="/ai.png" />
+                </div>
+              </div>
+              <div className="chat-header">
+                Aly
+                {/* <span className="text-xs  opacity-50">Mission name</span> */}
+              </div>
+              <div className="chat-bubble">
+                <TextAI
+                  style={"font-bold text-xs"}
+                  text={
+                    "I had difficulty providing you with a budget, perhaps you should modify/give me a budget"
+                  }
+                ></TextAI>
+              </div>
+            </div>
+          )}
+          <ElementResponseAI
+            target={"title"}
+            title={`Project name :`}
+            text={aiResponse?.name}
+          />
+          <ElementResponseAI
+            target={"budget"}
+            title={`Budget total for this mission:`}
+            text={aiResponse?.budget?.total}
+          >
+            $
+          </ElementResponseAI>
+
+          <ElementResponseAI
+            target={"description"}
+            title={"Abstract description :"}
+            text={aiResponse?.abstract}
+          />
+
+          <ElementResponseAI
+            target={"description"}
+            title={"Detail :"}
+            text={aiResponse?.detail}
+          />
+        </MyCard>
+        <div className="flex w-fit px-4 flex-col">
+          <div className="flex justify-between items-center">
+            <h6 className="flex items-center justify-end">
+              Nombre de tâches :{" "}
+              <MyNum style={"ml-2"} num={aiResponse?.roles?.length || 0} />
+            </h6>
+            <MyMainBtn
+              style={"ml-auto"}
+              template={2}
+              setter={() => fetchAI()}
+              icon={{ no: true }}
+            >
+              {isLoading ? (
+                <span className="loading loading-ring "></span>
+              ) : (
+                <Icon icon={icfy.ux.refresh} className={`rotate-${isRotate}`} />
+              )}
+            </MyMainBtn>
+          </div>
+
           {aiResponse?.roles?.length > 0 ? (
             <div className="grid gap-2 w-full  grid-cols-2">
               {aiResponse?.roles?.map((el, index) => (
                 <MyCard
                   template={1}
                   key={v4()}
-                  styles="on_hover bg-white/5 w-full p-3"
+                  styles="on_hover flex flex-col bg-white/5 w-full p-3"
                 >
                   <button
                     onClick={() =>
@@ -162,11 +236,8 @@ export const FormResponseAI = () => {
                   >
                     <Icon icon={icfy.ux.garbage} className="text-error " />
                   </button>
-                  <TextAI
-                    text={index + 1 + "- " + el?.role_name}
-                    style={" font-semibold "}
-                  >
-                    <div className="flex items-center mt-3 flex-wrap gap-2">
+                  <TextAI text={el?.role_name} style={" font-semibold "}>
+                    <div className="flex items-center my-3 flex-wrap gap-2">
                       {el?.skills_required?.map((el1, index1) => (
                         <div
                           className={`badge py-[2px] h-fit text-[9px] badge-xs badge-${
@@ -182,6 +253,22 @@ export const FormResponseAI = () => {
                       ))}
                     </div>
                   </TextAI>
+                  {aiResponse?.budget?.roles_budget?.[index]
+                    ?.allocated_budget ? (
+                    <div className="flex mt-auto items-center">
+                      <Icon
+                        icon={icfy.bank.dollars}
+                        className="mr-2 text-2xl"
+                      />
+                      <TextAI
+                        text={aiResponse?.budget?.roles_budget?.[
+                          index
+                        ]?.allocated_budget
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      ></TextAI>
+                    </div>
+                  ) : undefined}
                 </MyCard>
               ))}
             </div>
