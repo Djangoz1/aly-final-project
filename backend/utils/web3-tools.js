@@ -252,12 +252,6 @@ let _createLaunchpad = async ({
   let id = parseInt(await apiGet.tokensLengthOf(_addrLH)) + 1;
 
   let { launchpadURI, tokenURI } = await createURILaunchpad({ userID });
-  const token = await _testInitToken(account, "Django", "DJN", tokens);
-  let _tierDatas = tiersDatas || [
-    TIER_DATAS_EXEMPLE,
-    TIER_DATAS_EXEMPLE,
-    TIER_DATAS_EXEMPLE,
-  ];
 
   const currentTimestampSeconds = Math.floor(Date.now() / 1000);
 
@@ -265,29 +259,27 @@ let _createLaunchpad = async ({
   const saleStart = currentTimestampSeconds + 100000;
   let _launchpadDatas = {
     id,
-    tokenURI: launchpadURI,
-    tokenAddress: token.target || moock.tokenAddress,
-    numberOfTier: launchpadDatas?.numberOfTier || moock.numberOfTier,
+
     maxCap: launchpadDatas?.maxCap || moock.maxCap,
     minCap: launchpadDatas?.minCap || moock.minCap,
-    minInvest: launchpadDatas?.minInvest || _tierDatas[0].minTierCap,
+    minInvest:
+      launchpadDatas?.minInvest || launchpadDatas?.minCap || moock.minCap,
     maxInvest:
-      launchpadDatas?.maxInvest ||
-      _tierDatas[0].maxTierCap * BigInt(_tierDatas.length),
+      launchpadDatas?.maxInvest || launchpadDatas?.maxCap || moock.maxCap,
+
     saleStart: launchpadDatas?.saleStart || saleStart,
     saleEnd: launchpadDatas?.saleEnd || moock.saleEnd,
-    lockedTime: launchpadDatas?.lockedTime || moock.lockedTime,
+    amountRaised: 0,
     totalUser: launchpadDatas?.totalUser || moock.totalUser,
   };
   await apiPostPayable
     .connect(account)
-    .createLaunchpad(_launchpadDatas, _tierDatas, tokenURI, {
+    .createLaunchpad(_launchpadDatas, tokenURI, {
       value: await balancesHub.launchpadPrice(),
     });
 
   let launchpadAddr = await apiGet.addressOfLaunchpad(id);
-  await token.approve(launchpadAddr, await token.totalSupply());
-  await apiPost.lockTokens(id, await token.totalSupply());
+
   if (account.address != (await apiGet.ownerOfToken(id, _addrLH))) {
     throw new Error("Error Launchpad: URI ID");
   }

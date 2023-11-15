@@ -6,7 +6,7 @@ import { CVName } from "components/inputs/inputsCV/CVName";
 import { ImagePin } from "components/Image/ImagePin";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
-import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
+import { clientPocket, fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import { Icon } from "@iconify/react";
 import { icfy, icfyBUBBLE, icfyHEART, icfyMISSION, icfySEND } from "icones";
 import { MyModal } from "components/myComponents/modal/MyModal";
@@ -19,23 +19,35 @@ import { CodeEditor } from "components/myComponents/MyEditor";
 import { ENUMS } from "constants/enums";
 import { useInView } from "framer-motion";
 import { v4 } from "uuid";
-import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
+import {
+  doStateIndexerTools,
+  doStateTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
 import { useAuthState } from "context/auth";
 import { MyNum } from "components/myComponents/text/MyNum";
+import { Avatar } from "components/profile/ProfileAvatar";
 
 export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
   const [isDatas, setIsDatas] = useState(null);
+  if (color === 1) {
+    console.log("------", _pub);
+  }
   let [isClicked, setIsClicked] = useState(null);
   let { isConnected, address } = useAccount();
   let ref = useRef(null);
   let isInView = useInView(ref);
-  let { cv } = useAuthState();
+  let { cv, metadatas } = useAuthState();
   let tools = useToolsState();
+  let { indexer } = useToolsState();
   let dispatch = useToolsDispatch();
 
   const state = async () => {
     if (_pub && _owner) {
       setIsDatas({ pub: _pub, owner: _owner });
+    } else if (_pub && !_owner) {
+      setIsDatas({ pub: _pub });
     } else if (parseInt(id) > 0) {
       let pub;
 
@@ -60,6 +72,8 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
     }
   };
 
+  console.log(isDatas?.pub);
+
   useEffect(() => {
     if ((!isDatas && isInView) || (isInView && id != isDatas?.pub?.pubID)) {
       state();
@@ -68,9 +82,24 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
 
   let setterLike = async (func) => {
     if (isConnected) {
-      await _apiPost(func, [id]);
+      let _datas = {
+        userID: metadatas?.id,
+        postID: isDatas?.pub?.metadata?.id,
+      };
+      let likeUser = isDatas?.pub?.metadata?.likes?.filter(
+        (el) => el?.userID == metadatas?.id
+      )?.[0];
+
+      if (!likeUser) {
+        await clientPocket.records.create("likes", _datas);
+      } else {
+        await clientPocket.records.delete("likes", likeUser?.recordID);
+      }
+
       state();
     }
+
+    return;
   };
 
   return (
@@ -89,7 +118,8 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
           <div className="flex flex-col h-full  items-center ">
             {modal && <LogoIc styles={"mb-5"} />}
             <div className="avatar">
-              <ImagePin
+              <Avatar
+                metadatas={isDatas?.owner}
                 CID={isDatas?.owner?.image}
                 style={`w-${styles?.img || "12"} mask mask-squircle `}
               />
@@ -184,23 +214,17 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                     <Link
                       href={`#pub${id}`}
                       onClick={() =>
-                        doStateTools(
-                          dispatch,
-                          {
-                            ...tools?.state,
-                            front: {
-                              ...tools?.state?.front,
-                              indexPub: {
-                                id: id,
-                                answer:
-                                  id !== tools?.state?.front?.indexPub?.id
-                                    ? true
-                                    : !tools?.state?.front?.indexPub?.answer,
-                              },
-                            },
+                        doStateIndexerTools(dispatch, {
+                          ...indexer,
+                          indexPub: {
+                            ...indexer?.indexPub,
+                            id: id,
+                            answer:
+                              id !== indexer?.indexPub?.id
+                                ? true
+                                : !indexer?.indexPub?.answer,
                           },
-                          tools?.pointer
-                        )
+                        })
                       }
                       className={`flex text-[9px] border border-white/5  bg-white/5 btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer normal-case`}
                     >
@@ -208,7 +232,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                       Answers
                       <MyNum
                         toFix={0}
-                        num={isDatas?.pub?.datas?.answers?.length}
+                        num={isDatas?.pub?.metadata?.answers?.length}
                         style=" border-2 border-l-white/10 border-white/0 pl-2 "
                       ></MyNum>
                     </Link>
@@ -216,23 +240,17 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                       disabled={!cv}
                       href={`#pub${id}`}
                       onClick={() =>
-                        doStateTools(
-                          dispatch,
-                          {
-                            ...tools?.state,
-                            front: {
-                              ...tools?.state?.front,
-                              indexPub: {
-                                id: id,
-                                post:
-                                  id !== tools?.state?.front?.indexPub?.id
-                                    ? true
-                                    : !tools?.state?.front?.indexPub?.post,
-                              },
-                            },
+                        doStateIndexerTools(dispatch, {
+                          ...tools?.indexer,
+
+                          indexPub: {
+                            id: id,
+                            post:
+                              id !== tools?.state?.front?.indexPub?.id
+                                ? true
+                                : !tools?.state?.front?.indexPub?.post,
                           },
-                          tools?.pointer
-                        )
+                        })
                       }
                       className="btn ml-10 border border-white/5 text-[9px] normal-case btn-xs btn-ghost"
                     >
@@ -240,45 +258,51 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                       Post
                     </button>
                   </div>
-
-                  {tools?.state?.front?.indexPub?.id === id &&
-                    tools?.state?.front?.indexPub?.post === true && (
+                  {indexer?.indexPub?.id === id &&
+                    indexer?.indexPub?.post === true && (
                       <CreatePub
                         btn={<></>}
+                        refresh={state}
                         styles={`flex btn btn-ghost btn-xs py-2 h-fit w-fit hover:text-secondary cursor-pointer ${
                           !isConnected && "btn-disabled"
                         }`}
-                        answerID={id}
+                        answerID={isDatas?.pub?.metadata?.id}
                       />
                     )}
                 </div>
 
                 <button
-                  // disabled={!isConnected}
+                  disabled={!cv}
                   className={`flex border border-white/5 bg-white/5 text-[9px] normal-case btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer ${
-                    !isDatas?.likers?.includes(address)
-                      ? "hover:text-secondary"
-                      : "text-secondary hover:text-error"
+                    isDatas?.pub?.metadata?.likes?.filter(
+                      (el) => el?.userID == metadatas?.id
+                    )?.[0]
+                      ? "hover:text-error"
+                      : "hover:text-success"
                   }`}
-                  onClick={() =>
-                    setterLike(
-                      !isDatas?.likers?.includes(address)
-                        ? "likePub"
-                        : "unlikePub"
-                    )
-                  }
+                  onClick={() => setterLike()}
                 >
-                  {isDatas?.likers?.includes(address) ? (
-                    "Liked"
+                  {isDatas?.pub?.metadata?.likes?.filter(
+                    (el) => el?.userID == metadatas?.id
+                  )?.[0] ? (
+                    <>
+                      <Icon
+                        icon={icfy.like}
+                        className="text-lg text-success  mr-1"
+                      />
+                      {/* <Icon className={`text-lg mr-2 debug`} /> */}
+                      Liked
+                    </>
                   ) : (
                     <>
-                      <Icon icon={icfySEND} className={`text-lg mr-2 `} />
+                      <Icon icon={icfy.like} className="text-lg  mr-1" />
+                      {/* <Icon className={`text-lg mr-2 debug`} /> */}
                       Likes
                     </>
                   )}
                   <MyNum
                     toFix={0}
-                    num={parseInt(isDatas?.pub?.datas?.likes)}
+                    num={parseInt(isDatas?.pub?.metadata?.likes?.length)}
                     style=" border-2 border-l-white/10 border-white/0 pl-2 "
                   ></MyNum>
                 </button>
@@ -301,10 +325,20 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
             )}
           </div>
         </div>
-        {tools?.state?.front?.indexPub?.id === id &&
-          tools?.state?.front?.indexPub?.answer === true &&
-          isDatas?.pub?.datas?.answers?.map((el) => (
-            <Pub key={v4()} color={1} styles={"bg-white c1 "} id={el} />
+        {console.log("indexer", indexer)}
+        {indexer?.indexPub?.id === id &&
+          indexer?.indexPub?.answer === true &&
+          isDatas?.pub?.metadata?.answers?.map((el) => (
+            <>
+              {console.log(el)}
+              <Pub
+                key={v4()}
+                _pub={{ metadata: el }}
+                color={1}
+                styles={"bg-white c1 "}
+                id={el}
+              />
+            </>
           ))}
       </>
     )

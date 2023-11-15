@@ -138,7 +138,6 @@ library DataTypes {
     }
 
     struct PubData {
-        uint likes;
         uint answers;
         uint missionID;
         bool isPayable;
@@ -149,15 +148,6 @@ library DataTypes {
         uint viewers;
         string tokenURI;
         bool isAllowed;
-    }
-    /**
-     *    @param id
-     *    @param pubID
-     */
-    struct LikeData {
-        uint256 id;
-        uint256 pubID;
-        uint256 indexedAt;
     }
 
     // *::::::::::::: ------- :::::::::::::* //

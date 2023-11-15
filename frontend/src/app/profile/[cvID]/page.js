@@ -68,11 +68,12 @@ function App({ params }) {
   let fetch = async () => {
     setIsLoading(true);
     let _state = await doStateProfileTools({ dispatch, cvID });
+    console.log("_state", _state);
     setIsState(_state);
     setIsLoading(false);
   };
   useEffect(() => {
-    if (!isState || status === "reload") {
+    if (status === "idle" || status === "reload") {
       fetch();
       console.log("Origin fetch is datas cv", isState);
     }

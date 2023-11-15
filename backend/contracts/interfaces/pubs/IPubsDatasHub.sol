@@ -24,10 +24,6 @@ interface IPubsDatasHub {
 
     function indexerOf(uint _id) external view returns (uint[] memory);
 
-    function like(uint _cvID, uint _pubID) external;
-
-    function unlike(uint _cvID, uint _pubID) external;
-
     // -------------------------- //
     // ****** REFERAL PUBS ****** //
     // ****** ------------ ****** //
@@ -45,10 +41,6 @@ interface IPubsDatasHub {
     ) external;
 
     function answersOfPub(uint _pubID) external view returns (uint[] memory);
-
-    function dataOf(
-        uint _likeID
-    ) external view returns (DataTypes.LikeData memory);
 
     function pubsOfMission(
         uint _missionID

@@ -4,14 +4,14 @@ import { useFormState } from "context/form";
 import { icfy } from "icones";
 import React, { useEffect, useState } from "react";
 
-export const ElementResponseAI = ({ title, children, text, target }) => {
+export const ElementResponseAI = ({ style, title, children, text, target }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isFormValue, setIsFormValue] = useState(false);
 
   const { form } = useFormState();
   return (
     <div className="w-full h-fit  py-2 px-4 hover:bg-white/5 flex flex-col on_hover relative">
-      <div className="absolute right-0 top-0  flex items-center">
+      <div className="absolute on_hover_view right-0 top-0  flex items-center">
         <button
           className={`btn btn-xs btn-ghost ${
             !isEdit ? "on_hover_view" : "text-success"
@@ -40,12 +40,12 @@ export const ElementResponseAI = ({ title, children, text, target }) => {
       ) : isFormValue ? (
         <TextAI
           text={`${children ? children : ""}${form?.[target]}`}
-          style={"mb-4 text-xs"}
+          style={"mb-4 text-xs " + style}
         ></TextAI>
       ) : text ? (
         <TextAI
           text={`${children ? children : ""}${text}`}
-          style={"mb-4 text-xs"}
+          style={"mb-4 text-xs " + style}
         ></TextAI>
       ) : (
         <div className="loading loading-spinner" />

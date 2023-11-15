@@ -98,27 +98,7 @@ export const CVProfile = ({}) => {
                 >
                   Publish
                 </MyMainBtn>
-                {/* //!Moock local. To delete */}
-                <Pub
-                  _owner={{ username: "Django" }}
-                  _pub={{
-                    metadata: {
-                      description: (
-                        <>
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Error odit repudiandae, itaque ducimus accusamus
-                          quasi corrupti quisquam quia optio soluta et libero
-                          perferendis nemo vitae deleniti sapiente adipisci eos.
-                          Recusandae.
-                        </>
-                      ),
-                    },
-                  }}
-                  id={1}
-                  styles={{ size: "10px", clamp: "none" }}
-                  key={v4()}
-                />
-                {/* //!Moock local. To delete */}
+
                 {state?.pubs?.length > 0 ? (
                   state?.pubs?.map((pub, index) => (
                     <Pub

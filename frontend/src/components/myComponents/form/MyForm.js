@@ -25,6 +25,7 @@ import { v4 } from "uuid";
 import { useToolsState } from "context/tools";
 import { MyCardPrice } from "../card/MyCardPrice";
 import { MyToggle } from "./MyToggle";
+import { FormTxs } from "sections/Form/FormTxs";
 
 export const MyForm = ({
   stateInit,
@@ -401,29 +402,31 @@ let Child1 = ({ components, sideImg, title, arr, submit, editer }) => {
                         </div>
                       </div>
                     ) : undefined}
-                    {pointer !== 0 && pointer !== components?.length && target
-                      ? components?.[pointer]?.component
-                      : isConnected && (
-                          <MyCardPrice
-                            style={"mx-auto"}
-                            btn={{ no: true }}
-                            lists={arr?.map((el, i) => {
-                              return (
-                                i > 0 && {
-                                  title: el?.title,
+                    {pointer !== 0 &&
+                    pointer !== components?.length &&
+                    target ? (
+                      components?.[pointer]?.component
+                    ) : isConnected && pointer === 0 ? (
+                      <MyCardPrice
+                        style={"mx-auto"}
+                        btn={{ no: true }}
+                        lists={arr?.map((el, i) => {
+                          return (
+                            i > 0 && {
+                              title: el?.title,
 
-                                  check:
-                                    pointer === components?.length
-                                      ? true
-                                      : false,
-                                }
-                              );
-                            })}
-                            price={form?.price}
-                            color={2}
-                            badge={{ title: title, icon: icsystem?.[target] }}
-                          />
-                        )}
+                              check:
+                                pointer === components?.length ? true : false,
+                            }
+                          );
+                        })}
+                        price={form?.price}
+                        color={2}
+                        badge={{ title: title, icon: icsystem?.[target] }}
+                      />
+                    ) : (
+                      <FormTxs />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               ) : undefined}

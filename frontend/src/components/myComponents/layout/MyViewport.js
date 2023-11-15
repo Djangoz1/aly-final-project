@@ -112,9 +112,7 @@ export function Viewport({
           <div ref={ref1} className="absolute  bottom-0 py-1 w-full"></div>
           {!fixed ? children : undefined}
         </div>
-        <motion.span className="position  absolute bottom-10 right-10">
-          #00<span className="c2 ">{`${id}`}</span>
-        </motion.span>
+
         {side && (
           <div className="w-[15vw] h-[92vh] backdrop-blur  rounded-tr-lg overflow-hidden shadow1 bottom-0 left-0  absolute  z-10">
             {side}

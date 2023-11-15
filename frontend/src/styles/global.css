@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 @import "satoshi.css";
+@import "nippo.css";
 @font-face {
   font-family: "Satoshi";
+  /* src: url("/frontend/public/Satoshi_Complete/Fonts/WEB/css/satoshi.css") format("otf"); */
+}
+@font-face {
+  font-family: "Nippo";
   /* src: url("/frontend/public/Satoshi_Complete/Fonts/WEB/css/satoshi.css") format("otf"); */
 }
 
@@ -21,11 +26,11 @@ body {
   box-shadow: 0px 0px 38px 2px rgba(45, 255, 196, 0.28);
 }
 
-.on_hover:hover .on_hover_view {
+.on_hover:hover > .on_hover_view {
   opacity: 100;
 }
 
-.on_hover .on_hover_view {
+.on_hover > .on_hover_view {
   opacity: 0;
 }
 
@@ -79,6 +84,10 @@ body {
 
 .font2 {
   font-family: "Satoshi-Variable", "exo", sans-serif;
+}
+
+.font3 {
+  font-family: "Nippo-Variable", sans-serif;
 }
 
 .text-shadow {

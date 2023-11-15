@@ -23,6 +23,7 @@ export const LayoutTools = ({ children, state }) => {
 
   useEffect(() => {
     if (address) {
+      console.log("address", address);
       doAuthCV(dispatch, address);
     }
   }, [address]);

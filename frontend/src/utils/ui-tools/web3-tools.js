@@ -13,9 +13,6 @@ export const viemClient = createPublicClient({
 // *::::::::::::::: GLOBAL  :::::::::::::::*
 
 export const _apiPost = async (func, args, value) => {
-  console.log("func ", func);
-  console.log("args ", args);
-  console.log("value ", value);
   try {
     const { request } = await prepareWriteContract({
       address: ADDRESSES["apiPost"],
@@ -32,9 +29,6 @@ export const _apiPost = async (func, args, value) => {
   }
 };
 export const _apiPostPayable = async (func, args, value) => {
-  console.log("func ", func);
-  console.log("args ", args);
-  console.log("value ", value);
   try {
     return await _apiPostAt({
       targetContract: "apiPostPayable",
@@ -71,7 +65,7 @@ export const _apiPostAt = async ({
 
 export const _apiGet = async (func, args, walletClient) => {
   try {
-    let account;
+    let account = undefined;
     if (walletClient) {
       account = walletClient.account;
     }

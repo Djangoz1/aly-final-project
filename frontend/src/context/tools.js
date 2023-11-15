@@ -29,6 +29,7 @@ const initialState = {
   state: null,
   id: null,
   target: null,
+  indexer: null,
   index: 0,
   pointer: null,
   url: null,
@@ -48,92 +49,102 @@ export const doReloadTools = async (dispatch) => {
   dispatch({ status: "reload" });
 };
 
+export const doStateIndexerTools = async (dispatch, indexer) => {
+  dispatch({ status: "pending indexer" });
+  dispatch({ indexer, status: "success" });
+};
+
 export const doStateProfileTools = async ({ dispatch, cvID }) => {
   dispatch({ status: "pending profile" });
-  let owner = await stateCV(cvID);
-  owner.details = {
-    wadge: 0,
-    // ! To fix
-    missions: [],
-    features: [],
-    arbitrators: [],
-    badges: [],
-    disputes: [],
-  };
-
-  for (let index = 0; index < owner?.datas?.proposals?.length; index++) {
-    const featureID = owner?.datas?.proposals?.[index];
-    let feature = {
-      datas: await _apiGet("datasOfFeature", [featureID]),
-      details: await _apiGet("datasOfWork", [featureID]),
+  if (cvID > 0) {
+    console.log("profile tools context", cvID);
+    let owner = await stateCV(cvID);
+    owner.details = {
+      wadge: 0,
+      // ! To fix
+      missions: [],
+      features: [],
+      arbitrators: [],
+      badges: [],
+      disputes: [],
     };
 
-    !owner?.details?.badges.includes(feature?.datas?.specification) &&
-      owner?.details?.badges.push(feature?.datas?.specification);
+    for (let index = 0; index < owner?.datas?.proposals?.length; index++) {
+      const featureID = owner?.datas?.proposals?.[index];
+      let feature = {
+        datas: await _apiGet("datasOfFeature", [featureID]),
+        details: await _apiGet("datasOfWork", [featureID]),
+      };
 
-    // * Si status === validated chercher l'arbitratorID du worker
-    if (feature?.datas?.status === 2) {
-      let arbitration = await _apiGet("arbitrationOfCV", [
-        cvID,
-        feature?.datas?.specification,
-      ]);
-      if (!owner?.details?.arbitrators.includes(arbitration)) {
-        owner?.details?.arbitrators.push(arbitration);
+      !owner?.details?.badges.includes(feature?.datas?.specification) &&
+        owner?.details?.badges.push(feature?.datas?.specification);
+
+      // * Si status === validated chercher l'arbitratorID du worker
+      if (feature?.datas?.status === 2) {
+        let arbitration = await _apiGet("arbitrationOfCV", [
+          cvID,
+          feature?.datas?.specification,
+        ]);
+        if (!owner?.details?.arbitrators.includes(arbitration)) {
+          owner?.details?.arbitrators.push(arbitration);
+        }
       }
+      if (feature?.details?.workerContest || feature?.details?.ownerContest) {
+        feature.datas.dispute = await _apiGet("disputeOfFeature", [featureID]);
+
+        owner.details.disputes.push(feature.datas.dispute);
+      }
+      owner?.details?.features?.push(feature);
     }
-    if (feature?.details?.workerContest || feature?.details?.ownerContest) {
-      feature.datas.dispute = await _apiGet("disputeOfFeature", [featureID]);
 
-      owner.details.disputes.push(feature.datas.dispute);
+    for (let index = 0; index < owner?.datas?.missions?.length; index++) {
+      let missionID = owner?.datas?.missions?.[index];
+      let mission = await stateMission(missionID);
+
+      owner?.details?.missions?.push(mission);
     }
-    owner?.details?.features?.push(feature);
-  }
+    let invites = await _apiGet("invitesOfCV", [cvID]);
+    owner.details.invites = [];
+    for (let index = 0; index < invites?.length; index++) {
+      let feature = await stateFeature(invites[index]);
+      owner.details.invites.push({
+        featureID: feature?.featureID,
+        title: feature?.metadatas?.title,
+        domain: feature?.metadatas?.attributes?.[0]?.domain,
+        specification: feature?.datas?.specification,
+        status: feature?.datas?.status,
+        specification: feature?.datas?.specification,
+        wadge: feature?.datas?.wadge,
+      });
+    }
+    let _pubs = await _apiGet("indexerOfToken", [cvID, ADDRESSES["pubsHub"]]);
+    owner.details.launchpads = { arr: [], totalRaised: 0 };
 
-  for (let index = 0; index < owner?.datas?.missions?.length; index++) {
-    let missionID = owner?.datas?.missions?.[index];
-    let mission = await stateMission(missionID);
+    for (let index = 0; index < owner?.datas?.launchpads?.length; index++) {
+      let launchpad = await stateLaunchpad(owner?.datas?.launchpads?.[index]);
+      owner.details.launchpads.arr.push({
+        title: launchpad?.metadatas?.title,
+        domain: launchpad?.metadatas?.attributes?.[0]?.domain,
+        launchpadID: launchpad?.launchpadID,
+      });
+      owner.details.launchpads.totalRaised += parseInt(
+        launchpad.datas.amountRaised
+      );
+    }
 
-    owner?.details?.missions?.push(mission);
-  }
-  let invites = await _apiGet("invitesOfCV", [cvID]);
-  owner.details.invites = [];
-  for (let index = 0; index < invites?.length; index++) {
-    let feature = await stateFeature(invites[index]);
-    owner.details.invites.push({
-      featureID: feature?.featureID,
-      title: feature?.metadatas?.title,
-      domain: feature?.metadatas?.attributes?.[0]?.domain,
-      specification: feature?.datas?.specification,
-      status: feature?.datas?.status,
-      specification: feature?.datas?.specification,
-      wadge: feature?.datas?.wadge,
+    let _state = {
+      profile: owner,
+      pubs: _pubs,
+    };
+
+    dispatch({
+      status: "success",
+      state: _state,
     });
+    return _state;
+  } else {
+    throw new Error("Error state profile tools: Invalid cvID");
   }
-  let _pubs = await _apiGet("indexerOfToken", [cvID, ADDRESSES["pubsHub"]]);
-  owner.details.launchpads = { arr: [], totalRaised: 0 };
-
-  for (let index = 0; index < owner?.datas?.launchpads?.length; index++) {
-    let launchpad = await stateLaunchpad(owner?.datas?.launchpads?.[index]);
-    owner.details.launchpads.arr.push({
-      title: launchpad?.metadatas?.title,
-      domain: launchpad?.metadatas?.attributes?.[0]?.domain,
-      launchpadID: launchpad?.launchpadID,
-    });
-    owner.details.launchpads.totalRaised += parseInt(
-      launchpad.datas.amountRaised
-    );
-  }
-
-  let _state = {
-    profile: owner,
-    pubs: _pubs,
-  };
-
-  dispatch({
-    status: "success",
-    state: _state,
-  });
-  return _state;
 };
 
 export const doStateMissionTools = async (dispatch, missionID) => {

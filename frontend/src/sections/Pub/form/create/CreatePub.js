@@ -8,7 +8,7 @@ import { Icon } from "@iconify/react";
 import { icfy, icfyETHER, icfyINFO, icfySEND } from "icones";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
-import { createURIPub } from "utils/ui-tools/pinata-tools";
+import { clientPocket, createURIPub } from "utils/ui-tools/pinata-tools";
 import { useAccount } from "wagmi";
 import { CodeEditor } from "components/myComponents/MyEditor";
 import {
@@ -74,21 +74,35 @@ export const CreatePub = ({ answerID, refresh, missionID, style, btn }) => {
 
       form.owner = metadatas;
 
-      let { uri, uriPayable } = await createURIPub(form);
-
-      if (uriPayable) {
-        await _apiPost("createPayablePub", [
-          uri,
-          ethers.utils.parseEther(form?.amount)?._hex,
-          uriPayable,
-        ]);
-      } else if (answerID > 0) {
-        await _apiPost("createPubAnswer", [answerID, uri]);
-      } else if (missionID > 0) {
-        await _apiPost("createPubMission", [missionID, uri]);
-      } else {
+      let _metadatas = {
+        description: form?.description,
+        image: form?.image,
+        postID: answerID,
+        title: form?.title,
+        tags: form?.tags,
+        userID: metadatas?.id,
+      };
+      await clientPocket.records.create("posts", _metadatas);
+      if (!answerID) {
         await _apiPost("createPub", [uri]);
       }
+      if (refresh) {
+        refresh();
+      }
+      return;
+      // let { uri, uriPayable } = await createURIPub(form);
+      // if (uriPayable) {
+      //   await _apiPost("createPayablePub", [
+      //     uri,
+      //     ethers.utils.parseEther(form?.amount)?._hex,
+      //     uriPayable,
+      //   ]);
+      // } else if (answerID > 0) {
+      //   await _apiPost("createPubAnswer", [answerID, uri]);
+      // } else if (missionID > 0) {
+      //   await _apiPost("createPubMission", [missionID, uri]);
+      // } else {
+      // }
 
       await doAuthCV(dispatchAuth, address);
       if (refresh) {

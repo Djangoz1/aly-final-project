@@ -31,10 +31,6 @@ contract PubsDatasHub is ERC721, Ownable {
      */
     mapping(uint => mapping(uint => bool)) internal listsOfAllowedAccounts;
 
-    mapping(uint => uint[]) internal pubsToLikes;
-
-    mapping(uint => DataTypes.LikeData) internal likesToDatas;
-
     /**
      * @dev storage indexer like for each CV
      * @notice uint param is for cv id
@@ -80,46 +76,6 @@ contract PubsDatasHub is ERC721, Ownable {
             _iAS.pubsDatasHub() == address(this),
             "CollectLikePub: Error deployment"
         );
-    }
-
-    function like(uint _cvID, uint _pubID) external onlyProxy {
-        address _from = Bindings.ownerOf(_cvID, _iAS.cvsHub());
-
-        require(cvsToLikes[_cvID][_pubID] == 0, "CV already like this pub");
-        _likeIDs.increment();
-        uint newLikeID = _likeIDs.current();
-        DataTypes.LikeData memory newDatas;
-        _mint(_from, newLikeID);
-
-        newDatas.indexedAt = pubsToLikes[_pubID].length;
-        pubsToLikes[_pubID].push(newLikeID);
-        pubsToDatas[_pubID].likes++;
-        newDatas.pubID = _pubID;
-        newDatas.id = newLikeID;
-        cvsToLikes[_cvID][_pubID] = newLikeID;
-        likesToDatas[newLikeID] = newDatas;
-    }
-
-    function unlike(uint _cvID, uint _pubID) external onlyProxy {
-        address _from = Bindings.ownerOf(_cvID, _iAS.cvsHub());
-
-        uint _likeID = cvsToLikes[_cvID][_pubID];
-        require(
-            _likeID <= _likeIDs.current() && _likeID != 0,
-            "Like ID not exist"
-        );
-        require(likesToDatas[_likeID].id == _likeID, "Not liked");
-        require(ownerOf(_likeID) == _from, "Not the owner");
-        DataTypes.LikeData memory prevDatas = likesToDatas[_likeID];
-        require(prevDatas.pubID == _pubID, "Missmatch pubID");
-        require(_likeID == prevDatas.id, "Missmatch likeID");
-        DataTypes.LikeData memory cleanDatas;
-        delete pubsToLikes[prevDatas.pubID][prevDatas.indexedAt];
-        likesToDatas[_likeID] = cleanDatas;
-        delete cvsToLikes[_cvID][_pubID];
-        pubsToDatas[_pubID].likes--;
-
-        _burn(_likeID);
     }
 
     function datasOfPayablePub(
@@ -184,14 +140,6 @@ contract PubsDatasHub is ERC721, Ownable {
         returns (uint[] memory)
     {
         return pubsToLikes[_pubID];
-    }
-
-    function dataOf(
-        uint _likeID
-    ) external view returns (DataTypes.LikeData memory) {
-        require(_likeID <= _likeIDs.current(), "Like ID not exist");
-        require(likesToDatas[_likeID].id != 0, "Not liked");
-        return likesToDatas[_likeID];
     }
 
     function dataOfPub(

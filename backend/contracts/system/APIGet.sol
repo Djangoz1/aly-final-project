@@ -305,12 +305,6 @@ contract APIGet {
         return _pubsDatasHub().answersOfPub(_pubID);
     }
 
-    function datasOfLike(
-        uint _likeID
-    ) external view returns (DataTypes.LikeData memory) {
-        return _pubsDatasHub().dataOf(_likeID);
-    }
-
     function datasOfPub(
         uint _pubID
     ) external view returns (DataTypes.PubData memory) {

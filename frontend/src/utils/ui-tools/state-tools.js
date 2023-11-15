@@ -3,7 +3,7 @@
 import { fetchCV, fetchStatsOfCV } from "utils/cvs";
 import { fetchPubsOfCV } from "utils/pubs";
 import { fetchMission, fetchMissionsOfCV, fetchWorksOfCV } from "utils/works";
-import { fetchJSONByCID } from "./pinata-tools";
+import { clientPocket, fetchJSONByCID } from "./pinata-tools";
 import { _apiGet, _apiGetAt } from "./web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { findBadges, stateDetailsMission } from "utils/works/tools";
@@ -15,12 +15,15 @@ export const stateCV = async (cvID) => {
   if (cvID?.cvID) {
     return cvID;
   } else if (cvID && cvID > 0) {
-    return {
+    let result = {
       cvID: cvID,
       metadatas: await fetchCV(cvID),
       datas: await fetchStatsOfCV(cvID),
       details: null,
     };
+    return result;
+  } else {
+    throw new Error("Error state profile: Invalid CV ID");
   }
 };
 
@@ -196,6 +199,35 @@ export const statePub = async (pubID, walletClient) => {
     let uri = await _apiGet("tokenURIOf", [pubID, ADDRESSES["pubsHub"]]);
     let metadata = await fetchJSONByCID({ id: uri, table: "posts" });
 
+    let likes;
+    let answers;
+    try {
+      likes =
+        metadata?.id &&
+        (await clientPocket.records.getList("likes", 1, 50, {
+          filter: `postID = "${metadata?.id}"`,
+        }));
+    } catch (error) {
+      likes = [];
+    }
+    try {
+      answers =
+        metadata?.id &&
+        (await clientPocket.records.getList("posts", 1, 50, {
+          filter: `postID = "${metadata?.id}"`,
+        }));
+    } catch (error) {
+      answers = [];
+    }
+
+    metadata = {
+      ...metadata,
+      likes: likes?.items?.map((el) => {
+        return { userID: el?.userID, recordID: el?.id };
+      }),
+      answers: answers?.items,
+    };
+
     let datas = await _apiGet("datasOfPub", [pubID]);
     if (datas?.answers > 0) {
       datas.answers = await _apiGet("answersOfPub", [pubID]);
@@ -283,33 +315,16 @@ export let stateFeature = async (featureID) => {
 export const stateLaunchpad = async (launchpadID) => {
   if (launchpadID > 0) {
     const datas = await _apiGet("datasOfLaunchpad", [launchpadID]);
-    let metadatas = await fetchJSONByCID({
-      id: datas.tokenURI,
-      table: "launchpads",
-    });
+
     let tokenURI = await _apiGet("tokenURIOf", [
       launchpadID,
       ADDRESSES["launchpadsDatasHub"],
     ]);
+    let metadatas = await fetchJSONByCID({
+      id: tokenURI,
+      table: "launchpads",
+    });
     // Faire un checker
-    datas.currentTier = parseInt(
-      await _apiGet("currentTierIDOf", [launchpadID])
-    );
-    console.log(datas.currentTier);
-
-    datas.tokenName = await _apiGetAt({
-      func: "name",
-      targetContract: "erc20",
-      address: datas?.tokenAddress,
-    });
-    datas.tokenSymbol = await _apiGetAt({
-      func: "symbol",
-      targetContract: "erc20",
-      address: datas?.tokenAddress,
-    });
-
-    datas.tiersDatas = [];
-    let tokenPrice = 0;
 
     datas.address = await _apiGet("addressOfLaunchpad", [launchpadID]);
     datas.status = await _apiGet("statusOfLaunchpad", [launchpadID]);
@@ -318,40 +333,11 @@ export const stateLaunchpad = async (launchpadID) => {
       ADDRESSES["launchpadHub"],
     ]);
 
-    datas.allowance = parseInt(
-      (await _apiGetAt({
-        func: "allowance",
-        targetContract: "erc20",
-        args: [_owner, datas.address],
-        address: datas?.tokenAddress,
-      })) /
-        10n ** 18n
-    );
-
-    datas.balanceOwner = parseInt(
-      (await _apiGetAt({
-        func: "balanceOf",
-        targetContract: "erc20",
-        args: [_owner],
-        address: datas?.tokenAddress,
-      })) /
-        10n ** 18n
-    );
-
     let cvOwner = await _apiGet("cvOf", [_owner]);
     let owner = await fetchCV(cvOwner);
 
-    let amountRaised = 0;
-    for (let i = 0; i < datas?.numberOfTier; i++) {
-      let tierDatas = await _apiGet("tierOfLaunchpad", [launchpadID, i]);
-      datas.tiersDatas.push(tierDatas);
-      tokenPrice += parseFloat(tierDatas.tokenPrice);
-      amountRaised += parseInt(tierDatas.amountRaised);
-    }
-    datas.amountRaised = ethers.utils.formatEther(`${amountRaised}`);
-    datas.tokenPrice = ethers.utils.formatEther(
-      `${tokenPrice / datas?.numberOfTier}`
-    );
+    datas.amountRaised = ethers.utils.formatEther(`${datas?.amountRaised}`);
+
     return { launchpadID, datas, metadatas, owner };
   }
 };

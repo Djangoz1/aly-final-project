@@ -42,11 +42,12 @@ import { MyLoader } from "components/myComponents/layout/MyLoader";
 import PocketBase from "pocketbase";
 import { TextAI } from "components/myComponents/text/TextAI";
 import { FormResponseAI } from "sections/Form/FormResponseAI";
+import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
-  let dispatch = useAuthDispatch();
-
+  let dispatch = useToolsDispatch();
+  let { state } = useToolsState();
   let [price, setPrice] = useState(0.5); // ! balancesHub.missionPrice()
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
@@ -58,33 +59,72 @@ const PageCreateProfile = () => {
   );
 
   let submitForm = async (form) => {
+    let _txs = { db: null, bc: null, submit: true };
+    await doStateTools(dispatch, {
+      ...state,
+      txs: { pointer: 0, ..._txs },
+    });
     const client = new PocketBase("http://127.0.0.1:8090");
-
+    console.log("before submit", form?.ai);
+    let aiAssist = form?.ai?.instructions;
     let metadatas = {
-      description: form?.description,
-      title: form?.title,
+      description: aiAssist
+        ? form?.ai?.recommandations?.detail
+        : form?.description,
+      abstact: aiAssist && form?.ai?.recommandations?.abstract,
+      title: aiAssist ? form?.ai?.recommandations?.name : form?.title,
+      budget: aiAssist
+        ? form?.ai?.recommandations?.budget?.total
+        : form?.budget,
       image: form?.image,
       banniere: form?.banniere,
       reference: form?.reference ? parseInt(form?.reference) : undefined,
 
       domain: parseInt(form?.domain),
-      owner: 1, // ! Change to cvID
+      owner: cv,
     };
 
-    console.log("metadatas, ,", metadatas);
     const record = await client.records.create("missions", metadatas);
-    console.log("record, ,", record);
+    console.log("jai eu le record", record);
+    _txs.db = record;
+
+    await doStateTools(dispatch, {
+      ...state,
+      txs: { pointer: 1, ..._txs },
+    });
 
     //   ! Recuperation de l'ID
     let uri = record.id;
 
     //   ! Decoment for create mission on blockchain
-    // await _apiPostPayable(
-    //   "createMission",
-    //   [uri],
-    //   ethers?.utils?.parseEther(form?.price)
-    // );
+    // return;
+
+    let price = await _apiGetAt({
+      func: "missionPrice",
+      targetContract: "balancesHub",
+    });
+    let hash = await _apiPostPayable("createMission", [uri], price);
+    _txs.bc = hash;
+    await doStateTools(dispatch, {
+      ...state,
+      txs: { pointer: 2, ..._txs },
+    });
   };
+
+  useEffect(() => {
+    (async () => {
+      if (!price) {
+        setPrice(
+          ethers.formatEther(
+            await _apiGetAt({
+              func: "missionPrice",
+              targetContract: "balancesHub",
+            })
+          )
+        );
+      }
+    })();
+  }, []);
 
   return (
     <MyLayoutApp
@@ -97,7 +137,10 @@ const PageCreateProfile = () => {
         submit={submitForm}
         stateInit={{
           allowed: price ? true : undefined,
-          form: { ...moock_create_mission, price },
+          form: {
+            ...moock_create_mission,
+            price,
+          },
           placeholders: moock_create_mission_placeholder,
           checked: [[], []],
         }}

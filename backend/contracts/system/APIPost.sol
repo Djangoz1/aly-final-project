@@ -560,32 +560,6 @@ contract APIPost is Ownable {
         );
     }
 
-    // ! TO remove ? Can be db
-
-    /**
-     * @notice Binding for like pub
-     * @param _pubID must to be an existed ID -- notLikedPub
-     * @dev this function trigger PubsHub && CollectLikePubs contracts
-     * msg.sender == ownerOfCV(x)
-     * Permet de liké une publication
-     */
-    function likePub(uint _pubID) external {
-        IPubsDatasHub(_pubsDatasHub).like(_cvOf(msg.sender), _pubID);
-    }
-
-    // ! TO remove ? Can be db
-
-    /**
-     * @notice Binding for unlike pub
-     * @param _pubID must to be an existed ID -- onlyLikedPub
-     * @dev this function trigger PubsHub && CollectLikePubs contracts
-     * msg.sender == ownerOfCV(x)
-     * Permet d'unliké une publication liké
-     */
-    function unlikePub(uint _pubID) external {
-        IPubsDatasHub(_pubsDatasHub).unlike(_cvOf(msg.sender), _pubID);
-    }
-
     // ************* ------- ************* //
     // ************* Dispute ************* //
     // ************* ------- ************* //

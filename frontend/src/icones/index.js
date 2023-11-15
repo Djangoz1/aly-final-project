@@ -5,7 +5,9 @@ export const icfy = {
     close: "ant-design:eye-invisible-outlined",
     open: "ic:outline-remove-red-eye",
   },
+  like: "iconamoon:like-duotone",
   ux: {
+    remove: "clarity:remove-solid",
     edit: "line-md:edit-twotone-full",
     refresh: "solar:refresh-bold-duotone",
     shop: "icon-park-twotone:shopping",
