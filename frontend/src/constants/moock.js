@@ -148,7 +148,8 @@ export let moock_create_mission = {
   description: null,
   reference: null,
   launchpad: null,
-  ai: { instructions: true, recommandations: null },
+  aiAssisted: true,
+  ai: { recommandations: null },
 };
 
 export let moock_create_mission_placeholder = {

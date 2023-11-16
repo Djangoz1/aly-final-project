@@ -51,7 +51,14 @@ export const ProfileAvatar = ({
   );
 };
 
-export const Avatar = ({ CID, metadatas, noCircle, style }) => {
+export const Avatar = ({
+  CID,
+  metadatas,
+  src,
+  noCircle,
+  avatarStyle,
+  style,
+}) => {
   return metadatas && !CID ? (
     <div className="avatar placeholder">
       <div
@@ -61,7 +68,7 @@ export const Avatar = ({ CID, metadatas, noCircle, style }) => {
       </div>
     </div>
   ) : (
-    <div className="avatar">
+    <div className={`avatar ${avatarStyle || undefined}`}>
       <ImagePin
         style={`rounded-full ${
           !noCircle
@@ -69,7 +76,7 @@ export const Avatar = ({ CID, metadatas, noCircle, style }) => {
             : null
         } ${style || "w-16"}`}
         CID={CID}
-        defaultImage={"/defaultprofile.png"}
+        defaultImage={src || "/defaultprofile.png"}
       />
     </div>
   );

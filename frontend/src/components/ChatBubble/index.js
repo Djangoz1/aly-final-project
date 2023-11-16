@@ -1,26 +1,33 @@
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { TextAI } from "components/myComponents/text/TextAI";
+import { Avatar } from "components/profile/ProfileAvatar";
 import React from "react";
 import { v4 as uuid } from "uuid";
-export const ChatBubble = ({ messages }) => {
+export const ChatBubble = ({
+  children,
+  style,
+  ai,
+  CID,
+  name,
+  text,
+  footer,
+  image,
+}) => {
   return (
-    <div className=" ">
-      <div className="chat chat-end">
-        <div className="chat-header">
-          <CVName />
-          <time className="text-xs opacity-50">12:46</time>
-        </div>
-        <div className="chat-bubble">
-          {messages?.map((message, index) => (
-            <span
-              className={message.add ? "text-green-500" : "text-red-500"}
-              key={uuid()}
-            >
-              {message.text}
-              <br />
-            </span>
-          ))}
-        </div>
-        <div className="chat-footer opacity-50">Feature # </div>
+    <div className={"chat  chat-start " + style}>
+      <Avatar
+        src={ai ? "/ai.png" : image}
+        CID={CID}
+        avatarStyle="chat-image w-12 h-12 "
+        noCircle={true}
+      ></Avatar>
+      <div className="chat-header">
+        {ai ? "Aly" : name}
+        {/* <span className="text-xs  opacity-50">Mission name</span> */}
+      </div>
+      <div className="chat-bubble">
+        <TextAI style={" text-xs"} text={text}></TextAI>
+        {children || undefined}
       </div>
     </div>
   );

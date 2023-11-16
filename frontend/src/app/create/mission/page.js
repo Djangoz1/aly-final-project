@@ -47,7 +47,7 @@ import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useToolsDispatch();
-  let { state } = useToolsState();
+  let { state, pointer } = useToolsState();
   let [price, setPrice] = useState(0.5); // ! balancesHub.missionPrice()
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
@@ -66,7 +66,7 @@ const PageCreateProfile = () => {
     });
     const client = new PocketBase("http://127.0.0.1:8090");
     console.log("before submit", form?.ai);
-    let aiAssist = form?.ai?.instructions;
+    let aiAssist = form?.aiAssisted;
     let metadatas = {
       description: aiAssist
         ? form?.ai?.recommandations?.detail
@@ -171,12 +171,10 @@ const PageCreateProfile = () => {
             component: <FormCreateMission2 />,
             label: "Dontkno",
           },
-          {
-            component: <FormResponseAI />,
-            label: "Dontkno",
-          },
         ]}
-      />
+      >
+        {pointer === 3 ? <FormResponseAI /> : undefined}
+      </MyFormCreate>
     </MyLayoutApp>
   );
 };
