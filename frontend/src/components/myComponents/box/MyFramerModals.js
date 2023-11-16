@@ -22,7 +22,7 @@ export const MyFramerModal = ({
           key={v4()}
           onClick={() => setSelectedId(index)}
         >
-          <MyCard template={1} styles={style}>
+          <MyCard template={1} styles={style + " cursor-pointer"}>
             {el}
           </MyCard>
         </motion.div>

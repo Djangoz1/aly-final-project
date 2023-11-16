@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TextAI } from "../../components/myComponents/text/TextAI";
+import "./style.css";
 import {
   doInitStateForm,
   doStateFormPointer,
@@ -11,7 +12,12 @@ import { v4 } from "uuid";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { Icon } from "@iconify/react";
 import { icfy, icfyAI, icsystem } from "icones";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useAnimation,
+  useInView,
+} from "framer-motion";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyLoader } from "components/myComponents/layout/MyLoader";
@@ -25,6 +31,8 @@ import { MyInput } from "components/myComponents/form/MyInput";
 export const FormResponseAI = () => {
   const { form, target } = useFormState();
   console.log(form);
+  let ref = useRef(null);
+  let isInView = useInView(ref);
   let dispatch = useFormDispatch();
   const { pointer } = useFormState();
   let aiResponse = form?.ai?.recommandations;
@@ -67,7 +75,7 @@ export const FormResponseAI = () => {
     let parts = iaInstructions();
     // Constructing the final prompt
     setPrompt(`Here is my description of mission:\n\n${parts.join("\n")}`);
-  }, []);
+  }, [isInView]);
   let fetchAI = async () => {
     const data = {
       mission: prompt,
@@ -104,122 +112,126 @@ export const FormResponseAI = () => {
   };
 
   useEffect(() => {
-    if (!aiResponse && prompt) {
+    if (!aiResponse && prompt && isInView) {
       fetchAI();
       console.log("fetch ai response");
     }
-  }, [form?.description]);
+  }, [form?.description, isInView]);
 
   console.log("airesponse :", aiResponse);
 
   const [selectedId, setSelectedId] = useState(null);
   return (
     <>
-      <div className="flex relative flex-col  w-full ">
+      <div ref={ref} className="flex relative flex-col  w-full ">
         <div className="flex  w-full  flex-col-reverse ">
-          <MyCard
-            template={1}
-            styles={"py-4 w-full"}
-            className="flex px-2 py-3 border rounded-lg border-white/5 flex-col w-1/3"
-          >
-            <MyNum
-              num={aiResponse?.budget?.total}
-              style={"absolute top-2 right-2"}
+          {!isLoading ? (
+            <MyCard
+              template={1}
+              styles={"py-4 w-full"}
+              className="flex px-2 py-3 border rounded-lg border-white/5 flex-col w-1/3"
             >
-              ${" "}
-            </MyNum>
-            <ChatBubble
-              ai={true}
-              style={"ml-4"}
-              text={"Let's see what I've cooked..."}
-            />
-            {aiResponse?.roles?.length === 0 && (
-              <ChatBubble
-                ai={true}
-                style={"ml-4"}
-                text={"I didn't find any specific task for your project ..."}
+              <MyNum
+                num={aiResponse?.budget?.total}
+                style={"absolute top-2 right-2"}
               >
-                <p className="text-warning text-[9px]">
-                  Maybe you can reload or build by own
-                </p>
-              </ChatBubble>
-            )}
-
-            {aiResponse?.budget?.total &&
-            form?.budget != aiResponse?.budget?.total ? (
+                ${" "}
+              </MyNum>
               <ChatBubble
                 ai={true}
                 style={"ml-4"}
-                text={`I advise you to opt for a budget of ${aiResponse?.budget?.total} $`}
-              >
-                <span className="line-through text-error  text-xs">
-                  {form?.budget}
-                </span>
-              </ChatBubble>
-            ) : undefined}
-            {aiResponse?.budget?.roles_budget?.length !==
-              aiResponse?.roles?.length && (
-              <ChatBubble
-                ai={true}
-                style={"ml-4"}
-                text={
-                  "I had difficulty providing you with a budget, perhaps you should modify/give me a budget"
-                }
+                text={"Let's see what I've cooked..."}
               />
-            )}
-            <ElementResponseAI
-              target={"title"}
-              title={`Project name :`}
-              text={aiResponse?.name}
-            />
-            <ElementResponseAI
-              target={"budget"}
-              title={`Budget total for this mission:`}
-              text={aiResponse?.budget?.total}
-            >
-              $
-            </ElementResponseAI>
+              {aiResponse?.roles?.length === 0 && (
+                <ChatBubble
+                  ai={true}
+                  style={"ml-4"}
+                  text={"I didn't find any specific task for your project ..."}
+                >
+                  <p className="text-warning text-[9px]">
+                    Maybe you can reload or build by own
+                  </p>
+                </ChatBubble>
+              )}
 
-            <ElementResponseAI
-              style={"whitespace-break-spaces"}
-              target={"description"}
-              title={"Abstract description :"}
-              text={aiResponse?.abstract}
-            />
+              {aiResponse?.budget?.total &&
+              form?.budget != aiResponse?.budget?.total ? (
+                <ChatBubble
+                  ai={true}
+                  style={"ml-4"}
+                  text={`I advise you to opt for a budget of ${aiResponse?.budget?.total} $`}
+                >
+                  <span className="line-through text-error  text-xs">
+                    {form?.budget}
+                  </span>
+                </ChatBubble>
+              ) : undefined}
+              {aiResponse?.budget?.roles_budget?.length !==
+                aiResponse?.roles?.length && (
+                <ChatBubble
+                  ai={true}
+                  style={"ml-4"}
+                  text={
+                    "I had difficulty providing you with a budget, perhaps you should modify/give me a budget"
+                  }
+                />
+              )}
+              <ElementResponseAI
+                target={"title"}
+                title={`Project name :`}
+                text={aiResponse?.name}
+              />
+              <ElementResponseAI
+                target={"budget"}
+                title={`Budget total for this mission:`}
+                text={aiResponse?.budget?.total}
+              >
+                $
+              </ElementResponseAI>
 
-            <ElementResponseAI
-              target={"description"}
-              title={"Detail :"}
-              text={aiResponse?.detail}
-            />
-            <MyInput
-              styles={"w-4/5 mx-auto mt-5"}
-              target={"chatAI"}
-              setter={(value) => {
-                const parts = [];
+              <ElementResponseAI
+                style={"whitespace-break-spaces"}
+                target={"description"}
+                title={"Abstract description :"}
+                text={aiResponse?.abstract}
+              />
 
-                parts.push(`Previous:${JSON.stringify(aiResponse, 2, null)}`);
-                // Add project description
-                parts.push(`Update: "${value}"`);
-                parts.push(`Instructions:\n\n${iaInstructions().join("\n")}`);
+              <ElementResponseAI
+                target={"description"}
+                title={"Detail :"}
+                text={aiResponse?.detail}
+              />
+              <MyInput
+                styles={"w-4/5 mx-auto mt-5"}
+                target={"chatAI"}
+                setter={(value) => {
+                  const parts = [];
 
-                // Handle budget
+                  parts.push(`Previous:${JSON.stringify(aiResponse, 2, null)}`);
+                  // Add project description
+                  parts.push(`Update: "${value}"`);
+                  parts.push(`Instructions:\n\n${iaInstructions().join("\n")}`);
 
-                // Constructing the final prompt
-                let _prompt = `Here is your previous response and I want to update only few modifications (Keep the rest):\n\n${parts.join(
-                  "\n"
-                )}`;
-                setPrompt(_prompt);
-                console.log(_prompt);
-                setIsLoading(true);
-                fetchAI();
-                setIsLoading(false);
-              }}
-            />
-          </MyCard>
+                  // Handle budget
+
+                  // Constructing the final prompt
+                  let _prompt = `Here is your previous response and I want to update only few modifications (Keep the rest):\n\n${parts.join(
+                    "\n"
+                  )}`;
+                  setPrompt(_prompt);
+                  console.log(_prompt);
+                  setIsLoading(true);
+                  fetchAI();
+                  setIsLoading(false);
+                }}
+              />
+            </MyCard>
+          ) : (
+            <MyLoading />
+          )}
           <div className="flex flex-col">
             <div className="flex -z-1 justify-between items-center">
-              {form?.target === "missions" ? (
+              {form?.target === "mission" ? (
                 <h6 className="flex items-center justify-end">
                   Nombre de tâches :{" "}
                   <MyNum style={"ml-2"} num={aiResponse?.roles?.length || 0} />
@@ -437,4 +449,44 @@ export const FormResponseAI = () => {
       </div>
     </>
   );
+};
+
+let MyLoading = () => {
+  <div className="w-screen debug h-screen flex items-center justify-center">
+    <div className="gearbox ">
+      <div className="overlay"></div>
+      <div className="gear one">
+        <div className="gear-inner">
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+      </div>
+      <div className="gear two">
+        <div className="gear-inner">
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+      </div>
+      <div className="gear three">
+        <div className="gear-inner">
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+      </div>
+      <div className="gear four large">
+        <div className="gear-inner">
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+      </div>
+    </div>
+    ;
+  </div>;
 };

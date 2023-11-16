@@ -115,8 +115,11 @@ export const doInitStateForm = async (dispatch, form) => {
   if (form?.form) {
     dispatch({
       status: "success",
-      form: form?.form,
-      placeholders: form?.placeholders,
+      form: { ...form?.form },
+      placeholders: {
+        ...form?.placeholders,
+        chatAI: "Write something to Aly ...",
+      },
       checked: form?.checked,
       superChecked: form?.superChecked,
       pointer: 0,
