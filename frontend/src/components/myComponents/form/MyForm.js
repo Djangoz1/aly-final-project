@@ -319,7 +319,7 @@ let Child1 = ({
                       </MyToggle>
                     )}
 
-                    {(editer || pointer === components?.length) && (
+                    {(editer || pointer >= components?.length) && (
                       <MyMainBtn
                         template={1}
                         style={
@@ -426,7 +426,10 @@ let Child1 = ({
                         </div>
                       ) : undefined}
                       {pointer !== 0 &&
-                      pointer !== components?.length + 1 &&
+                      ((pointer !== components?.length + 1 &&
+                        form?.aiAssisted) ||
+                        (!form?.aiAssisted &&
+                          pointer !== components?.length)) &&
                       target ? (
                         components?.[pointer]?.component
                       ) : isConnected && pointer === 0 ? (

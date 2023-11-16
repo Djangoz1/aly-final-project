@@ -180,11 +180,38 @@ export const FormResponseAI = () => {
                 target={"title"}
                 title={`Project name :`}
                 text={aiResponse?.name}
+                setter={(value) =>
+                  doInitStateForm(dispatch, {
+                    ...form,
+                    ai: {
+                      ...form?.ai,
+                      recommandations: {
+                        ...form?.ai?.recommandations,
+                        name: value,
+                      },
+                    },
+                  })
+                }
               />
               <ElementResponseAI
                 target={"budget"}
                 title={`Budget total for this mission:`}
                 text={aiResponse?.budget?.total}
+                setter={(value) =>
+                  doInitStateForm(dispatch, {
+                    ...form,
+                    ai: {
+                      ...form?.ai,
+                      recommandations: {
+                        ...form?.ai?.recommandations,
+                        budget: {
+                          ...form?.ai?.recommandations?.budget,
+                          total: value,
+                        },
+                      },
+                    },
+                  })
+                }
               >
                 $
               </ElementResponseAI>
@@ -194,14 +221,39 @@ export const FormResponseAI = () => {
                 target={"description"}
                 title={"Abstract description :"}
                 text={aiResponse?.abstract}
+                setter={(value) =>
+                  doInitStateForm(dispatch, {
+                    ...form,
+                    ai: {
+                      ...form?.ai,
+                      recommandations: {
+                        ...form?.ai?.recommandations,
+                        abstract: value,
+                      },
+                    },
+                  })
+                }
               />
 
               <ElementResponseAI
                 target={"description"}
                 title={"Detail :"}
                 text={aiResponse?.detail}
+                setter={(value) =>
+                  doInitStateForm(dispatch, {
+                    ...form,
+                    ai: {
+                      ...form?.ai,
+                      recommandations: {
+                        ...form?.ai?.recommandations,
+                        detail: value,
+                      },
+                    },
+                  })
+                }
               />
               <MyInput
+                label={false}
                 styles={"w-4/5 mx-auto mt-5"}
                 target={"chatAI"}
                 setter={(value) => {

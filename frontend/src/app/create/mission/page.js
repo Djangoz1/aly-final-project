@@ -32,7 +32,7 @@ import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 
 import { icfyETHER } from "icones";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import { createURI } from "utils/ui-tools/pinata-tools";
+import { clientPocket, createURI } from "utils/ui-tools/pinata-tools";
 import { useCVState } from "context/hub/cv";
 import {
   FormCreateMission1,
@@ -109,6 +109,26 @@ const PageCreateProfile = () => {
       ...state,
       txs: { pointer: 2, ..._txs },
     });
+    let _featureMetadatas = [];
+    for (
+      let index = 0;
+      index < form?.ai?.recommandations?.roles.length;
+      index++
+    ) {
+      const element = form?.ai?.recommandations?.roles[index];
+      let _metadatasFeature = {
+        title: element?.role_name,
+        abstract: element?.reason,
+        skills: JSON.stringify(element?.skills_required, null, 2),
+        budget: form?.ai?.recommandations?.budget?.roles_budget?.[index] || 0,
+        missionID: uri,
+        deployed: false,
+      };
+      console.log("_metadatas", _metadatasFeature);
+      await clientPocket.records.create("features", _metadatasFeature);
+      _featureMetadatas.push(_metadatasFeature);
+    }
+    console.log(_featureMetadatas);
   };
 
   useEffect(() => {
