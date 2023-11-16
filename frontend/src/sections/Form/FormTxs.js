@@ -1,10 +1,21 @@
+import { ChatBubble } from "components/ChatBubble";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyCheckboxes } from "components/myComponents/form/MyCheckboxes";
+import { MyTextArea } from "components/myComponents/form/MyTextArea";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { useFormState } from "context/form";
 import { useToolsState } from "context/tools";
-import React from "react";
+import React, { useState } from "react";
 import { v4 } from "uuid";
+import { clientPocket } from "../../utils/ui-tools/pinata-tools";
+import { useAuthState } from "context/auth";
 
 export const FormTxs = () => {
+  let { metadatas } = useAuthState();
   let { state, target } = useToolsState();
+  let { form } = useFormState();
+  let [isView, setIsView] = useState(0);
+  let [isDone, setIsDone] = useState(null);
   console.log("state fdfsdf", state);
   let txs = [
     <h6 className="font3">Confirmer la création de {target} ...</h6>,
@@ -42,26 +53,100 @@ export const FormTxs = () => {
   ];
   return (
     <div className="flex flex-col">
+      <MyMenusTabs
+        color={12}
+        styleOrigin={"mb-4"}
+        template={2}
+        setter={setIsView}
+        value={isView}
+        target={"value"}
+        arr={[
+          { value: "Transactions", url: "#" },
+          form?.aiAssisted ? { value: "Feedbacks", url: "#" } : undefined,
+        ]}
+      ></MyMenusTabs>
       {/* <h6 className="font3">
                         </h6> */}
-      <ul className="steps steps-vertical">
-        {txs?.map(
-          (el, i) =>
-            (i <= state?.txs?.pointer + 1 || i === 0) && (
-              <li
-                key={v4()}
-                data-content={i <= state?.txs?.pointer || i === 3 ? "✓" : "✋"}
-                className={`step ${
-                  i <= state?.txs?.pointer || i === 3
-                    ? "step-success"
-                    : "step-error"
-                }`}
-              >
-                <div className="flex flex-col items-start my-10">{el}</div>
-              </li>
-            )
-        )}
-      </ul>
+      {
+        [
+          <ul className="steps steps-vertical">
+            {txs?.map(
+              (el, i) =>
+                (i <= state?.txs?.pointer + 1 || i === 0) && (
+                  <li
+                    key={v4()}
+                    data-content={
+                      i <= state?.txs?.pointer || i === 3 ? "✓" : "✋"
+                    }
+                    className={`step ${
+                      i <= state?.txs?.pointer || i === 3
+                        ? "step-success"
+                        : "step-error"
+                    }`}
+                  >
+                    <div className="flex flex-col items-start my-10">{el}</div>
+                  </li>
+                )
+            )}
+          </ul>,
+          <div className="flex flex-col">
+            <ChatBubble
+              ai={true}
+              text={
+                "Please post a feedback for help me to improve my knowledge."
+              }
+              style={"mb-5"}
+            />
+            {!isDone ? (
+              <>
+                <MyCheckboxes
+                  label={"Rating"}
+                  target={"ratingAi"}
+                  template={1}
+                  checkboxes={[1, 2, 3, 4, 5]}
+                />
+
+                <MyTextArea
+                  styles={"min-h-[20vh] mt-4"}
+                  target={"feedbacks"}
+                  label={{ no: true }}
+                />
+                <MyMainBtn
+                  style={"mt-10 btn-xs py-2 ml-auto"}
+                  setter={async () => {
+                    console.log(form);
+                    let datas = {
+                      feedback: form?.feedbacks,
+                      rating: form?.ratingAi + 1,
+                      aiID: form?.ai?.recommandations?.id,
+                    };
+                    console.log(datas);
+                    let record = await clientPocket.records.create(
+                      "feedbacks",
+                      datas
+                    );
+                    console.log(record);
+
+                    if (record?.id) {
+                      setIsDone(true);
+                    }
+                  }}
+                  template={1}
+                >
+                  Post feedback
+                </MyMainBtn>
+              </>
+            ) : (
+              <ChatBubble
+                ai={true}
+                text={
+                  "Thank you " + metadatas?.username + " for your feedback ! 🙏"
+                }
+              />
+            )}
+          </div>,
+        ][isView]
+      }
     </div>
   );
 };

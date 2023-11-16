@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TextAI } from "../../components/myComponents/text/TextAI";
-import "./style.css";
 import {
   doInitStateForm,
   doStateFormPointer,
@@ -279,8 +278,11 @@ export const FormResponseAI = () => {
               />
             </MyCard>
           ) : (
-            <MyLoading />
+            <div className=" flex  w-full h-[40vh]">
+              <MyLoader template={1} style={"mx-auto my-auto"} />
+            </div>
           )}
+
           <div className="flex flex-col">
             <div className="flex -z-1 justify-between items-center">
               {form?.target === "mission" ? (
@@ -503,8 +505,8 @@ export const FormResponseAI = () => {
   );
 };
 
-let MyLoading = () => {
-  <div className="w-screen debug h-screen flex items-center justify-center">
+let MyLoading = ({ style }) => {
+  return (
     <div className="gearbox ">
       <div className="overlay"></div>
       <div className="gear one">
@@ -539,6 +541,5 @@ let MyLoading = () => {
         </div>
       </div>
     </div>
-    ;
-  </div>;
+  );
 };

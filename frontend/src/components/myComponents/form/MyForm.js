@@ -27,6 +27,9 @@ import { MyCardPrice } from "../card/MyCardPrice";
 import { MyToggle } from "./MyToggle";
 import { FormTxs } from "sections/Form/FormTxs";
 import { FormResponseAI } from "sections/Form/FormResponseAI";
+import { MyModal } from "../modal/MyModal";
+import { MyTextArea } from "./MyTextArea";
+import { MyFramerModal } from "../box/MyFramerModals";
 
 export const MyForm = ({
   stateInit,
@@ -365,45 +368,47 @@ let Child1 = ({
                   </div> */}
                   </div>
                 ) : (
-                  <ol className=" divide-x divide-white/5 bg-white/10   rounded-lg  shadow1   text-sm c4 flex">
-                    {arr?.map((el, i) => (
-                      <li
-                        key={v4()}
-                        onClick={() =>
-                          i < pointer && doStateFormPointer(dispatch, i)
-                        }
-                        className={`relative overflow-hidden transition-all flex items-center justify-center gap-2 p-4 ${
-                          i === pointer
-                            ? "bg3 c1  rounded-lg  "
-                            : "bg-transparent "
-                        }`}
-                      >
-                        {pointer !== i && (
-                          <>
-                            {i != 0 && (
-                              <span className="absolute -left-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-white rtl:border-e-0 rtl:border-t-0 rtl:bg-gray-50 sm:block"></span>
-                            )}
+                  pointer <= components?.length - 1 && (
+                    <ol className=" divide-x divide-white/5 bg-white/10   rounded-lg  shadow1   text-sm c4 flex">
+                      {arr?.map((el, i) => (
+                        <li
+                          key={v4()}
+                          onClick={() =>
+                            i < pointer && doStateFormPointer(dispatch, i)
+                          }
+                          className={`relative overflow-hidden transition-all flex items-center justify-center gap-2 p-4 ${
+                            i === pointer
+                              ? "bg3 c1  rounded-lg  "
+                              : "bg-transparent "
+                          }`}
+                        >
+                          {pointer !== i && (
+                            <>
+                              {i != 0 && (
+                                <span className="absolute -left-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-white rtl:border-e-0 rtl:border-t-0 rtl:bg-gray-50 sm:block"></span>
+                              )}
 
-                            {i != arr?.length - 1 && (
-                              <span className="absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-gray-50 rtl:border-e-0 rtl:border-t-0 rtl:bg-white sm:block"></span>
-                            )}
-                          </>
-                        )}
+                              {i != arr?.length - 1 && (
+                                <span className="absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-gray-50 rtl:border-e-0 rtl:border-t-0 rtl:bg-white sm:block"></span>
+                              )}
+                            </>
+                          )}
 
-                        <Icon icon={el?.icon} className=" text-[44px]" />
+                          <Icon icon={el?.icon} className=" text-[44px]" />
 
-                        <p className="leading-none">
-                          <strong className="block font-semibold">
-                            {el?.title}
-                          </strong>
-                          <small className="mt-1">
-                            Lorem ipsum dolor, sit amet consectetur adipisicing
-                            elit.
-                          </small>
-                        </p>
-                      </li>
-                    ))}
-                  </ol>
+                          <p className="leading-none">
+                            <strong className="block font-semibold">
+                              {el?.title}
+                            </strong>
+                            <small className="mt-1">
+                              Lorem ipsum dolor, sit amet consectetur
+                              adipisicing elit.
+                            </small>
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  )
                 )}
 
                 {isConnected ? (
@@ -461,66 +466,6 @@ let Child1 = ({
           </div>
         )}
       </Viewport>
-
-      {/* {components?.map((el, i) => (
-        <Elem index={i} elem={el} key={v4()} />
-      ))} */}
     </>
   );
 };
-
-// <Viewport particles={"z-2 fixed"} full={true}>
-//   <div className="flex w-[65vw] ml-auto">
-//     {/* <div className="backdrop-blur  mb-1 rounded-lg px-3 max-h-[75vh] overflow-scroll hide-scrollbar w-2/5 mr-4 py-2">
-//             <h6 className="text-lg">
-//               {isConnected ? (
-//                 <Hg1>{arr?.[pointer]?.title}</Hg1>
-//               ) : (
-//                 <span className="flex items-center">
-//                   <Icon icon={icfy.ux.warning} className="text-warning mr-2" />{" "}
-//                   Oops ... You're not connected
-//                 </span>
-//               )}
-//             </h6>
-
-//             {(arr?.[pointer]?.description || !isConnected) && (
-//               <MyFormInfo
-//                 description={
-//                   isConnected
-//                     ? arr?.[pointer]?.description
-//                     : "Please connected on your account with your wallet provider ?"
-//                 }
-//               />
-//             )}
-//           </div> */}
-
-//     <div
-//       className={`w-full relative flex flex-col  px-4 py-2 max-h-[80vh] overflow-scroll hide-scrollbar   backdrop-blur  shadow-lg     box-border  rounded-lg `}
-//     >
-//       {(arr?.[pointer]?.description || !isConnected) && (
-//         <MyFormInfo
-//           title={
-//             <h6 className="text-2xl">
-//               {isConnected ? (
-//                 arr?.[pointer]?.title
-//               ) : (
-//                 <span className="flex items-center">
-//                   <Icon icon={icfy.ux.warning} className="text-warning mr-2" />{" "}
-//                   Oops ... You're not connected
-//                 </span>
-//               )}
-//             </h6>
-//           }
-//           description={
-//             isConnected
-//               ? arr?.[pointer]?.description
-//               : "Please connected on your account with your wallet provider ?"
-//           }
-//         />
-//       )}
-//       {isConnected && components[pointer]}
-//       <div className="h-full mb-5"></div>
-//
-//     </div>
-//   </div>
-// </Viewport>;

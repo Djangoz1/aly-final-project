@@ -103,32 +103,38 @@ const PageCreateProfile = () => {
       func: "missionPrice",
       targetContract: "balancesHub",
     });
-    let hash = await _apiPostPayable("createMission", [uri], price);
-    _txs.bc = hash;
-    await doStateTools(dispatch, {
-      ...state,
-      txs: { pointer: 2, ..._txs },
-    });
-    let _featureMetadatas = [];
-    for (
-      let index = 0;
-      index < form?.ai?.recommandations?.roles.length;
-      index++
-    ) {
-      const element = form?.ai?.recommandations?.roles[index];
-      let _metadatasFeature = {
-        title: element?.role_name,
-        abstract: element?.reason,
-        skills: JSON.stringify(element?.skills_required, null, 2),
-        budget: form?.ai?.recommandations?.budget?.roles_budget?.[index] || 0,
-        missionID: uri,
-        deployed: false,
-      };
-      console.log("_metadatas", _metadatasFeature);
-      await clientPocket.records.create("features", _metadatasFeature);
-      _featureMetadatas.push(_metadatasFeature);
+
+    try {
+      let hash = await _apiPostPayable("createMission", [uri], price);
+      _txs.bc = hash;
+      await doStateTools(dispatch, {
+        ...state,
+        txs: { pointer: 2, ..._txs },
+      });
+      let _featureMetadatas = [];
+      for (
+        let index = 0;
+        index < form?.ai?.recommandations?.roles.length;
+        index++
+      ) {
+        const element = form?.ai?.recommandations?.roles[index];
+        let _metadatasFeature = {
+          title: element?.role_name,
+          abstract: element?.reason,
+          skills: JSON.stringify(element?.skills_required, null, 2),
+          budget: form?.ai?.recommandations?.budget?.roles_budget?.[index] || 0,
+          missionID: uri,
+          deployed: false,
+        };
+        console.log("_metadatas", _metadatasFeature);
+        await clientPocket.records.create("features", _metadatasFeature);
+        _featureMetadatas.push(_metadatasFeature);
+        console.log(_featureMetadatas);
+      }
+    } catch (error) {
+      await clientPocket.records.delete("missions", uri);
+      console.log("missions delete");
     }
-    console.log(_featureMetadatas);
   };
 
   useEffect(() => {
