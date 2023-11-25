@@ -1,39 +1,51 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./style.css";
 
-import { useToolsState } from "context/tools";
-
-import { useAccount } from "wagmi";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { useAuthState } from "context/auth";
+import { controllers } from "utils/controllers";
 
-export const BtnFollow = ({ follow, style, unfollow, refresh, cvID }) => {
-  let { state, pointer } = useToolsState();
+export const BtnFollow = ({ follow, userID, style, unfollow, refresh }) => {
   let [isFollow, setIsFollow] = useState(null);
 
-  let { isConnected } = useAccount();
-  let { cv } = useAuthState();
+  let { cv, metadatas } = useAuthState();
 
   let checkFollow = async () => {
-    setIsFollow(await _apiGet("isFollow", [cv, cvID]));
+    try {
+      let follow = await controllers.get.profile.follow({
+        ownerID: metadatas?.id,
+        followID: userID,
+      });
+      setIsFollow(follow);
+    } catch (error) {
+      setIsFollow(false);
+    }
   };
+
   useEffect(() => {
-    if (cvID > 0 && cv > 0 && cv != cvID) checkFollow();
-  }, [cvID, cv]);
-
-  let setFollow = async (followFunc) => {
-    if (cv != cvID) {
-      await _apiPost(followFunc, [cvID]);
-
+    if (
+      isFollow === null &&
+      userID !== metadatas?.id &&
+      userID &&
+      metadatas?.id
+    )
       checkFollow();
+  }, [userID, metadatas?.id]);
 
+  let setFollow = async () => {
+    if (userID != metadatas?.id) {
+      await controllers.create.follow({
+        followID: userID,
+        ownerID: metadatas?.id,
+      });
+      checkFollow();
       refresh && refresh();
     }
   };
   return (
-    cv !== cvID && (
+    userID !== metadatas?.id && (
       <button
-        onClick={() => setFollow(isFollow ? "unfollowCV" : "followCV")}
+        onClick={() => setFollow()}
         className={`transition-all btn btn-ghost p-2 rounded-full w-fit ${
           style && style
         } h-fit ${isFollow ? "text-error shadow2" : "c2 shadow1"}`}

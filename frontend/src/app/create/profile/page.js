@@ -26,7 +26,7 @@ import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 import {
   FormCreateProfile1,
   FormCreateProfile2,
-} from "sections/Profile/form/create/FormCreateProfile1";
+} from "sections/Form/forms/create/FormCreateProfile1";
 import { MyCardList } from "components/myComponents/card/MyCardList";
 import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
 

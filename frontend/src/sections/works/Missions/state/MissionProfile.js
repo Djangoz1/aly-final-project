@@ -22,7 +22,7 @@ import { _table_invites } from "utils/works/feature";
 import { v4 } from "uuid";
 
 export const MissionProfile = ({ missionID }) => {
-  let { state, pointer } = useToolsState();
+  let { state, pointer, status } = useToolsState();
   let [isMission, setIsMission] = useState(null);
 
   let fetch = async () => {
@@ -30,12 +30,14 @@ export const MissionProfile = ({ missionID }) => {
   };
 
   useEffect(() => {
-    if (missionID && isMission?.missionID !== missionID) {
-      fetch();
-    } else if (state?.mission) {
-      setIsMission(state?.mission);
+    if (status === "success" || status === "reload") {
+      if (missionID && isMission?.missionID !== missionID) {
+        fetch();
+      } else if (state?.mission) {
+        setIsMission(state?.mission);
+      }
     }
-  }, [missionID, state?.mission]);
+  }, [missionID, state?.mission, status]);
 
   let infos = [
     {
@@ -50,16 +52,15 @@ export const MissionProfile = ({ missionID }) => {
     },
     {
       title: "Features",
-      value: isMission?.datas?.features?.length,
+      num: isMission?.datas?.features?.length,
     },
     {
       title: "Work slot",
-      value:
-        isMission?.datas?.features?.length - isMission?.datas?.workers || 0,
+      num: isMission?.datas?.features?.length - isMission?.datas?.workers || 0,
     },
     {
       title: "Disputes",
-      value: isMission?.datas?.disputes || 0,
+      num: isMission?.datas?.disputes || 0,
     },
 
     {
@@ -76,7 +77,11 @@ export const MissionProfile = ({ missionID }) => {
     },
     {
       title: "Posts",
-      value: isMission?.datas?.pubs?.length,
+      num: isMission?.pubs?.length,
+    },
+    {
+      title: "Followers",
+      num: isMission?.details?.social?.followers?.length,
     },
     {
       title: "Domain",
@@ -84,13 +89,11 @@ export const MissionProfile = ({ missionID }) => {
         <p className="flex items-center  capitalize">
           <Icon
             className={`mr-2 text-2xl text-${
-              ENUMS.domain[isMission?.metadatas?.attributes?.[0]?.domain]?.color
+              ENUMS.domain[isMission?.metadatas?.domain]?.color
             }`}
-            icon={
-              ENUMS.domain[isMission?.metadatas?.attributes?.[0]?.domain]?.icon
-            }
+            icon={ENUMS.domain[isMission?.metadatas?.domain]?.icon}
           />
-          {ENUMS.domain[isMission?.metadatas?.attributes?.[0]?.domain]?.name}
+          {ENUMS.domain[isMission?.metadatas?.domain]?.name}
         </p>
       ),
     },
@@ -110,33 +113,33 @@ export const MissionProfile = ({ missionID }) => {
       ),
     },
   ];
+  console.log(isMission);
   return (
-    <div className="flex relative overflow-visible  h-full">
+    <div className="flex flex-col pt-20  relative overflow-visible  h-full">
+      <div className="flex flex-col px-4">
+        <div className="flex items-center">
+          <MissionName
+            style={"w-fit c4 uppercase font-semibold text-lg"}
+            metadatas={isMission?.metadatas}
+            id={isMission?.missionID}
+          />
+          <div className="badge badge-primary uppercase ml-2">
+            {ENUMS?.domain?.[isMission?.metadatas?.domain || 0]?.name}
+          </div>
+        </div>
+        {isMission?.metadatas?.abstract && (
+          <article className="text-xs font-light my-8">
+            {isMission?.metadatas?.abstract}
+          </article>
+        )}
+        <article className=" font-light c3 my-8">
+          {isMission?.metadatas?.description}
+        </article>
+      </div>
       <MyCardInfos
         style={"w-full rounded-t-none mr-[1px]"}
         arr={infos}
       ></MyCardInfos>
-      <MyCardInfo
-        header={{
-          title: (
-            <MissionName
-              metadatas={isMission?.metadatas}
-              id={isMission?.missionID}
-            />
-          ),
-
-          image: isMission?.metadatas?.image,
-        }}
-        color={1}
-        styles={" w-full h-full overflow-visible "}
-        noBtn={true}
-        main={{
-          text: isMission?.metadatas?.description,
-          title:
-            ENUMS?.domain?.[isMission?.metadatas?.attributes?.[0]?.domain]
-              ?.name,
-        }}
-      />
     </div>
   );
 };

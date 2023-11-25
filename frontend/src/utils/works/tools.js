@@ -41,6 +41,7 @@ export let stateDetailsMission = async ({ features }) => {
       id: feature?.featureID,
       status: feature?.datas?.status,
       dispute: feature?.datas?.dispute,
+      cvWorker: feature?.datas?.cvWorker,
       domain: feature?.metadatas?.attributes?.[0]?.domain,
       specification: feature?.datas?.specification,
     });
@@ -51,5 +52,5 @@ export let stateDetailsMission = async ({ features }) => {
     let courtID = _courts[index];
     _badges.push(courtID);
   }
-  return { badges: _badges, features: _features };
+  return { badges: _badges, features: _features, social: null };
 };

@@ -27,8 +27,9 @@ import { LayoutForm } from "sections/Form/LayoutForm";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyInputFile } from "components/myComponents/form/MyInputsFile";
 import { ethers } from "ethers";
+import { controllers } from "utils/controllers";
 
-export const CreatePub = ({ answerID, refresh, missionID, style, btn }) => {
+export const CreatePub = ({ answerID, refresh, mission, style, btn }) => {
   const { cv, metadatas } = useAuthState();
   let moock = moock_create_post;
 
@@ -73,19 +74,12 @@ export const CreatePub = ({ answerID, refresh, missionID, style, btn }) => {
       }
 
       form.owner = metadatas;
+      form.answerID = answerID;
+      form.mission = mission;
+      console.log("ezgkljzgkzgj", form);
+      let result = await controllers.create.pub(form);
+      console.log("result", result);
 
-      let _metadatas = {
-        description: form?.description,
-        image: form?.image,
-        postID: answerID,
-        title: form?.title,
-        tags: form?.tags,
-        userID: metadatas?.id,
-      };
-      await clientPocket.records.create("posts", _metadatas);
-      if (!answerID) {
-        await _apiPost("createPub", [uri]);
-      }
       if (refresh) {
         refresh();
       }
@@ -112,10 +106,6 @@ export const CreatePub = ({ answerID, refresh, missionID, style, btn }) => {
       }
     }
   };
-
-  moock.missionID = missionID || null;
-  moock.answerID = parseInt(answerID) || null;
-  moock.reference = answerID ? 2 : missionID ? 1 : 0;
 
   return (
     // isConnected && (
@@ -149,11 +139,10 @@ export const CreatePub = ({ answerID, refresh, missionID, style, btn }) => {
           },
         }}
         styles={{
-          btn: style,
           modal: "w-fit",
         }}
       >
-        <div className="w-full bgprim  h-full p-10">
+        <div className={`w-full  h-full p-10 ${style}`}>
           <div className="flex mb-5 w-full  ">
             <MyMenusTabs
               style={" ml-auto flex-row "}

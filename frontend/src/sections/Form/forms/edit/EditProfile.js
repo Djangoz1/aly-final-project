@@ -10,7 +10,7 @@ import {
   FormEditProfile2,
   FormEditProfile3,
   FormEditProfile4,
-} from "sections/Profile/form/edit/FormEditProfile";
+} from "sections/Form/forms/edit/FormEditProfile";
 import { useAccount } from "wagmi";
 import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 
@@ -27,48 +27,51 @@ import {
 import { MyForm } from "components/myComponents/form/MyForm";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { LayoutForm } from "sections/Form/LayoutForm";
+import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { MyLayoutHeader } from "components/myComponents/layout/MyLayoutHeader";
+import { MySelect } from "components/myComponents/form/MySelects";
+import { useState } from "react";
 
 export const EditProfile = ({ styles }) => {
   let { address, isConnected } = useAccount();
   let { metadatas, datas, cv } = useAuthState();
   let { state } = useToolsState();
 
-  let dispatch = useToolsDispatch();
-  let dispatchAuth = useAuthDispatch();
-
-  let submitForm = async (form) => {
-    if (isConnected && cv) {
-      let tokenURI = await createURICv(form);
-      await _apiPost("setTokenURIOf", [cv, tokenURI, ADDRESSES["cvsHub"]]);
-      await doAuthCV(dispatchAuth, address);
-      doReloadTools(dispatch);
-    }
-  };
+  let [isIndex, setIsIndex] = useState(0);
 
   let moock = toMockProfile({ address, metadatas, cvID: cv });
 
   return (
-    <div className="bgprim  min-h-[60vh] w-full flex h-full">
+    <div className="  min-h-[60vh] w-full flex flex-col h-full">
       <LayoutForm
         stateInit={{
-          allowed: true,
+          allowed: metadatas ? true : undefined,
           form: moock,
           placeholders: moock,
         }}
       >
+        <MyLayoutHeader
+          metadatas={metadatas}
+          cvID={cv}
+          image={metadatas?.avatar}
+          username={metadatas?.username}
+          allowed={cv > 0}
+        >
+          {/* <MySelect target={'domain'} label={"What's your domain ?"}/> */}
+        </MyLayoutHeader>
         <MyMenusTabs
-          template={1}
-          value={state?.indexSettings || 0}
+          template={3}
+          value={isIndex}
           target={"title"}
           color={1}
-          setter={(i) => doStateTools(dispatch, { ...state, indexSettings: i })}
-          style={" w-1/5 rounded-none "}
+          setter={(i) => setIsIndex(i)}
+          // style={" w-1/5 rounded-none "}
           arr={MENUS.profile?.edit}
         />
         <div className="  px-3 py-5 h-full">
           {
             [<FormEditProfile1 />, <FormEditProfile2 />, <FormEditProfile4 />][
-              state?.indexSettings || 0
+              isIndex
             ]
           }
         </div>

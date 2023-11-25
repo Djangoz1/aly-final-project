@@ -9,7 +9,6 @@ export const MyStatus = ({
   padding,
   status,
   target,
-  refresh,
   style,
   children,
   setter,
@@ -19,7 +18,7 @@ export const MyStatus = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { state } = useToolsState();
+  const { state, refresh } = useToolsState();
 
   let handleClick = async () => {
     if (allowed && status != toStatus) {

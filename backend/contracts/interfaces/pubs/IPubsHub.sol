@@ -12,9 +12,5 @@ interface IPubsHub {
         bool _isPayable
     ) external returns (uint);
 
-    function likePub(uint _cvID, uint _id) external;
-
     function indexerPayableOf(uint _cvID) external view returns (uint[] memory);
-
-    function unlikePub(uint _cvID, uint _id) external;
 }

@@ -245,7 +245,6 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
     }
 
     function indexerOf(uint _cvID) external view returns (uint[] memory) {
-        require(_indexer[_cvID].length > 0, "No feature found");
         return _indexer[_cvID];
     }
 

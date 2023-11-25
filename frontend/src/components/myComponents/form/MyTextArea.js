@@ -9,8 +9,10 @@ import {
 } from "context/form";
 import { icfySEND } from "icones";
 import React, { useEffect, useState } from "react";
+import { MyMainBtn } from "../btn/MyMainBtn";
+import { clientPocket } from "utils/ui-tools/pinata-tools";
 
-export const MyTextArea = ({ label, target, setter, styles }) => {
+export const MyTextArea = ({ label, metadatas, target, setter, styles }) => {
   let { form, placeholders, pointer, modal, checked } = useFormState();
   let [value, setValue] = useState(null);
   let dispatch = useFormDispatch();
@@ -22,9 +24,22 @@ export const MyTextArea = ({ label, target, setter, styles }) => {
   let handleBlur = () => {
     setIsFocus(false);
   };
+
   useEffect(() => {
     if (target && !value) setValue(form?.[target]);
   }, [target, modal]);
+
+  let handlePost = async () => {
+    if (setter) {
+      setter(form?.target);
+    } else if (metadatas) {
+      await clientPocket.records.update(
+        metadatas["@collectionName"],
+        metadatas.id,
+        { [target]: form[target] }
+      );
+    }
+  };
 
   let handleChange = (_value) => {
     setValue(_value);
@@ -53,18 +68,18 @@ export const MyTextArea = ({ label, target, setter, styles }) => {
           value={value || undefined}
           onBlur={handleBlur}
           onFocus={handleFocus}
-          className={`textarea font2 bg-zinc-900 w-full   font-light ${
+          className={`textarea font2 bg-gradient-to-bl from-zinc-900 to-white/5 w-full   font-light ${
             !isFocus ? "" : "shadow1"
           }  ${styles || "min-h-[10vh] max-h-[30vh]"}`}
           placeholder={placeholders?.[target]}
         ></textarea>
-        {setter ? (
-          <MyBtnLoading
-            setter={() => setter(form?.[target], target)}
-            style={"absolute top-0 right-0 btn btn-ghost  text-2xl c2"}
-          >
-            <Icon icon={icfySEND} />
-          </MyBtnLoading>
+        {setter || metadatas ? (
+          <MyMainBtn
+            icon={icfySEND}
+            template={1}
+            setter={handlePost}
+            style={"absolute btn-xs top-2 right-2   text-2xl c2"}
+          ></MyMainBtn>
         ) : undefined}
       </div>
     </div>

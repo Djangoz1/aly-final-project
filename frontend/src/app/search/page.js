@@ -12,34 +12,45 @@ import { _apiPost } from "utils/ui-tools/web3-tools";
 import { useAccount } from "wagmi";
 import { MyInput } from "components/myComponents/form/MyInput";
 import { LayoutForm } from "sections/Form/LayoutForm";
-import { ListJobs } from "sections/list/ListJobs";
-import { ListProfiles } from "sections/list/ListProfiles";
-import { ListLaunchpads } from "sections/list/ListLaunchpads";
+
 import { ENUMS } from "constants/enums";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { doPointerTools, useToolsDispatch, useToolsState } from "context/tools";
+import {
+  doPointerTools,
+  doStateTools,
+  useToolsDispatch,
+  useToolsState,
+} from "context/tools";
 import { MySub } from "components/myComponents/text/MySub";
 import { v4 } from "uuid";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyBtns } from "components/myComponents/btn/MyBtns";
+import { useAuthState } from "context/auth";
+import { controllers } from "utils/controllers";
+import { AssetFreelancer } from "components/assets/AssetProfile";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
+
+  let { metadatas } = useAuthState();
   let { state, pointer } = useToolsState();
   let dispatch = useToolsDispatch();
   let [isPointer, setIsPointer] = useState();
+  useEffect(() => {
+    (async () =>
+      doStateTools(dispatch, {
+        lists: await controllers.get.profile.list({ filter: "" }),
+      }))();
+  }, []);
+  console.log(state);
   return (
     <MyLayoutDashboard
       color={2}
-      id={0}
-      menus={[
-        { url: "#section0", title: "Jobs", icon: icsystem.feature },
-        { url: "#section1", title: "Freelancers", icon: icsystem.profile },
-        { url: "#section2", title: "Launchpad", ic: icsystem.escrow },
-        { url: "#section3", title: "Disputes", icon: icsystem.escrow },
-      ]}
-      template={1}
+      target={"search"}
+      owner={metadatas}
+      url={"/search/"}
+      template={0}
     >
       <Page />
     </MyLayoutDashboard>
@@ -47,50 +58,10 @@ export default function PageSearch({ params }) {
 }
 
 let Page = () => {
-  let { pointer } = useToolsState();
+  let { pointer, state } = useToolsState();
   let [isExtend, setIsExtend] = useState(null);
   let dispatch = useToolsDispatch();
-  let filterJobs = (job) => {
-    let allowed = false;
 
-    if (
-      (job?.datas?.specification === isCourt || isCourt <= 1) &&
-      ((job?.datas?.isInviteOnly && isInvite === 1) ||
-        (!job?.datas?.isInviteOnly && isInvite === 2) ||
-        isInvite === 0) &&
-      (isStarted === 0 ||
-        (isStarted === 1 && parseInt(job?.datas?.startedAt) > 0) ||
-        (isStarted === 2 && parseInt(job?.datas?.startedAt) === 0))
-    ) {
-      allowed = true;
-    }
-
-    return allowed;
-  };
-  let filterProfile = (profile) => {
-    let allowed = false;
-
-    if (
-      (profile?.details?.badges.includes(isCourt) || isCourt <= 1) &&
-      ((profile?.metadatas?.attributes?.[0]?.visibility && isInvite === 1) ||
-        (!profile?.metadatas?.attributes?.[0]?.visibility && isInvite === 2) ||
-        isInvite === 0) &&
-      (isStarted === 0 ||
-        (isStarted === 2 && profile?.datas?.proposals?.length > 0) ||
-        (isStarted === 1 && profile?.datas?.proposals?.length === 0))
-    ) {
-      allowed = true;
-    }
-    console.log("filter profile page search ....", allowed);
-
-    return allowed;
-  };
-
-  let lists = [
-    <ListJobs bool={filterJobs} />,
-    <ListProfiles bool={filterProfile} />,
-    <ListLaunchpads />,
-  ];
   let [isCourt, setIsCourt] = useState(0);
   let [isDomain, setIsDomain] = useState(null);
   let [isInvite, setIsInvite] = useState(0);
@@ -258,10 +229,11 @@ let Page = () => {
         ) : (
           []
         )}
-        <div className="overflow-y-scroll pt-10 backdrop-blur">
-          {lists?.[pointer]}
+        <div className=" grid grid-cols-3  grid-rows-4 gap-4 overflow-y-scroll w-full min-h-screen pt-10 backdrop-blur h-fit">
+          {state?.lists?.map((el) => (
+            <AssetFreelancer style={"   "} key={v4()} owner={el} />
+          ))}
         </div>
-
         <div className="w-1/6  ml-auto overflow-y-scroll h-full  border border-white/5 border-r-white/0 border-b-white/0">
           <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
             <MyTitle style={"mt-2 mb-3 font-bold"}>Language techno</MyTitle>
@@ -314,9 +286,6 @@ let Page = () => {
             </MyBtns>
           </div>
         </div>
-        {/* <ListLaunchpads /> */}
-        {/* <ListJobs /> */}
-        {/* <ListProfiles /> */}
       </div>
     </>
   );

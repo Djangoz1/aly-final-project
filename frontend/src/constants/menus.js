@@ -1,9 +1,10 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { icfy } from "icones";
+import { icfy, icfyCODE, icfyIMG, icfyINFO, icfyTIME, icsystem } from "icones";
 import { styles } from "styles/style";
 import { EditTokenLaunchpad } from "sections/Launchpad/form/EditLockToken";
 import Link from "next/link";
 import { _apiPost } from "utils/ui-tools/web3-tools";
+import { ENUMS } from "./enums";
 
 export const MENUS_CREATE_FEATURE = [
   { i: "ℹ️", title: "Introduction" },
@@ -44,16 +45,85 @@ export const MENUS = {
       { i: "🫂", title: "Social" },
       { i: "🔌", title: "Blockchain" },
     ],
+    page: [
+      {
+        title: "Account",
+        sub: [{ icon: icfy.ux.workspace, title: "Workspace", url: "/" }],
+      },
+      {
+        title: "Overview",
+        sub: [
+          { icon: icfyINFO, title: "Informations", url: "/informations" },
+          { icon: icfyIMG, title: "Gallery", url: "/gallery" },
+          { icon: icsystem.mission, title: "Missions", url: "/missions" },
+          { icon: icsystem.feature, title: "Features", url: "/features" },
+          { icon: icsystem.feature, title: "Jobs", url: "/jobs" },
+          { icon: icsystem.launchpad, title: "Launchpads", url: "/launchpads" },
+          { icon: icfy.msg.casual, title: "Invitations", url: "/invitations" },
+          { icon: icsystem.escrow, title: "Escrows", url: "/escrows" },
+        ],
+      },
+
+      {
+        title: "Social Media",
+        sub: [
+          { icon: icfy.msg.post, title: "Posts", url: "/social" },
+          { icon: icfyCODE, title: "Codes", url: "" },
+          { icon: icfy.msg.casual, title: "Messages", url: "" },
+          { icon: icfy.like, title: "Likes", url: "" },
+        ],
+      },
+    ],
     create: [
       { i: "ℹ️", title: "Introduction" },
       { i: "🗂️", title: "Information personnelle" },
       { i: "👨‍💻", title: "Work" },
     ],
   },
+  search: {
+    page: [
+      {
+        title: "Search",
+        sub: [
+          { url: "/search/jobs", title: "Jobs", icon: icsystem.feature },
+          { url: "/search/", title: "Freelancers", icon: icsystem.profile },
+          {
+            url: "/search/launchpads",
+            title: "Launchpad",
+            ic: icsystem.escrow,
+          },
+          { url: "/search/disputes", title: "Disputes", icon: icsystem.escrow },
+        ],
+      },
+    ],
+  },
   escrow: {
     create: [
       { i: "ℹ️", title: "Introduction" },
       { i: "🗂️", title: "Informations" },
+    ],
+    page: [
+      {
+        title: "Court",
+        sub: ENUMS.courts.map((el) => {
+          return { title: el.court, icon: el.badge };
+        }),
+      },
+    ],
+  },
+
+  pub: {
+    page: [
+      {
+        title: "Overview",
+        sub: [
+          { icon: icfyTIME, title: "My page" },
+          { icon: icfyINFO, title: "All", url: "/" },
+          { icon: icfyIMG, title: "Payable", url: "/payables" },
+          { icon: icfyTIME, title: "Codes", url: "/codes" },
+          { icon: icsystem.feature, title: "Features", url: "/features" },
+        ],
+      },
     ],
   },
   // launchpad: {
@@ -81,27 +151,232 @@ export const MENUS = {
   },
 };
 
+export const menus_id = (target, id) => {
+  let menus = {
+    profile: [
+      {
+        title: "Account",
+        sub: [
+          {
+            icon: icfy.ux.workspace,
+            title: "Workspace",
+            url: "/profile/" + id + "/",
+          },
+        ],
+      },
+      {
+        title: "Overview",
+        sub: [
+          {
+            icon: icfyINFO,
+            title: "Informations",
+            url: "/profile/" + id + "/informations",
+          },
+          {
+            icon: icfyIMG,
+            title: "Gallery",
+            url: "/profile/" + id + "/gallery",
+          },
+          {
+            icon: icsystem.mission,
+            title: "Missions",
+            url: "/profile/" + id + "/missions",
+          },
+          {
+            icon: icsystem.feature,
+            title: "Features",
+            url: "/profile/" + id + "/features",
+          },
+          {
+            icon: icsystem.feature,
+            title: "Jobs",
+            url: "/profile/" + id + "/jobs",
+          },
+          {
+            icon: icsystem.launchpad,
+            title: "Launchpads",
+            url: "/profile/" + id + "/launchpads",
+          },
+          {
+            icon: icfy.msg.casual,
+            title: "Notifications",
+            url: "/profile/" + id + "/notifications",
+          },
+          {
+            icon: icsystem.escrow,
+            title: "Escrows",
+            url: "/profile/" + id + "/escrows",
+          },
+        ],
+      },
+
+      {
+        title: "Social Media",
+        sub: [
+          {
+            icon: icfy.msg.post,
+            title: "Posts",
+            url: "/profile/" + id + "/social",
+          },
+          { icon: icfyCODE, title: "Codes" },
+          {
+            icon: icfy.msg.casual,
+            title: "Messages",
+            url: "/profile/" + id + "/messages",
+          },
+          { icon: icfy.like, title: "Likes" },
+        ],
+      },
+      {
+        title: "Settings",
+        sub: [
+          {
+            icon: icfy.ux.edit,
+            title: "Profile",
+            url: "/profile/" + id + "/settings",
+          },
+        ],
+      },
+    ],
+
+    launchpad: [
+      {
+        title: "Launchpad",
+        sub: [
+          {
+            icon: icfy.ux.workspace,
+            title: "Workspace",
+            url: "/launchpad/" + id + "/",
+          },
+        ],
+      },
+      {
+        title: "Overview",
+        sub: [
+          {
+            icon: icfyINFO,
+            title: "Informations",
+            url: "/launchpad/" + id + "/informations",
+          },
+
+          {
+            icon: icfyIMG,
+            title: "Gallery",
+            url: "/launchpad/" + id + "/gallery",
+          },
+          {
+            icon: icsystem.feature,
+            title: "Children",
+            url: "/launchpad/" + id + "/features",
+          },
+        ],
+      },
+
+      {
+        title: "Social Media",
+        sub: [
+          {
+            icon: icfy.msg.post,
+            title: "Posts",
+            url: "/works/mission/" + id + "/social",
+          },
+        ],
+      },
+    ],
+    mission: [
+      {
+        title: "Mission",
+        sub: [
+          {
+            icon: icfy.ux.workspace,
+            title: "Workspace",
+            url: "/works/mission/" + id + "/",
+          },
+        ],
+      },
+      {
+        title: "Overview",
+        sub: [
+          {
+            icon: icfyTIME,
+            title: "Agendas",
+            url: "/works/mission/" + id + "/agendas",
+          },
+          {
+            icon: icfyIMG,
+            title: "Gallery",
+            url: "/works/mission/" + id + "/gallery",
+          },
+          {
+            icon: icsystem.feature,
+            title: "Features",
+            url: "/works/mission/" + id + "/features",
+          },
+
+          {
+            icon: icfy.msg.casual,
+            title: "Invitations",
+            url: "/works/mission/" + id + "/invitations",
+          },
+          {
+            icon: icsystem.escrow,
+            title: "Escrow",
+            url: "/works/mission/" + id + "/escrows",
+          },
+          {
+            icon: icsystem.launchpad,
+            title: "Launchpad",
+            url: "/works/mission/" + id + "/launchpads",
+          },
+        ],
+      },
+
+      {
+        title: "Social Media",
+        sub: [
+          {
+            icon: icfy.msg.post,
+            title: "Posts",
+            url: "/works/mission/" + id + "/social",
+          },
+        ],
+      },
+      {
+        title: "Settings",
+        sub: [
+          {
+            icon: icfy.ux.edit,
+            title: "Mission",
+            url: "/works/mission/" + id + "/settings",
+          },
+        ],
+      },
+    ],
+  };
+  return menus[target];
+};
+
 export let MENUS_ID = (id, owner, cvID) => {
   return {
     mission: [
       {
-        url: "/works/mission/" + id + "/test",
+        url: "//works/mission/" + id + "/test",
         title: "Overview",
       },
       {
-        url: "/works/mission/" + id + "/features/test",
+        url: "//works/mission/" + id + "/features/test",
         title: "Features",
       },
       {
-        url: "/works/mission/" + id + "/agenda/test",
+        url: "//works/mission/" + id + "/agenda/test",
         title: "Agenda",
       },
       {
-        url: "/works/mission/" + id + "/",
+        url: "//works/mission/" + id + "/",
         title: "Disputes",
       },
       {
-        url: "/works/mission/" + id + "/pubs/test",
+        url: "//works/mission/" + id + "/pubs/test",
         title: "Pubs",
       },
     ],

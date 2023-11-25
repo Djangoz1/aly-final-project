@@ -15,8 +15,6 @@ contract PubsDatasHub is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _likeIDs;
 
-    mapping(uint => uint[]) internal missionsToPubs;
-    mapping(uint => uint[]) internal pubsToAnswers;
     /**
      * @dev storage indexer like for each pub
      * @notice uint param is for pub ID
@@ -30,14 +28,6 @@ contract PubsDatasHub is ERC721, Ownable {
      * pubID > cvID > bool
      */
     mapping(uint => mapping(uint => bool)) internal listsOfAllowedAccounts;
-
-    /**
-     * @dev storage indexer like for each CV
-     * @notice uint param is for cv id
-     * @notice return likeData for each pubID
-     */
-
-    mapping(uint => mapping(uint => uint)) internal cvsToLikes;
 
     modifier onlyProxy() {
         require(
@@ -124,24 +114,6 @@ contract PubsDatasHub is ERC721, Ownable {
         return true;
     }
 
-    /**
-     * @return Total likes
-     */
-    function tokensLength() external view returns (uint) {
-        return _likeIDs.current();
-    }
-
-    function indexerOf(
-        uint _pubID
-    )
-        external
-        view
-        ifTokenExist(_pubID, _iAS.pubsHub())
-        returns (uint[] memory)
-    {
-        return pubsToLikes[_pubID];
-    }
-
     function dataOfPub(
         uint _pubID
     )
@@ -151,48 +123,6 @@ contract PubsDatasHub is ERC721, Ownable {
         returns (DataTypes.PubData memory)
     {
         return pubsToDatas[_pubID];
-    }
-
-    function addPubMission(
-        uint _newPubID,
-        uint _missionID,
-        string memory _tokenURI
-    ) external {
-        require(_newPubID != 0, "Error create pub");
-        missionsToPubs[_missionID].push(_newPubID);
-        pubsToDatas[_newPubID].missionID = _missionID;
-    }
-
-    function addPubAnswer(
-        uint _newPubID,
-        uint _pubID,
-        string memory _tokenURI
-    ) external {
-        require(_newPubID != 0, "Error create pub");
-        pubsToAnswers[_pubID].push(_newPubID);
-        pubsToDatas[_pubID].answers++;
-    }
-
-    function answersOfPub(
-        uint _pubID
-    )
-        external
-        view
-        ifTokenExist(_pubID, _iAS.pubsHub())
-        returns (uint[] memory)
-    {
-        return pubsToAnswers[_pubID];
-    }
-
-    function pubsOfMission(
-        uint _missionID
-    )
-        external
-        view
-        ifTokenExist(_missionID, _iAS.missionsHub())
-        returns (uint[] memory)
-    {
-        return missionsToPubs[_missionID];
     }
 
     function _cvOf(address _for) internal view returns (uint) {

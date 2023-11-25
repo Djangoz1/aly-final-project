@@ -123,7 +123,7 @@ export function Viewport({
       {fixed && (
         <AnimatePresence>
           <motion.div
-            className="h-screen z-100 w-screen fixed p-20 top-0 left-0"
+            className="h-screen z-100 w-screen fixed py-20 top-0 left-0"
             key={v4()}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

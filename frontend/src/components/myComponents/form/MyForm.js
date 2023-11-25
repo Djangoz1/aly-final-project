@@ -190,7 +190,7 @@ let Child1 = ({
   editer,
 }) => {
   let dispatch = useFormDispatch();
-  let [isLoading, setIsLoading] = useState(null);
+
   let { form, placeholders, pointer, disabled, checked, superChecked } =
     useFormState();
 
@@ -237,32 +237,19 @@ let Child1 = ({
 
   let handleSubmit = async () => {
     if (isConnected) {
-      setIsLoading(true);
       await submit(form);
-      setIsLoading(false);
     }
   };
 
   return (
     <>
-      <Viewport
-        img={{
-          image: (
-            <img
-              src="https://uploads-ssl.webflow.com/646f65e37fe0275cfb808405/646f66cdeeb4ddfdae25a26e_Background%20Hero.svg"
-              alt=""
-              className="absolute -z-10 inline-block h-full w-full object-cover"
-            />
-          ),
-        }}
-        full={true}
-      >
+      <div className="w-screen  mt-[15vh]  h-screen">
         {pointer === components?.length && form?.aiAssisted ? (
           <FormResponseAI />
         ) : (
-          <div className="mx-auto w-full h-full py-20    ">
+          <div className="w-full h-full     ">
             <div className="h-full w-full   flex flex-row">
-              <div className="   overflow-y-scroll hide-scrollbar relative  pb-10 bg-[#f7f6f2]  rounded-lg px-10 py-3 flex   min-w-[40%] w-[40%]  flex-col h-auto items-center gap-4 ">
+              <div className="   overflow-y-scroll hide-scrollbar relative  pb-10 bg-[#f7f6f2]   px-10 py-3 flex   min-w-[40%] w-[40%]  flex-col h-auto items-center gap-4 ">
                 {/* <div className="absolute -z-2 w-full h-full  backdrop-blur-[3px]"></div> */}
                 <div className="flex relative z-3 justify-between items-end w-full ">
                   <h2 className=" mt-3 text-black max-w-[55px] text-3xl font-extrabold md:text-3xl text-left uppercase w-full">
@@ -350,7 +337,7 @@ let Child1 = ({
                 )}
               </div>
 
-              <div className="bg-zinc-800  overflow-y-scroll hide-scrollbar rounded-sm  shadowh _hover  ml-10 px-8 pt-6 pb-10 w-full ">
+              <div className="bgprim  overflow-y-scroll hide-scrollbar rounded-sm  shadowh _hover   px-8 pt-6 pb-10 w-full ">
                 {!isConnected ? (
                   <div className="flex flex-col  h-1/2 justify-between items-center w-full text-center">
                     <span className="text-[44px] font-light text-warning">
@@ -465,7 +452,7 @@ let Child1 = ({
             </div>
           </div>
         )}
-      </Viewport>
+      </div>
     </>
   );
 };

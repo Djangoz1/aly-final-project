@@ -26,53 +26,22 @@ import {
   icfyTWITTER,
 } from "icones";
 import React from "react";
-import { createURI, createURICv } from "utils/ui-tools/pinata-tools";
+import {
+  clientPocket,
+  createURI,
+  createURICv,
+} from "utils/ui-tools/pinata-tools";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { useAccount } from "wagmi";
 let margin = "mb-8";
 // Identity
 export const FormEditProfile1 = () => {
   const { state } = useToolsState(null);
-  const { cv } = useAuthState();
+  const { cv, metadatas } = useAuthState();
   const { address } = useAccount();
   const dispatch = useToolsDispatch();
   const dispatchCV = useAuthDispatch();
-  let handleChange = async (value, target, attributes) => {
-    let metadatas = { ...state?.profile?.metadatas };
-    console.log("value", value);
-    console.log("metadatas", metadatas?.[target]);
-    console.log("value", target);
 
-    if (metadatas[target] == value || metadatas?.[target] == value) {
-      throw new Error("Error: Same value");
-    }
-
-    if (
-      target === "username" ||
-      target === "image" ||
-      target === "description"
-    ) {
-      metadatas[target] = value;
-    } else if (target === "phone") {
-      metadatas.identity[target] = value;
-    } else if (target === "banniere") {
-      metadatas[target] = value;
-    }
-
-    let uri = await createURI({
-      id: state?.profile?.cvID,
-      title: "CV",
-      metadatas: metadatas,
-    });
-    await _apiPost("setTokenURIOf", [
-      state?.profile?.cvID,
-      uri,
-      ADDRESSES.cvsHub,
-    ]);
-
-    await doStateProfileTools({ dispatch, cvID: state?.profile?.cvID });
-    await doAuthCV(dispatchCV, address);
-  };
   return (
     <div className="">
       <p className="text-xs c4 w-3/4 mb-5">
@@ -87,41 +56,41 @@ export const FormEditProfile1 = () => {
         <MyInput
           styles={" w-full  mr-5 "}
           icon={icfySEND}
-          setter={handleChange}
+          metadatas={metadatas}
           target={"username"}
         />
         <MyInput
           target={"phone"}
           styles={" w-full  ml-5 "}
           icon={icfySEND}
-          setter={handleChange}
+          metadatas={metadatas}
         />
       </div>
 
       <div className="flex items-center">
         <MyInputFile
           styles={margin + "  c3 mr-5"}
-          setter={handleChange}
           label={"Photo de profil"}
-          target={"image"}
+          metadatas={metadatas}
+          target={"avatar"}
         />
         <MyInputFile
+          metadatas={metadatas}
           styles={margin + "  c3 mr-5"}
-          setter={handleChange}
           label={"Bannière"}
           target={"banniere"}
         />
         <MyInputFile
+          metadatas={metadatas}
           styles={margin + "  c3 mr-5"}
-          setter={handleChange}
           label={"CV"}
           target={"cvImg"}
         />
       </div>
       <MyTextArea
+        metadatas={metadatas}
         label={"Bio"}
         styles={"w-full "}
-        setter={handleChange}
         target={"description"}
       />
     </div>

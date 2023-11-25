@@ -31,61 +31,53 @@ const EscrowPage = () => {
   return (
     <>
       <MyLayoutDashboard
-        template={1}
+        template={2}
         target={"escrowIntro"}
         noMenu={true}
         menus={[{ title: "hero" }, { title: "intro" }]}
       >
-        {
-          [
-            <div className="w-full   items-end h-full flex">
-              <div className=" flex   items-end  mt-auto">
-                <div className="flex flex-col">
-                  <Hg1
-                    className="text-xs leading-0 font2 uppercase"
-                    gradient={[
-                      "to right",
-                      "rgba(201,78,21,0.92), rgba(201,21,103,1)",
-                    ]}
-                  >
-                    Powered by workers experiment
-                  </Hg1>
-                  <h3 className={styles.hero}>
-                    Trust on
-                    <br />
-                    <Hg1 style={"font-normal"}>Protocole</Hg1>
-                    <br />
-                    Code is <Hg1 style={"font-normal"}>Law</Hg1>
-                  </h3>
-
-                  <div className="flex mt-3 items-center">
-                    <div className="badge badge-warning badge-xs mr-3" />
-                    Build our trustless protocole
-                  </div>
-                </div>
-                <MyMainBtn style={"ml-10"} url={"/community/escrow/lists"}>
-                  View court
-                </MyMainBtn>
-              </div>
-            </div>,
-            <div className=" my-auto w-full font2">
-              <h2
-                className={`text-center font-light text-white/20 text-[34px] mb-[6vh]`}
+        <div className="w-full   items-end h-full flex">
+          <div className=" flex   items-end  mt-auto">
+            <div className="flex flex-col">
+              <Hg1
+                className="text-xs leading-0 font2 uppercase"
+                gradient={[
+                  "to right",
+                  "rgba(201,78,21,0.92), rgba(201,21,103,1)",
+                ]}
               >
-                <Hg1 style={"font-light "}>Escrow protocole</Hg1>
-              </h2>
-              <div className="flex justify-evenly">
-                <MyCardIc
-                  icon={icfy.court.injustice}
-                  title={"Protect by Juror"}
-                />
+                Powered by workers experiment
+              </Hg1>
+              <h3 className={styles.hero}>
+                Trust on
+                <br />
+                <Hg1 style={"font-normal"}>Protocole</Hg1>
+                <br />
+                Code is <Hg1 style={"font-normal"}>Law</Hg1>
+              </h3>
 
-                <MyCardIc icon={icfy.ux.warning} title={"Escrow protocole"} />
-                <MyCardIc icon={icfy.court.justice} title={"Became juror"} />
+              <div className="flex mt-3 items-center">
+                <div className="badge badge-warning badge-xs mr-3" />
+                Build our trustless protocole
               </div>
-            </div>,
-          ]?.[pointer ? pointer : 0]
-        }
+            </div>
+            <MyMainBtn
+              template={1}
+              style={"ml-10"}
+              url={"/community/escrow/lists"}
+            >
+              View court
+            </MyMainBtn>
+          </div>
+        </div>
+        <div className=" my-auto w-full font2">
+          <div className="flex justify-evenly">
+            <MyCardIc icon={icfy.court.injustice} title={"Protect by Juror"} />
+
+            <MyCardIc icon={icfy.ux.warning} title={"Escrow protocole"} />
+            <MyCardIc icon={icfy.court.justice} title={"Became juror"} />
+          </div>
+        </div>
       </MyLayoutDashboard>
     </>
   );

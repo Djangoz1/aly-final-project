@@ -37,7 +37,7 @@ import { MyModal } from "components/myComponents/modal/MyModal";
 import { ImagePin } from "components/Image/ImagePin";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
-import { EditProfile } from "sections/Profile/form/edit/EditProfile";
+import { EditProfile } from "sections/Form/forms/edit/EditProfile";
 import { AssetProfile1 } from "components/assets/AssetProfile";
 import { MyFModal } from "components/myComponents/modal/MyFramerModal";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
@@ -152,15 +152,11 @@ function App({ params }) {
     <MyLayoutDashboard
       isLoading={isLoading}
       noMenu={true}
-      template={2}
-      btn={{
-        title: "Invite worker",
-        info: <>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</>,
-      }}
-      target={"pubs"}
+      template={0}
+      target={"pub"}
     >
       <>
-        <div className="w-full flex h-full relative">
+        <div className="debug w-full flex h-full relative">
           <div className="w-1/6 border border-white/5 border-l-0 border-b-0 h-full">
             {state?.pubs?.arr?.map((el, i) => (
               <div

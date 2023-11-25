@@ -30,12 +30,11 @@ async function main() {
   // await deleteAllPinnedFiles();
 
   let accounts = [this.addr6, this.addr1, this.addr2, this.addr3];
-  let feature = await _createLaunchpad({
+  let feature = await _createFeature({
     account: this.owner,
     addressSystem: ADDRESSES.addressSystem,
-    launchpad: true,
-    accounts,
   });
+  await apiPost.inviteWorker(2, feature);
 
   console.log('"launchpad', feature);
 

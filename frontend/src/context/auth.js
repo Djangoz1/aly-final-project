@@ -28,10 +28,9 @@ const initialState = {
 
 export const doAuthCV = async (dispatch, address) => {
   dispatch({ status: "pending" });
-  console.log("owner1", await _apiGet("ownerOfToken", [1, ADDRESSES.cvsHub]));
-  console.log("owner2", address);
+
   let cvID = parseInt(await _apiGet("cvOf", [address]));
-  console.log(cvID);
+
   let state = await stateCV(cvID);
   let details = await stateDetailsCV(cvID);
   if (!state?.error) {

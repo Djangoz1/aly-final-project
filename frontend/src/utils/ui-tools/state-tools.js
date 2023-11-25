@@ -162,10 +162,11 @@ export const stateDispute = async (disputeID) => {
   dispute.timers = await _apiGet("timersOfDispute", [disputeID]);
   dispute.arbitrators = await _apiGet("arbitratorsOfDispute", [disputeID]);
   dispute.counters = await _apiGet("countersOfDispute", [disputeID]);
-
+  console.log("dispute", dispute);
   let metadatas = await fetchJSONByCID({
     id: dispute?.tokenURI,
     table: "escrows",
+    expand: "featureID",
   });
   let _metadatas = await fetchJSONByCID({ id: uriFeature, table: "features" });
   metadatas.title = _metadatas?.title;
@@ -179,11 +180,24 @@ export const stateMission = async (missionID) => {
     let datas = await fetchMission(missionID);
 
     let details = await stateDetailsMission({ features: datas?.features });
+    let metadatas = await fetchJSONByCID({ id: datas?.uri, table: "missions" });
 
+    let records = await clientPocket.records.getList(
+      "follows_missions",
+      1,
+      50,
+      {
+        filter: `missionID = "${metadatas?.id}"`,
+      }
+    );
+
+    details.social = {
+      followers: records.items,
+    };
     let result = {
       missionID,
       datas,
-      metadatas: await fetchJSONByCID({ id: datas?.uri, table: "missions" }),
+      metadatas: metadatas,
       details: details,
     };
     return result;
@@ -229,11 +243,7 @@ export const statePub = async (pubID, walletClient) => {
     };
 
     let datas = await _apiGet("datasOfPub", [pubID]);
-    if (datas?.answers > 0) {
-      datas.answers = await _apiGet("answersOfPub", [pubID]);
-    } else {
-      datas.answers = [];
-    }
+
     let payable = {
       datas: null,
       metadatas: null,
@@ -257,6 +267,18 @@ export const statePub = async (pubID, walletClient) => {
       owner: await _apiGet("cvOf", [_owner]),
     };
   }
+};
+
+export const stateArbitrator = async (arbitratorID) => {
+  let result = {
+    owner: await _apiGet("ownerOfToken", [
+      arbitratorID,
+      ADDRESSES["arbitratorsHub"],
+    ]),
+    datas: await _apiGet("datasOfArbitrator", [arbitratorID]),
+  };
+
+  return result;
 };
 
 export let stateFeature = async (featureID) => {

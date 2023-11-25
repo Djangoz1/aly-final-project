@@ -25,7 +25,7 @@ import { fromTimestamp } from "utils/ux-tools";
 import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 import { useAccount } from "wagmi";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
-import { EditProfile } from "./form/edit/EditProfile";
+import { EditProfile } from "../Form/forms/edit/EditProfile";
 import { MENUS_ID } from "constants/menus";
 import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
 import { MyHeaderCard } from "components/myComponents/card/MyCardList";

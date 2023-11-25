@@ -33,47 +33,20 @@ export const StateLaunchpadInfos = () => {
   let info1 = [
     {
       title: "Total participants",
-      value: parseInt(state?.launchpad?.datas?.totalUser),
+      num: parseInt(state?.launchpad?.datas?.totalUser),
     },
     {
       title: "Launchpad contract",
       value: state?.launchpad?.metadatas?.title,
     },
-    {
-      title: "Balance token owner",
-      value: state?.launchpad?.datas?.balanceOwner,
-    },
-    {
-      title: "Allowance contract",
-      value: <>{state?.launchpad?.datas?.allowance} Tokens</>,
-    },
+
     {
       title: "Balance contract",
-      value: <>{state?.launchpad?.datas?.amountRaised} ETH</>,
-    },
-    {
-      title: "Round actuel",
-      value: (
-        <>
-          {state?.launchpad?.datas?.currentTier + 1}/
-          {state?.launchpad?.datas?.numberOfTier}
-        </>
-      ),
+      num: state?.launchpad?.datas?.amountRaised,
+      value: " ETH",
     },
   ];
   let info2 = [
-    {
-      title: "Token contract",
-      value: (
-        <div className="flex flex-col">
-          {state?.launchpad?.datas?.tokenName} (
-          {state?.launchpad?.datas?.tokenSymbol})
-          <p className="text-[8px] text-white/60">
-            {state?.launchpad?.datas?.tokenAddress}
-          </p>
-        </div>
-      ),
-    },
     {
       title: (
         <>
@@ -123,10 +96,6 @@ export const StateLaunchpadInfos = () => {
     {
       title: <>Ended</>,
       value: <>{fromTimestamp(parseInt(state?.launchpad?.datas?.saleEnd))}</>,
-    },
-    {
-      title: <>Locked time</>,
-      value: <>{parseInt(state?.launchpad?.datas?.lockedTime)}</>,
     },
   ];
 

@@ -114,10 +114,8 @@ export const AssetFreelancer = ({ owner, style }) => {
     if (!isImages && owner?.metadatas) {
       let images = [];
       owner?.metadatas?.image && images.push(owner?.metadatas?.image);
-      owner?.metadatas?.attributes[0].cvImg &&
-        images.push(owner?.metadatas?.attributes?.[0]?.cvImg);
-      owner?.metadatas?.attributes?.[0]?.banniere &&
-        images.push(owner?.metadatas?.attributes?.[0]?.banniere);
+      owner?.metadatas?.cvImg && images.push(owner?.metadatas?.cvImg);
+      owner?.metadatas?.banniere && images.push(owner?.metadatas?.banniere);
       setIsImages(images);
     }
   }, [owner?.metadatas]);
@@ -150,15 +148,12 @@ export const AssetFreelancer = ({ owner, style }) => {
             </span>
             <span className="rounded-lg  ml-3 flex items-center   bg1 shadow c3 font-semibold py-1 px-2 h-fit w-fit text-xs ">
               <Icon
-                icon={
-                  ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.icon
-                }
+                icon={ENUMS.domain[owner?.metadatas?.domain]?.icon}
                 className={
-                  " mr-2 text-" +
-                  ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.color
+                  " mr-2 text-" + ENUMS.domain[owner?.metadatas?.domain]?.color
                 }
               />
-              {ENUMS.domain[owner?.metadatas?.attributes?.[0]?.domain]?.name}
+              {ENUMS.domain[owner?.metadatas?.domain]?.name}
             </span>
           </div>
         </div>
@@ -180,7 +175,7 @@ export const AssetFreelancer = ({ owner, style }) => {
         <MyStatus
           style={`absolute top-3  py-1  px-2 text-xs left-3 z-1 `}
           target={"visibility"}
-          status={owner?.metadatas?.attributes?.[0]?.visibility ? 0 : 1}
+          status={owner?.metadatas?.visibility ? 0 : 1}
         />
         <div
           className="
@@ -188,6 +183,7 @@ export const AssetFreelancer = ({ owner, style }) => {
         >
           <BtnFollow
             cvID={owner?.cvID}
+            userID={owner?.metadatas?.id}
             follow={<Icon icon={icfy.person.check} />}
             unfollow={<Icon icon={icfy.person.uncheck} />}
             style={" text-xl px-3 backdrop-blur-xl bg-black/60"}
@@ -221,7 +217,7 @@ export const AssetFreelancer = ({ owner, style }) => {
                 </div>
               )
           )}
-          {owner?.metadatas?.attributes?.[0]?.skills?.map(
+          {owner?.metadatas?.skills?.map(
             (el, i) =>
               owner.details.badges.length + i < 5 && (
                 <div

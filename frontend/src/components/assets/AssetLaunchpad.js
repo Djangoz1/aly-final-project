@@ -27,6 +27,7 @@ import {
 } from "context/tools";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { _apiPost } from "utils/ui-tools/web3-tools";
+import { MyNum } from "components/myComponents/text/MyNum";
 
 export const AssetLaunchpad = ({
   id,
@@ -43,7 +44,7 @@ export const AssetLaunchpad = ({
   let fetchState = async () => {
     setIsLaunchpad(await stateLaunchpad(id));
   };
-  console.log("test", isLaunchpad);
+
   let dispatch = useToolsDispatch();
   let { pointer } = useToolsState();
   useEffect(() => {
@@ -65,26 +66,7 @@ export const AssetLaunchpad = ({
       ),
       icon: icfy.person.team,
     },
-    {
-      title: "Token allowed left",
-      description: (
-        <>
-          <span className="text-xs uppercase mr-2">Round</span>
-          {isLaunchpad?.datas?.currentTier + 1}
-        </>
-      ),
-      icon: icfy.bank.coin,
-    },
-    {
-      title: "Allowance",
-      description: (
-        <>
-          {isLaunchpad?.datas?.allowance}
-          <span className="text-xs ml-2 uppercase">tokens</span>
-        </>
-      ),
-      icon: icfy.bank.coin,
-    },
+
     {
       title: "Fundraising goal",
       description: (
@@ -97,19 +79,7 @@ export const AssetLaunchpad = ({
       ),
       icon: icfy.bank.coin,
     },
-    {
-      title: "Token price",
-      description: (
-        <>
-          {ethers?.utils?.formatEther(
-            isLaunchpad?.datas?.tiersDatas?.[isLaunchpad?.datas?.currentTier]
-              ?.tokenPrice || 0
-          )}
-          <span className="text-xs ml-2">ETH</span>
-        </>
-      ),
-      icon: icfyETHER,
-    },
+
     {
       icon: icfyTIME,
       title: isLaunchpad?.datas?.status === 1 ? "Sale start" : "Sale end",
@@ -131,18 +101,7 @@ export const AssetLaunchpad = ({
       icon: STATUS.launchpad[isLaunchpad?.datas?.status]?.icon,
     },
   ];
-  let price1 = parseInt(
-    state?.launchpad?.datas?.amountRaised || isLaunchpad?.datas?.amountRaised
-  );
-  let price2 = parseInt(
-    parseFloat(
-      state?.launchpad?.datas?.amountRaised || isLaunchpad?.datas?.amountRaised
-    )
-      .toFixed(2)
-      .toString()
-      .split(".")[1]
-  );
-  console.log("price2EZ2", price1);
+
   return (
     <MyCardList
       target={target}
@@ -151,23 +110,7 @@ export const AssetLaunchpad = ({
       icon={{ img: isLaunchpad?.metadatas?.image }}
       style={style}
       image={isLaunchpad?.metadatas?.image}
-      price={
-        <>
-          <span className="countdown">
-            <span
-              style={{
-                "--value": price1 || 0,
-              }}
-            ></span>{" "}
-            .
-            <span
-              style={{
-                "--value": price2 || 0,
-              }}
-            ></span>
-          </span>
-        </>
-      }
+      price={<MyNum num={isLaunchpad?.datas.amountRaised} />}
       url={url || `/launchpad/${isLaunchpad?.launchpadID}`}
       btn={{
         title: isLaunchpad?.metadatas?.title,

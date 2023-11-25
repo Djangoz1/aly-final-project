@@ -23,7 +23,7 @@ export const MyMainBtn = ({
   let [isLoading, setIsLoading] = useState(null);
   let formState = form ? useFormState() : undefined;
 
-  let { pointer } = useToolsState();
+  let { pointer, refresh } = useToolsState();
   let router = useRouter();
 
   let handleClick = async () => {
@@ -35,7 +35,9 @@ export const MyMainBtn = ({
         await setter();
       }
       setIsLoading(false);
-      router.refresh();
+      if (refresh) {
+        refresh();
+      }
     }
   };
   return (
@@ -50,9 +52,10 @@ export const MyMainBtn = ({
           "font-semibold  hover:[box-shadow:rgb(171,_196,_245)_0px_0px] max-w-full grid-cols-2 bg1 shadowh _hover px-8 py-2 [box-shadow:rgb(171,_196,_245)_-8px_8px] ",
           `font-semibold ${
             [
-              "text-white hover:text-black hover:bg-gradient-to-r hover:from-white/10 hover:to-white   bg-black border-white/40",
-              "text-black hover:text-white   bg-white border-zinc-800/40 hover:bg-gradient-to-l hover:from-black/10 hover:to-black",
+              "text-white hover:text-black bg-gradient-to-r hover:from-white/10 hover:to-white   from-black to-transparent border-white/40",
+              "text-black hover:text-white   bg-gradient-to-bl from-white to-transparent  border-zinc-800/40 hover:bg-gradient-to-l hover:from-black/10 hover:to-black",
               "text-black bg-lime-400     border-black  hover:bg-white",
+              "text-white bg-error hover:text-black     border-black  hover:bg-white",
             ]?.[color || 0]
           }    ${
             padding || "px-5"
@@ -80,7 +83,7 @@ export const MyMainBtn = ({
           ) : undefined}
         </>
       )}
-      {!icon?.no && (
+      {!icon?.no && icon !== false && (
         <Icon
           icon={icon || icfy.ux.arrow}
           className={` flex-none transition-all ${

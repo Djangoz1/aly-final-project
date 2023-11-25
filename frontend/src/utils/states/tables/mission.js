@@ -8,12 +8,11 @@ import { STATUS } from "constants/status";
 import { icfyETHER } from "icones";
 import Link from "next/link";
 
-export let _table_missions = (details) => {
+export let _table_missions = (missions) => {
   let list = [];
-  for (let index = 0; index < details?.missions?.length; index++) {
-    const el = details?.missions?.[index];
+  for (let index = 0; index < missions?.length; index++) {
+    const el = missions?.[index];
 
-    console.log(el);
     let status = STATUS.mission[el?.datas?.status];
     let domain = ENUMS.domain?.[el?.metadatas?.domain];
     let arr = [

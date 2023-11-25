@@ -9,6 +9,8 @@ import { _apiGet } from "utils/ui-tools/web3-tools";
 import "./style.css";
 import { Icon } from "@iconify/react";
 import { icfy, icfySEND } from "icones";
+import { useToolsState } from "context/tools";
+import { clientPocket } from "utils/ui-tools/pinata-tools";
 export let MyInput = ({
   target,
   min,
@@ -21,18 +23,38 @@ export let MyInput = ({
   icon,
   setter,
   styles,
+  metadatas,
   result,
 }) => {
   let [isLoading, setIsLoading] = useState(false);
   let { form, placeholders, superChecked, checked, pointer, disabled } =
     useFormState();
+  let { refresh } = useToolsState();
   let dispatch = useFormDispatch();
 
   let handlePost = async () => {
-    if (setter && !isLoading && !disabled) {
-      setIsLoading(true);
-      await setter(form?.[target], target);
-      setIsLoading(false);
+    if ((metadatas || setter) && !isLoading && !disabled) {
+      try {
+        setIsLoading(true);
+        if (metadatas) {
+          await clientPocket.records.update(
+            metadatas["@collectionName"],
+            metadatas.id,
+            { [target]: form?.[target] }
+          );
+        } else {
+          setter(form?.[target]);
+        }
+
+        // await setter(form?.[target], target);
+        setIsLoading(false);
+        handleChange(null);
+        if (refresh) {
+          refresh();
+        }
+      } catch ({ error }) {
+        console.error(error);
+      }
     }
   };
 
@@ -96,11 +118,11 @@ export let MyInput = ({
         </label>
       )}
       <div
-        className={`bg-zinc-900 appearance-none w-full  py-1  flex items-center h-fit rounded-lg input-xs ${
+        className={`bg-gradient-to-bl from-zinc-900 border-white/5 border to-white/5 w-full  py-1  flex items-center h-fit rounded-lg  ${
           !isFocus ? "" : ""
         }`}
       >
-        {icon && !setter ? (
+        {icon && !metadatas && !setter ? (
           <Icon icon={icon} className="c2 ml-2 text-2xl mr-3" />
         ) : undefined}
         <input
@@ -123,7 +145,7 @@ export let MyInput = ({
             isFocus && "border-success/20"
           }   appearance-none input-ghost input-xs input font-light  py-1 h-fit `}
         />
-        {setter ? (
+        {metadatas || setter ? (
           <div
             onClick={handlePost}
             className="btn btn-ghost btn-xs px-2 py-0 c2    w-fit h-fit"

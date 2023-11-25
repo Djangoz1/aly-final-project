@@ -18,7 +18,7 @@ import { useAuthState } from "context/auth";
 import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
 import { stateDispute } from "utils/ui-tools/state-tools";
 
-export const FeatureDispute = ({ disputeID }) => {
+export const FeatureDispute = ({ disputeID, dispute }) => {
   console.log("diospyute", disputeID);
   let { state, index } = useToolsState();
   let auth = useAuthState();
@@ -30,6 +30,8 @@ export const FeatureDispute = ({ disputeID }) => {
   let fetchState = async () => {
     if (disputeID) {
       setIsDispute(await stateDispute(disputeID));
+    } else if (dispute) {
+      setIsDispute(dispute);
     } else if (state?.features?.[index]?.details?.dispute) {
       setIsDispute(state?.features?.[index]?.details?.dispute);
     }
@@ -172,11 +174,11 @@ export const FeatureDispute = ({ disputeID }) => {
 
   return (
     <>
-      <div className="flex w-full">
+      <div className="flex flex-col w-full">
         <MyCardInfos
           title={"Escrow datas"}
           arr={infosDispute}
-          style={"mr-3 w-2/5 rounded-tl-none "}
+          style={"mr-3 w-full rounded-tl-none "}
         >
           <div className=" mt-3 flex justify-end">
             {isDispute?.datas?.timers?.createdAt == 0 &&

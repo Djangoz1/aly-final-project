@@ -1,7 +1,7 @@
 .burger_btn {
   position: relative;
-  width: 70px;
-  height: 70px;
+  width: 50px;
+  height: 50px;
   /* background-color: rgb(2, 6, 11); */
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
   border-radius: 50%;
@@ -15,7 +15,7 @@
 .burger_btn span {
   position: absolute;
   height: 2px;
-  width: 30px;
+  width: 20px;
   background-color: rgb(255, 255, 255);
   border-radius: 4px;
   cursor: pointer;
@@ -23,34 +23,34 @@
 }
 
 .burger_btn span:nth-child(1) {
-  transform: translateY(-15px);
-  width: 20px;
-  left: 15px;
+  transform: translateY(-10px);
+  width: 10px;
+  left: 10px;
 }
 
 .burger_btn.burger_btn_clicked span:nth-child(1) {
   /* .burger_btn.burger_btn:hover span:nth-child(1) { */
-  width: 30px;
+  width: 20px;
   transform: translateY(0px) rotate(45deg);
   transition-delay: 0.125s;
 }
 
 .burger_btn span:nth-child(2) {
-  transform: translateY(15px);
-  width: 15px;
-  left: 15px;
+  transform: translateY(10px);
+  width: 10px;
+  left: 10px;
 }
 
 .burger_btn.burger_btn_clicked span:nth-child(2) {
   /* .burger_btn.burger_btn:hover span:nth-child(2) { */
-  width: 30px;
+  width: 20px;
   transform: translateY(0px) rotate(315deg);
   transition-delay: 0.125s;
 }
 
 .burger_btn:hover span:nth-child(3),
 .burger_btn.burger_btn_clicked span:nth-child(3) {
-  transform: translateX(60px);
+  transform: translateX(40px);
 }
 
 /* Theme switch */

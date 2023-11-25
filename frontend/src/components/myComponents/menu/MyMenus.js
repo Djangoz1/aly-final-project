@@ -19,35 +19,50 @@ import { Icon } from "@iconify/react";
 import { icfy, icfyARROWD, icfyGITHUB, icsystem } from "icones";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
+import { MySub } from "../text/MySub";
 
-export const MyMenus = ({ menus, styles, setter }) => {
-  let dispatch = useFormDispatch();
-  let { pointer } = useFormState();
-  let handleClick = (title, index) => {
-    doStateFormPointer(dispatch, index);
-  };
+export const MyMenus = ({ menus, id, current, styles, setter }) => {
+  // let dispatch = useFormDispatch();
+  // let { pointer } = useFormState();
+  // let handleClick = (title, index) => {
+  //   doStateFormPointer(dispatch, index);
+  // };
+
+  let { url } = useToolsState();
 
   return (
-    <div className={`flex tabs-boxed ${styles?.box}`}>
-      {menus?.map((el, index) => (
-        <div
-          onClick={() => handleClick(el?.title, index)}
-          key={v4()}
-          className={`${
-            pointer === index ? "font-black text-white bg1  border-y-0 " : ""
-          } relative w-full font-light tab tab-xs  hover:bg-white/10 rounded-lg h-fit py-2 flex items-center text-[10px]   cursor-pointer ${
-            styles?.el
-          } `}
-        >
-          <div
-            className={` g1  rounded-full    w-1/4 absolute  left-1/2 -translate-x-1/2 translate-y-1/2 bottom-0 ${
-              pointer === index && "gb1  py-[1px] "
-            }`}
-          ></div>
-          {el?.i && <span className="mr-2">{el?.i}</span>}
-          {el?.title}
-        </div>
-      ))}
+    <div className={`flex px-5 box-border flex-col`}>
+      {menus?.map(
+        (el, index) =>
+          el?.title && (
+            <div key={v4()} className={"flex my-4 flex-col"}>
+              <div className="flex mb-1 items-center">
+                <MySub style={"whitespace-nowrap c4"}>{el?.title}</MySub>
+                <div className="w-full ml-2 border border-white/5" />
+              </div>
+              {el?.sub?.map(
+                (subElem) =>
+                  subElem?.title && (
+                    <Link
+                      href={`${subElem?.url ? `${subElem?.url}` : "#"}`}
+                      className={`flex indicator items-center font-light hover:text-white rounded-lg hover:bg-white/5 text-xs p-2  w-full relative ${
+                        current == subElem?.url ? "bg-white/10 c3" : "c4"
+                      }`}
+                      key={v4()}
+                    >
+                      <Icon icon={subElem?.icon} className="text-[24px] mr-3" />{" "}
+                      {subElem?.title}
+                      {current == subElem?.url ? (
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 pl-1 py-3 translate-x-1/2 rounded-full gb1 g1" />
+                      ) : (
+                        <></>
+                      )}
+                    </Link>
+                  )
+              )}
+            </div>
+          )
+      )}
     </div>
   );
 };

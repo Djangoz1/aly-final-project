@@ -8,7 +8,7 @@ import { MyBigBtn } from "./MyBigBtn";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import { MyModal } from "components/myComponents/modal/MyModal";
-import { EditProfile } from "sections/Profile/form/edit/EditProfile";
+import { EditProfile } from "sections/Form/forms/edit/EditProfile";
 import { styles } from "styles/style";
 import { useRouter } from "next/router";
 import { useAccount } from "wagmi";

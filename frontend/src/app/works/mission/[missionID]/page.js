@@ -2,326 +2,292 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-import { useAuthState } from "context/auth";
 import {
   doStateMissionTools,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 
+import { _apiGetAt, _apiPost } from "utils/ui-tools/web3-tools";
+
 import {
-  stateCV,
-  stateDetailsCV,
-  stateFeature,
-  stateMission,
-} from "utils/ui-tools/state-tools";
+  Avatar,
+  AvatarsList,
+  ProfileAvatar,
+} from "components/profile/ProfileAvatar";
+
+import { useAuthState } from "context/auth";
 
 import { Icon } from "@iconify/react";
 import {
   icfy,
   icfyCODE,
   icfyETHER,
-  icfyFB,
-  icfyGITHUB2,
-  icfyLINKEDIN,
-  icfyTWITTER,
+  icfyMAIL,
+  icfySEND,
   icsystem,
 } from "icones";
 
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
-import { STATUS } from "constants/status";
 
-import { AgendasMission } from "sections/works/Missions/state/AgendasMission";
-import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
-import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
-import { MissionPubs } from "sections/works/Missions/state/MissionPubs";
-import { Viewport } from "components/myComponents/layout/MyViewport";
-import {
-  AssetProfile,
-  AssetProfile1,
-  AssetProfileCard,
-} from "components/assets/AssetProfile";
-import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { _apiPost } from "utils/ui-tools/web3-tools";
-import { MyFModal } from "components/myComponents/modal/MyFramerModal";
-import Link from "next/link";
-import { MyMenusDropdown } from "components/myComponents/menu/MyMenus";
-import { MyCard } from "components/myComponents/card/MyCard";
-import { MyStatus } from "components/myComponents/item/MyStatus";
-import { MyFunMenus } from "components/myComponents/menu/MyFunMenus";
-import { Avatar, ProfileAvatar } from "components/profile/ProfileAvatar";
-import { CVName } from "components/inputs/inputsCV/CVName";
-import { BtnFollow } from "components/btn/BtnsSocial/BtnFollow";
-import { MissionMenusDropdown } from "sections/works/Missions/state/MissionMenusDropdown";
-import { MyLoader } from "components/myComponents/layout/MyLoader";
-import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { MySub } from "components/myComponents/text/MySub";
-import { v4 } from "uuid";
+import { _apiGet } from "utils/ui-tools/web3-tools";
+
 import { ENUMS } from "constants/enums";
+
+import { v4 } from "uuid";
+
+import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
+import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
+import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
+import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
+import { MENUS } from "constants/menus";
+import { LayoutMission } from "sections/Layout/layouts/LayoutMission";
+import { MySub } from "components/myComponents/text/MySub";
+import { MyLayoutHeader } from "components/myComponents/layout/MyLayoutHeader";
+import { CVName } from "components/inputs/inputsCV/CVName";
+import { MyNum } from "components/myComponents/text/MyNum";
+import { controllers } from "utils/controllers";
+import { ImagePin } from "components/Image/ImagePin";
+import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
+import { MyStatus } from "components/myComponents/item/MyStatus";
+import { MyBadge, MyList } from "components/myComponents/box/MyList";
+import { MyChart } from "components/myComponents/box/MyChart";
+import { MyModal } from "components/myComponents/modal/MyModal";
 
 function App({ params }) {
   const { cv } = useAuthState();
 
-  const tools = useToolsState();
-  const { state, pointer } = useToolsState();
+  const { state, status, pointer } = useToolsState();
 
-  let [isState, setIsState] = useState(null);
-  let [loading, setLoading] = useState(null);
   const missionID = params.missionID;
+
   let dispatch = useToolsDispatch();
-  let fetch = async () => {
-    setLoading(true);
-    let _state = await doStateMissionTools(dispatch, parseInt(missionID));
-    setIsState(_state);
-    setLoading(false);
-  };
+  let [isDatas, setIsDatas] = useState(null);
+  let [isWorkers, setIsWorkers] = useState(null);
   useEffect(() => {
-    if (!isState) {
-      fetch();
-      console.log("Origine !!! fetch mission state", isState);
-    }
-  }, [missionID]);
+    (async () => {
+      let lists = [];
+      for (
+        let index = 0;
+        index < state?.mission?.details?.features.length;
+        index++
+      ) {
+        const element = state?.mission?.details?.features[index];
+        let worker = await controllers.get.profile.item({
+          cvID: element?.cvWorker,
+        });
+        lists.push({
+          metadatas: {
+            username: worker?.metadatas?.username,
+            id: worker?.metadatas?.id,
+            avatar: worker?.metadatas?.avatar,
+            ["@collectionName"]: "accounts",
+          },
+          designation: ENUMS.courts?.[element?.specification]?.court,
+        });
+      }
+      setIsWorkers(lists);
+    })();
+  }, [state?.mission?.details?.features]);
 
-  let askToJoin = async (featureID) => {
-    console.log("askToJoin", askToJoin);
-    await _apiPost("askToJoin", [parseInt(featureID)]);
-    await doStateMissionTools(dispatch, parseInt(featureID));
-  };
-  console.log(state);
   return (
-    <MyLayoutDashboard
-      // setter={askToJoin}
+    <LayoutMission controller={"overview"} missionID={missionID} url={"/"}>
+      <MyLayoutHeader
+        style={"mb-7"}
+        target={"mission"}
+        bio={state?.owner?.metadatas?.description}
+        statusObj={{ current: state?.mission?.datas?.status }}
+        banniere={state?.mission?.metadatas?.banniere}
+        cvID={state?.owner?.cvID}
+        metadatas={state?.mission?.metadatas}
+        image={state?.mission?.metadatas?.image}
+        username={state?.owner?.metadatas?.username}
 
-      id={missionID}
-      allowed={
-        cv == state?.mission?.datas?.owner &&
-        state?.mission?.datas?.status === 0
-      }
-      refresh={() => doStateMissionTools(dispatch, state?.mission?.missionID)}
-      template={[0, 1, 1, 1, 1, 1]?.[pointer]}
-      isLoading={loading}
-      header={state?.mission?.metadatas?.title}
-      statusObj={{
-        current: state?.mission?.datas?.status,
-        to: 1,
-      }}
-      price={state?.mission?.datas?.amount || 0}
-      owner={{ ...state?.owner?.metadatas, cvID: state?.owner?.cvID }}
-      url={`/works/mission/${missionID}`}
-      btn={{
-        title: cv == state?.owner?.cvID ? "New feature" : "Ask to join",
-        info: <>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</>,
-        url: cv == state?.owner?.cvID ? "/create/feature" : "#section2",
-      }}
-      // ownerProfile={
-      //   loading ? null : <AssetProfileCard />
-      //   // <AssetProfile1
-      //   //   style={"w-full"}
-      //   //   noBtn={true}
-      //   //   cvID={isState?.mission?.datas?.owner}
-      //   //   target={"owner"}
-      //   // />
-      // }
-      lists={[
-        {
-          icon: icfyCODE,
-          title: "Contract",
-          description: (
-            <>
-              <MySub style={"mr-2"}>On work</MySub>
-              {tools?.state?.mission?.datas?.workers}
-              {tools?.state?.mission?.datas?.workers > 0 && (
-                <> / {tools?.state?.mission?.datas?.features?.length}</>
+        // username={state?.owner?.metadatas?.username}
+      ></MyLayoutHeader>
+      <div className="flex flex-col-reverse">
+        <div className="w-full -z-1 mb-2 flex">
+          <MyCardInfos
+            style={"w-[44%] rounded-t-none mr-[1px]"}
+            arr={[
+              {
+                title: "Status",
+                value: (
+                  <MyStatus
+                    status={state?.mission?.datas?.status}
+                    target={"mission"}
+                    padding={"px-2 py-1"}
+                  />
+                ),
+              },
+              {
+                title: "Features",
+                num: state?.mission?.datas?.features?.length,
+              },
+              {
+                title: "Work slot",
+                num:
+                  state?.mission?.datas?.features?.length -
+                    state?.mission?.datas?.workers || 0,
+              },
+              {
+                title: "Disputes",
+                num: state?.mission?.datas?.disputes || 0,
+              },
+
+              {
+                title: "Total wadge",
+                value: (
+                  <>
+                    <p className="flex items-center">
+                      <Icon
+                        icon={icfyETHER}
+                        className="text-white text-lg mr-1  "
+                      />
+                      <span>{state?.mission?.datas?.amount.toFixed(5)}</span>
+                      <span className="text-white c2  ml-1">ETH</span>
+                    </p>
+                  </>
+                ),
+              },
+              {
+                title: "Posts",
+                num: state?.mission?.pubs?.length,
+              },
+              {
+                title: "Followers",
+                num: state?.mission?.details?.social?.followers?.length,
+              },
+              {
+                title: "Domain",
+                value: (
+                  <p className="flex items-center  capitalize">
+                    <Icon
+                      className={`mr-2 text-2xl text-${
+                        ENUMS.domain[state?.mission?.metadatas?.domain]?.color
+                      }`}
+                      icon={
+                        ENUMS.domain[state?.mission?.metadatas?.domain]?.icon
+                      }
+                    />
+                    {ENUMS.domain[state?.mission?.metadatas?.domain]?.name}
+                  </p>
+                ),
+              },
+
+              {
+                title: "Technology",
+                value: (
+                  <div className="w-full flex overflow-x-scroll h-full hide-scrollbar">
+                    {state?.mission?.details?.badges?.map((el) => (
+                      <Icon
+                        key={v4()}
+                        icon={ENUMS.courts?.[el]?.badge}
+                        className="text-white c2 text-[24px] mr-4"
+                      />
+                    ))}
+                  </div>
+                ),
+              },
+            ]}
+          />
+          <div className="px-4 w-[50%]">
+            <MySub style={"mt-5 mb-2 hover:text-white c4"}>
+              Presented {state?.mission?.metadatas?.title}
+            </MySub>
+            <article className="text-white/80 font-ligt whitespace-break-spaces text-[10px] mb-10">
+              {state?.mission?.metadatas?.abstract}
+              <br />
+              <br />
+              <br />
+              {state?.mission?.metadatas?.description}
+            </article>
+          </div>
+        </div>
+        <div className="flex flex-row-reverse items-center  -translate-y-1/2  w-full gap-3">
+          {/* <Avatar metadatas={}/> */}
+          <div className="ml-auto mr-5 ">
+            <AvatarsList lists={isWorkers} />
+          </div>
+          <MyCard
+            template={0}
+            styles={"w-fit  flex flex-col px-1 py-2  items-center gap-1 h-fit"}
+          >
+            <Icon icon={icfy.person.friend} className="text-2xl" />
+            <MySub style={"c4"}>Follower(s)</MySub>
+            <MyNum num={state?.mission?.details?.social?.followers?.length} />
+          </MyCard>
+          <MyCard
+            template={0}
+            styles={"w-fit  flex flex-col px-1 py-2  items-center gap-1 h-fit"}
+          >
+            <Icon icon={icfyCODE} className="text-2xl" />
+            <MySub style={"c4"}>Worker(s)</MySub>
+            <div className="flex items-center">
+              <MyNum num={state?.mission?.datas?.workers} />
+              {state?.mission?.datas?.workers > 0 && (
+                <>
+                  {" "}
+                  / <MyNum num={state?.mission?.datas?.features?.length} />
+                </>
               )}
-              <Icon icon={icsystem.mission} className="ml-2 mr-4" />
-            </>
-          ),
-        },
-        {
-          title: "Specifications",
-          image: "/worker.png",
-          description: (
-            <>
-              <Icon icon={icsystem.feature} className=" mr-2" />
-              {state?.mission?.details?.badges?.map((el, i) => (
-                <Icon
-                  icon={ENUMS.courts?.[el]?.badge}
-                  className={`w-[34px] h-[34px] _hover rounded-full ${
-                    i > 0 && "-ml-5 hover:ml-0"
-                  }`}
-                  key={v4()}
-                />
-              ))}
-            </>
-          ),
-          url: `#section1`,
-        },
-        {
-          title: "Workers",
-
-          description: (
-            <>
-              <Icon icon={icsystem.profile} className=" mr-2" />
-              {state?.features?.map((el, i) => (
-                <ProfileAvatar
-                  onlyAvatar={true}
-                  style={`w-[44px] h-[44px] _hover rounded-full ${
-                    i > 0 && "-ml-5 hover:ml-0"
-                  }`}
-                  cvID={el?.datas?.cvWorker}
-                  key={v4()}
-                />
-              ))}
-            </>
-          ),
-          url: `#section1`,
-        },
-        {
-          title: "Social",
-          description: (
-            <>
-              <Icon icon={icsystem.social} className=" mr-2" />
-              {state?.mission?.datas?.pubs?.length || 0}
-            </>
-          ),
-          url: `#section1`,
-        },
-        {
-          title: "Escrow",
-
-          description: (
-            <>
-              <Icon icon={icsystem.escrow} className=" mr-2" />
-              {state?.mission?.datas?.disputes || 0}
-            </>
-          ),
-          url: `#section1`,
-        },
-        {
-          title: "Notifications",
-
-          description: <>to do</>,
-          url: `#section1`,
-        },
-      ]}
-      menus={
-        loading
-          ? []
-          : [
-              { icon: icfy.ux.admin, title: "Profile", url: "#section1" },
-              { icon: icfy.ux.admin, title: "Agendas", url: "#section2" },
-              { icon: icfy.ux.admin, title: "Features", url: "#section3" },
-              { icon: icfy.ux.admin, title: "Pubs", url: "#section4" },
-            ]
-      }
-      target={"mission"}
-    >
-      <div className=" w-full relative">
-        {/* <Viewport
-            img={tools?.state?.mission?.metadatas?.attributes?.[0]?.banniere}
-            id={"home"}
-            full={true}
-            index={null}
-          > */}
-
-        {/* */}
-        {
-          [
-            <div className=""></div>,
-            <MissionProfile />,
-            <AgendasMission />,
-            <MissionFeatures index={tools?.state?.front?.props} />,
-            <MissionPubs />,
-          ]?.[pointer]
-        }
-        {/* 
-          
-         
-
-          <div className="fixed z-100 bottom-20   flex flex-col items-end h-fit right-10">
-            <CreatePub
-              style={" bottom-20 btn c2 btn-xs btn-outline flex h-fit mb-2 "}
-              missionID={missionID}
-              btn={<Icon icon={icfy?.msg?.chat} className="text-2xl m-4" />}
-            />
-            <div className="flex  mt-2">
-              {tools?.state?.features?.[tools?.index]?.datas?.cvWorker == 0 &&
-                tools?.pointer == 2 &&
-                tools?.state?.features?.[tools?.index]?.datas?.owner != cv && (
-                  <MyFModal
-                    btns={{ btn: "Join feature", submit: "Confirm" }}
-                    submit={() =>
-                      askToJoin(
-                        tools?.state?.features?.[tools?.index]?.featureID
-                      )
-                    }
-                    styles={{ btn: "btn btn-xs c2 btn-outline " }}
-                  >
-                    <div className="min-h-[20vh]">
-                      <p className="text-xs">
-                        Êtes-vous sûre de vouloir demander à travailler pour
-                        <span className="text-success">
-                          {
-                            tools?.state?.features?.[tools?.index]?.metadatas
-                              ?.title
-                          }
-                          ?{" "}
-                        </span>
-                      </p>
-                      <div className="flex flex-col">
-                        <span className="text-white/60  text-[10px]">
-                          Si l'owner accepte votre proposition, vous serez
-                          désigner automatiquement comme le worker.
-                        </span>
-                        <span className="text-white/60  text-[10px]">
-                          Please be sure to be available for this task.
-                        </span>
-                      </div>
-                    </div>
-                  </MyFModal>
-                )}
-
-              {tools?.state?.mission?.datas?.status === 0 &&
-                tools?.state?.owner?.cvID == cv && (
-                  <MyFModal
-                    submit={closeMission}
-                    styles={{ btn: "btn btn-xs ml-4 btn-error" }}
-                    btns={{ btn: "Close Mission", submit: "Valider" }}
-                  >
-                    <div className="min-h-[20vh]">
-                      <p className="text-xs">
-                        Êtes-vous sûre de vouloir{" "}
-                        <span className="text-error">fermer la mission ? </span>
-                      </p>
-                      <div className="flex flex-col">
-                        <span className="text-white/60  text-[10px]">
-                          Si vous accepter, cette mission ne pourras plus créer
-                          de nouvelles features.
-                        </span>
-                        <span className="text-white/60  text-[10px]">
-                          Les features en cours convervent leurs modalités et
-                          peuvent aller jusqu'à leurs termes.
-                        </span>
-                      </div>
-                    </div>
-                  </MyFModal>
-                )}
-
-              {tools?.state?.mission?.datas?.status === 0 &&
-                tools?.state?.owner?.cvID == cv && (
-                  <Link
-                    href={"/create/feature"}
-                    className="btn btn-xs c2 ml-4 "
-                  >
-                    Create feature
-                  </Link>
-                )}
             </div>
-          </div> */}
+          </MyCard>
+
+          <MyCard
+            template={0}
+            styles={"w-fit  flex flex-col px-1 py-2  items-center gap-1 h-fit"}
+          >
+            <Icon icon={icfy.court.hammer} className="text-2xl" />
+            <MySub style={"c4"}>Disputes</MySub>
+            <div className="flex c4 text-xs  items-center">
+              <MyNum
+                style={"c3 mr-2 text-sm"}
+                num={state?.mission?.datas?.disputes?.length || 0}
+              />
+            </div>
+          </MyCard>
+          {state?.mission?.datas?.launchpad > 0 ? (
+            <MyCard
+              template={0}
+              styles={
+                "w-fit  flex flex-col px-1 py-2  super-btn items-center gap-1 h-fit"
+              }
+            >
+              <Icon icon={icsystem.launchpad} className="text-4xl" />
+              <MySub style={"c4"}>Launchpad name</MySub>
+            </MyCard>
+          ) : (
+            <></>
+          )}
+
+          <MyModal
+            style={
+              "fixed z-100 backdrop-blur-xl bg-black/30  left-4    bg-zinc-950 flex justify-center w-fit max-w-full top-0 "
+            }
+            btn={
+              <MyChart
+                style={"w-full bg-black cursor-pointer h-fit "}
+                price={state?.mission?.datas?.amount}
+              />
+            }
+          >
+            <MyList
+              description={"All recent payment to workers"}
+              arr={state?.features?.map((el) => [
+                el?.metadatas?.created,
+                <CVName cvID={el?.datas?.cvWorker} />,
+                el?.metadatas?.title,
+                ENUMS.domain?.[el?.metadatas?.domain]?.name,
+                <MyBadge>-{el?.datas?.wadge} ETH</MyBadge>,
+              ])}
+            />
+          </MyModal>
+        </div>
       </div>
-    </MyLayoutDashboard>
+    </LayoutMission>
   );
 }
 

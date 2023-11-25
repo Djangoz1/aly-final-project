@@ -94,28 +94,12 @@ contract APIGet {
     // ************ CV ************ //
     // ************ -- ************ //
 
+    function isAcceptToken(uint _cvID) external view returns (bool) {
+        return ICVsHub(_iAS.cvsHub()).isAcceptToken(_cvID);
+    }
+
     function cvOf(address _for) external view returns (uint) {
         return _cvOf(_for);
-    }
-
-    function followerOf(uint _cvID, uint _index) external view returns (uint) {
-        return ICVsDatasHub(_iAS.cvsDatasHub()).followerOf(_cvID, _index);
-    }
-
-    function followedOf(uint _cvID, uint _index) external view returns (uint) {
-        return ICVsDatasHub(_iAS.cvsDatasHub()).followedOf(_cvID, _index);
-    }
-
-    function lengthOfFollower(uint _cvID) external view returns (uint) {
-        return ICVsDatasHub(_iAS.cvsDatasHub()).lengthOfFollower(_cvID);
-    }
-
-    function lengthOfFollowed(uint _cvID) external view returns (uint) {
-        return ICVsDatasHub(_iAS.cvsDatasHub()).lengthOfFollowed(_cvID);
-    }
-
-    function isFollow(uint _cvID, uint _cvFollow) external view returns (bool) {
-        return ICVsDatasHub(_iAS.cvsDatasHub()).isFollow(_cvID, _cvFollow);
     }
 
     // ---------------------------- //
@@ -301,20 +285,10 @@ contract APIGet {
         return IPubsHub(_iAS.pubsHub()).indexerPayableOf(_cvID);
     }
 
-    function answersOfPub(uint _pubID) external view returns (uint[] memory) {
-        return _pubsDatasHub().answersOfPub(_pubID);
-    }
-
     function datasOfPub(
         uint _pubID
     ) external view returns (DataTypes.PubData memory) {
         return _pubsDatasHub().dataOfPub(_pubID);
-    }
-
-    function pubsOfMission(
-        uint _missionID
-    ) external view returns (uint[] memory) {
-        return _pubsDatasHub().pubsOfMission(_missionID);
     }
 
     // ---------------------------- //

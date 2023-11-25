@@ -7,6 +7,7 @@ export const icfy = {
   },
   like: "iconamoon:like-duotone",
   ux: {
+    workspace: "ic:outline-workspace-premium",
     remove: "clarity:remove-solid",
     edit: "line-md:edit-twotone-full",
     refresh: "solar:refresh-bold-duotone",
@@ -67,6 +68,7 @@ export const icfy = {
     shell: "skill-icons:powershell-dark",
   },
   msg: {
+    post: "iconoir:post",
     casual: "line-md:email",
     opened: "line-md:email-opened",
     chat: "fluent-mdl2:chat-invite-friend",

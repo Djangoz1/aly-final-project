@@ -28,24 +28,6 @@ interface IPubsDatasHub {
     // ****** REFERAL PUBS ****** //
     // ****** ------------ ****** //
 
-    function addPubMission(
-        uint _newPubID,
-        uint _missionID,
-        string memory _tokenURI
-    ) external;
-
-    function addPubAnswer(
-        uint _newPubID,
-        uint _pubID,
-        string memory _tokenURI
-    ) external;
-
-    function answersOfPub(uint _pubID) external view returns (uint[] memory);
-
-    function pubsOfMission(
-        uint _missionID
-    ) external view returns (uint[] memory);
-
     function dataOfPub(
         uint _pubID
     ) external view returns (DataTypes.PubData memory);

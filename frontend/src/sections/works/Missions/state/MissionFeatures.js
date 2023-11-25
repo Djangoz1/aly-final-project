@@ -54,7 +54,7 @@ export const MissionFeatures = ({ featureID, index }) => {
   }, [isInView, featureID]);
 
   useEffect(() => {
-    if (!featureID && state?.front?.props[0]) {
+    if (!featureID && index) {
       setIsState({ feature: state?.features?.[index] });
     }
   }, [index]);
@@ -83,9 +83,6 @@ export const MissionFeatures = ({ featureID, index }) => {
   return (
     <>
       <div ref={ref} className="flex h-full w-full  ">
-        <div className=" overflow-y-scroll w-1/5 backdrop-blur-[1px]">
-          <MissionMenusDropdown />
-        </div>
         <div className="flex flex-col w-full">
           <MyMenusTabs
             template={2}

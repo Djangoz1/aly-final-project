@@ -91,7 +91,7 @@ export let toMockProfile = ({ address, metadatas, cvID }) => {
     address: address,
     username: metadatas?.username,
     description: metadatas?.description,
-    image: metadatas?.image,
+    avatar: metadatas?.avatar,
     visibility: metadatas?.visibility,
     cvImg: attributes?.cvImg,
     banniere: attributes?.banniere,
@@ -112,6 +112,21 @@ export let toMockProfile = ({ address, metadatas, cvID }) => {
   };
 
   return moock;
+};
+
+export let toMockMission = ({ metadatas, address, missionID }) => {
+  return {
+    target: "Mission",
+    id: missionID,
+    owner: address,
+    abstract: metadatas?.abstract,
+    banniere: metadatas?.banniere,
+    image: metadatas?.image,
+    github: metadatas?.social?.github,
+    linkedin: metadatas?.social?.linkedin,
+    facebook: metadatas?.social?.facebook,
+    twitter: metadatas?.social?.twitter,
+  };
 };
 
 export let moock_create_escrow = {

@@ -36,6 +36,8 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
 
     mapping(uint256 => mapping(DataTypes.CourtIDs => uint256))
         internal indexersCV;
+
+    mapping(uint256 => uint[]) _cvsToArbitrators;
     // Ajoutez votre code ici
 
     IAddressSystem private _iAS;
@@ -77,6 +79,7 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         datas[newArbitrator.id] = newArbitrator;
         indexersCourt[_courtID].push(newArbitrator.id);
         indexersCV[_cvID][_courtID] = newArbitrator.id;
+        _cvsToArbitrators[_cvID].push(newArbitrator.id);
     }
 
     function calculateWeight(uint256 balance) internal pure returns (uint256) {
@@ -184,6 +187,10 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         return indexersCourt[_courtID];
     }
 
+    function indexerOf(uint _cvID) external view returns (uint[] memory) {
+        return _cvsToArbitrators[_cvID];
+    }
+
     function tokensLength() external view returns (uint256) {
         return _tokenIDs.current();
     }
@@ -192,7 +199,10 @@ contract ArbitratorsHub is ERC721URIStorage, Ownable {
         uint256 _arbitratorID
     ) external view returns (DataTypes.ArbitratorData memory) {
         require(_arbitratorID <= _tokenIDs.current(), "Invalid arbitrator ID");
-        return datas[_arbitratorID];
+        DataTypes.ArbitratorData memory _datas = datas[_arbitratorID];
+
+        _datas.banned = _suspectVote[_cvOf(ownerOf(_arbitratorID))] >= 3;
+        return _datas;
     }
 
     /**

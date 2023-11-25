@@ -44,7 +44,7 @@ export const MyDashboard = ({
         color={color}
         setter={setter}
         icon={{ img: icsystem?.[target] }}
-        style={"h-full w-full rounded-xl  overflow-hidden mx-5 my-5 mb-20"}
+        style={"h-full w-full rounded-xl  overflow-hidden  my-5 mb-20"}
         price={
           <>
             <MyNum toFix={3} num={parseFloat(price)} />

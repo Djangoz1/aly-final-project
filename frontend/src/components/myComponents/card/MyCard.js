@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { v4 } from "uuid";
 import { MySub } from "../text/MySub";
 import { icfy } from "icones";
+import { MyNum } from "../text/MyNum";
 
 export const MyCard = ({ head, children, template, icon, styles }) => {
   return (
@@ -15,6 +16,7 @@ export const MyCard = ({ head, children, template, icon, styles }) => {
           `shadowh bg-gradient-to-l backdrop-blur-[2px] bgprim`,
           "bg-transparent border border-white/5 backdrop-blur hover:bg-white/5",
           `shadowh bg-gradient-to-l backdrop-blur-[2px] from-zinc-950 via-zinc-950 to-white/5`,
+          ` backdrop-blur-xl bg-white/5 `,
         ]?.[template || 0]
       }   c3`}
     >
@@ -120,7 +122,9 @@ export const MyCardInfos = ({ style, arr, title, children }) => {
                 />
                 {el?.title}
               </MySub>
-              <div className="w-1/2 flex items-center  ">{el?.value}</div>
+              <div className="w-1/2 flex items-center  ">
+                {el?.num >= 0 ? <MyNum num={el?.num} /> : el?.value}
+              </div>
             </div>
           )
       )}

@@ -116,7 +116,13 @@ export default function Home() {
         <div id="stars3"></div>
       </div> */}
 
-      <MyLayoutApp notLoad={true} initState={isState} url={`/`} target={"home"}>
+      <MyLayoutApp
+        template={2}
+        notLoad={true}
+        initState={isState}
+        url={`/`}
+        target={"home"}
+      >
         <>
           <Viewport
             img={{

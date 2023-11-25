@@ -1,6 +1,6 @@
 import { MyInput } from "components/myComponents/form/MyInput";
 import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
-import { MySelects } from "components/myComponents/form/MySelects";
+import { MySelect, MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
 import { DEV_DOMAIN } from "constants/languages";
 import React from "react";
@@ -10,19 +10,15 @@ export const FormCreateMission1 = () => {
   return (
     <div>
       <MyInput styles={margin} target={"title"} />
-      <MySelects
+      <MySelect
         styles={margin}
-        selects={[
-          {
-            label: "Domaine",
-            target: "domain",
-            target1: "name",
-            arr: DEV_DOMAIN,
-          },
-        ]}
+        arr={DEV_DOMAIN.map((el) => el?.name)}
+        target={"domain"}
+        label="Domaine"
       />
+
       <MyInputsFile
-        styles={margin + " mr-5"}
+        styles={margin + " mb-3 mr-5"}
         inputs={[
           { label: "Image", target: "image" },
           { label: "Bannière", target: "banniere" },

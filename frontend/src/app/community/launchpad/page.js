@@ -51,8 +51,8 @@ const LaunchpadPage = () => {
 
   return (
     <>
-      <MyLayoutApp styles={"flex font2 flex-col "}>
-        <Viewport full={true} id={"hero"} index={0}>
+      <MyLayoutApp template={1} styles={"flex h-screen font2  "}>
+        <div className="flex  relative  min-h-screen w-full">
           <div className="mt-auto justify-end mb-10 flex flex-col">
             <LinearGradient
               className="text-xs w-fit leading-0 font2 uppercase"
@@ -83,28 +83,23 @@ const LaunchpadPage = () => {
               </LinearGradient>
             </h1>
           </div>
+
+          <div className="grid grid-cols-2 gap-3 absolute top-20 right-10 w-fit ">
+            <MyCardIc
+              icon={icfy.ux.flag}
+              title={"Launch Project"}
+              url={"/create/launchpad"}
+              btn={"Create Launchpad"}
+            />
+            <MyCardIc icon={icfy.ux.mediation} title={"Manage Launchpad"} />
+            <MyCardIc icon={icfy.bank.coin} title={"Standard ERC20"} />
+            <MyCardIc icon={icfy.bank.bag} title={"Invest on Launchpad"} />
+          </div>
+        </div>
+        {/* <Viewport full={true} id={"hero"} index={0}>
         </Viewport>
         <Viewport id={"services"} full={true} index={1}>
-          <div className="  my-auto font2">
-            <h2
-              className={`text-center font-light text-white/20 text-[34px] mb-[6vh]`}
-            >
-              <Hg style={"font-light"}>Owner</Hg> |{" "}
-              <Hg1 style={"font-light "}>Investor</Hg1>
-            </h2>
-            <div className="flex justify-evenly">
-              <MyCardIc
-                icon={icfy.ux.flag}
-                title={"Launch Project"}
-                url={"/create/launchpad"}
-                btn={"Create Launchpad"}
-              />
-              <MyCardIc icon={icfy.ux.mediation} title={"Manage Launchpad"} />
-              <MyCardIc icon={icfy.bank.coin} title={"Standard ERC20"} />
-              <MyCardIc icon={icfy.bank.bag} title={"Invest on Launchpad"} />
-            </div>
-          </div>
-        </Viewport>
+        </Viewport> */}
       </MyLayoutApp>
     </>
   );

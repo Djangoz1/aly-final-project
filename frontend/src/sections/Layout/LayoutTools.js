@@ -15,7 +15,7 @@ import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { zeroAddress } from "viem";
 import { doStateCV } from "context/hub/cv";
 
-export const LayoutTools = ({ children, state }) => {
+export const LayoutTools = ({ children, template, state }) => {
   let { address } = useAccount();
   let { cv } = useAuthState();
 
@@ -29,10 +29,20 @@ export const LayoutTools = ({ children, state }) => {
   }, [address]);
 
   return (
-    <>
+    <div
+      className={`h-screen  flex w-screen overflow-y-scroll overflow-x-hidden ${
+        template === 0 ? "flex-row-reverse" : "flex-col"
+      }`}
+    >
       <Child state={state} children={children} />
-      <Header />
-    </>
+      {template !== 0 ? (
+        <div className="fixed top-0 left-0 w-full">
+          <Header />
+        </div>
+      ) : (
+        <></>
+      )}
+    </div>
   );
 };
 

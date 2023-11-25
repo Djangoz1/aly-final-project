@@ -13,6 +13,7 @@ import { v4 } from "uuid";
 
 export const CVInfos = () => {
   let { state } = useToolsState();
+  console.log(state);
   let [isTabs, setIsTabs] = useState(0);
   let infos = [
     {
@@ -71,25 +72,25 @@ export const CVInfos = () => {
   let infosDatas = [
     {
       title: "Missions",
-      value: state?.profile?.datas?.missions?.length,
+      num: state?.profile?.datas?.missions?.length,
     },
     {
       title: "Features",
-      value: state?.profile?.datas?.features,
+      num: state?.profile?.datas?.features?.length || 0,
     },
     {
       title: "Jobs",
-      value: state?.profile?.datas?.proposals?.length,
+      num: state?.profile?.datas?.proposals?.length,
     },
     {
       title: "Pubs",
-      value: state?.profile?.datas?.pubs,
+      num: state?.profile?.datas?.pubs?.length,
     },
   ];
   let infosDispute = [
     {
       title: "Disputes",
-      value: state?.profile?.details?.disputes?.length,
+      num: state?.profile?.details?.disputes?.length,
     },
 
     {
@@ -205,11 +206,11 @@ export const CVInfos = () => {
       : []),
   ];
   return (
-    <div className="flex-col font2 w-full h-full">
+    <div className="flex-col pt-10 font2 w-full ">
       <MyMenusTabs
-        color={1}
-        template={3}
-        style={"w-full uppercase font-light font2 bgprim"}
+        color={17}
+        template={2}
+        style={"ml-5 mb-8  uppercase font-light font2"}
         value={isTabs}
         setter={setIsTabs}
         arr={["On chain", "Off chain"]}
@@ -217,37 +218,29 @@ export const CVInfos = () => {
       <div className="flex  w-full">
         <MyCardInfos
           title={"Work protocole "}
-          style={"w-full  rounded-t-none "}
+          style={"w-full  rounded-none "}
           arr={[infos, infoOffChain][isTabs]}
         />
-        <MyCardInfos
-          title={"Datas protocole "}
-          style={
-            "w-full ml-[1px]   rounded-t-none " +
-            ["text-center", "text-right"][isTabs]
-          }
-          arr={[infosDatas, infoOffChaindatas][isTabs]}
-        />
-
-        {
-          [
-            <div className="flex flex-col  w-full  ml-[1px]">
-              <MyCardInfos
-                style={
-                  "rounded-b-none rounded-t-none text-right w-full mb-[1px] "
-                }
-                title={"Escrow protocole"}
-                arr={infosDispute}
-              />
-              <MyCardInfos
-                style={"rounded-t-none text-right w-full "}
-                title={"Launchpad protocole"}
-                arr={infosLaunchpad}
-              />
-            </div>,
-          ][isTabs]
-        }
       </div>
+      <MyCardInfos
+        title={"Datas protocole "}
+        style={"w-full ml-[1px]   rounded-none "}
+        arr={[infosDatas, infoOffChaindatas][isTabs]}
+      />
+      {isTabs === 0 && (
+        <div className="flex flex-col  w-full  ml-[1px]">
+          <MyCardInfos
+            style={"rounded-b-none rounded-t-none text-right w-full mb-[1px] "}
+            title={"Escrow protocole"}
+            arr={infosDispute}
+          />
+          <MyCardInfos
+            style={"rounded-t-none text-right w-full "}
+            title={"Launchpad protocole"}
+            arr={infosLaunchpad}
+          />
+        </div>
+      )}
     </div>
   );
 };

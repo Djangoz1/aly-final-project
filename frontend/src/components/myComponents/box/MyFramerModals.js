@@ -15,7 +15,7 @@ export const MyFramerModal = ({
 }) => {
   return (
     <>
-      {arr.map((el, index) => (
+      {arr?.map((el, index) => (
         <motion.div
           ref={index === arr?.length - 1 ? undefined : undefined}
           layoutId={"modal#" + index}
@@ -40,6 +40,47 @@ export const MyFramerModal = ({
               <motion.button
                 className="btn btn-ghost btn-xs absolute opacity-70 hover:opacity-100  transition top-2 right-2"
                 onClick={() => setSelectedId(null)}
+              >
+                <Icon
+                  className="hover:scale-125 text-lg transition hover:text-xl"
+                  icon={icfy.ux.check.uncheck}
+                />
+              </motion.button>
+
+              {children}
+            </MyCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+export const MyModal = ({
+  btn,
+
+  style,
+  id,
+
+  children,
+}) => {
+  let [isSelected, setIsSeleted] = useState(null);
+  return (
+    <>
+      <motion.div
+        layoutId={"modal#" + id}
+        onClick={() => setIsSeleted(!isSelected)}
+      >
+        {btn}
+      </motion.div>
+
+      <AnimatePresence>
+        {isSelected && (
+          <motion.div className={`z-100 ${style}`} layoutId={"modal#" + id}>
+            <MyCard template={3} styles={" flex flex-col  relative  " + style}>
+              <motion.button
+                className="btn btn-ghost btn-xs absolute opacity-70 hover:opacity-100  transition top-2 right-2"
+                onClick={() => setIsSeleted(false)}
               >
                 <Icon
                   className="hover:scale-125 text-lg transition hover:text-xl"

@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuthState } from "context/auth";
 import {
   doStateProfileTools,
+  doStateToolsProfile,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
@@ -32,7 +33,7 @@ import { MyModal } from "components/myComponents/modal/MyModal";
 import { ImagePin } from "components/Image/ImagePin";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
-import { EditProfile } from "sections/Profile/form/edit/EditProfile";
+import { EditProfile } from "sections/Form/forms/edit/EditProfile";
 import { AssetProfile1 } from "components/assets/AssetProfile";
 import { MyFModal } from "components/myComponents/modal/MyFramerModal";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
@@ -54,176 +55,170 @@ import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashbo
 import { STATUS } from "constants/status";
 import { MySub } from "components/myComponents/text/MySub";
 import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
+import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
+import { MyCard } from "components/myComponents/card/MyCard";
+import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
+import { MENUS } from "constants/menus";
+import { Avatar } from "components/profile/ProfileAvatar";
+import { LayoutForm } from "sections/Form/LayoutForm";
+import { MySelect, MySelects } from "components/myComponents/form/MySelects";
+import { controllers } from "utils/controllers";
+import { MyLayoutHeader } from "components/myComponents/layout/MyLayoutHeader";
+import { MyStatus } from "components/myComponents/item/MyStatus";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyNum } from "components/myComponents/text/MyNum";
+import { MyChart } from "components/myComponents/box/MyChart";
 
 function App({ params }) {
-  const { cv } = useAuthState();
+  const { cv, metadatas } = useAuthState();
 
-  const { state, status, pointer } = useToolsState();
+  const { state, status, pointer, refresh } = useToolsState();
+
   let [isLoading, setIsLoading] = useState(null);
   let [isState, setIsState] = useState(null);
 
   const cvID = params.cvID;
 
   let dispatch = useToolsDispatch();
-  let fetch = async () => {
-    setIsLoading(true);
-    let _state = await doStateProfileTools({ dispatch, cvID });
-    console.log("_state", _state);
-    setIsState(_state);
-    setIsLoading(false);
-  };
-  useEffect(() => {
-    if (status === "idle" || status === "reload") {
-      fetch();
-      console.log("Origin fetch is datas cv", isState);
-    }
-  }, [cvID, status]);
 
   return (
-    <MyLayoutDashboard
-      //! isLoading={isLoading}
-      template={[0, 1, 1, 1, 1]?.[pointer]}
-      id={cvID}
-      btn={{
-        title: "Invite worker",
-        info: <>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</>,
-      }}
-      refresh={() => doStateProfileTools({ dispatch, cvID })}
-      owner={state?.profile?.metadatas}
-      price={state?.profile?.datas?.amount}
-      allowed={cv == cvID}
-      statusObj={{
-        current: state?.profile?.metadatas?.visibility ? 0 : 1,
-        to: state?.profile?.metadatas?.visibility ? 1 : 0,
-      }}
-      header={state?.profile?.metadatas?.username}
-      lists={[
-        {
-          title: "Enterprise",
-          description: (
-            <>
-              {state?.profile?.datas?.missions?.length}{" "}
-              <Icon icon={icsystem.mission} className="ml-2 mr-4" />
-              {state?.profile?.datas?.features}{" "}
-              <Icon icon={icsystem.feature} className="ml-2 mr-4" />
-              {state?.profile?.details?.wadge}{" "}
-              <Icon icon={icfyETHER} className="ml-2 mr-4" />
-            </>
-          ),
-          url: `#section2`,
-        },
-        {
-          title: "Worker",
-          description: (
-            <>
-              {state?.profile?.details?.arbitrators?.length}{" "}
-              <Icon icon={icfy.court.hammer} className="ml-2 mr-4" />
-              {state?.profile?.datas?.proposals?.length}{" "}
-              <Icon icon={icsystem.feature} className="ml-2 mr-4" />
-              {state?.profile?.details?.wadge}{" "}
-              <Icon icon={icfyETHER} className="ml-2 mr-4" />
-            </>
-          ),
-          url: `#section2`,
-        },
-        {
-          title: "Launchpad",
-          description: (
-            <>
-              {state?.profile?.datas?.launchpads?.length}{" "}
-              <Icon icon={icsystem.launchpad} className="ml-2 mr-4" />
-              {state?.profile?.details?.launchpads?.totalRaised}{" "}
-              <Icon icon={icfyETHER} className="ml-2 mr-4" />
-            </>
-          ),
-          url: `#section2`,
-        },
+    <LayoutProfile controller={"features"} cvID={cvID} url={"/"}>
+      <MyLayoutHeader
+        style={"mb-10"}
+        cvID={state?.profile?.cvID}
+        username={state?.profile?.metadatas?.username}
+        image={state?.profile?.metadatas?.avatar}
+        target={"profile"}
+        statusObj={{
+          current: state?.profile?.metadatas?.visibility ? 0 : 1,
+          to: state?.profile?.metadatas?.visibility ? 1 : 0,
+        }}
+        allowed={cv == state?.profile?.cvID}
+        metadatas={state?.profile?.metadatas}
+      >
+        {cv == cvID ? (
+          <LayoutForm
+            stateInit={{
+              allowed: true,
+              placeholders: { domain: "What's your main skill ?" },
+              form: {
+                target: "domain",
+                domain: state?.profile?.metadatas?.domain,
+              },
+            }}
+          >
+            <MySelect
+              arr={ENUMS.domain.map((el) => el?.name)}
+              target={"domain"}
+              label={"Votre département d'entreprise"}
+              setter={async (value) => {
+                let metadatas = state?.profile?.metadatas;
+                metadatas.domain = value?.index;
+                await controllers.update.profile(metadatas);
+              }}
+            ></MySelect>
+          </LayoutForm>
+        ) : (
+          <div className="flex w-full flex-wrap items-">
+            <MySub style={"items-center flex"}>
+              <Icon
+                className="text-lg mr-2"
+                icon={ENUMS?.domain[metadatas?.domain]?.icon}
+              />
+              {ENUMS?.domain[metadatas?.domain]?.name}
+            </MySub>
+          </div>
+        )}
+        <div className="absolute top-3 right-3">
+          <MyStatus
+            style={" w-fit text-[8px]"}
+            target={"token"}
+            allowed={cv == cvID}
+            toStatus={state?.profile?.datas?.acceptToken ? 1 : 0}
+            status={state?.profile?.datas?.acceptToken ? 0 : 1}
+          ></MyStatus>
+        </div>
+      </MyLayoutHeader>
 
-        {
-          title: "Social",
-          description: (
-            <>
-              {state?.profile?.datas?.missions?.length}{" "}
-              <Icon icon={icsystem.mission} className="ml-2 mr-4" />
-              {state?.profile?.datas?.features}{" "}
-              <Icon icon={icsystem.feature} className="ml-2 mr-4" />
-              {state?.profile?.details?.wadge}{" "}
-              <Icon icon={icfyETHER} className="ml-2 mr-4" />
-            </>
-          ),
-          url: `#section1`,
-        },
-        {
-          title: "Notifications",
-          description: (
-            <>
-              {state?.profile?.datas?.invitation?.length}{" "}
-              <Icon icon={icfySEND} className="ml-2 rotate-180 mr-4" />
-              {state?.profile?.details?.invites?.length}{" "}
-              <Icon icon={icfySEND} className="ml-2 mr-4" />
-            </>
-          ),
-          url: `#section2`,
-        },
-      ]}
-      menus={[
-        {
-          title: "Profile",
-          url: "#section1",
-          icon: icfy.ux.admin,
-        },
-        {
-          title: "Dashboard",
-          url: "#section2",
-          icon: icfy.ux.mediation,
-        },
-        {
-          title: "Informations",
-          url: "#section3",
-          icon: icfy.ux.admin,
-        },
+      <div className="flex gap-3  w-full -translate-y-1/2">
+        <MyChart price={state?.profile?.datas?.amount} />
+        <MyChart price={state?.profile?.datas?.amount} title={"Total wadge"} />
+        <MyChart price={state?.profile?.datas?.amount} title={"Total invest"} />
+      </div>
 
-        cv == cvID
-          ? {
-              title: "Settings",
-              url: "#section4",
-              icon: icfy.tools.casual,
-            }
-          : undefined,
-      ]}
-      target={"profile"}
-    >
-      <>
-        {
-          [
-            <></>,
-            <CVProfile />,
-            <div className="flex h-full w-full">
-              <CVMenusDropdown style={"   backdrop-blur mr-[1px] w-1/5"} />
+      <div className="grid grid-cols-2 gap-5 pt-20 px-10">
+        {[
+          {
+            title: "Enterprise",
+            description: (
+              <>
+                <MyNum num={state?.profile?.datas?.missions?.length} />{" "}
+                <Icon icon={icsystem.mission} className="ml-2 mr-4" />
+                <MyNum num={state?.profile?.datas?.features?.length} />{" "}
+                <Icon icon={icsystem.feature} className="ml-2 mr-4" />
+                <MyNum num={state?.profile?.datas?.amount} />{" "}
+                <Icon icon={icfyETHER} className="ml-2 mr-4" />
+              </>
+            ),
+            url: `#section2`,
+          },
+          {
+            title: "Worker",
+            description: (
+              <>
+                <MyNum num={state?.profile?.datas?.arbitrators?.length} />{" "}
+                <Icon icon={icfy.court.hammer} className="ml-2 mr-4" />
+                <MyNum num={state?.profile?.datas?.proposals?.length} />{" "}
+                <Icon icon={icsystem.feature} className="ml-2 mr-4" />
+                <MyNum num={state?.profile?.details?.wadge || 0} />{" "}
+                <Icon icon={icfyETHER} className="ml-2 mr-4" />
+              </>
+            ),
+            url: `#section2`,
+          },
+          {
+            title: "Launchpad",
+            description: (
+              <>
+                <MyNum num={state?.profile?.datas?.launchpads?.length || 0} />{" "}
+                <Icon icon={icsystem.launchpad} className="ml-2 mr-4" />
+                <MyNum
+                  num={state?.profile?.details?.launchpads?.totalRaised || 0}
+                />{" "}
+                <Icon icon={icfyETHER} className="ml-2 mr-4" />
+              </>
+            ),
+            url: `#section2`,
+          },
 
-              <CVOverview />
-            </div>,
-            <CVInfos />,
-            cv == cvID ? <EditProfile /> : undefined,
-          ]?.[pointer]
-        }
-
-        {/* 
-
-          
-          {cv == cvID && (
-            <Viewport id={"edit"} index={3}>
-            </Viewport>
-          )}
-          <div className="fixed z-100 bottom-20  flex flex-col items-end right-10">
-           
-            {state?.profile?.cvID != cv &&
-              state?.profile?.metadatas?.visibility && (
-                <EditWorker styles={"c2"} />
-              )}
-          </div> */}
-      </>
-    </MyLayoutDashboard>
+          {
+            title: "Notifications",
+            description: (
+              <>
+                <MyNum num={state?.profile?.datas?.invitation?.length || 0} />{" "}
+                <Icon icon={icfySEND} className="ml-2 rotate-180 mr-4" />
+                <MyNum num={state?.profile?.datas?.notifications || 0} />{" "}
+                <Icon icon={icfySEND} className="ml-2 mr-4" />
+              </>
+            ),
+            url: `#section2`,
+          },
+        ].map((el, i) =>
+          el?.title ? (
+            <MyCardFolder
+              key={v4()}
+              style={"min-w-full "}
+              image={el?.image || `/${el?.title}.png`}
+              title={el?.title}
+              url={el?.url}
+              color={i}
+            >
+              {el?.description}
+            </MyCardFolder>
+          ) : undefined
+        )}
+      </div>
+    </LayoutProfile>
   );
 }
 

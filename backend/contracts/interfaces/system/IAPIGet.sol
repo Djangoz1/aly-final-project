@@ -148,12 +148,6 @@ interface IAPIGet {
     // *********** PUBS *********** //
     // *********** ---- *********** //
 
-    function answersOfPub(uint _pubID) external view returns (uint[] memory);
-
-    function datasOfLike(
-        uint _likeID
-    ) external view returns (DataTypes.LikeData memory);
-
     function datasOfPub(
         uint _pubID
     ) external view returns (DataTypes.PubData memory);

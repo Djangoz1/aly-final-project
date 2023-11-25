@@ -63,66 +63,32 @@ export const CVProfile = ({}) => {
     }
   };
 
-  console.log("state cvProfile", state);
   return (
     <>
-      <div className="flex w-full h-full relative flex-col">
-        <div className="flex   relative h-full   overflow-scroll hide-scrollbar  flex-wrap ">
-          <div className="flex w-full h-full">
-            <MyMenusTabs
-              template={1}
-              style={"  w-1/6 bg-white/5 backdrop-blur-[1px] "}
-              color={8}
-              target={"value"}
-              value={state?.indexers?.profile || 0}
-              setter={(i) => setTabs(i)}
-              arr={[
-                { value: "All", icon: icfy.ux.plus },
-                { value: "Posts", icon: icfy.msg.opened },
-                { value: "Codes", icon: icfyCODE },
-                { value: "Publish", icon: icfy.msg.chat },
-              ]}
-            />
-
-            {state?.indexers?.profile <= 2 ||
-            state?.indexers?.profile === undefined ? (
-              <motion.div className="w-full bgprim c3 rounded-b-lg  flex relative flex-col     overflow-y-scroll hide-scrollbar">
-                <MyMainBtn
-                  setter={() => setTabs(3)}
-                  padding={"px-4 py-1"}
-                  template={1}
-                  url={"#section1"}
-                  icon={icfySEND}
-                  style={"top-2 absolute btn-xs right-2"}
-                  color={1}
-                >
-                  Publish
-                </MyMainBtn>
-
-                {state?.pubs?.length > 0 ? (
-                  state?.pubs?.map((pub, index) => (
-                    <Pub
-                      _owner={state?.profile?.metadatas}
-                      id={pub}
-                      bools={bools}
-                      styles={{ size: "10px", clamp: "none" }}
-                      key={v4()}
-                    />
-                  ))
-                ) : (
-                  <p className="text-center text-white/40 my-auto">
-                    No pubs found
-                  </p>
-                )}
-              </motion.div>
+      <div className="flex w-full  bgprim relative">
+        {state?.indexers?.profile <= 2 ||
+        state?.indexers?.profile === undefined ? (
+          <motion.div className="w-full  pb-20 c3 rounded-b-lg  flex relative flex-col     ">
+            {state?.pubs?.length > 0 ? (
+              state?.pubs?.map((pub, index) => (
+                <Pub
+                  _owner={state?.profile?.metadatas}
+                  _pub={pub}
+                  bools={bools}
+                  styles={{ size: "10px", clamp: "none" }}
+                  key={v4()}
+                />
+              ))
             ) : (
-              <CreatePub
-                style={"  c2  mb-4"}
-                btn={<Icon icon={icfy?.msg?.chat} className="text-6xl m-2" />}
-              />
+              <p className="text-center text-white/40 my-auto">No pubs found</p>
             )}
-          </div>
-        </div>
+          </motion.div>
+        ) : (
+          <CreatePub
+            style={"  c2  mb-4"}
+            btn={<Icon icon={icfy?.msg?.chat} className="text-6xl m-2" />}
+          />
+        )}
       </div>
     </>
   );

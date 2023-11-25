@@ -122,7 +122,7 @@ export const FormResponseAI = () => {
   const [selectedId, setSelectedId] = useState(null);
   return (
     <>
-      <div ref={ref} className="flex relative flex-col  w-full ">
+      <div ref={ref} className="flex px-8 relative flex-col  w-full ">
         <div className="flex  w-full  flex-col-reverse ">
           {!isLoading ? (
             <MyCard

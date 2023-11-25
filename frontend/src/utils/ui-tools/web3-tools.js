@@ -65,22 +65,28 @@ export const _apiPostAt = async ({
 
 export const _apiGet = async (func, args, walletClient) => {
   try {
-    let account = undefined;
+    let res;
     if (walletClient) {
-      account = walletClient.account;
+      res = await readContract({
+        address: ADDRESSES["apiGet"],
+        args: args,
+        abi: ABI_API_G,
+        functionName: func,
+        account: walletClient.account,
+      });
+    } else {
+      res = await readContract({
+        address: ADDRESSES["apiGet"],
+        args: args,
+        abi: ABI_API_G,
+        functionName: func,
+      });
     }
-    const res = await readContract({
-      address: ADDRESSES["apiGet"],
-      args: args,
-      abi: ABI_API_G,
-      functionName: func,
-      account,
-    });
 
     return res;
   } catch (error) {
     let _error = { error };
-    console.error("error", { error });
+    console.error(`error ${func}(${args})`, { error });
     return _error.details;
   }
 };

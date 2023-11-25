@@ -134,43 +134,6 @@ contract APIPost is Ownable {
         ICVsHub(_cvsHub).mint(msg.sender, _tokenURI);
     }
 
-    //! To replace with db
-    /**
-     * @notice Binding for follow cv.
-     * Must have a cv for sender address & can't follow own cv.
-     * @param _cvToFollow is cv ID want follow
-     * @dev this function trigger cvsDatasHub contract
-     */
-
-    function followCV(uint _cvToFollow) external {
-        uint cvFollower = _cvOf(msg.sender);
-        require(
-            _cvToFollow != cvFollower &&
-                Bindings.tokensLength(_cvsHub) >= _cvToFollow,
-            "Can't follow yourself"
-        );
-        ICVsDatasHub(_cvsDatasHub).follow(cvFollower, _cvToFollow);
-    }
-
-    //! To replace with db
-
-    /**
-     * @notice Binding for unfollow cv.
-     * Must have a cv for sender address & can't unfollow own cv & not followed cv.
-     * @param _cvToUnfollow is cv ID want unfollow
-     * @dev this function trigger cvsDatasHub contract
-     */
-
-    function unfollowCV(uint _cvToUnfollow) external {
-        uint cvFollower = _cvOf(msg.sender);
-        require(
-            _cvToUnfollow != cvFollower &&
-                Bindings.tokensLength(_cvsHub) >= _cvToUnfollow,
-            "Can't unfollow yourself"
-        );
-        ICVsDatasHub(_cvsDatasHub).unfollow(cvFollower, _cvToUnfollow);
-    }
-
     // ************* -------- ************* //
     // ************* Missions ************* //
     // ************* -------- ************* //
@@ -521,43 +484,6 @@ contract APIPost is Ownable {
         bool _isPayable
     ) internal returns (uint) {
         return IPubsHub(_pubsHub).mint(_cvID, _tokenURI, _isPayable);
-    }
-
-    // ! TO remove ? Can be db
-    /**
-     * @notice Binding for create pub answer
-     * @param _pubID must to be an existed ID
-     * @param _tokenURI is for pinataCRUD by exemple
-     * @dev this function trigger PubsHub && CollectPubs contracts
-     * msg.sender == ownerOfCV(x)
-     * Permet de poster une réponse à une publication
-     */
-    function createPubAnswer(uint _pubID, string calldata _tokenURI) external {
-        uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI, false);
-        require(newPubID != 0, "Error create pub");
-        IPubsDatasHub(_pubsDatasHub).addPubAnswer(newPubID, _pubID, _tokenURI);
-    }
-
-    // ! TO remove ? Can be db
-
-    /**
-     * @notice Binding for create pub Mission
-     * @param _missionID must to be an existed ID
-     * @param _tokenURI is for pinataCRUD by exemple
-     * @dev this function trigger PubsHub && CollectPubs && MissionsHub contracts
-     * msg.sender == ownerOfCV(x)
-     * Permet de poster une publication sur le mur d'une mission
-     */
-    function createPubMission(
-        uint _missionID,
-        string calldata _tokenURI
-    ) external {
-        uint newPubID = _createPub(_cvOf(msg.sender), _tokenURI, false);
-        IPubsDatasHub(_pubsDatasHub).addPubMission(
-            newPubID,
-            _missionID,
-            _tokenURI
-        );
     }
 
     // ************* ------- ************* //

@@ -15,45 +15,11 @@ export const MissionPubs = () => {
   let { state } = useToolsState();
 
   let ref = useRef(null);
-  const isInView = useInView(ref);
-
-  let dispatch = useToolsDispatch();
-  let fetch = async () => {
-    let _state = state;
-
-    _state.owner.details =
-      state?.owner?.details ||
-      (await stateDetailsCV(_state?.mission?.datas?.cvOwner));
-
-    _state.pubs = [];
-
-    let _pubs = await _apiGet("pubsOfMission", [
-      parseInt(state?.mission?.missionID),
-    ]);
-    _state.followers = [];
-
-    for (let index = 0; index < _pubs.length; index++) {
-      const pubID = _pubs[index];
-
-      let pubState = await statePub(pubID);
-      let owner = await stateCV(pubState?.owner);
-      _state.pubs.push({ pub: pubState, owner });
-    }
-
-    doStateTools(dispatch, _state);
-  };
-
-  useEffect(() => {
-    if (isInView && !state?.pubs) {
-      console.log("Fetch pubs ...");
-      fetch();
-    }
-  }, [isInView]);
 
   return (
     <>
-      <div className="flex w-full  relative flex-col">
-        <div className="flex bg-white/5   h-[80vh] relative border border-1 border-white/10 overflow-scroll hide-scrollbar  flex-col ">
+      <div className="flex w-full   relative flex-col">
+        <div className="flex     relative border border-1 border-white/10   flex-col ">
           <div className="relative  flex items-end justify-between    w-full h-[26vh]">
             <div className="overflow-hidden rounded-xl h-[26vh] absolute w-full">
               <ImagePin
@@ -95,18 +61,19 @@ export const MissionPubs = () => {
           </div>
           <div
             ref={ref}
-            className="w-full  rounded-lg backdrop-blur   flex flex-col     overflow-y-scroll hide-scrollbar"
+            className="w-full   rounded-lg backdrop-blur   flex flex-col     overflow-y-scroll hide-scrollbar"
           >
             {state?.pubs?.length > 0 ? (
-              state?.pubs?.map((el) => (
-                <Pub
-                  styles={{ clamp: "3", size: "10px" }}
-                  id={el?.pub?.pubID}
-                  state={el?.pub}
-                  _owner={el?.owner?.metadatas}
-                  key={v4()}
-                />
-              ))
+              state?.pubs
+                ?.reverse()
+                ?.map((el) => (
+                  <Pub
+                    styles={{ clamp: "3", size: "10px" }}
+                    _pub={el}
+                    _owner={el?.owner?.metadatas}
+                    key={v4()}
+                  />
+                ))
             ) : (
               <p className="text-center text-white/40 my-auto">No pubs found</p>
             )}

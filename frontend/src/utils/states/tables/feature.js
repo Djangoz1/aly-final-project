@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { MyStatus } from "components/myComponents/item/MyStatus";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { doStateMission } from "context/hub/mission";
@@ -73,25 +74,13 @@ export let _table_features = (features, owner) => {
             </p>
           </div>
         )}
-        <span
-          className={` flex badge-xs  mt-2 text-[9px] badge badge-outline py-2  items-center badge-${
-            el?.details?.signedWorker
-              ? status.color
-              : STATUS._feature.hiring.color
-          }`}
-        >
-          <Icon
-            className="mr-2 "
-            icon={
-              el?.details?.signedWorker
-                ? status.icon
-                : STATUS._feature.hiring.icon
-            }
-          />
-          {el?.details?.signedWorker
-            ? status.status
-            : STATUS._feature.hiring.status}
-        </span>
+
+        <MyStatus
+          target={"_feature"}
+          status={"hiring"}
+          padding={"px-4 py-1"}
+          style={"text-[8px] "}
+        ></MyStatus>
       </div>,
       <p className="text-right text-[10px]">
         <span className={`text-white mr-2`}>{el?.datas?.wadge}</span>

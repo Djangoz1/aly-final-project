@@ -9,19 +9,17 @@ import Link from "next/link";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { timestampToCounter } from "utils/ux-tools";
 
-export let _table_arbitrators = (disputes) => {
+export let _table_arbitrators = (arbitrators) => {
   let list = [];
 
-  console.log("disputes", disputes);
-
-  for (let index = 0; index < disputes?.length; index++) {
-    const el = disputes[index];
+  for (let index = 0; index < arbitrators?.disputes?.length; index++) {
+    const el = arbitrators?.disputes[index];
 
     let court = ENUMS.courts[el?.datas?.courtID];
 
     let arr = [
       <div className="flex items-center ">
-        <Icon icon={court.badge} className="text-3xl mr-1" />
+        <Icon icon={court?.badge} className="text-3xl mr-1" />
 
         <div className="flex flex-col">
           <p className="font-bold  whitespace-nowrap hover:text-info">

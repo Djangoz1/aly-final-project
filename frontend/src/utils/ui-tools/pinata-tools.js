@@ -18,13 +18,19 @@ export const fetchJSONByCID = async ({ id, table, expand }) => {
     throw new Error("Error fetch datas: Missing pocketbase config");
   }
   try {
-    const record = await clientPocket.records.getOne(table, id, {
+    const record = await clientPocket.records.getOne(table, `${id}`, {
       expand,
     });
 
     return record;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'objet JSON :", error);
+    console.error(
+      "Erreur lors de la récupération de l'objet JSON " +
+        table +
+        id +
+        " :" +
+        error
+    );
     return null;
   }
 };

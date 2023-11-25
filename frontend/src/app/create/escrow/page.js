@@ -49,6 +49,7 @@ import { FormCreateEscrow1 } from "sections/works/Escrows/form/create/FormCreate
 import { useToolsState } from "context/tools";
 import { stateFeature } from "utils/ui-tools/state-tools";
 import { STATUS } from "constants/status";
+import { controllers } from "utils/controllers";
 
 const PageCreateEscrow = () => {
   let { address, isConnected } = useAccount();
@@ -57,7 +58,6 @@ const PageCreateEscrow = () => {
   let { metadatas, cv } = useAuthState();
   let { cvID } = useCVState();
   let { state } = useToolsState();
-  let tools = useToolsState();
   let [isState, setIsState] = useState(null);
   let stateInit = async () => {
     let jobs = await _apiGet("jobsOfCV", [cv]);
@@ -75,6 +75,7 @@ const PageCreateEscrow = () => {
         arr.push({
           title: "#" + parseInt(id) + " " + feature?.metadatas.title + " - job",
           id,
+          hash: feature.metadatas.id,
           max: await _apiGet("lengthOfCourt", [feature?.datas?.specification]),
         });
     }
@@ -91,6 +92,8 @@ const PageCreateEscrow = () => {
           title:
             "#" + parseInt(id) + " " + feature?.metadatas.title + " - owner",
           id,
+          hash: feature.metadatas.id,
+
           max: await _apiGet("lengthOfCourt", [feature?.datas?.specification]),
         });
     }
@@ -111,33 +114,10 @@ const PageCreateEscrow = () => {
   );
 
   let submitForm = async (form) => {
-    let id = parseInt(state?.arr?.[parseInt(form?.feature)]?.id);
-    console.log("wshhh start");
-    let metadatas = {
-      description: form.description,
-      image: form?.image,
-    };
-
-    if (form?.appeal > 0 && form?.arbitrators >= 3) {
-      const record = await clientPocket.records.create("escrows", metadatas);
-      let uri = record?.id;
-      console.log(
-        "r888888676454345345345345345345345345345345345345345345345345ecord",
-        record
-      );
-      let hash = await _apiPost("contestFeature", [
-        id,
-        parseInt(form?.appeal),
-        parseInt(form?.arbitrators),
-        uri,
-      ]);
-
-      let disputeID = await _apiGet("disputeOfFeature", [id]);
-
-      hash = await _apiPost("initDispute", [disputeID]);
-    } else {
-      throw new Error("Missing escrow values");
-    }
+    let hash = await controllers.create.dispute({
+      ...form,
+      feature: state.arr[form.feature],
+    });
   };
 
   return (

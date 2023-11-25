@@ -32,10 +32,10 @@ export const MyCardFolder = ({
     <div
       className={`flex flex-col  _hover hover:-translate-y-1 ${
         hoverable ? "card-folder" : undefined
-      } ${style}`}
+      } `}
     >
       <div
-        className={`h-[180px] round relative   z-1 shadow1 rounded-2xl overflow-hidden  md:w-[250px] w-[330px] ${
+        className={`${style} h-[180px] round relative   z-1 shadow1 rounded-2xl overflow-hidden  md:w-[250px] w-[330px] ${
           colors?.[color || 0]?.bg
         } `}
       >

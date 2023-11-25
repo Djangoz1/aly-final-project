@@ -13,8 +13,8 @@ export let fetchCV = async (cvID) => {
     let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
 
     let json = await fetchJSONByCID({ id: uri, table: "accounts" });
-    const result = { ...json, cvID: cvID };
-    return result;
+
+    return json;
   }
 };
 
@@ -25,13 +25,13 @@ export let fetchStatsOfCV = async (cvID) => {
       ADDRESSES["missionsHub"],
     ]);
 
-    let features = parseInt(
-      await _apiGet("balanceOfToken", [cvID, ADDRESSES["featuresHub"]])
-    );
+    let features = await _apiGet("indexerOfToken", [
+      cvID,
+      ADDRESSES["featuresHub"],
+    ]);
 
-    let pubs = parseInt(
-      await _apiGet("balanceOfToken", [cvID, ADDRESSES["pubsHub"]])
-    );
+    // let pubs = await _apiGet("indexerOfToken", [cvID, ADDRESSES["pubsHub"]]);
+
     let launchpads = await _apiGet("indexerOfToken", [
       cvID,
       ADDRESSES["launchpadHub"],
@@ -39,23 +39,31 @@ export let fetchStatsOfCV = async (cvID) => {
 
     let _jobs = await _apiGet("jobsOfCV", [cvID]);
 
-    let invitation = await _apiGet("invitesOfCV", [cvID]);
-
-    let followers = parseInt(await _apiGet("lengthOfFollower", [cvID]));
-    let follows = parseInt(await _apiGet("lengthOfFollowed", [cvID]));
+    let invitations = await _apiGet("invitesOfCV", [cvID]);
 
     let amount = 0;
+
+    let notifications = [];
+    for (let index = 0; index < features.length; index++) {
+      const featureID = features[index];
+      let datas = await _apiGet("datasOfWork", [featureID]);
+      notifications += datas.workerDemand.length;
+    }
     // ! To dooooo
 
     let stats = {
       missions,
       features,
       proposals: _jobs,
-      pubs,
-      invitation,
+      // pubs,
+      arbitrators: await _apiGet("indexerOfToken", [
+        cvID,
+        ADDRESSES["arbitratorsHub"],
+      ]),
+      invitations,
+      notifications,
       launchpads,
-      followers,
-      follows,
+      acceptToken: await _apiGet("isAcceptToken", [cvID]),
       amount,
     };
 

@@ -1,4 +1,4 @@
-import { icfy, icfyCODE, icfyCODER, icfyGITHUB } from "icones";
+import { icfy, icfyCODE, icfyCODER, icfyETHER, icfyGITHUB } from "icones";
 import {
   clientPocket,
   createURI,
@@ -10,6 +10,10 @@ import { ADDRESSES } from "./web3";
 
 export const _STATUS = async ({ state, to, target }) => {
   let funcs = {
+    token: [
+      async () => await _apiPost("changeAcceptToken"),
+      async () => await _apiPost("changeAcceptToken"),
+    ],
     profile: [
       async () => {
         let metadatas = { ...state?.profile?.metadatas };
@@ -68,21 +72,21 @@ export const STATUS = {
     },
   ],
 
-  profile: [
+  token: [
     {
-      icon: icfy.eye.open,
-      status: "Disponible",
+      icon: icfy.bank.coin,
+      status: "Accept token",
       color: "success",
       bg: " border-success/40 bg-success/10 ",
     },
     {
-      icon: icfy.eye.close,
-      status: "Indisponible",
+      icon: icfyETHER,
+      status: "Only ETH",
       color: "error",
       bg: " border-error/40 bg-error/10 ",
     },
   ],
-  visibility: [
+  profile: [
     {
       icon: icfy.eye.open,
       status: "Disponible",

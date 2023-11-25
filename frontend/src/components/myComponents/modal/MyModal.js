@@ -1,62 +1,50 @@
-import { doStateFormModal, useFormDispatch, useFormState } from "context/form";
-import React, { useEffect, useState } from "react";
-import { styles as _styles } from "styles/style";
+import React, { useState } from "react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { v4 } from "uuid";
+import { MyCard } from "../card/MyCard";
+import { Icon } from "@iconify/react";
+import { icfy } from "icones";
 import { MyOverlay } from "../MyOverlay";
-export const MyModal = ({ force, setForce, styles, modal, form, btn }) => {
-  const [isOpen, setIsOpen] = useState(false);
 
-  let formState = form && useFormState();
+export const MyModal = ({
+  btn,
 
-  let dispatch = form && useFormDispatch();
-  const handleClick = () => {
-    setIsOpen(!isOpen);
-    if (form) {
-      console.log("isOpen", !isOpen);
-      doStateFormModal(dispatch, !isOpen);
-    }
-  };
-  useEffect(() => {
-    if (force && isOpen) {
-      setIsOpen(false);
-      setForce(false);
-    }
-    if (!isOpen && setForce) {
-      setForce(true);
-    }
-  }, [force, isOpen]);
+  style,
+  id,
 
-  useEffect(() => {
-    if (form && !formState.modal) {
-      setIsOpen(false);
-    }
-  }, [formState?.modal]);
+  children,
+}) => {
+  let [isSelected, setIsSeleted] = useState(false);
 
   return (
     <>
-      <button
-        className={`btn  ${
-          styles?.btn
-            ? styles?.btn
-            : _styles.gbtn + " w-fit gb1 cursor-pointer btn-xs"
-        }`}
-        onClick={handleClick}
+      <motion.div
+        layoutId={"modal#" + id}
+        className="relative"
+        onClick={() => setIsSeleted(!isSelected)}
       >
         {btn}
-      </button>
-      {isOpen && (
-        <div className="absolute">
-          <div className="fixed h-screeen justify-center flex items-center w-screen font2  top-0 left-0">
-            <MyOverlay setter={handleClick} style={"debug left-0 top-0"} />
-            <div
-              className={`backdrop-blur bg-zinc-900  ${
-                styles?.modal || "w-fit"
-              } hide-scrollbar z-100 overflow-y-auto p-5 max-h-[90vh] rounded-xl shadow-2xl  relative   `}
-            >
-              {modal}
-            </div>
-          </div>
-        </div>
-      )}
+      </motion.div>
+      <AnimatePresence>
+        {isSelected && (
+          <>
+            <motion.div className={`z-100 ${style}`} layoutId={"modal#" + id}>
+              <div className="relative h-full w-full">
+                {children}
+                <motion.button
+                  className="btn  btn-ghost btn-xs absolute opacity-70 hover:opacity-100  transition top-2 right-2"
+                  onClick={() => setIsSeleted(false)}
+                >
+                  <Icon
+                    className="hover:scale-125 text-lg transition hover:text-xl"
+                    icon={icfy.ux.check.uncheck}
+                  />
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };

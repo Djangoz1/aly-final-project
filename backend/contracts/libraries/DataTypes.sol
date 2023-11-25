@@ -44,6 +44,7 @@ library DataTypes {
         uint256 indexedAtCourt;
         uint256 nbArbitrations;
         uint256[] disputes;
+        bool banned;
     }
 
     struct EvidenceData {

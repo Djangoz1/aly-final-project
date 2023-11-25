@@ -182,7 +182,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
 
   return (
     <>
-      <div className="grid grid-flow-col text-lg gap-5 text-center auto-cols-max">
+      <div className="grid grid-flow-col  gap-5 text-center auto-cols-max">
         <div className="flex flex-col items-center">
           <span
             className={` countdown font-mono ${

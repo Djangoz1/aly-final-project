@@ -32,7 +32,7 @@ import { MyModal } from "components/myComponents/modal/MyModal";
 import { ImagePin } from "components/Image/ImagePin";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
-import { EditProfile } from "sections/Profile/form/edit/EditProfile";
+import { EditProfile } from "sections/Form/forms/edit/EditProfile";
 import { AssetProfile1 } from "components/assets/AssetProfile";
 import { MyFModal } from "components/myComponents/modal/MyFramerModal";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
@@ -61,7 +61,7 @@ import { MyCountdown } from "components/myComponents/MyCountdown";
 import { MyNum } from "components/myComponents/text/MyNum";
 
 function App({ params }) {
-  const { cv } = useAuthState();
+  const { cv, metadatas } = useAuthState();
 
   const { state, status, pointer } = useToolsState();
   let [isLoading, setIsLoading] = useState(null);
@@ -74,7 +74,6 @@ function App({ params }) {
     setIsLoading(true);
     let courts = [];
     let datas = {
-      balance: 0n,
       famous: 0,
       disputes: await _apiGet("tokensLength", [ADDRESSES["disputesHub"]]),
       users: 0n,
@@ -83,8 +82,8 @@ function App({ params }) {
     let max = 0n;
 
     for (let index = 2; index < ENUMS.courts.length; index++) {
-      let balance = await _apiGet("balanceOfCourt", [index]);
-      datas.balance += balance;
+      // let balance = await _apiGet("balanceOfCourt", [index]);
+      // datas.balance += balance;
       let arbitrators = await _apiGet("lengthOfCourt", [index]);
       if (arbitrators > max) {
         max = arbitrators;
@@ -95,7 +94,7 @@ function App({ params }) {
       courts.push({
         ...ENUMS.courts[index],
         courtID: index,
-        balance: balance,
+
         arbitrators,
       });
     }
@@ -115,55 +114,21 @@ function App({ params }) {
     <MyLayoutDashboard
       initState={isState}
       isLoading={isLoading}
-      template={1}
-      id={cvID}
-      btn={{
-        title: "Invite worker",
-        info: <>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</>,
-      }}
+      template={0}
+      // btn={{
+      //   title: "Invite worker",
+      //   info: <>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</>,
+      // }}
+
       refresh={() => doStateProfileTools({ dispatch, cvID })}
-      owner={state?.profile?.metadatas}
+      owner={metadatas}
       price={state?.profile?.datas?.amount}
       allowed={cv == cvID}
-      noMenu={true}
-      header={state?.profile?.metadatas?.username}
-      menus={[
-        {
-          title: "Lists",
-          url: "#section0",
-          icon: icfy.ux.admin,
-        },
-      ]}
-      target={"profile"}
+      target={"escrow"}
     >
-      {console.log(state)}
-      <div className="flex w-full">
-        <div className="flex h-full flex-col">
-          <div className="flex flex-col mb-auto">
-            <MyTitle>Total balance</MyTitle>
-
-            <MyNum
-              toFix={4}
-              style={"text-[1.8em] "}
-              num={state?.datas?.balance}
-            >
-              <MySub style={"c4 mt-auto  ml-2"}>ETH</MySub>
-            </MyNum>
-            <MyTitle>Total arbitrators</MyTitle>
-
-            <MyNum toFix={0} style={"text-[1.8em] "} num={state?.datas?.users}>
-              <MySub style={"c4 mt-auto  ml-2"}>users</MySub>
-            </MyNum>
-            <MyTitle>Total disputes</MyTitle>
-
-            <MyNum
-              toFix={0}
-              style={"text-[1.8em] "}
-              num={state?.datas?.disputes}
-            >
-              <MySub style={"c4 mt-auto  ml-2"}>disputes</MySub>
-            </MyNum>
-          </div>
+      {console.log("state", state)}
+      <div className="mt-20 flex flex-col w-full">
+        <div className="flex items-end mb-8 h-full w-full">
           <MyCardStat
             icon={state?.courts?.[state?.datas?.famous]?.badge}
             subtitle={"MVP"}
@@ -180,9 +145,25 @@ function App({ params }) {
               value: parseInt(state?.courts?.[state?.datas?.famous]?.balance),
             }}
           />
+          <div className="flex flex-col mt-auto ml-5">
+            <MyTitle>Total arbitrators</MyTitle>
+
+            <MyNum toFix={0} style={"text-[1.8em] "} num={state?.datas?.users}>
+              <MySub style={"c4 mt-auto  ml-2"}>users</MySub>
+            </MyNum>
+            <MyTitle>Total disputes</MyTitle>
+
+            <MyNum
+              toFix={0}
+              style={"text-[1.8em] "}
+              num={state?.datas?.disputes}
+            >
+              <MySub style={"c4 mt-auto  ml-2"}>disputes</MySub>
+            </MyNum>
+          </div>
         </div>
 
-        <div className="grid w-fit ml-auto overflow-y-scroll grid-cols-3 gap-8 ">
+        <div className="grid w-full overflow-y-scroll grid-cols-3 gap-8 ">
           {state?.courts?.map((el, i) => (
             <MyCardFolder
               key={v4()}
@@ -192,10 +173,8 @@ function App({ params }) {
               color={i}
               title={el.court}
             >
-              <Icon icon={icfyETHER} className="mr-2" /> {parseInt(el?.balance)}
-              <MySub style={"ml-2"}>ETH</MySub>
-              <Icon icon={icfy.person.team} className="ml-4 mr-2" />{" "}
-              {parseInt(el?.arbitrators)}
+              <Icon icon={icfy.person.team} className="mr-2" />{" "}
+              <MyNum num={parseInt(el?.arbitrators)} />
               <MySub style={"ml-2"}>arbitrators</MySub>
             </MyCardFolder>
           ))}

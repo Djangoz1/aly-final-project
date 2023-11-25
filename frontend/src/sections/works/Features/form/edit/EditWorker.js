@@ -104,9 +104,7 @@ export const EditWorker = ({ styles }) => {
           btn: styles,
           modal: "w-fit",
         }}
-      >
-        <FormWorker features={isFeatures} />
-      </MyFormModal>
+      ></MyFormModal>
     )
   );
 };
