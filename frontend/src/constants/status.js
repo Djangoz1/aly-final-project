@@ -55,6 +55,12 @@ export const STATUS = {
       color: "warning",
       bg: " border-warning/40 bg-warning/10 ",
     },
+    notDeployed: {
+      icon: icfy.hand.check,
+      status: "Not Deployed",
+      color: "warning",
+      bg: " border-warning/40 bg-warning/10 ",
+    },
   },
 
   court: [

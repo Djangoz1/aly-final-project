@@ -12,7 +12,14 @@ import React, { useEffect, useState } from "react";
 import { MyMainBtn } from "../btn/MyMainBtn";
 import { clientPocket } from "utils/ui-tools/pinata-tools";
 
-export const MyTextArea = ({ label, metadatas, target, setter, styles }) => {
+export const MyTextArea = ({
+  rows,
+  label,
+  metadatas,
+  target,
+  setter,
+  styles,
+}) => {
   let { form, placeholders, pointer, modal, checked } = useFormState();
   let [value, setValue] = useState(null);
   let dispatch = useFormDispatch();
@@ -31,7 +38,7 @@ export const MyTextArea = ({ label, metadatas, target, setter, styles }) => {
 
   let handlePost = async () => {
     if (setter) {
-      setter(form?.target);
+      setter(form?.[target], form);
     } else if (metadatas) {
       await clientPocket.records.update(
         metadatas["@collectionName"],
@@ -57,13 +64,14 @@ export const MyTextArea = ({ label, metadatas, target, setter, styles }) => {
 
   return (
     <div className={`flex w-full flex-col  ${form?.[target] && "text-white"}`}>
-      {!label?.no && (
+      {!label?.no && label !== false && (
         <label className="text-light font-light text-xs mb-1 uppercase ">
           {label || target} {checked?.[pointer]?.includes(target) && " *"}
         </label>
       )}
       <div className="w-full h-full relative">
         <textarea
+          rows={rows || undefined}
           onChange={(e) => handleChange(e.target.value)}
           value={value || undefined}
           onBlur={handleBlur}

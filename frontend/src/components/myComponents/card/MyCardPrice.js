@@ -16,6 +16,7 @@ export const MyCardPrice = ({
   active,
   color,
   lists,
+  template,
   description,
 }) => {
   let colors = [
@@ -29,7 +30,7 @@ export const MyCardPrice = ({
   return (
     <MyCard
       styles={`${style && style} px-8 pt-4 pb-8 ${size || " min-w-[282px]"}`}
-      template={1}
+      template={template}
     >
       <div
         className={`mb-4 rounded-lg ${

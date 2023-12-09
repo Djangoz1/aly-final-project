@@ -3,78 +3,33 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
-import {
-  doStateProfileTools,
-  doStateToolsProfile,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
-
-import {
-  stateCV,
-  stateDetailsCV,
-  stateFeature,
-  stateMission,
-  statePub,
-} from "utils/ui-tools/state-tools";
+import { useToolsDispatch, useToolsState } from "context/tools";
 
 import { Icon } from "@iconify/react";
 import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
 
-import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import {
-  HEAD_table_features,
-  _table_features,
-} from "utils/states/tables/feature";
+import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
-import { Viewport } from "components/myComponents/layout/MyViewport";
-import { CVProfile } from "sections/Profile/state/CVProfile";
 import { _apiGet } from "utils/ui-tools/web3-tools";
-import { ADDRESSES } from "constants/web3";
-import { MyModal } from "components/myComponents/modal/MyModal";
-import { ImagePin } from "components/Image/ImagePin";
-import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
-import { EditProfile } from "sections/Form/forms/edit/EditProfile";
-import { AssetProfile1 } from "components/assets/AssetProfile";
-import { MyFModal } from "components/myComponents/modal/MyFramerModal";
-import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { v4 } from "uuid";
-import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
-import { CVInfos } from "sections/Profile/state/CVInfos";
-import {
-  MyMenusDropdown,
-  MyMenusDropdownProfile,
-  MyMenusTabs,
-} from "components/myComponents/menu/MyMenus";
-import { CVMenusDropdown } from "sections/Profile/state/CVMenusDropdown";
-import { BtnsSocial } from "components/btn/BtnsSocial";
-import { Loader } from "@react-three/drei";
-import { MyLoader } from "components/myComponents/layout/MyLoader";
-import { MyCardList } from "components/myComponents/card/MyCardList";
-import { doStateFormPointer } from "context/form";
-import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { STATUS } from "constants/status";
+
 import { MySub } from "components/myComponents/text/MySub";
-import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
 import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
-import { MyCard } from "components/myComponents/card/MyCard";
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
-import { MENUS } from "constants/menus";
-import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
-import { MyTable } from "components/myComponents/table/MyTable";
-import {
-  HEAD_table_missions,
-  _table_missions,
-} from "utils/states/tables/mission";
+
 import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
-import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { MyBadge, MyList } from "components/myComponents/box/MyList";
+import { MyTitle } from "components/myComponents/text/MyTitle";
+import { MyCardIc } from "components/myComponents/card/MyCardIc";
+import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
+import { MyCardInfos } from "components/myComponents/card/MyCard";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -98,15 +53,7 @@ function App({ params }) {
     }
   }, [state?.features]);
 
-  //   let isTable = {
-  //     btn: "Missions",
-  //     table:,
-  //     head: ,
-  //     setState: stateMission,
-
-  //     // btns: MENUS_EDIT.mission,
-  //   };
-  console.log(state);
+  console.log("state", state);
   let dispatch = useToolsDispatch();
   let [selectedID, setSelectedID] = useState(null);
   let colors = [
@@ -126,70 +73,48 @@ function App({ params }) {
       url={"/features"}
     >
       <div className="flex w-full flex-col-reverse">
-        <MyCard template={1} styles={"h-full  rounded-t-none w-full "}>
-          <div
-            ref={ref}
-            className="w-full h-full rounded-lg py-20 shadow backdrop-blur "
-          >
-            <MyTable
-              list={_table_features(state?.features, state?.profile?.metadatas)}
-              head={HEAD_table_features}
-
-              // btns={infos?.[state?.indexOverview]?.btns}
-              // editBtns={infos?.[state?.indexOverview]?.editBtns}
-            />
-          </div>
-        </MyCard>
-        <div className="flex w-full">
-          <MyScrolledXDiv>
+        <MyList
+          head={["Date", "Court", "Mission", "Worker", "Status", "Amount"]}
+          arr={state?.features?.map((el) => [
+            el?.metadatas?.created,
+            <MyBadge color={1}>
+              <Icon icon={ENUMS.courts?.[el?.datas?.specification]?.badge} />
+              {ENUMS.courts?.[el?.datas?.specification]?.court}
+            </MyBadge>,
+            el?.metadatas?.title,
+            <CVName cvID={el?.datas?.cvWorker} />,
+            <MyStatus status={el?.datas?.status} target={"feature"} />,
+            <MyBadge>{el?.datas?.wadge} ETH</MyBadge>,
+          ])}
+        />
+        <div className="flex relative  w-full">
+          <MyScrolledXDiv style={" gap-4 pr-[400px] "}>
             <>
-              <MyFramerModal
-                style={
-                  "on_hover my-3 min-w-[430px] flex flex-col h-[150px] p-2 mr-2 bg-white/5  "
-                }
-                arr={state?.features?.map((el) => (
-                  <>
-                    <h6 className="font-light text-sm ">
-                      {el?.metadatas?.title}
-                    </h6>
-                    <div className="flex mb-3 items-center">
-                      <Icon icon={icsystem.feature} className="text-lg mr-2" />
-                      <MySub>
+              {state?.features?.map((el) => (
+                <MyCardDropdown
+                  style={"h-fit min-w-fit"}
+                  key={v4()}
+                  header={
+                    <>
+                      <Icon
+                        icon={icsystem.feature}
+                        className="c4 text-lg mr-2"
+                      />
+                      <MySub size={"8"}>
                         <CVName cvID={el?.datas?.cvWorker} />
                       </MySub>
                       <Icon
                         icon={icfy.bank.dollars}
-                        className="text-lg ml-4 mr-2"
+                        className="c4 text-lg ml-4 mr-2"
                       />
-                      <MyNum num={el?.datas?.wadge} />
-                      <Icon
-                        icon={icfy.person.team}
-                        className="text-lg ml-4 mr-2"
-                      />
-                      <MyNum num={el?.datas?.workers} />
-                    </div>
-                    <div className="grid mt-3 grid-cols-5 gap-2 items-center">
-                      <div
-                        className={
-                          "badge badge-" + colors[el?.metadatas?.domain]
-                        }
-                      >
-                        {ENUMS.domain[el?.metadatas?.domain]?.name}
-                      </div>
-                      <div className="badge super-btn">
-                        {ENUMS.courts[el?.datas?.specification]?.court}
-                      </div>
-                      {JSON.parse(el?.metadatas?.skills)?.map((skill, i) => (
-                        <div
-                          key={v4()}
-                          className={"badge badge-" + colors?.[i]}
-                        >
-                          {skill}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex mt-auto w-full items-center">
+                      <MySub style={"flex gap-1 items-start"} size={"9"}>
+                        <MyNum num={el?.datas?.wadge} />
+                        <span className="c4">ETH</span>
+                      </MySub>
+                    </>
+                  }
+                  footer={
+                    <>
                       {el?.datas?.launchpad > 0 ? (
                         <MyMainBtn
                           template={2}
@@ -202,29 +127,83 @@ function App({ params }) {
                         <></>
                       )}
                       <MyStatus
+                        padding={"px-2 py-1 "}
                         status={el?.datas?.status}
                         style={" w-full text-xs"}
                         target={"feature"}
                       />
-                    </div>
-                  </>
-                ))}
-                selectedId={selectedID}
-                setSelectedId={setSelectedID}
-              >
-                <div className="w-full h-full ">
-                  <MissionFeatures
-                    featureID={state?.features?.[selectedID]?.featureID}
+                    </>
+                  }
+                  title={el?.metadatas?.title}
+                >
+                  <MyCardInfos
+                    style={"w-full min-w-[500px]"}
+                    template={5}
+                    arr={[
+                      {
+                        title: "Domain",
+                        icon: ENUMS.domain[el?.metadatas?.domain]?.icon,
+                        value: (
+                          <MyBadge
+                            style={
+                              "text-xs text-center justify-center font-light"
+                            }
+                            color={el?.metadatas?.domain}
+                          >
+                            {ENUMS.domain[el?.metadatas?.domain]?.name}
+                          </MyBadge>
+                        ),
+                      },
+                      {
+                        title: "Specification",
+                        icon: ENUMS.courts[el?.datas?.specification]?.badge,
+                        value: (
+                          <MyBadge color={1} style="  text-xs">
+                            {ENUMS.courts[el?.datas?.specification]?.court}
+                          </MyBadge>
+                        ),
+                      },
+                      {
+                        title: "Skills",
+                        value: (
+                          <div className="flex gap-2 w-2/3 flex-wrap">
+                            {el?.metadatas?.skills?.map((skill, i) => (
+                              <MyBadge
+                                style={
+                                  "min-w-[100px] overflow-hidden transition hover:min-w-fit  text-[8px]"
+                                }
+                                color={i}
+                                key={v4()}
+                              >
+                                {skill}
+                              </MyBadge>
+                            ))}
+                          </div>
+                        ),
+                      },
+                    ]}
                   />
-                </div>
-              </MyFramerModal>
+                </MyCardDropdown>
+              ))}
             </>
           </MyScrolledXDiv>
-          <div className="bg-zinc-900 flex items-center p-4 ">
-            <Icon icon={icfyETHER} className="text-[64px]" />
-            <div className="flex flex-col">
-              <MyNum style={"text-xl"} num={isAmount} />
-              <MySub size={8}>Total depense</MySub>
+          <div className="backdrop-blur-2xl gap-2 flex-col absolute right-0 top-0 h-full flex items-start p-4 pl-1 ">
+            <div className="flex items-center pl-2 border-4 gap-2 border-l-white/5 border-white/0 ">
+              <Icon icon={icfyETHER} className="text-[24px]" />
+              <div className="flex flex-col ">
+                <MyNum style={"text-xs"} num={isAmount}>
+                  {" "}
+                  ETH
+                </MyNum>
+                <MySub size={8}>Total depense</MySub>
+              </div>
+            </div>
+            <div className="flex items-center pl-2 border-4 gap-2  border-l-white/5 border-white/0 ">
+              <Icon icon={icsystem.feature} className="text-[24px]" />
+              <div className="flex flex-col ">
+                <MyNum style={"text-xs"} num={state?.features?.length}></MyNum>
+                <MySub size={8}>Total feature(s)</MySub>
+              </div>
             </div>
           </div>
         </div>

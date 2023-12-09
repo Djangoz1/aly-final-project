@@ -12,7 +12,6 @@ import {
   FormEditProfile4,
 } from "sections/Form/forms/edit/FormEditProfile";
 import { useAccount } from "wagmi";
-import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 
 import { _apiPost, _apiPostAt } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";

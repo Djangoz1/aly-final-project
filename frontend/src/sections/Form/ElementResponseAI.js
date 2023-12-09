@@ -18,7 +18,7 @@ export const ElementResponseAI = ({
   let dispatch = useToolsDispatch();
   const { form } = useFormState();
   return (
-    <div className="w-full h-fit  py-2 px-4 hover:bg-white/5 flex flex-col on_hover relative">
+    <div className="w-full h-fit  py-2 px-4 hover:bg-white/5 flex  on_hover relative">
       <div className="absolute on_hover_view right-0 top-0  flex items-center">
         <button
           className={`btn btn-xs btn-ghost ${
@@ -39,7 +39,10 @@ export const ElementResponseAI = ({
         </button>
       </div>
 
-      <TextAI style={"font-bold underline"} text={title}></TextAI>
+      <TextAI
+        style={"font-semibold c4 min-w-[30%] uppercase text-xs"}
+        text={title}
+      ></TextAI>
       {isEdit ? (
         <textarea
           className="textarea min-h-[10vh] bg-transparent p-0 m-0 w-full border-0 textarea-xs focus:bg-transparent textarea-ghost"

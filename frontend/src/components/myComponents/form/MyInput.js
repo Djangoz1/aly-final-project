@@ -105,7 +105,7 @@ export let MyInput = ({
   }, [max]);
 
   return (
-    <div className={` ${styles || "w-fit mr-5 c3 "}`}>
+    <div className={` ${styles || "w-fit  c3 "}`}>
       {label !== false && (
         <label
           className={`label font-light w-fit   leading-0 text-xs mb-1  py-0  uppercase 

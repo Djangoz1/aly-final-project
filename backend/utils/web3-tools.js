@@ -12,20 +12,26 @@ const {
   createURIPub,
   createURILaunchpad,
   createURI,
+  pocketClient,
 } = require("./pinata");
 
-let _createCV = async (name, account, addressSystem) => {
+let _createCV = async ({ metadatas, account, addressSystem }) => {
   let _iAS = await getContractAt("AddressSystem", addressSystem);
   let _addrG = await _iAS.apiGet();
   let _addrP = await _iAS.apiPost();
   let _addrCVH = await _iAS.cvsHub();
-
+  if (!metadatas?.username) {
+    throw new Error("Create CV : Missing username");
+  }
   let apiGet = await getContractAt("APIGet", _addrG);
   let apiPost = await getContractAt("APIPost", _addrP);
 
   let tokenURI = await createURICV({
-    name,
+    username: metadatas.username,
+    description: metadatas?.description,
+    avatar: metadatas?.avatar,
   });
+  console.log("token", tokenURI);
 
   await apiPost.connect(account).createCV(tokenURI);
 
@@ -99,7 +105,7 @@ let _createMission = async ({
   if (account.address != (await apiGet.ownerOfToken(id, _addrMH))) {
     throw new Error("Error Missions: URI ID");
   }
-  return { missionID: id, launchpadID };
+  return { missionID: id, missionHash: uri, launchpadID };
 };
 
 let _createFeature = async ({
@@ -110,10 +116,12 @@ let _createFeature = async ({
   specification,
   title,
   description,
+  skills,
   account,
   accounts,
   finish,
   wadge,
+  abstract,
   domain,
   addressSystem,
 }) => {
@@ -151,7 +159,9 @@ let _createFeature = async ({
     missionID: idMission,
     title,
     description,
-    attributes: [{ domain }],
+    domain,
+    abstract,
+    skills,
   });
 
   if (launchpadID) {
@@ -183,6 +193,7 @@ let _createFeature = async ({
         }
       );
   }
+  await pocketClient.records.update("features", uri, { deployedID: featureID });
 
   if (account.address != (await apiGet.ownerOfToken(featureID, _addrFH))) {
     throw new Error("Error Feature: URI ID");
@@ -200,7 +211,12 @@ let _createFeature = async ({
     }
   }
 
-  return { id: featureID, launchpadID, missionID: _missionID };
+  return {
+    featureID: featureID,
+    featureHash: uri,
+    launchpadID,
+    missionID: _missionID,
+  };
 };
 
 let _createLaunchpad = async ({

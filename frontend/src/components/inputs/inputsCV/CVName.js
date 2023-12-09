@@ -10,6 +10,9 @@ import { _apiGet } from "utils/ui-tools/web3-tools";
 
 export const CVName = ({ styles, metadata, cvID }) => {
   const { cv } = useAuthState();
+  if (cvID == 0) {
+    return "No worker";
+  }
   const [isName, setIsName] = useState(null);
   let ref = useRef(null);
   let isInView = useInView(ref);
@@ -26,7 +29,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
   };
 
   useEffect(() => {
-    if ((!isName || (isName != metadata?.username && metadata)) && isInView) {
+    if (!isName && isInView) {
       state();
     }
   }, [cvID, metadata, isInView]);

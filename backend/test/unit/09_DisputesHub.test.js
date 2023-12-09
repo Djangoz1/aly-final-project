@@ -11,7 +11,7 @@ const { ZERO_ADDRESS, getAccount } = require("../../helpers/test_utils");
 
 const CONTRACT_NAME = "DisputesHub";
 
-describe.only(`Contract ${CONTRACT_NAME} `, () => {
+describe(`Contract ${CONTRACT_NAME} `, () => {
   let addressSystem;
   let contract;
   let apiPost;
@@ -203,7 +203,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
       });
     });
 
-    describe.only("Dispute Contract", () => {
+    describe("Dispute Contract", () => {
       let dispute;
       let disputeID;
       let tokenURI = "disputesURI";
@@ -359,7 +359,7 @@ describe.only(`Contract ${CONTRACT_NAME} `, () => {
         });
       });
 
-      describe.only("Scenario", () => {
+      describe("Scenario", () => {
         describe("Senario : With 4 arbitrators", () => {
           /**
            * @notice Test de l'init de la dispute

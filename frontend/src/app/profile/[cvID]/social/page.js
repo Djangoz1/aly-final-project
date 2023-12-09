@@ -13,11 +13,11 @@ import {
 import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
-import { CVProfile } from "sections/Profile/state/CVProfile";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
 import { MyLayoutHeader } from "components/myComponents/layout/MyLayoutHeader";
+import { LayoutSocial } from "sections/Layout/layouts/LayoutSocial";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -38,14 +38,21 @@ function App({ params }) {
       url={"/social"}
     >
       <>
-        <MyLayoutHeader
-          username={state?.profile?.metadatas?.username}
-          image={state?.profile?.metadatas?.avatar}
-          cvID={state?.profile?.cvID}
-          banniere={state?.profile?.metadatas?.banniere}
-          metadatas={state?.profile?.metadatas}
+        <LayoutSocial
+          pubs={
+            state?.pubs?.length > 0
+              ? [
+                  ...state?.pubs?.reverse()?.map((el) => {
+                    return {
+                      metadatas: el?.metadatas,
+                      owner: state?.profile?.metadatas,
+                    };
+                  }),
+                ]
+              : null
+          }
+          owner={state?.profile}
         />
-        <CVProfile />
       </>
     </LayoutProfile>
   );

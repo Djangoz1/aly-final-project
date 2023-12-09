@@ -25,8 +25,8 @@ function useParallax(value, distance) {
 export function Viewport({
   index,
   side,
-  particles,
   fixed,
+  inherit,
   img,
   full,
   background,
@@ -69,7 +69,9 @@ export function Viewport({
       <section
         // style={{ overflow: "scroll" }}
         id={`section${index}`}
-        className="viewport -z-1  w-[100vw] flex flex-col  font2  h-[100vh] mb-10 carr-sec"
+        className={` -z-1  w-screen flex flex-col  font2  ${
+          inherit ? inherit : "h-screen"
+        } carr-sec`}
       >
         {!background
           ? img?.image
@@ -120,7 +122,7 @@ export function Viewport({
         )}
       </section>
 
-      {fixed && (
+      {fixed ? (
         <AnimatePresence>
           <motion.div
             className="h-screen z-100 w-screen fixed py-20 top-0 left-0"
@@ -133,6 +135,8 @@ export function Viewport({
             {children}
           </motion.div>
         </AnimatePresence>
+      ) : (
+        <></>
       )}
     </>
   );

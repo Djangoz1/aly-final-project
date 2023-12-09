@@ -9,6 +9,9 @@ export const MyToggle = ({ style, target, children, label }) => {
     _form[target] = e.target.checked;
     doInitStateForm(dispatch, _form);
   };
+  if (form?.[target] === undefined) {
+    return <></>;
+  }
 
   return (
     <>

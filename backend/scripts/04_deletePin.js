@@ -16,8 +16,11 @@ const deleter = async () => {
     "follows_missions",
     "payable_posts",
     "posts",
+    "toDo",
     "missions",
+
     "launchpads",
+    "features",
     "cvs",
     "accounts",
   ];

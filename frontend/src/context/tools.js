@@ -69,17 +69,26 @@ export const doStateToolsLaunchpad = async ({
     let launchpad = await stateLaunchpad(launchpadID);
     console.log("launchpad", launchpad);
     let owner = { cvID: launchpad.owner.cvID, metadatas: launchpad.owner };
-    launchpad = { datas: launchpad.datas, metadatas: launchpad.metadatas };
+    launchpad = {
+      datas: launchpad.datas,
+      launchpadID: launchpad.launchpadID,
+      metadatas: launchpad.metadatas,
+    };
 
     console.log("taaaarget", target);
     console.log("launchpad tools", launchpad);
-    let _controllers = {};
+    let _controllers = {
+      social: async () => {
+        return await controllers.get.pub.list({ launchpad });
+      },
+    };
     console.log("controllers state", state);
     let _state = {
       owner,
       memory: [target],
       launchpad,
       gallery: null,
+      social: null,
       escrows: null,
       features: null,
     };
@@ -134,6 +143,13 @@ export const doStateToolsMission = async ({
           const featureID = mission?.datas?.features[index];
           features.push(await stateFeature(featureID));
         }
+        let result = await clientPocket.records.getList("features", 1, 50, {
+          filter: `deployedID = 0 && missionID = "${mission?.metadatas?.id}"`,
+        });
+
+        let _features = result.items.map((el) => ({ metadatas: el }));
+        features.push(..._features);
+
         return features;
       },
 
@@ -153,9 +169,11 @@ export const doStateToolsMission = async ({
       },
       overview: async () => {
         _state.features = await _controllers.features();
+        _state.pubs = await _controllers.pubs();
       },
       agendas: async () => {
         let events = [];
+        let toDo = [];
         if (!_state?.features) {
           _state.features = await _controllers.features();
         }
@@ -193,8 +211,21 @@ export const doStateToolsMission = async ({
 
             events.push(event);
           }
+          let result = await clientPocket.records.getList("toDo", 1, 50, {
+            filter: `featureID = "${feature?.metadatas?.id}"`,
+          });
+          if (result?.items?.length) {
+            toDo.push({ list: result.items, index });
+          }
         }
-        return events;
+
+        return { events, toDo };
+      },
+      gallery: async () => {
+        let records = await clientPocket.records.getList("gallery", 1, 50, {
+          filter: `missionID = "${mission?.metadatas?.id}"`,
+        });
+        return records.items;
       },
     };
     console.log("controllers state", _state);
@@ -226,6 +257,7 @@ export const doStateToolsProfile = async ({
       "-------- fucking disgrace -------",
       await controllers.get.profile.item({ cvID })
     );
+
     let owner = await controllers.get.profile.item({ cvID });
     let _state = {
       profile: owner,
@@ -311,6 +343,17 @@ export const doStateToolsProfile = async ({
         }
         return arbitrators;
       },
+      overview: async () => {
+        _state.features = await _controllers.features();
+        _state.profile = {
+          ..._state.profile,
+          details: await stateDetailsCV({
+            cvID,
+            ..._state.profile.datas,
+            id: _state.profile.metadatas.id,
+          }),
+        };
+      },
       notifications: async () => {
         let notifications = [];
         for (let index = 0; index < owner?.datas?.features?.length; index++) {
@@ -320,20 +363,31 @@ export const doStateToolsProfile = async ({
             notifications.push(feature);
           }
         }
-        let invites = [];
-        for (let index = 0; index < owner?.datas?.invites?.length; index++) {
-          const featureID = owner.datas?.invites[index];
+        let invitations = [];
+        for (
+          let index = 0;
+          index < owner?.datas?.invitations?.length;
+          index++
+        ) {
+          const featureID = owner.datas?.invitations[index];
 
-          invites.push(await stateFeature(featureID));
+          invitations.push(
+            await controllers.get.feature.item({
+              featureID,
+              withOwner: true,
+              expand: "missionID",
+            })
+          );
         }
-        return { demands: notifications, invites };
+        return { demands: notifications, invitations };
       },
     };
 
     _state?.memory.push(target);
 
     if (_controllers[target]) {
-      _state[target] = await _controllers[target]();
+      let result = await _controllers[target]();
+      if (result) _state[target] = result;
     }
 
     dispatch({

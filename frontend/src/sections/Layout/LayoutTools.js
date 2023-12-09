@@ -1,19 +1,9 @@
-"use client";
-
-import { MyHeader } from "components/myComponents/MyHeader";
 import "styles/app.css";
-import {
-  ToolsProvider,
-  doStateTools,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
+import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 import React, { useEffect } from "react";
 import { Header } from "./Header";
 import { useAccount } from "wagmi";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
-import { zeroAddress } from "viem";
-import { doStateCV } from "context/hub/cv";
 
 export const LayoutTools = ({ children, template, state }) => {
   let { address } = useAccount();

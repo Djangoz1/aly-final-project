@@ -4,34 +4,29 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
 import {
-  doStateProfileTools,
   doStateToolsMission,
-  doStateToolsProfile,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 
-import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
+import { icfy, icsystem } from "icones";
 
 import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
-import { CVProfile } from "sections/Profile/state/CVProfile";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
-import { MyModal } from "components/myComponents/modal/MyModal";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { MENUS, menus_id } from "constants/menus";
-import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
+import { menus_id } from "constants/menus";
+
 import { LayoutForm } from "sections/Form/LayoutForm";
-import { MySelects } from "components/myComponents/form/MySelects";
-import { stateCV, stateFeature } from "utils/ui-tools/state-tools";
+import { MySelect, MySelects } from "components/myComponents/form/MySelects";
+import { stateFeature } from "utils/ui-tools/state-tools";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MySub } from "components/myComponents/text/MySub";
 import { ChatBubble } from "components/ChatBubble";
-import { STATUS } from "constants/status";
+
 import { MyLayoutBtn } from "components/myComponents/btn/MyLayoutBtn";
 import { clientPocket } from "utils/ui-tools/pinata-tools";
 
@@ -58,7 +53,7 @@ export const LayoutMission = ({ missionID, url, children, controller }) => {
   };
 
   useEffect(() => {
-    if (isLoading === null || status === "idle" || status === "reload") {
+    if (isLoading === null) {
       fetch();
       console.log("Origin fetch");
     }
@@ -69,7 +64,7 @@ export const LayoutMission = ({ missionID, url, children, controller }) => {
   //     menus[1].sub[6] = undefined;
   //   }
 
-  let menus = menus_id("mission", missionID);
+  let menus = [...menus_id("mission", missionID)];
   if (state?.mission?.datas?.launchpad == 0) {
     menus[1].sub[5] = undefined;
   }
@@ -253,38 +248,39 @@ let Button = ({ controller, target, missionID }) => {
                     }
               }
               text={`If he sign first he gonna be your worker`}
-            >
-              <span className="flex items-center">
-                <MySub style={"flex mt-3 items-center"}></MySub>
-              </span>
-            </ChatBubble>
+            ></ChatBubble>
 
-            <MySelects
+            <MySelect
               styles={"mt-4"}
-              selects={[
-                {
-                  target: "feature",
-                  arr: isDatas?.features?.map(
-                    (el) =>
-                      `#${parseInt(el?.featureID)} ${el?.metadatas?.title}`
-                  ),
-                },
-              ]}
+              arr={state?.features?.map((el) =>
+                el?.datas?.status === 0 && !el?.datas?.isInviteOnly
+                  ? `#${parseInt(el?.featureID)} ${el?.metadatas?.title}`
+                  : undefined
+              )}
+              target="feature"
             />
             <MyMainBtn
-              setter={async (form) =>
-                await _apiPost("inviteWorker", [
-                  state?.profile?.missionID,
-                  isDatas?.features?.[form?.feature]?.featureID,
-                ])
-              }
+              setter={async (form) => {
+                console.log(
+                  form?.feature,
+                  state?.features?.[form?.feature]?.featureID
+                );
+                state?.mission?.datas?.owner != cv
+                  ? await _apiPost("askToJoin", [
+                      state?.features?.[form?.feature]?.featureID,
+                    ])
+                  : await _apiPost("inviteWorker", [
+                      state?.profile?.missionID,
+                      isDatas?.features?.[form?.feature]?.featureID,
+                    ]);
+              }}
               padding={"px-2 py-1 "}
               style={"mt-8 btn-xs"}
               color={1}
               template={1}
               form={true}
             >
-              Invite
+              {state?.mission?.datas?.owner != cv ? "Join" : "Invite"}
             </MyMainBtn>
           </LayoutForm>
         </div>,

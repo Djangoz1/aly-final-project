@@ -24,18 +24,18 @@ export const AgendasMission = () => {
   const { state, pointer } = useToolsState();
 
   let ref = useRef(null);
-
+  let { colors } = ENUMS;
   return (
-    <div className="w-full pt-20 mt-[1px] h-full flex-col flex" ref={ref}>
+    <div className="w-full   h-full flex-col flex" ref={ref}>
       <div className="flex w-full justify-between ">
         <MyCardInfos
           style={"rounded-none w-full mr-[1px] h-fit"}
-          arr={state?.agendas?.map((event) => {
+          arr={state?.agendas?.events?.map((event, i) => {
             return {
               // icon: ENUMS.domain?.[],
               title: (
                 <>
-                  <div className="badge badge-xs badge-primary mr-2" />
+                  <div className={`${colors?.[i]} badge badge-xs mr-2`} />
                   {event?.title}
                 </>
               ),
@@ -56,7 +56,7 @@ export const AgendasMission = () => {
         ></MyCardInfos>
 
         <div className={" backdrop-blur-[2px] p-0  w-full"} color={1}>
-          <MyCalendar events={state?.agendas} />
+          <MyCalendar events={state?.agendas?.events} />
         </div>
       </div>
     </div>

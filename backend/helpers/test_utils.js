@@ -23,15 +23,15 @@ const getAccount = (accounts, address) =>
   accounts.filter((el) => (el.address === address ? el : null));
 
 const CV_DATAS_URI_EXEMPLE = {
-  cvImg: "img/cv.jpeg",
+  // cvImg: "img/cv.jpeg",
   username: "Django",
   description: "CEO of deWork 🫅🏽",
-  banniere: "img/banniere.png",
-  avatar: "img/profile.jpeg",
+  // banniere: "img/banniere.png",
+  // avatar: "img/profile.jpeg",
   email: "jg.djangone@gmail.com",
-  visibility: true,
+  visibility: "true",
 
-  banniere: null,
+  // banniere: null,
   identity: JSON.stringify(
     {
       firstName: "Julien",

@@ -36,8 +36,7 @@ import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyBtns } from "components/myComponents/btn/MyBtns";
 import { useAuthState } from "context/auth";
 import { controllers } from "utils/controllers";
-import { AssetFreelancer } from "components/assets/AssetProfile";
-import { MENUS } from "constants/menus";
+
 import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { MyStatus } from "components/myComponents/item/MyStatus";
@@ -45,21 +44,25 @@ import Link from "next/link";
 import { MissionName } from "components/inputs/inputsMission/MissionName";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
-
+  let [isLoading, setIsLoading] = useState(null);
   let { metadatas } = useAuthState();
   let { state, pointer } = useToolsState();
   let dispatch = useToolsDispatch();
   let [isPointer, setIsPointer] = useState();
   useEffect(() => {
-    (async () =>
+    (async () => {
+      setIsLoading(true);
       doStateTools(dispatch, {
         lists: await controllers.get.feature.list({ filter: "" }),
-      }))();
+      });
+      setIsLoading(false);
+    })();
   }, []);
   console.log(state);
   return (
     <MyLayoutDashboard
       color={2}
+      isLoading={isLoading}
       target={"search"}
       owner={metadatas}
       url={"/search/jobs"}

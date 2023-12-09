@@ -31,42 +31,48 @@ export const MyNum = ({ num, toFix, style, children }) => {
   }, [num]);
   return (
     <span ref={ref} className={`flex items-center ${style}`}>
-      {isNums?.int?.map(
-        (el, i) =>
-          (isNums?.int?.length % 2 !== 0 && i != isNums?.int?.length - 1) ||
-          (isNums?.int?.length === 1 && (
+      {num == 0 ? (
+        0
+      ) : (
+        <>
+          {isNums?.int?.map(
+            (el, i) =>
+              (isNums?.int?.length % 2 !== 0 && i != isNums?.int?.length - 1) ||
+              (isNums?.int?.length === 1 && (
+                // (i > 0 && parseInt(el) > 0) ||
+                <span
+                  key={`int${i}`}
+                  className="countdown w-fit m-0   leading-none p-0 tracking-[-0.5px]"
+                >
+                  <span
+                    style={{
+                      "--value": !isInView ? 0 : parseInt(el) || 0,
+                    }}
+                  ></span>
+                </span>
+              ))
+          )}
+          {isNums?.int?.length % 2 !== 0 && isNums?.int?.length > 1 ? (
             // (i > 0 && parseInt(el) > 0) ||
-            <span
-              key={`int${i}`}
-              className="countdown w-fit m-0   leading-none p-0 tracking-[-0.5px]"
-            >
+            <span className=" w-fit m-0   leading-none p-0 tracking-[-0.5px]">
+              <span>{isNums?.int?.[isNums?.int?.length - 1]}</span>
+            </span>
+          ) : (
+            <></>
+          )}
+          {isNums?.float?.length > 0 && "."}
+          {isNums?.float?.map((el, i) => (
+            <span key={"float " + el + i} className="countdown">
               <span
+                key={"float" + el + i}
                 style={{
                   "--value": !isInView ? 0 : parseInt(el) || 0,
                 }}
               ></span>
             </span>
-          ))
+          ))}
+        </>
       )}
-      {isNums?.int?.length % 2 !== 0 && isNums?.int?.length > 1 ? (
-        // (i > 0 && parseInt(el) > 0) ||
-        <span className=" w-fit m-0   leading-none p-0 tracking-[-0.5px]">
-          <span>{isNums?.int?.[isNums?.int?.length - 1]}</span>
-        </span>
-      ) : (
-        <></>
-      )}
-      {isNums?.float?.length > 0 && "."}
-      {isNums?.float?.map((el, i) => (
-        <span key={"float " + el + i} className="countdown">
-          <span
-            key={"float" + el + i}
-            style={{
-              "--value": !isInView ? 0 : parseInt(el) || 0,
-            }}
-          ></span>
-        </span>
-      ))}
       {children}
     </span>
   );

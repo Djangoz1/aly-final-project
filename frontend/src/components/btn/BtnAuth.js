@@ -75,7 +75,8 @@ export const BtnAuth = ({ drawerBtn }) => {
                   }
                 >
                   <Avatar
-                    CID={metadatas?.image}
+                    metadatas={metadatas}
+                    CID={metadatas?.avatar}
                     style={"w-12 ml-2 mr-4 rounded-full"}
                   />
                   <div

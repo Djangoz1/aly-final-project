@@ -26,7 +26,7 @@ import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
 import { Viewport } from "components/myComponents/layout/MyViewport";
-import { CVProfile } from "sections/Profile/state/CVProfile";
+
 import { _apiGet, _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { MyModal } from "components/myComponents/modal/MyModal";

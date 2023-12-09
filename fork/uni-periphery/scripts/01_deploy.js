@@ -16,12 +16,17 @@ async function main() {
     this.addr6,
     this.addr7,
   ] = await ethers.getSigners();
+  const token = await ethers.deployContract("ERC20", 100000 * 10 ** 18);
 
   const weth = await ethers.deployContract("WETH9");
   const uniRouter = await ethers.deployContract("UniswapV2Router02", [
     address.factory,
     weth.target,
   ]);
+
+  await uniRouter.createPair(token.target, weth.target);
+  let pair = await uniRouter.getPair(token.target, weth.target);
+  console.log(pair);
 
   console.log("Uniswap router deployed to", uniRouter.target);
   console.log("WETH9 deployed to", weth.target);

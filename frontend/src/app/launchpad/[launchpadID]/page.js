@@ -30,6 +30,7 @@ import { MyNum } from "components/myComponents/text/MyNum";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { StateLaunchpadInfos } from "sections/Launchpad/state/StateLaunchpadInfos";
 import { MyTitle } from "components/myComponents/text/MyTitle";
+import { MyBadge } from "components/myComponents/box/MyList";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -44,7 +45,6 @@ function App({ params }) {
     <LayoutLaunchpad
       controller={"overview"}
       launchpadID={launchpadID}
-      refresh={() => doStateLaunchpadTools({ dispatch, launchpadID })}
       url={"/"}
     >
       <MyLayoutHeader
@@ -55,20 +55,39 @@ function App({ params }) {
         metadatas={state?.owner?.metadatas}
       >
         <div className="flex absolute top-2 right-2 items-center">
-          <Icon icon={icfyTIME} className="mr-2" />
-          <MyCountdown
-            style={"mt-2 "}
-            size={10}
-            startDate={Math.floor(Date.now() / 1000)}
-            check={
-              Math.floor(Date.now() / 1000) < state?.launchpad?.datas?.endDate
-            }
-            timestamp={parseInt(
-              state?.launchpad?.datas?.status === 1
-                ? state?.launchpad?.datas?.saleEnd
-                : state?.launchpad?.datas?.saleStart
-            )}
-          />
+          <MyBadge style={"mr-3"} color={1}>
+            <MySub style={"c4 mr-2 text-xs"}>Max cap</MySub>
+            <MyNum
+              num={ethers.utils.formatEther(
+                `${state?.launchpad?.datas?.maxCap || 0}`
+              )}
+              toFix={0}
+            />{" "}
+            ETH
+          </MyBadge>
+          <MyBadge color={1} style={"mr-3"}>
+            <MySub style={"c4 mr-2 text-xs"}>Min cap</MySub>
+            <MyNum
+              num={ethers.utils.formatEther(
+                `${state?.launchpad?.datas?.minCap || 0}`
+              )}
+              toFix={0}
+            />{" "}
+            ETH
+          </MyBadge>
+          <MyBadge color={1}>
+            <Icon icon={icfyTIME} className="mr-2" />
+            <MyCountdown
+              style={" "}
+              size={10}
+              startDate={Math.floor(Date.now() / 1000)}
+              timestamp={parseInt(
+                state?.launchpad?.datas?.status === 1
+                  ? state?.launchpad?.datas?.saleEnd
+                  : state?.launchpad?.datas?.saleStart
+              )}
+            />
+          </MyBadge>
         </div>
       </MyLayoutHeader>
       <div className="flex items-center gap-3 w-full -translate-y-1/2">
@@ -82,41 +101,20 @@ function App({ params }) {
         >
           <MyNum num={state?.launchpad?.datas?.totalUser} />
         </MyChart>
-        <MyCard
-          styles={"w-fit h-fit flex items-center gap-4 flex-col px-2 py-1"}
-        >
-          <Icon className="text-2xl" icon={icfyETHER} />
-          <MySub style={"c4"}>Max cap</MySub>
-          <MyNum
-            num={ethers.utils.formatEther(
-              `${state?.launchpad?.datas?.maxCap || 0}`
-            )}
-            toFix={0}
-          />
-        </MyCard>
-        <MyCard
-          styles={"w-fit h-fit flex items-center gap-4 flex-col px-2 py-1"}
-        >
-          <Icon className="text-2xl" icon={icfyETHER} />
-          <MySub style={"c4"}>Max cap</MySub>
-          <MyNum
-            num={ethers.utils.formatEther(
-              `${state?.launchpad?.datas?.minCap || 0}`
-            )}
-            toFix={0}
-          />
-        </MyCard>
       </div>
 
-      <div className="px-5">
-        <MyTitle style="mb-4 underline">Description</MyTitle>
+      <div className="flex c4 my-3 px-4 ">
+        <MyTitle style=" text-[8px] min-w-[15%]">Description</MyTitle>
 
-        <article className="text-xs   my-3 text-justify whitespace-break-spaces font-light">
+        <article className="text-xs   hover:text-white  text-justify whitespace-break-spaces font-light">
           {state?.launchpad?.metadatas?.description}
         </article>
       </div>
+      <div className="flex mt-5 w-full  px-4">
+        <MyTitle style="c4 text-[8px] min-w-[15%] ">Informations</MyTitle>
 
-      <StateLaunchpadInfos />
+        <StateLaunchpadInfos />
+      </div>
     </LayoutLaunchpad>
   );
 }

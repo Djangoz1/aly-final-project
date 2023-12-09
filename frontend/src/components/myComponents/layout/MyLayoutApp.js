@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 
@@ -72,7 +70,9 @@ export let MyLayoutApp = ({
           alt=""
           className="fixed -z-[0] h-screen w-screen top-0 left-0 object-cover"
         />
-      ) : undefined}
+      ) : (
+        <></>
+      )}
       {children}
       {template > 0 ? (
         <Viewport

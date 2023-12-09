@@ -4,6 +4,7 @@ import { MySub } from "../text/MySub";
 import { MyTitle } from "../text/MyTitle";
 import { v4 } from "uuid";
 import { MyCard } from "../card/MyCard";
+import { ENUMS } from "constants/enums";
 
 export const MyList = ({ withoutBtn, title, arr, description, head }) => {
   return (
@@ -37,6 +38,7 @@ export const MyList = ({ withoutBtn, title, arr, description, head }) => {
                 {head ? (
                   head.map((el, i) => (
                     <th
+                      key={v4()}
                       className={` py-3 ${
                         i === 0
                           ? "pe-3"
@@ -74,17 +76,20 @@ export const MyList = ({ withoutBtn, title, arr, description, head }) => {
             {/* <!-- Table Body --> */}
             <tbody>
               {arr?.map((el) => (
-                <tr key={v4()} className="border-b border-white/5">
+                <tr
+                  key={v4()}
+                  className="border-b hover:bg-white/5 border-white/5"
+                >
                   {el?.map((el1, i) => (
                     <td
                       key={v4()}
                       className={`${
                         i === 0
                           ? "pe-3 text-start text-xs"
-                          : i === el1.length - 1
+                          : i === el1?.length - 1
                           ? "ps-3"
                           : "p-3 font-medium"
-                      } py-3  hover:text-white c4`}
+                      } py-3   hover:text-white c4`}
                     >
                       {el1}
                     </td>
@@ -119,9 +124,19 @@ export const MyList = ({ withoutBtn, title, arr, description, head }) => {
   );
 };
 
-export const MyBadge = ({ children }) => {
+export const MyBadge = ({ style, children, color }) => {
   return (
-    <div className="inline-block rounded-full bg-rose-100 px-2 py-1 text-xs font-semibold leading-4 whitespace-nowrap text-rose-800">
+    <div
+      className={`${
+        style || "min-w-[40px] text-xs"
+      } flex rounded-full   px-2 py-1  justify-center leading-4 whitespace-nowrap w-fit flex-nowrap min-w-[40px] text-center    ${
+        [
+          "text-rose-800 bg-rose-100",
+          "bg-gradient-to-l from-slate-800 border border-white/5 to-zinc-950 backdrop-blur",
+          ...ENUMS.colors,
+        ]?.[color || 0]
+      }`}
+    >
       {children}
     </div>
   );

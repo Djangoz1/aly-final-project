@@ -166,11 +166,11 @@ html {
 }
 
 .carr-sec {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
 
   position: relative;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   perspective: 500px;
 }
 

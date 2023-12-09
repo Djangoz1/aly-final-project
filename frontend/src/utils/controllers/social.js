@@ -3,12 +3,16 @@ import { _apiPost } from "utils/ui-tools/web3-tools";
 
 export const controllersPub = {
   create: async (form) => {
+    if (!form.owner.id) {
+      throw new Error("Missing owner ID");
+    }
     try {
       let metadatas = {
         description: form.description,
         image: form?.image,
         postID: form?.answerID,
         missionID: form?.mission?.metadatas?.id,
+        launchpadID: form?.launchpadID,
         title: form?.title,
         tags: form?.tags,
         userID: form.owner.id,
@@ -25,10 +29,25 @@ export const controllersPub = {
     }
   },
   get: {
-    list: async ({ userID, missionHash }) => {
+    list: async ({ userID, missionHash, launchpadHash }) => {
       if (missionHash) {
         const resultList = await clientPocket.records.getList("posts", 1, 50, {
           filter: `missionID = "${missionHash}"`,
+        });
+
+        let lists = [];
+        for (let index = 0; index < resultList.items.length; index++) {
+          const element = resultList.items[index];
+          let owner = await clientPocket.records.getOne(
+            "accounts",
+            element?.userID
+          );
+          lists.push({ metadatas: element, owner });
+        }
+        return lists;
+      } else if (launchpadHash) {
+        const resultList = await clientPocket.records.getList("posts", 1, 50, {
+          filter: `launchpadID = "${launchpadHash}"`,
         });
 
         let lists = [];
@@ -47,9 +66,7 @@ export const controllersPub = {
         });
 
         let lists = [];
-        return resultList.items.map((el) => {
-          return { metadatas: el };
-        });
+        return resultList.items.map((el) => ({ metadatas: el }));
       }
     },
   },

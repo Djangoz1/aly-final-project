@@ -43,7 +43,7 @@ export let fetchStatsOfCV = async (cvID) => {
 
     let amount = 0;
 
-    let notifications = [];
+    let notifications = 0;
     for (let index = 0; index < features.length; index++) {
       const featureID = features[index];
       let datas = await _apiGet("datasOfWork", [featureID]);

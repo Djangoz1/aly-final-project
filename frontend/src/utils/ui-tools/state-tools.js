@@ -10,6 +10,7 @@ import { findBadges, stateDetailsMission } from "utils/works/tools";
 import { ethers } from "ethers";
 import { _api } from "@iconify/react";
 import { STATUS } from "constants/status";
+import { controllers } from "utils/controllers";
 
 export const stateCV = async (cvID) => {
   if (cvID?.cvID) {
@@ -27,122 +28,166 @@ export const stateCV = async (cvID) => {
   }
 };
 
-export const stateDetailsCV = async (cvID) => {
-  let _jobs = await _apiGet("jobsOfCV", [cvID]);
+export const stateDetailsCV = async ({
+  cvID,
+  features,
+  proposals,
+  launchpads,
+  missions,
+  id,
+}) => {
+  if (cvID) {
+    let _jobs = await _apiGet("jobsOfCV", [cvID]);
+  }
+
+  let details = {
+    work: {
+      depense: 0,
+      wadge: 0,
+    },
+    launchpad: {
+      raised: 0,
+    },
+    social: {
+      pubs: 0,
+      followers: 0,
+      followed: 0,
+    },
+    escrows: {
+      disputes: 0,
+    },
+  };
+
+  for (let index = 0; index < features?.length; index++) {
+    const feature = await stateFeature(features[index]);
+    details.work.depense += parseInt(feature.datas.wadge);
+    if (feature?.datas?.dispute) {
+      details.escrows.dispute++;
+    }
+  }
+
+  for (let index = 0; index < proposals?.length; index++) {
+    const feature = await stateFeature(proposals[index]);
+    details.work.wadge += parseInt(feature.datas.wadge);
+    if (feature?.datas?.dispute) {
+      details.escrows.dispute++;
+    }
+  }
+
+  for (let index = 0; index < launchpads?.length; index++) {
+    const launchpad = await stateLaunchpad(launchpads[index]);
+    details.launchpad.raised += parseInt(launchpad?.datas?.amountRaised);
+  }
+
+  let request = await controllers.get.pub.list({ userID: id });
+
+  details.social.pubs = request?.length || 0;
+  request = await controllers.get.follower.list({ userID: id });
+  details.social.followed = request?.length || 0;
 
   let badges = [];
 
   let _wadge = 0;
 
-  let features = [];
-  let arbitrators = [];
-  let disputes = [];
-  let _arbitrators = [];
+  // let features = [];
+  // let arbitrators = [];
+  // let disputes = [];
+  // let _arbitrators = [];
 
-  for (let index = 0; index < _jobs?.length; index++) {
-    const featureID = _jobs[index];
-    let feature = await stateFeature(featureID);
-    !badges.includes(feature?.datas?.specification) &&
-      badges.push(feature?.datas?.specification);
-    _wadge += parseFloat(feature?.datas?.wadge);
+  // for (let index = 0; index < _jobs?.length; index++) {
+  //   const featureID = _jobs[index];
+  //   let feature = await stateFeature(featureID);
+  //   !badges.includes(feature?.datas?.specification) &&
+  //     badges.push(feature?.datas?.specification);
+  //   _wadge += parseFloat(feature?.datas?.wadge);
 
-    if (feature?.datas?.status === 2) {
-      let arbitration = await _apiGet("arbitrationOfCV", [
-        cvID,
-        feature?.datas?.specification,
-      ]);
-      if (!_arbitrators.includes(arbitration)) {
-        _arbitrators.push({
-          arbitratorID: arbitration,
-          courtID: feature?.datas?.specification,
-        });
-      }
-    }
-    if (feature?.datas?.dispute) {
-      disputes.push(featureID);
-    }
+  //   if (feature?.datas?.status === 2) {
+  //     let arbitration = await _apiGet("arbitrationOfCV", [
+  //       cvID,
+  //       feature?.datas?.specification,
+  //     ]);
+  //     if (!_arbitrators.includes(arbitration)) {
+  //       _arbitrators.push({
+  //         arbitratorID: arbitration,
+  //         courtID: feature?.datas?.specification,
+  //       });
+  //     }
+  //   }
+  //   if (feature?.datas?.dispute) {
+  //     disputes.push(featureID);
+  //   }
 
-    features.push({
-      featureID: feature?.featureID,
-      title: feature?.metadatas?.title,
-      dispute: feature?.datas?.dispute,
-      domain: feature?.metadatas?.attributes?.[0]?.domain,
-      specification: feature?.datas?.specification,
-      status: feature?.datas?.status,
-      specification: feature?.datas?.specification,
-      wadge: feature?.datas?.wadge,
-    });
-  }
+  //   features.push({
+  //     featureID: feature?.featureID,
+  //     title: feature?.metadatas?.title,
+  //     dispute: feature?.datas?.dispute,
+  //     domain: feature?.metadatas?.attributes?.[0]?.domain,
+  //     specification: feature?.datas?.specification,
+  //     status: feature?.datas?.status,
+  //     specification: feature?.datas?.specification,
+  //     wadge: feature?.datas?.wadge,
+  //   });
+  // }
 
-  for (let index = 0; index < _arbitrators?.length; index++) {
-    let arbitrator = {
-      arbitratorID: _arbitrators[index]?.arbitratorID,
-      courtID: _arbitrators[index]?.courtID,
-      disputes: [],
-    };
+  // for (let index = 0; index < _arbitrators?.length; index++) {
+  //   let arbitrator = {
+  //     arbitratorID: _arbitrators[index]?.arbitratorID,
+  //     courtID: _arbitrators[index]?.courtID,
+  //     disputes: [],
+  //   };
 
-    let disputes = await _apiGet("indexerOfToken", [
-      _arbitrators[index]?.arbitratorID,
-      ADDRESSES["disputesDatasHub"],
-    ]);
+  //   let disputes = await _apiGet("indexerOfToken", [
+  //     _arbitrators[index]?.arbitratorID,
+  //     ADDRESSES["disputesDatasHub"],
+  //   ]);
 
-    for (let index1 = 0; index1 < disputes?.length; index1++) {
-      arbitrator.disputes.push({
-        disputeID: disputes[index1],
-        allowance: await _apiGet("allowanceOfArbitrator", [
-          disputes[index1],
-          arbitrator.arbitratorID,
-        ]),
-      });
-    }
-    arbitrators.push(arbitrator);
+  //   for (let index1 = 0; index1 < disputes?.length; index1++) {
+  //     arbitrator.disputes.push({
+  //       disputeID: disputes[index1],
+  //       allowance: await _apiGet("allowanceOfArbitrator", [
+  //         disputes[index1],
+  //         arbitrator.arbitratorID,
+  //       ]),
+  //     });
+  //   }
+  //   arbitrators.push(arbitrator);
 
-    // let arbitrator = await _apiGet("datasOfArbitrator", [_arbitrators[index]?.arbitratorID]);
-    // let disputes = await _apiGet("indexerOfToken", [
-    //   _arbitrators[index]?.arbitratorID,
-    //   ADDRESSES["disputesDatasHub"],
-    // ]);
-    // let _disputes = [];
-    // for (let index = 0; index < disputes.length; index++) {
-    //   const disputeID = disputes[index];
+  // let arbitrator = await _apiGet("datasOfArbitrator", [_arbitrators[index]?.arbitratorID]);
+  // let disputes = await _apiGet("indexerOfToken", [
+  //   _arbitrators[index]?.arbitratorID,
+  //   ADDRESSES["disputesDatasHub"],
+  // ]);
+  // let _disputes = [];
+  // for (let index = 0; index < disputes.length; index++) {
+  //   const disputeID = disputes[index];
 
-    //   let dispute = await _apiGet("datasOfDispute", [disputeID]);
-    //   let uriFeature = await _apiGet("tokenURIOf", [
-    //     dispute?.featureID,
-    //     ADDRESSES["featuresHub"],
-    //   ]);
-    //   let metadatas = await fetchJSONByCID(uriFeature);
-    //   dispute.title = await metadatas?.title;
-    //   dispute.allowance = await _apiGet("allowanceOfArbitrator", [
-    //     dispute?.id,
-    //     _arbitrators[index]?.arbitratorID,
-    //   ]);
-    //   _disputes.push(dispute);
-    // }
+  //   let dispute = await _apiGet("datasOfDispute", [disputeID]);
+  //   let uriFeature = await _apiGet("tokenURIOf", [
+  //     dispute?.featureID,
+  //     ADDRESSES["featuresHub"],
+  //   ]);
+  //   let metadatas = await fetchJSONByCID(uriFeature);
+  //   dispute.title = await metadatas?.title;
+  //   dispute.allowance = await _apiGet("allowanceOfArbitrator", [
+  //     dispute?.id,
+  //     _arbitrators[index]?.arbitratorID,
+  //   ]);
+  //   _disputes.push(dispute);
+  // }
 
-    // arbitrators.arr.push({
-    //   court: arbitrator?.courtID,
-    //   arbitratorID: _arbitrators[index]?.arbitratorID,
-    //   disputes: _disputes,
-    // });
+  // arbitrators.arr.push({
+  //   court: arbitrator?.courtID,
+  //   arbitratorID: _arbitrators[index]?.arbitratorID,
+  //   disputes: _disputes,
+  // });
 
-    // arbitrators.totalBalance += parseInt(arbitrator?.balance);
-    // arbitrators.totalArbitration += parseInt(arbitrator?.nbArbitrations);
-  }
+  // arbitrators.totalBalance += parseInt(arbitrator?.balance);
+  // arbitrators.totalArbitration += parseInt(arbitrator?.nbArbitrations);
+  // }
 
-  let wadge = _jobs?.length > 0 ? _wadge / _jobs.length : 0;
+  // let wadge = _jobs?.length > 0 ? _wadge / _jobs.length : 0;
 
-  return {
-    missions: null,
-    badges,
-    wadge,
-    invites: null,
-    launchpads: null,
-    arbitrators,
-
-    features,
-    disputes,
-  };
+  return details;
 };
 
 export const stateDispute = async (disputeID) => {

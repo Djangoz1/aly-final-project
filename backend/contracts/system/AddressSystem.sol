@@ -14,6 +14,9 @@ contract AddressSystem is Ownable {
     address public accessControl;
     address public missionsHub;
     address public factory;
+    address public challengesHub;
+    address public challengersHub;
+
     address public balancesHub;
     address public featuresHub;
     address public collectWorkInteraction;
@@ -46,6 +49,8 @@ contract AddressSystem is Ownable {
             disputesHub != address(0) &&
             missionsHub != address(0) &&
             cvsDatasHub != address(0) &&
+            challengersHub != address(0) &&
+            challengesHub != address(0) &&
             cvsHub != address(0) &&
             featuresHub != address(0) &&
             workProposalHub != address(0) &&
@@ -99,6 +104,19 @@ contract AddressSystem is Ownable {
     // -------------------------------- //
     // ************* WORKS ************ //
     // ************* ----- ************ //
+    function setChallengesHub() external {
+        require(challengesHub == address(0), "ChallengesHub already init");
+        challengesHub = msg.sender;
+        _hasInit();
+    }
+
+    function setChallengersHub() external {
+        require(challengersHub == address(0), "ChallengersHub already init");
+        challengersHub = msg.sender;
+
+        _hasInit();
+    }
+
     function setCollectWorkInteraction() external {
         require(
             collectWorkInteraction == address(0),

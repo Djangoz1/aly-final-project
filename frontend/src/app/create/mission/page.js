@@ -33,24 +33,21 @@ import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 import { icfyETHER } from "icones";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import { clientPocket, createURI } from "utils/ui-tools/pinata-tools";
-import { useCVState } from "context/hub/cv";
 import {
   FormCreateMission1,
   FormCreateMission2,
 } from "sections/works/Missions/form/create/FormCreateMission";
-import { MyLoader } from "components/myComponents/layout/MyLoader";
-import PocketBase from "pocketbase";
-import { TextAI } from "components/myComponents/text/TextAI";
+
 import { FormResponseAI } from "sections/Form/FormResponseAI";
 import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
+import { controllers } from "utils/controllers";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useToolsDispatch();
   let { state, pointer } = useToolsState();
   let [price, setPrice] = useState(0.5); // ! balancesHub.missionPrice()
-  let { metadatas, cv } = useAuthState();
-  let { cvID } = useCVState();
+  let { metadatas, cv, datas } = useAuthState();
 
   _form_create_mission[0].title = (
     <>
@@ -59,19 +56,18 @@ const PageCreateProfile = () => {
   );
 
   let submitForm = async (form) => {
-    let _txs = { db: null, bc: null, submit: true };
+    let _txs = { db: null, bc: null, result: null, submit: true };
     await doStateTools(dispatch, {
       ...state,
       txs: { pointer: 0, ..._txs },
     });
-    const client = new PocketBase("http://127.0.0.1:8090");
-    console.log("before submit", form?.ai);
+
     let aiAssist = form?.aiAssisted;
     let metadatas = {
       description: aiAssist
         ? form?.ai?.recommandations?.detail
         : form?.description,
-      abstact: aiAssist && form?.ai?.recommandations?.abstract,
+      abstact: aiAssist ? form?.ai?.recommandations?.abstract : form?.abstract,
       title: aiAssist ? form?.ai?.recommandations?.name : form?.title,
       budget: aiAssist
         ? form?.ai?.recommandations?.budget?.total
@@ -84,8 +80,8 @@ const PageCreateProfile = () => {
       owner: cv,
     };
 
-    const record = await client.records.create("missions", metadatas);
-    console.log("jai eu le record", record);
+    const record = await clientPocket.records.create("missions", metadatas);
+
     _txs.db = record;
 
     await doStateTools(dispatch, {
@@ -96,44 +92,63 @@ const PageCreateProfile = () => {
     //   ! Recuperation de l'ID
     let uri = record.id;
 
-    //   ! Decoment for create mission on blockchain
+    //   ! Decoment for create mission only on db
     // return;
 
+    let hash;
     let price = await _apiGetAt({
       func: "missionPrice",
       targetContract: "balancesHub",
     });
 
+    console.log("ici", form);
     try {
-      let hash = await _apiPostPayable("createMission", [uri], price);
-      _txs.bc = hash;
-      await doStateTools(dispatch, {
-        ...state,
-        txs: { pointer: 2, ..._txs },
-      });
-      let _featureMetadatas = [];
+      console.log("wtf", form);
+      if (form?.launchpad >= 0 && form?.launchpad !== null) {
+        hash = await _apiPost("createMissionLaunchpad", [
+          datas?.launchpads[parseInt(form?.launchpad)],
+          uri,
+        ]);
+      } else {
+        console.log("wtf-----", form);
+        hash = await _apiPostPayable("createMission", [uri], price);
+      }
+    } catch (error) {
+      await clientPocket.records.delete("missions", uri);
+
+      return;
+    }
+
+    let missionID = await _apiGet("tokensLengthOf", [ADDRESSES["missionsHub"]]);
+
+    _txs.bc = hash;
+    await doStateTools(dispatch, {
+      ...state,
+      txs: { pointer: 2, ..._txs },
+    });
+
+    if (aiAssist) {
       for (
         let index = 0;
         index < form?.ai?.recommandations?.roles.length;
         index++
       ) {
-        const element = form?.ai?.recommandations?.roles[index];
-        let _metadatasFeature = {
+        let element = form?.ai?.recommandations?.roles[index];
+        let datas = {
+          missionID: missionID,
+          missionHash: uri,
           title: element?.role_name,
           abstract: element?.reason,
           skills: JSON.stringify(element?.skills_required, null, 2),
-          budget: form?.ai?.recommandations?.budget?.roles_budget?.[index] || 0,
-          missionID: uri,
-          deployed: false,
         };
-        console.log("_metadatas", _metadatasFeature);
-        await clientPocket.records.create("features", _metadatasFeature);
-        _featureMetadatas.push(_metadatasFeature);
-        console.log(_featureMetadatas);
+
+        await controllers.create.feature(datas);
       }
-    } catch (error) {
-      await clientPocket.records.delete("missions", uri);
-      console.log("missions delete");
+      _txs.result = `/works/mission/${missionID}`;
+      await doStateTools(dispatch, {
+        ...state,
+        txs: { pointer: 3, ..._txs },
+      });
     }
   };
 

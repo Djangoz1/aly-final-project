@@ -26,9 +26,13 @@ import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
 import { ChatBubble } from "components/ChatBubble";
 import { doStateTools } from "context/tools";
 import { MyInput } from "components/myComponents/form/MyInput";
+import { stateMission } from "utils/ui-tools/state-tools";
+import { useAuthState } from "context/auth";
+import { ENUMS } from "constants/enums";
 
 export const FormResponseAI = () => {
   const { form, target } = useFormState();
+  const { datas } = useAuthState();
   console.log(form);
   let ref = useRef(null);
   let isInView = useInView(ref);
@@ -37,26 +41,51 @@ export const FormResponseAI = () => {
   let aiResponse = form?.ai?.recommandations;
   const [prompt, setPrompt] = useState(null);
   let [isLoading, setIsLoading] = useState(null);
-  let iaInstructions = () => {
+  console.log("proooomùpt ---------", prompt);
+  let iaInstructions = async () => {
     const parts = [];
-
-    // Add project description
-    if (form?.description) {
-      parts.push(`Detail: "${form.description}"`);
-    }
-
-    // Handle budget
-    if (form?.budget > 0) {
+    if (form.target === "feature") {
+      // Handle budget
+      let mission = await stateMission(datas.missions[form.missionID || 0]);
       parts.push(
-        `Budget: "My budget is ${form.budget} dollars (this budget can be changed if necessary)."`
+        `PROMPT ENGENEERING 1 : "You must to list the practices for this role on your response."`
       );
+      parts.push(
+        `PROMPT ENGENEERING 2 : "your client looking for a developper for his company. This is a context and information for your response but it's not for your client mission. Here is short detail of company: "${
+          mission?.metadatas?.abstract || mission?.metadatas?.title
+        }""`
+      );
+      parts.push(
+        `LANGAGE TECHNOLOGY : "Your client looking for a developper with ${
+          form.domain > 0
+            ? ENUMS.courts[parseInt(form.domain)].court
+            : `entreprise on domain ${
+                ENUMS.domain[parseInt(mission?.metadatas.domain)].name
+              }`
+        } abilities and with an experience of ${
+          ENUMS.domain[parseInt(form.specification)].name
+        }"`
+      );
+      if (form?.description) {
+        parts.push(`Detail: {
+          mission : "${form.description}"
+        }`);
+      }
+    } else {
+      // Add project description
+      if (form?.description) {
+        parts.push(`Detail: "${form.description}"`);
+      }
     }
-
     // Handle features
     if (form?.features > 0 || form?.target === "feature") {
       const featureText = form?.target === "feature" ? 1 : form?.features;
       const featureNote =
         form?.target !== "feature" ? "but you can change it if necessary" : "";
+      (async () => {
+        parts.push();
+      })();
+
       parts.push(
         `Roles: "I want to create ${featureText} role(s) ${featureNote}"`
       );
@@ -71,9 +100,11 @@ export const FormResponseAI = () => {
     return parts;
   };
   useEffect(() => {
-    let parts = iaInstructions();
-    // Constructing the final prompt
-    setPrompt(`Here is my description of mission:\n\n${parts.join("\n")}`);
+    (async () => {
+      let parts = await iaInstructions();
+      // Constructing the final prompt
+      setPrompt(`Here is my description of mission:\n\n${parts.join("\n")}`);
+    })();
   }, [isInView]);
   let fetchAI = async () => {
     const data = {
@@ -126,9 +157,9 @@ export const FormResponseAI = () => {
         <div className="flex  w-full  flex-col-reverse ">
           {!isLoading ? (
             <MyCard
-              template={1}
-              styles={"py-4 w-full"}
-              className="flex px-2 py-3 border rounded-lg border-white/5 flex-col w-1/3"
+              template={3}
+              styles={"py-4 flex flex-col min-h-[80vh] px-4 w-full"}
+              className="flex relative px-2 py-3 border rounded-lg border-white/5 flex-col w-1/3"
             >
               <MyNum
                 num={aiResponse?.budget?.total}
@@ -177,7 +208,7 @@ export const FormResponseAI = () => {
               )}
               <ElementResponseAI
                 target={"title"}
-                title={`Project name :`}
+                title={`Project names`}
                 text={aiResponse?.name}
                 setter={(value) =>
                   doInitStateForm(dispatch, {
@@ -194,7 +225,7 @@ export const FormResponseAI = () => {
               />
               <ElementResponseAI
                 target={"budget"}
-                title={`Budget total for this mission:`}
+                title={`Total budget`}
                 text={aiResponse?.budget?.total}
                 setter={(value) =>
                   doInitStateForm(dispatch, {
@@ -251,31 +282,63 @@ export const FormResponseAI = () => {
                   })
                 }
               />
-              <MyInput
-                label={false}
-                styles={"w-4/5 mx-auto mt-5"}
-                target={"chatAI"}
-                setter={(value) => {
-                  const parts = [];
 
-                  parts.push(`Previous:${JSON.stringify(aiResponse, 2, null)}`);
-                  // Add project description
-                  parts.push(`Update: "${value}"`);
-                  parts.push(`Instructions:\n\n${iaInstructions().join("\n")}`);
+              <div className="flex mt-auto gap-5  justify-between">
+                <MyMainBtn
+                  template={1}
+                  color={1}
+                  setter={() => doStateFormPointer(dispatch, pointer - 1)}
+                  icon={{ no: true }}
+                  style={"flex items-center w-fit"}
+                >
+                  <span className="flex items-center">
+                    Previous
+                    <Icon icon={icfy.ux.arrow} className={`-rotate-90 `} />
+                  </span>
+                </MyMainBtn>
+                <MyInput
+                  label={false}
+                  styles={"w-full "}
+                  target={"chatAI"}
+                  setter={(value) => {
+                    const parts = [];
 
-                  // Handle budget
+                    parts.push(
+                      `Previous:${JSON.stringify(aiResponse, 2, null)}`
+                    );
+                    // Add project description
+                    parts.push(`Update: "${value}"`);
+                    parts.push(
+                      `Instructions:\n\n${iaInstructions().join("\n")}`
+                    );
 
-                  // Constructing the final prompt
-                  let _prompt = `Here is your previous response and I want to update only few modifications (Keep the rest):\n\n${parts.join(
-                    "\n"
-                  )}`;
-                  setPrompt(_prompt);
-                  console.log(_prompt);
-                  setIsLoading(true);
-                  fetchAI();
-                  setIsLoading(false);
-                }}
-              />
+                    // Handle budget
+
+                    // Constructing the final prompt
+                    let _prompt = `Here is your previous response and I want to update only few modifications (Keep the rest):\n\n${parts.join(
+                      "\n"
+                    )}`;
+                    setPrompt(_prompt);
+                    console.log(_prompt);
+                    setIsLoading(true);
+                    fetchAI();
+                    setIsLoading(false);
+                  }}
+                />
+
+                <MyMainBtn
+                  template={1}
+                  color={0}
+                  setter={() => doStateFormPointer(dispatch, pointer + 1)}
+                  icon={{ no: true }}
+                  style={"flex items-center w-fit"}
+                >
+                  <span className="flex items-center">
+                    Next
+                    <Icon icon={icfy.ux.arrow} className={`rotate-90 `} />
+                  </span>
+                </MyMainBtn>
+              </div>
             </MyCard>
           ) : (
             <div className=" flex  w-full h-[40vh]">
@@ -474,72 +537,6 @@ export const FormResponseAI = () => {
           </div>
         </div>
       </div>
-
-      <div className="flex mt-10  justify-between">
-        <MyMainBtn
-          template={1}
-          color={1}
-          setter={() => doStateFormPointer(dispatch, pointer - 1)}
-          icon={{ no: true }}
-          style={"flex items-center w-fit"}
-        >
-          <span className="flex items-center">
-            Previous
-            <Icon icon={icfy.ux.arrow} className={`-rotate-90 `} />
-          </span>
-        </MyMainBtn>
-        <MyMainBtn
-          template={1}
-          color={0}
-          setter={() => doStateFormPointer(dispatch, pointer + 1)}
-          icon={{ no: true }}
-          style={"flex items-center w-fit"}
-        >
-          <span className="flex items-center">
-            Next
-            <Icon icon={icfy.ux.arrow} className={`rotate-90 `} />
-          </span>
-        </MyMainBtn>
-      </div>
     </>
-  );
-};
-
-let MyLoading = ({ style }) => {
-  return (
-    <div className="gearbox ">
-      <div className="overlay"></div>
-      <div className="gear one">
-        <div className="gear-inner">
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-        </div>
-      </div>
-      <div className="gear two">
-        <div className="gear-inner">
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-        </div>
-      </div>
-      <div className="gear three">
-        <div className="gear-inner">
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-        </div>
-      </div>
-      <div className="gear four large">
-        <div className="gear-inner">
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-        </div>
-      </div>
-    </div>
   );
 };

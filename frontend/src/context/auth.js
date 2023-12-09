@@ -32,11 +32,11 @@ export const doAuthCV = async (dispatch, address) => {
   let cvID = parseInt(await _apiGet("cvOf", [address]));
 
   let state = await stateCV(cvID);
-  let details = await stateDetailsCV(cvID);
+
   if (!state?.error) {
     dispatch({
       cv: cvID,
-      details,
+
       metadatas: state?.metadatas,
       datas: state?.datas,
       status: "idle",

@@ -7,6 +7,14 @@ interface IAddressSystem {
 
     function cvsHub() external view returns (address);
 
+    function challengesHub() external view returns (address);
+
+    function challengersHub() external view returns (address);
+
+    function setChallengesHub() external;
+
+    function setChallengersHub() external;
+
     function setCVsHub() external;
 
     function setCVsDatasHub() external;

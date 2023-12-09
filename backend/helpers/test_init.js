@@ -63,6 +63,13 @@ const _testInitAll = async () => {
   let launchpads = await _testInitLaunchpadsContracts(addressSystem.target);
   let systems = await _testInitSystemsContracts(addressSystem.target);
   let accessControl = systems.accessControl;
+
+  let challengesHub = await ethers.deployContract("ChallengesHub", [
+    addressSystem.target,
+  ]);
+  let challengersHub = await ethers.deployContract("ChallengersHub", [
+    addressSystem.target,
+  ]);
   let token = await ethers.deployContract("Token", [addressSystem.target]);
   systems.addressSystem = addressSystem;
 
@@ -94,7 +101,7 @@ const _testInitAll = async () => {
     escrows,
     works,
     pubs,
-
+    challenges: { challengersHub, challengesHub },
     token,
   };
 };

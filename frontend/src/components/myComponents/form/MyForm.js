@@ -17,7 +17,7 @@ import { styles as _styles } from "styles/style";
 import { useAccount } from "wagmi";
 import { Icon } from "@iconify/react";
 import { icfy, icfyARROWD, icsystem } from "icones";
-import { MyCard1 } from "../card/MyCard";
+import { MyCard, MyCard1 } from "../card/MyCard";
 import { Viewport } from "../layout/MyViewport";
 import { Hg, Hg1 } from "components/text/HeroGradient";
 import { useInView } from "framer-motion";
@@ -193,18 +193,19 @@ let Child1 = ({
 
   let { form, placeholders, pointer, disabled, checked, superChecked } =
     useFormState();
-
+  let test = useFormState();
+  console.log("test", test);
   let { isConnected } = useAccount();
 
   const { target } = useToolsState();
 
   console.log("form", form);
-  console.log("checked", checked);
+
   useEffect(() => {
     if (!isConnected) doStateFormDisabled(dispatch, true);
     if (pointer === 0 && isConnected) doStateFormDisabled(dispatch, false);
     if (checked?.[pointer]?.length > 0) {
-      // doStateFormChecked({ dispatch, pointer, form, checked, superChecked });
+      doStateFormChecked({ dispatch, pointer, form, checked, superChecked });
     }
   }, [isConnected, pointer]);
 
@@ -247,105 +248,101 @@ let Child1 = ({
         {pointer === components?.length && form?.aiAssisted ? (
           <FormResponseAI />
         ) : (
-          <div className="w-full h-full     ">
-            <div className="h-full w-full   flex flex-row">
-              <div className="   overflow-y-scroll hide-scrollbar relative  pb-10 bg-[#f7f6f2]   px-10 py-3 flex   min-w-[40%] w-[40%]  flex-col h-auto items-center gap-4 ">
-                {/* <div className="absolute -z-2 w-full h-full  backdrop-blur-[3px]"></div> */}
-                <div className="flex relative z-3 justify-between items-end w-full ">
-                  <h2 className=" mt-3 text-black max-w-[55px] text-3xl font-extrabold md:text-3xl text-left uppercase w-full">
-                    {title}
-                  </h2>
+          <div className="h-full w-full   flex flex-row">
+            <div className="     overflow-y-scroll hide-scrollbar relative  pb-10 bg-[#f7f6f2]   px-10 py-3 flex   min-w-[40%] w-[40%]  flex-col h-auto items-center gap-4 ">
+              {/* <div className="absolute -z-2 w-full h-full  backdrop-blur-[3px]"></div> */}
+              <div className="flex relative z-3 justify-between items-end w-full ">
+                <h2 className=" mt-3 text-black max-w-[55px] text-3xl font-extrabold md:text-3xl text-left uppercase w-full">
+                  {title}
+                </h2>
 
-                  {(sideImg || target) && (
-                    <img
-                      src={sideImg || `/${target}.gif`}
-                      alt=""
-                      className=" w-64 h-64 ml-3 inline-block"
-                    />
-                  )}
-                </div>
-                <AnimatePresence>
-                  <motion.div
-                    key={pointer}
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    // exit={{ y: -10, opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className=" w-full  text-justify text-xs  whitespace-break-spaces c4"
-                  >
-                    {arr?.[pointer]?.description || (
-                      <>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Asperiores mollitia in dignissimos quia maxime excepturi
-                        harum ex eius rem aliquid voluptatum debitis
-                        necessitatibus tempora quo, reprehenderit atque magni
-                        porro molestias?
-                      </>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-                {isConnected && (
-                  <div className="flex w-full relative mt-auto">
-                    {pointer !== 0 && (
-                      <button
-                        onClick={() =>
-                          doStateFormPointer(dispatch, pointer - 1)
-                        }
-                        className="btn btn-outline  shadow hover:bg-black hover:text-error text-black"
-                      >
-                        <Icon
-                          icon={icfy.ux.arrow}
-                          className="-rotate-90 mr-2"
-                        />
-                        <span className=" flex items-center">Previous </span>
-                      </button>
-                    )}
-                    {pointer === 0 && (
-                      <MyToggle
-                        style={form?.ia === true ? "c1" : "text-error"}
-                        target={"aiAssisted"}
-                      >
-                        Active / Désactive Aly
-                      </MyToggle>
-                    )}
-
-                    {(editer || pointer >= components?.length) && (
-                      <MyMainBtn
-                        template={1}
-                        style={
-                          "ml-auto bg1 flex w-fit items-center text-white hover:border-[#202361] shadow hover:bg-transparent hc1"
-                        }
-                        setter={handleSubmit}
-                        disabled={disabled}
-                        // className="btn btn-xs btn-outline h-fit  btn-info "
-                      >
-                        {editer || "Submit"}
-                      </MyMainBtn>
-                    )}
-                    {pointer < components?.length && !arr?.[pointer]?.error && (
-                      <button
-                        disabled={disabled}
-                        onClick={() =>
-                          doStateFormPointer(dispatch, pointer + 1)
-                        }
-                        className="btn ml-auto shadow z-3 relative  hover:bg-white hover:text-success  bg-black text-white"
-                      >
-                        Next <Icon icon={icfy.ux.arrow} className="rotate-90" />
-                      </button>
-                    )}
-                  </div>
+                {(sideImg || target) && (
+                  <img
+                    src={sideImg || `/${target}.gif`}
+                    alt=""
+                    className=" w-64 h-64 ml-3 inline-block"
+                  />
                 )}
               </div>
+              <AnimatePresence>
+                <motion.div
+                  key={pointer}
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  // exit={{ y: -10, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className=" w-full  text-justify text-xs  whitespace-break-spaces c4"
+                >
+                  {arr?.[pointer]?.description || (
+                    <>
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Asperiores mollitia in dignissimos quia maxime excepturi
+                      harum ex eius rem aliquid voluptatum debitis
+                      necessitatibus tempora quo, reprehenderit atque magni
+                      porro molestias?
+                    </>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+              {isConnected && (
+                <div className="flex w-full relative mt-auto">
+                  {pointer !== 0 && (
+                    <button
+                      onClick={() => doStateFormPointer(dispatch, pointer - 1)}
+                      className="btn btn-outline  shadow hover:bg-black hover:text-error text-black"
+                    >
+                      <Icon icon={icfy.ux.arrow} className="-rotate-90 mr-2" />
+                      <span className=" flex items-center">Previous </span>
+                    </button>
+                  )}
+                  {pointer === 0 && (
+                    <MyToggle
+                      style={form?.ia === true ? "c1" : "text-error"}
+                      target={"aiAssisted"}
+                    >
+                      Active / Désactive Aly
+                    </MyToggle>
+                  )}
 
-              <div className="bgprim  overflow-y-scroll hide-scrollbar rounded-sm  shadowh _hover   px-8 pt-6 pb-10 w-full ">
-                {!isConnected ? (
-                  <div className="flex flex-col  h-1/2 justify-between items-center w-full text-center">
-                    <span className="text-[44px] font-light text-warning">
-                      Please connect to your account !
-                    </span>
+                  {(editer || pointer >= components?.length) && (
+                    <MyMainBtn
+                      template={1}
+                      style={
+                        "ml-auto bg1 flex w-fit items-center text-white hover:border-[#202361] shadow hover:bg-transparent hc1"
+                      }
+                      _refresh={false}
+                      setter={handleSubmit}
+                      disabled={disabled}
+                      // className="btn btn-xs btn-outline h-fit  btn-info "
+                    >
+                      {editer || "Submit"}
+                    </MyMainBtn>
+                  )}
+                  {pointer < components?.length && !arr?.[pointer]?.error && (
+                    <button
+                      disabled={disabled}
+                      onClick={() => doStateFormPointer(dispatch, pointer + 1)}
+                      className="btn ml-auto shadow z-3 relative  hover:bg-white hover:text-success  bg-black text-white"
+                    >
+                      Next <Icon icon={icfy.ux.arrow} className="rotate-90" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
-                    <img src="/404.gif" />
-                    {/* <div className="🤚">
+            <div
+              template={4}
+              className="magicpattern  overflow-y-scroll hide-scrollbar rounded-sm  shadowh _hover   px-8 pt-6 pb-10 w-full "
+            >
+              {!isConnected ? (
+                <div className="flex flex-col  h-1/2 justify-between items-center w-full text-center">
+                  <span className="text-[44px] font-light text-warning">
+                    Please connect to your account !
+                  </span>
+
+                  <img src="/404.gif" />
+                  {/* <div className="🤚">
                     <div className="👉"></div>
                     <div className="👉"></div>
                     <div className="👉"></div>
@@ -353,102 +350,66 @@ let Child1 = ({
                     <div className="🌴"></div>
                     <div className="👍"></div>
                   </div> */}
-                  </div>
-                ) : (
-                  pointer <= components?.length - 1 && (
-                    <ol className=" divide-x divide-white/5 bg-white/10   rounded-lg  shadow1   text-sm c4 flex">
-                      {arr?.map((el, i) => (
-                        <li
-                          key={v4()}
-                          onClick={() =>
-                            i < pointer && doStateFormPointer(dispatch, i)
-                          }
-                          className={`relative overflow-hidden transition-all flex items-center justify-center gap-2 p-4 ${
-                            i === pointer
-                              ? "bg3 c1  rounded-lg  "
-                              : "bg-transparent "
-                          }`}
-                        >
-                          {pointer !== i && (
-                            <>
-                              {i != 0 && (
-                                <span className="absolute -left-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-white rtl:border-e-0 rtl:border-t-0 rtl:bg-gray-50 sm:block"></span>
-                              )}
+                </div>
+              ) : (
+                pointer <= components?.length - 1 && (
+                  <ol className=" gap-5 w-full    flex">
+                    {arr?.map((el, i) => (
+                      <div
+                        key={v4()}
+                        className={`w-full pt-1 rounded-lg ${
+                          i === pointer ? "g1 gb1" : "bg-neutral-600"
+                        }`}
+                      />
+                    ))}
+                  </ol>
+                )
+              )}
 
-                              {i != arr?.length - 1 && (
-                                <span className="absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 rotate-45 border border-white/5 ltr:border-b-0 ltr:border-s-0 ltr:bg-gray-50 rtl:border-e-0 rtl:border-t-0 rtl:bg-white sm:block"></span>
-                              )}
-                            </>
-                          )}
+              {isConnected ? (
+                <AnimatePresence>
+                  <motion.div
+                    key={arr?.[pointer]?.title}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    // exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="mx-auto h-full mt-10 overflow-y-scroll hide-scrollbar w-full "
+                  >
+                    {pointer !== 0 &&
+                    /**
+                     * @dev check if client is assisted by AI
+                     * @dev if yes render AIResponse
+                     * @dev if not render FormTxs
+                     */
+                    ((pointer !== components?.length + 1 && form?.aiAssisted) ||
+                      (!form?.aiAssisted && pointer !== components?.length)) &&
+                    target ? (
+                      components?.[pointer]?.component
+                    ) : isConnected && pointer === 0 ? (
+                      <MyCardPrice
+                        style={"mx-auto"}
+                        btn={{ no: true }}
+                        lists={arr?.map((el, i) => {
+                          return (
+                            i > 0 && {
+                              title: el?.title,
 
-                          <Icon icon={el?.icon} className=" text-[44px]" />
-
-                          <p className="leading-none">
-                            <strong className="block font-semibold">
-                              {el?.title}
-                            </strong>
-                            <small className="mt-1">
-                              Lorem ipsum dolor, sit amet consectetur
-                              adipisicing elit.
-                            </small>
-                          </p>
-                        </li>
-                      ))}
-                    </ol>
-                  )
-                )}
-
-                {isConnected ? (
-                  <AnimatePresence>
-                    <motion.div
-                      key={arr?.[pointer]?.title}
-                      initial={{ y: 10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      // exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="mx-auto h-full mt-10 overflow-y-scroll hide-scrollbar w-full "
-                    >
-                      {arr?.[pointer]?.info ? (
-                        <div className="flex flex-col items-center">
-                          <div className=" w-fit mx-auto mb-6  text-sm text-[#636262] lg:mb-8">
-                            {components?.length != pointer
-                              ? arr?.[pointer]?.info
-                              : "Récapitulatif d'Aly"}
-                          </div>
-                        </div>
-                      ) : undefined}
-                      {pointer !== 0 &&
-                      ((pointer !== components?.length + 1 &&
-                        form?.aiAssisted) ||
-                        (!form?.aiAssisted &&
-                          pointer !== components?.length)) &&
-                      target ? (
-                        components?.[pointer]?.component
-                      ) : isConnected && pointer === 0 ? (
-                        <MyCardPrice
-                          style={"mx-auto"}
-                          btn={{ no: true }}
-                          lists={arr?.map((el, i) => {
-                            return (
-                              i > 0 && {
-                                title: el?.title,
-
-                                check:
-                                  pointer === components?.length ? true : false,
-                              }
-                            );
-                          })}
-                          price={form?.price}
-                          color={2}
-                          badge={{ title: title, icon: icsystem?.[target] }}
-                        />
-                      ) : (
-                        <FormTxs />
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-                ) : undefined}
-              </div>
+                              check:
+                                pointer === components?.length ? true : false,
+                            }
+                          );
+                        })}
+                        price={form?.price}
+                        color={2}
+                        badge={{ title: title, icon: icsystem?.[target] }}
+                      />
+                    ) : (
+                      <FormTxs />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              ) : undefined}
             </div>
           </div>
         )}

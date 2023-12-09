@@ -37,7 +37,9 @@ export const _apiPostPayable = async (func, args, value) => {
       value,
     });
   } catch (error) {
-    console.log("error", error);
+    console.log(`error ${func} : {
+      ${error}
+    }`);
   }
 };
 export const _apiPostAt = async ({

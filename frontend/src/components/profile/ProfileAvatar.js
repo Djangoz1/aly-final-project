@@ -19,6 +19,7 @@ export const ProfileAvatar = ({
   component,
   metadatas,
   style,
+  styles,
 }) => {
   const [isMetadatas, setIsMetadatas] = useState(null);
   let state = async () => {
@@ -41,19 +42,20 @@ export const ProfileAvatar = ({
       <Avatar style={style} metadatas={isMetadatas} CID={isMetadatas?.avatar} />
     </>
   ) : (
-    <div className="flex items-end">
-      <div className="avatar h-fit">
-        <Avatar
-          style={style}
-          metadatas={isMetadatas}
-          CID={isMetadatas?.avatar}
-        />
-      </div>
-      <div className=" ml-3">
+    <div className={`flex items-end gap-3 ${styles?.div || ""}`}>
+      <Avatar style={style} metadatas={isMetadatas} CID={isMetadatas?.avatar} />
+
+      <div className="">
         <CVName metadata={isMetadatas} styles={"font-semibold text-xs"} />
-        <br />
-        <span className="font-light text-xs">CV #{cvID}</span>
-        {component}
+        {component !== false ? (
+          <>
+            <br />
+            <span className="font-light text-xs">CV #{cvID}</span>
+            {component}
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );
@@ -68,28 +70,30 @@ export const Avatar = ({
   children,
   style,
 }) => {
-  return metadatas && !CID ? (
+  return (metadatas && !CID) || children ? (
     <div className={"avatar placeholder " + avatarStyle || ""}>
       <div
         className={"bg-neutral-focus text-neutral-content rounded-full w-12"}
       >
-        <span className="text-xl">{metadatas?.username?.[0]}</span>
-        {children ? children : ""}
+        {children ? (
+          children
+        ) : (
+          <span className="text-xl">{metadatas?.username?.[0]}</span>
+        )}
       </div>
     </div>
   ) : (
-    <div className={`avatar ${avatarStyle || undefined}`}>
+    <div className={`avatar  ${avatarStyle || undefined}`}>
       <ImagePin
         metadatas={metadatas}
         style={`rounded-full ${
           !noCircle
-            ? "ring ring-primary ring-offset-base-100 ring-offset-2"
+            ? "ring ring-neutral ring-offset-base-100 ring-offset-2"
             : null
         } ${style || "w-16"}`}
         CID={CID}
         defaultImage={src || "/defaultprofile.png"}
       />
-      {children ? children : ""}
     </div>
   );
 };
@@ -127,6 +131,7 @@ export const AvatarsList = ({ lists }) => {
           onMouseEnter={() => setHoveredIndex(idx)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
+          {console.log(testimonial)}
           <AnimatePresence mode="wait">
             {hoveredIndex === idx && (
               <motion.div

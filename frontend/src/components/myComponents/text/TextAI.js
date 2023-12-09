@@ -12,14 +12,14 @@ export const TextAI = ({ text, style, children }) => {
     }
   }, [isInView]);
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col ${style}`}>
       <div className="">
         <AnimatePresence>
           {text ? (
             textArray?.map((char, index) => (
               <motion.span
                 ref={index === textArray.length - 1 ? ref : undefined}
-                className={style}
+                // className={style}
                 key={index}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}

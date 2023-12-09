@@ -30,43 +30,29 @@ import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
 import { Viewport } from "components/myComponents/layout/MyViewport";
-import { CVProfile } from "sections/Profile/state/CVProfile";
+
 import { _apiGet, _apiPostPayable } from "utils/ui-tools/web3-tools";
 import { ABIs, ADDRESSES } from "constants/web3";
 import { MyModal } from "components/myComponents/modal/MyModal";
 import { ImagePin } from "components/Image/ImagePin";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
-import { EditProfile } from "sections/Form/forms/edit/EditProfile";
-import { AssetProfile1 } from "components/assets/AssetProfile";
-import { MyFModal } from "components/myComponents/modal/MyFramerModal";
+
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { v4 } from "uuid";
 import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
 import { CVInfos } from "sections/Profile/state/CVInfos";
-import {
-  MyMenusDropdown,
-  MyMenusDropdownProfile,
-  MyMenusTabs,
-} from "components/myComponents/menu/MyMenus";
-import { CVMenusDropdown } from "sections/Profile/state/CVMenusDropdown";
-import { BtnsSocial } from "components/btn/BtnsSocial";
-import { Loader } from "@react-three/drei";
-import { MyLoader } from "components/myComponents/layout/MyLoader";
-import { MyCardList } from "components/myComponents/card/MyCardList";
-import { doStateFormPointer } from "context/form";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { STATUS } from "constants/status";
 import { MySub } from "components/myComponents/text/MySub";
-import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyTitle } from "components/myComponents/text/MyTitle";
-import { Avatar, ProfileAvatar } from "components/profile/ProfileAvatar";
+import { Avatar } from "components/profile/ProfileAvatar";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
 import { ethers } from "ethers";
 import { useAccount } from "wagmi";
-import { fetchJSONByCID, pinataGateway } from "utils/ui-tools/pinata-tools";
+import { pinataGateway } from "utils/ui-tools/pinata-tools";
 import { FileDisplay } from "components/FileDisplay";
 
 function App({ params }) {

@@ -61,13 +61,14 @@ export const MySelect = ({ arr, target, label, setter, styles }) => {
   };
   return (
     <div
-      className={`flex hover:text-white flex-col mr-10 ${
+      className={`flex hover:text-white flex-col  ${
         form?.[target] && "text-white"
       } ${styles}`}
     >
       {label !== false ? (
         <label className="text-light font-light text-xs mb-1 uppercase ">
-          {label} {label && checked?.[pointer]?.includes(target) && " *"}
+          {label !== false ? label || target : ""}{" "}
+          {label && checked?.[pointer]?.includes(target) && " *"}
         </label>
       ) : undefined}
       <select
@@ -78,11 +79,14 @@ export const MySelect = ({ arr, target, label, setter, styles }) => {
         <option value={""} disabled>
           {placeholders?.[target]}
         </option>
-        {arr?.map((el, i) => (
-          <option value={`${i}`} key={uuidv4()}>
-            {el}
-          </option>
-        ))}
+        {arr?.map(
+          (el, i) =>
+            el && (
+              <option value={`${i}`} key={uuidv4()}>
+                {el}
+              </option>
+            )
+        )}
       </select>
     </div>
   );

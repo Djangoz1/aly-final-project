@@ -28,11 +28,16 @@ import {
 } from "sections/works/Features/form/create/FormCreateFeature";
 import { useToolsState } from "context/tools";
 import { useRouter } from "next/navigation";
+import { controllers } from "utils/controllers";
+import { stateMission } from "utils/ui-tools/state-tools";
+import { ENUMS } from "constants/enums";
 const PageCreateFeature = () => {
   let { datas, metadatas, cv } = useAuthState();
   let account = useAuthState();
 
   let { state } = useToolsState();
+  console.log("state", state);
+
   let router = useRouter();
   let form = _form_create_feature;
   form[0].title = (
@@ -41,58 +46,52 @@ const PageCreateFeature = () => {
     </>
   );
 
+  let moock = moock_create_feature;
   form[0].info =
     datas?.missions?.length == 0 ? (
       <span className="text-error">Please create mission first</span>
     ) : undefined;
 
   form[0].error = datas?.missions?.length == 0 ? true : undefined;
+  console.log("-------------------------");
 
   let submitForm = async (form) => {
-    const client = new PocketBase("http://127.0.0.1:8090");
+    let missionID = datas?.missions[parseInt(form?.missionID || 0n)];
+    let value = await ethers.utils.parseEther(form?.wadge);
+    let mission = await stateMission(missionID);
 
-    const resultList = await client.records.getList("missions", 1, 50, {
-      filter: 'created >= "2022-01-01 00:00:00"',
-    });
-
-    console.log(resultList);
-
-    let metadatas = {
-      description: form?.description,
+    let _form = {
+      description: form?.aiAssisted
+        ? `${form?.ai?.recommandations?.roles?.[0]?.reason}
+      ${form?.ai?.recommandations?.detail}
+      `
+        : form?.description,
       title: form?.title,
       image: form?.image,
+      abstract: form?.aiAssisted
+        ? form?.ai?.recommandations?.abstract
+        : form?.abstract,
       domain: parseInt(form?.domain),
-      missionID: resultList?.[0]?.id, // ! Change to cvID
+
+      skills: form?.aiAssisted
+        ? form?.ai?.recommandations?.roles?.[0]?.skills_required
+        : form?.skills,
+      missionHash: mission?.metadatas?.id, // ! Change to cvID
+      missionID: missionID,
+      launchpadID: mission?.datas?.launchpad,
+      value: value._hex,
+      deployed: true,
+      featureHash: form?.featureHash,
+      specification: parseInt(form.specification),
+      estimatedDays: parseInt(form.estimatedDays),
+      isInviteOnly: form.onlyInvite,
     };
 
-    console.log("metadatas, ,", metadatas);
-    const record = await client.records.create("features", metadatas);
-    console.log("record, ,", record);
+    console.log("----------", _form);
 
-    //   ! Decoment for create mission on blockchain
+    let test = await controllers.create.feature(_form);
 
-    let missionID = state?.missions[parseInt(form?.missionID)]?.id;
-
-    //   ! Recuperation de l'ID
-    let uri = record.id;
-
-    // ! Decoment pour faire la transaction blockchain
-    let estimatedDays = parseInt(form?.estimatedDays);
-    if (missionID > 0 && estimatedDays > 0) {
-      let value = await ethers.utils.parseEther(form?.wadge);
-
-      await _apiPostPayable(
-        "createFeature",
-        [
-          missionID,
-          estimatedDays,
-          form?.onlyInvite,
-          uri,
-          parseInt(form?.specification),
-        ],
-        value._hex
-      );
-    }
+    console.log("state -----", test);
 
     //   router.push("/works/mission/" + missionID + "#section2");
   };
@@ -100,7 +99,7 @@ const PageCreateFeature = () => {
   return (
     <MyLayoutApp
       url={"/create/feature"}
-      initState={{ allowed: true }}
+      initState={{ form: state?.form, allowed: true }}
       target={"feature"}
     >
       <MyFormCreate
@@ -108,7 +107,18 @@ const PageCreateFeature = () => {
         side={<MySteps arr={MENUS_CREATE_FEATURE} />}
         stateInit={{
           allowed: true,
-          form: moock_create_feature,
+          form: {
+            ...moock,
+            target: "feature",
+            title: state?.form?.feature?.title || null,
+            description: state?.form?.feature?.description,
+            missionID: datas?.missions
+              ?.map((el, i) => (el == state?.form?.missionID ? i : undefined))
+              ?.filter((el) => el !== undefined)?.[0],
+            featureHash: state?.form?.feature?.id,
+            abstract: state?.form?.feature?.abstract,
+            skills: state?.form?.skills,
+          },
           placeholders: moock_create_feature_placeholders,
           checked: [
             [],

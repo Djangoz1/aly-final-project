@@ -1,18 +1,12 @@
 import { Icon } from "@iconify/react";
 import { ImagePin } from "components/Image/ImagePin";
 
-import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { icfyFB, icfyGITHUB2, icfyLINKEDIN, icfyTWITTER } from "icones";
 import React, { useEffect, useState } from "react";
 import { MyBigBtn } from "./MyBigBtn";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
-import { MyModal } from "components/myComponents/modal/MyModal";
-import { EditProfile } from "sections/Form/forms/edit/EditProfile";
-import { styles } from "styles/style";
-import { useRouter } from "next/router";
-import { useAccount } from "wagmi";
-import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
+
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 export const MyHeader = ({

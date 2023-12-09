@@ -10,6 +10,7 @@ import { useToolsState } from "context/tools";
 export const MyMainBtn = ({
   children,
   template,
+  _refresh,
   form,
   setter,
   padding,
@@ -35,7 +36,7 @@ export const MyMainBtn = ({
         await setter();
       }
       setIsLoading(false);
-      if (refresh) {
+      if (refresh && _refresh !== false) {
         refresh();
       }
     }

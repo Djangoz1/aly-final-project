@@ -10,9 +10,6 @@ import { Icon } from "@iconify/react";
 import { icfy, icfySEND } from "icones";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
-import { createURIPub } from "utils/ui-tools/pinata-tools";
-import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
-import { doStateMission, useMissionDispatch } from "context/hub/mission";
 import { useAccount } from "wagmi";
 import { ADDRESSES } from "constants/web3";
 import { fetchMissionsOfCV } from "utils/works";
@@ -34,7 +31,7 @@ let moock = {
 export const EditWorker = ({ styles }) => {
   const { cv } = useAuthState();
   let { address, isConnected } = useAccount();
-  let { cvID, datas, metadatas } = useCVState();
+
   let { state } = useToolsState();
   console.log(state);
   let dispatch = useToolsDispatch();
@@ -106,56 +103,5 @@ export const EditWorker = ({ styles }) => {
         }}
       ></MyFormModal>
     )
-  );
-};
-
-let FormWorker = ({ features }) => {
-  let { cvID, metadatas } = useCVState();
-  let [isFeature, setIsFeature] = useState(null);
-
-  return (
-    <MyFormInfo
-      title={
-        <>
-          <Icon icon={icfy.work.casual} className="mr-2 text-2xl text-info" />{" "}
-          Invite worker
-        </>
-      }
-      description={
-        <>
-          <div>
-            <p className="text-white flex items-center text-sm">
-              <Icon
-                icon={icfy.ux.warning}
-                className="text-warning text-xl mr-2"
-              />{" "}
-              Attention !
-            </p>
-            <br />
-            Ceci est une invitation et le worker doit accepté pour pouvoir
-            démarrer le travail. Le compteur claimable commenceras une fois que
-            le worker a accepté l'invitation
-          </div>
-          <p className="mt-4">
-            Vous voulez invitez{" "}
-            <span className="text-white">{metadatas?.username}</span> pour :
-            <span className="text-white ml-2">
-              #{isFeature?.id} {isFeature?.title || "en attente"}
-            </span>
-          </p>
-          <MySelects
-            selects={[
-              {
-                setter: setIsFeature,
-                target: "featureID",
-                arr: features,
-                value: "id",
-                target1: "title",
-              },
-            ]}
-          />
-        </>
-      }
-    />
   );
 };

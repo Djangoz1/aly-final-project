@@ -3,8 +3,7 @@ import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import React, { useEffect, useState } from "react";
 
 import { _form_create_profile } from "utils/ux-tools/form/profile";
-import { MySteps } from "components/myComponents/MySteps";
-import { MENUS } from "constants/menus";
+
 import { useAccount } from "wagmi";
 
 import {
@@ -41,7 +40,7 @@ import {
   FormCreateLaunchpad3,
 } from "sections/Launchpad/form/FormCreateLaunchpad";
 
-const PageCreateProfile = () => {
+const PageCreateLaunchpad = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useAuthDispatch();
   let [isPrice, setIsPrice] = useState(null);
@@ -50,7 +49,7 @@ const PageCreateProfile = () => {
       let metadatas = {
         title: form?.title,
         description: form?.description,
-        domain: form?.domain,
+        domain: parseInt(form?.domain),
         bio: form?.bio,
         image: form?.image,
         banniere: form?.banniere,
@@ -67,81 +66,38 @@ const PageCreateProfile = () => {
         ),
       };
 
-      console.log("meztadatas", metadatas);
-
       const record = await clientPocket.records.create("launchpads", metadatas);
+      let price = ethers?.utils?.parseEther(isPrice);
+      let tokenURI = record.id;
+      let saleStart = new Date(form.saleStart).getTime();
+      let saleEnd = new Date(form.saleEnd).getTime();
 
-      let launchpadURI = record.id;
-      let tokenURI = record.id; // ! USELESS to delete on blockchain
-
-      let dateStart = new Date(form.saleStart);
-      let saleStart = dateStart.getTime();
-      let dateEnd = new Date(form.saleEnd);
-      let saleEnd = dateEnd.getTime();
-
+      let maxCap = ethers.utils.parseEther(form.maxCap);
+      let minCap = ethers.utils.parseEther(form.minCap);
       let minInvest = ethers.utils.parseEther(form.minInvest);
       let maxInvest = ethers.utils.parseEther(form.maxInvest);
       let launchpadData = {
         id: 0,
-        tokenAddress: form.tokenAddress,
-        numberOfTier: BigInt(form.rounds),
-        maxCap: 0n,
-        minCap: 0n,
+        minCap: BigInt(minCap._hex),
+        maxCap: BigInt(maxCap._hex),
         minInvest: BigInt(minInvest._hex),
         maxInvest: BigInt(maxInvest._hex),
         saleStart: BigInt(saleStart),
         saleEnd: BigInt(saleEnd),
-        lockedTime: BigInt(form.lockedTime),
+        amountRaised: 0n,
         totalUser: 0n,
-        tokenURI: launchpadURI,
       };
-
-      let tiersDatas = [];
-      for (let index = 0; index < parseInt(form.rounds); index++) {
-        let tierDatas = {
-          minTierCap: BigInt(
-            ethers.utils.parseEther(form.minTiersCap[index])._hex
-          ),
-          maxTierCap: BigInt(
-            ethers.utils.parseEther(form.maxTiersCap[index])._hex
-          ),
-          tokenPrice: BigInt(
-            ethers.utils.parseEther(form.tokenPrice[index])._hex
-          ),
-          amountRaised: 0n,
-          users: 0n,
-        };
-        tiersDatas.push(tierDatas);
-      }
 
       await _apiPostPayable(
         "createLaunchpad",
-        [launchpadData, tiersDatas, tokenURI],
-        `${ethers?.utils?.parseEther(form?.price)}`
+        [launchpadData, tokenURI],
+        `${price._hex}`
       );
 
       let launchpadID = await _apiGet("tokensLengthOf", [
         ADDRESSES["launchpadHub"],
       ]);
-      let launchpadAddress = await _apiGet("addressOfLaunchpad", [launchpadID]);
-      if (
-        (await _apiGet("ownerOfToken", [
-          launchpadID,
-          ADDRESSES["launchpadHub"],
-        ])) == address
-      ) {
-        let hash = await _apiPostAt({
-          func: "approve",
-          targetContract: "erc20",
-          address: form?.tokenAddress,
-          args: [launchpadAddress, parseInt(form.tokenAllowance)],
-        });
 
-        hash = await _apiPost("lockTokens", [
-          launchpadID,
-          parseInt(form.tokenAllowance),
-        ]);
-      }
       return;
     }
   };
@@ -185,7 +141,6 @@ const PageCreateProfile = () => {
           { component: <></>, label: "Introduction" },
 
           { component: <FormCreateLaunchpad1 />, label: "Informations" },
-          { component: <FormCreateLaunchpad2 />, label: "Tokens" },
           { component: <FormCreateLaunchpad3 />, label: "Protocole" },
         ]}
         btn={
@@ -199,4 +154,4 @@ const PageCreateProfile = () => {
   );
 };
 
-export default PageCreateProfile;
+export default PageCreateLaunchpad;

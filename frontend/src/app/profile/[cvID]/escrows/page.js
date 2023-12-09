@@ -26,54 +26,22 @@ import {
   HEAD_table_features,
   _table_features,
 } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
 
-import { Viewport } from "components/myComponents/layout/MyViewport";
-import { CVProfile } from "sections/Profile/state/CVProfile";
 import { _apiGet } from "utils/ui-tools/web3-tools";
-import { ADDRESSES } from "constants/web3";
-import { MyModal } from "components/myComponents/modal/MyModal";
-import { ImagePin } from "components/Image/ImagePin";
-import { CVOverview } from "sections/Profile/state/CVOverview";
 import { ENUMS } from "constants/enums";
-import { EditProfile } from "sections/Form/forms/edit/EditProfile";
-import { AssetProfile1 } from "components/assets/AssetProfile";
-import { MyFModal } from "components/myComponents/modal/MyFramerModal";
-import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { v4 } from "uuid";
-import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
-import { CVInfos } from "sections/Profile/state/CVInfos";
-import {
-  MyMenusDropdown,
-  MyMenusDropdownProfile,
-  MyMenusTabs,
-} from "components/myComponents/menu/MyMenus";
-import { CVMenusDropdown } from "sections/Profile/state/CVMenusDropdown";
-import { BtnsSocial } from "components/btn/BtnsSocial";
-import { Loader } from "@react-three/drei";
-import { MyLoader } from "components/myComponents/layout/MyLoader";
-import { MyCardList } from "components/myComponents/card/MyCardList";
-import { doStateFormPointer } from "context/form";
-import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { STATUS } from "constants/status";
+
 import { MySub } from "components/myComponents/text/MySub";
-import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
 import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
-import { MENUS } from "constants/menus";
-import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
+
 import { MyTable } from "components/myComponents/table/MyTable";
-import {
-  HEAD_table_missions,
-  _table_missions,
-} from "utils/states/tables/mission";
+
 import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
-import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
 import { CVName } from "components/inputs/inputsCV/CVName";
 import {
   HEAD_table_arbitrators,

@@ -4,34 +4,30 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
 import {
-  doStateProfileTools,
   doStateToolsProfile,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
+import { icfy, icsystem } from "icones";
 
 import { _table_features } from "utils/states/tables/feature";
 import { _table_invites } from "utils/works/feature";
 
-import { CVProfile } from "sections/Profile/state/CVProfile";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 import { MyModal } from "components/myComponents/modal/MyModal";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { MENUS, menus_id } from "constants/menus";
-import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
+import { menus_id } from "constants/menus";
 import { LayoutForm } from "sections/Form/LayoutForm";
-import { MySelects } from "components/myComponents/form/MySelects";
+import { MySelect, MySelects } from "components/myComponents/form/MySelects";
 import { stateFeature } from "utils/ui-tools/state-tools";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MySub } from "components/myComponents/text/MySub";
 import { ChatBubble } from "components/ChatBubble";
-import { STATUS } from "constants/status";
-import { controllers } from "utils/controllers";
+
 import { MyLayoutBtn } from "components/myComponents/btn/MyLayoutBtn";
 
 export const LayoutProfile = ({ cvID, url, children, controller }) => {
@@ -63,27 +59,27 @@ export const LayoutProfile = ({ cvID, url, children, controller }) => {
 
   console.log("layout profile state", state);
   if (!state?.profile?.datas?.features?.length) {
-    menus[1].sub[3] = undefined;
-  }
-  if (!state?.profile?.datas?.missions?.length) {
     menus[1].sub[2] = undefined;
   }
+  if (!state?.profile?.datas?.missions?.length) {
+    menus[1].sub[1] = undefined;
+  }
   if (!state?.profile?.datas?.proposals?.length) {
-    menus[1].sub[4] = undefined;
+    menus[1].sub[3] = undefined;
   }
   if (!state?.profile?.datas?.launchpads?.length) {
-    menus[1].sub[5] = undefined;
+    menus[1].sub[4] = undefined;
   }
   if (!state?.profile?.datas?.arbitrators?.length) {
-    menus[1].sub[7] = undefined;
+    menus[1].sub[6] = undefined;
   }
   if (cv != cvID) {
-    menus[1].sub[6] = undefined;
+    menus[1].sub[5] = undefined;
   } else if (
     state?.profile?.datas?.invitations?.length > 0 ||
     state?.profile?.datas?.notifications > 0
   ) {
-    menus[1].sub[6].title = (
+    menus[1].sub[5].title = (
       <>
         Notifications{" "}
         <span className="indicator-item badge  badge-xs badge-primary">
@@ -155,39 +151,52 @@ let Button = () => {
           title: "Post",
           text: "Share a post about what happening ",
         },
-        {
-          icon: icfy.msg.opened,
-          title: "Message",
-          text:
-            "Send a direct message to " + state?.profile?.metadatas?.username,
-        },
-        {
-          icon: icfy.person.friend,
-          title: "Follow",
-          text: true
-            ? "Unfollow this account and remove his actuality on your social page"
-            : "Add this account on your list of follower to keep regard on his actuality",
-        },
+        cv != state?.profile?.cvID
+          ? {
+              icon: icfy.msg.opened,
+              title: "Message",
+              url: `profile/${cv}/messages`,
+              text:
+                "Send a direct message to " +
+                state?.profile?.metadatas?.username,
+            }
+          : undefined,
+        cv != state?.profile?.cvID
+          ? {
+              icon: icfy.person.friend,
+              title: "Follow",
+              text: true
+                ? "Unfollow this account and remove his actuality on your social page"
+                : "Add this account on your list of follower to keep regard on his actuality",
+            }
+          : undefined,
         {
           icon: icsystem.mission,
-          title: cv == state?.profile?.cvID ? "Mission" : "Join",
-          url: "/create/mission",
+          title: cv == state?.profile?.cvID ? "Mission" : "Invite worker",
+          url: cv == state?.profile?.cvID ? "/create/mission" : undefined,
 
-          text: "Create a mission to build your idea via our protocoles",
+          text:
+            cv == state?.profile?.cvID
+              ? "Create a mission to build your idea via our protocoles"
+              : `Invite ${state?.profile?.metadatas?.username} for work with you`,
         },
-        {
-          icon: icsystem.launchpad,
-          title: "Launchpad",
-          url: "/create/launchpad",
+        cv == state?.profile?.cvID
+          ? {
+              icon: icsystem.launchpad,
+              title: "Launchpad",
+              url: "/create/launchpad",
 
-          text: "Create a launchpad to funds raising",
-        },
-        {
-          icon: icfy.eye.open,
-          title: "visibility",
+              text: "Create a launchpad to funds raising",
+            }
+          : undefined,
+        cv == state?.profile?.cvID
+          ? {
+              icon: icfy.eye.open,
+              title: "Visibility",
 
-          text: "Change visibility to block/unblock invitation on feature",
-        },
+              text: "Change visibility to block/unblock invitation on feature",
+            }
+          : undefined,
       ]}
       modals={[
         <CreatePub />,
@@ -252,17 +261,12 @@ let Button = () => {
               </span>
             </ChatBubble>
 
-            <MySelects
+            <MySelect
+              arr={isDatas?.features?.map(
+                (el) => `#${parseInt(el?.featureID)} ${el?.metadatas?.title}`
+              )}
               styles={"mt-4"}
-              selects={[
-                {
-                  target: "feature",
-                  arr: isDatas?.features?.map(
-                    (el) =>
-                      `#${parseInt(el?.featureID)} ${el?.metadatas?.title}`
-                  ),
-                },
-              ]}
+              target="feature"
             />
             <MyMainBtn
               setter={async (form) =>

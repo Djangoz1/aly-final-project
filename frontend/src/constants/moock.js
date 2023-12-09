@@ -189,6 +189,7 @@ export let moock_create_feature = {
   ia: true,
   title: null,
   price: 0,
+  abstract: null,
   domain: null,
   image: null,
   description: null,
@@ -206,7 +207,7 @@ export let moock_create_feature_placeholders = {
   description: "Write your description ...",
   missionID: "Pour quelle mission ? ",
   specification: "Quelle technologie ?",
-
+  abstract: "Write your short description ...",
   wadge: "10",
   worker: "Name of worker",
   estimatedDays: "10",
@@ -218,22 +219,14 @@ export let moock_create_feature_placeholders = {
 
 export let moock_create_launchpad = {
   target: "Launchpad",
-  tokenAddress: null,
-  isAddress: null,
-  tokenAllowance: null,
-  price: null,
-  numberOfTier: null,
+
   maxCap: null, // bio
   minCap: null, // uri
   minInvest: null,
   maxInvest: null, // uri
   saleStart: null,
   saleEnd: null,
-  lockedTime: null,
-  rounds: [],
-  tokenPrice: [],
-  maxTiersCap: [],
-  minTiersCap: [],
+
   linkedin: null,
   facebook: null,
   twitter: null,
@@ -250,68 +243,40 @@ export let moock_create_launchpad = {
 export let moock_create_launchpad_checked = [
   [],
   ["title", "website", "domain", "description"],
-  ["tokenAddress", "tokenAllowance", "minInvest", "maxInvest"],
-  [
-    "lockedTime",
-    "saleStart",
-    "saleEnd",
-    "maxTiersCap",
-    "minTiersCap",
-    "tokenPrice",
-  ],
+  ["saleStart", "saleEnd", "minInvest", "maxInvest", "maxCap", "minCap"],
 ];
 
 export let moock_create_launchpad_superchecked = (form, pointer) => {
   let checkTierDatas = false;
 
-  if (pointer === 3) {
-    for (let index = 0; index < form?.maxTiersCap?.length; index++) {
-      let maxCap = form?.maxTiersCap?.[index];
-      let minCap = form?.minTiersCap?.[index];
-      let tokenPrice = parseFloat(form?.tokenPrice?.[index]);
-      if (minCap < maxCap) {
-        checkTierDatas = true;
-      }
-      if (tokenPrice == 0) {
-        checkTierDatas = false;
-      }
-    }
-    if (form?.maxTiersCap?.length === 0) {
-      checkTierDatas = false;
+  if (pointer === 2) {
+    let maxCap = form?.maxCap;
+    let minCap = form?.minCap;
+    if (minCap < maxCap) {
+      checkTierDatas = true;
     }
   }
 
   return [
     [],
     [],
+
     [
-      {
-        bool: form?.isAddress,
-      },
-      { bool: parseFloat(form?.tokenAllowance) > 0.01 },
-      { bool: parseFloat(form?.minInvest) > 0.01 },
       { bool: parseFloat(form?.maxInvest) > parseFloat(form?.minInvest) },
-    ],
-    [
       { bool: checkTierDatas },
-      { bool: parseInt(form?.rounds) > 1 && parseInt(form?.rounds) <= 5 },
-      { bool: parseInt(form?.lockedTime) > 1 },
     ],
   ];
 };
 export let moock_create_launchpad_placeholder = {
-  tokenAddress: "ERC20 token address",
-  tokenAllowance: "300",
-  maxTiersCap: "300 ETH", // bio
-  minTiersCap: "200 ETH", // uri
+  maxCap: "300 ETH", // bio
+  minCap: "200 ETH", // uri
   website: "URL website",
   minInvest: "10 ETH",
-  rounds: "5 rounds",
+
   maxInvest: "15 ETH", // uri
   saleStart: "Date de début",
   saleEnd: "Date de fin",
-  lockedTime: "Time lock",
-  tokenPrice: "0.03 ETH",
+
   linkedin: "URL linkedin",
   facebook: "URL facebook",
 

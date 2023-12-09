@@ -25,13 +25,15 @@ import { MySub } from "components/myComponents/text/MySub";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
 
-import { _table_missions } from "utils/states/tables/mission";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { ProfileAvatar } from "components/profile/ProfileAvatar";
 import { MySelect } from "components/myComponents/form/MySelects";
 import { LayoutForm } from "sections/Form/LayoutForm";
+import { MyBadge } from "components/myComponents/box/MyList";
+import { MissionName } from "components/inputs/inputsMission/MissionName";
+import { NoItems } from "components/myComponents/layout/NoItems";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -51,11 +53,11 @@ function App({ params }) {
   //   };
   useEffect(() => {
     let demands = 0;
-    let invites = 0;
+    let invites = state?.notifications?.invitations?.length;
     state?.notifications?.demands?.map(
       (el) => (demands += el?.details.demands?.length)
     );
-    state?.notifications?.invites?.map((el) => (invites += el?.arr.length));
+
     setIsLength({ demands, invites });
   }, [state?.notifications]);
   console.log(state);
@@ -112,7 +114,7 @@ function App({ params }) {
               )}
             </div>
             <div className="w-full h-full rounded-lg  shadow backdrop-blur ">
-              {state?.notification?.demands?.length > 0 ? (
+              {state?.notifications?.demands?.length > 0 ? (
                 state?.notifications?.demands?.map((feature) => (
                   <div
                     className="flex flex-col border border-white/0 border-t-white/5  pt-5 gap-2"
@@ -125,17 +127,30 @@ function App({ params }) {
                     {feature?.details?.demands?.map((account, i) => (
                       <div
                         className={
-                          "w-full on_hover pr-2 py-1 flex items-center border border-y-white/10 border-x-white/0  hover:bg-white/5"
+                          "w-full on_hover pr-2 py-1  h-fit flex items-center border border-y-white/10 border-x-white/0  hover:bg-white/5"
                         }
                         template={3}
                         key={v4()}
                       >
                         <div
-                          className={`pl-1 mr-2 py-3 g1 ${
+                          className={`pl-1  mr-2 py-3 g1 ${
                             ["gb1", "gr1"]?.[i % 2]
                           }`}
                         />
-                        <ProfileAvatar metadatas={account?.metadatas} />{" "}
+
+                        <ProfileAvatar
+                          cvID={parseInt(account?.cvID)}
+                          style={"w-10 h-10 m-2"}
+                          metadatas={account?.metadatas}
+                        />
+                        <MyBadge style={"ml-2"}>
+                          <Icon
+                            icon={
+                              ENUMS.domain[account?.metadatas?.domain]?.icon
+                            }
+                          />
+                          {ENUMS.domain[account?.metadatas?.domain]?.name}
+                        </MyBadge>
                         <div className="flex ml-auto on_hover_view">
                           <MyMainBtn
                             setter={async () =>
@@ -154,7 +169,7 @@ function App({ params }) {
                   </div>
                 ))
               ) : (
-                <span className="font-light c4 m-auto">No demands found</span>
+                <NoItems icon={icsystem.mission} />
               )}
             </div>
           </MyCard>
@@ -171,23 +186,15 @@ function App({ params }) {
                   invitations inbox
                 </MySub>
               </div>
-              {state?.notifications?.invites?.length > 1 ? (
+              {state?.notifications?.invitations?.length > 1 ? (
                 <MySelect
                   styles={"ml-auto mr-3"}
                   target={"demands"}
                   arr={[
                     "All",
-                    ...state?.notifications?.invitations?.map((el) => (
-                      <>
-                        <Icon
-                          icon={
-                            ENUMS.courts[el?.feature?.datas?.specification]
-                              ?.badge
-                          }
-                        />
-                        {el?.feature?.metadatas?.title}
-                      </>
-                    )),
+                    ...state?.notifications?.invitations?.map(
+                      (el) => el?.metadatas?.title
+                    ),
                   ]}
                 />
               ) : (
@@ -195,45 +202,69 @@ function App({ params }) {
               )}
             </div>
             <div className="w-full h-full rounded-lg  shadow backdrop-blur ">
-              {state?.notifications?.invites?.length > 0 ? (
-                state?.notifications?.invites?.map((object) => (
+              {state?.notifications?.invitations?.length > 0 ? (
+                state?.notifications?.invitations?.map((feature, i) => (
                   <div
                     className="flex  flex-col border border-white/0 border-t-white/5  pt-5 gap-2"
                     key={v4()}
                   >
                     <div className="flex items-center">
                       <Icon className="mr-2 rotate-90" icon={icfy.ux.arrow} />
-                      <MySub>{object?.feature?.metadatas?.title}</MySub>
+                      <MySub>{feature?.metadatas?.title}</MySub>
                     </div>
-                    {object?.arr?.map((el) => (
-                      <MyCard
-                        styles={
-                          "w-full px-2 py-1 flex items-center justify-between"
-                        }
-                        template={3}
-                        key={v4()}
-                      >
-                        <ProfileAvatar metadatas={el} />{" "}
-                        <div className="flex">
-                          <MyMainBtn
-                            style={"btn btn-ghost text-error btn-xs"}
-                            icon={icfy.ux.check.uncheck}
-                            template={3}
-                          ></MyMainBtn>
-                          <MyMainBtn
-                            style={"btn btn-ghost  btn-xs"}
-                            icon={icfy.ux.check.casual}
-                            template={1}
-                          ></MyMainBtn>
-                        </div>
-                      </MyCard>
-                    ))}
+                    <div className="flex items-center gap-3">
+                      <MyBadge color={1}>
+                        <MissionName
+                          id={feature?.datas?.missionID}
+                          metadatas={feature?.metadatas?.["@expand"]?.missionID}
+                        />
+                      </MyBadge>
+                      <MyBadge color={i}>
+                        <Icon
+                          icon={
+                            ENUMS.courts[feature?.datas?.specification]?.badge
+                          }
+                        />
+                        {ENUMS.courts[feature?.datas?.specification]?.court}
+                      </MyBadge>
+                    </div>
+                    <MyCard
+                      styles={
+                        "w-full px-2 py-1 flex items-center justify-between"
+                      }
+                      template={3}
+                      key={v4()}
+                    >
+                      <ProfileAvatar
+                        cvID={feature?.owner?.cvID}
+                        metadatas={feature?.owner?.metadatas}
+                      />{" "}
+                      <div className="flex">
+                        {console.log(feature.featureID)}
+                        <MyMainBtn
+                          style={"btn btn-ghost text-error btn-xs"}
+                          icon={icfy.ux.check.uncheck}
+                          _refresh={false}
+                          template={3}
+                          setter={async () =>
+                            await _apiPost("declineJob", [feature?.featureID])
+                          }
+                        ></MyMainBtn>
+                        <MyMainBtn
+                          _refresh={false}
+                          setter={async () =>
+                            await _apiPost("acceptJob", [feature?.featureID])
+                          }
+                          style={"btn btn-ghost  btn-xs"}
+                          icon={icfy.ux.check.casual}
+                          template={1}
+                        ></MyMainBtn>
+                      </div>
+                    </MyCard>
                   </div>
                 ))
               ) : (
-                <span className="font-light c4 m-auto">
-                  No invitations found
-                </span>
+                <NoItems target={"Invitations"} icon={icsystem.feature} />
               )}
             </div>
           </MyCard>

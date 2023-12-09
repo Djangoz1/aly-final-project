@@ -20,7 +20,12 @@ import { _table_invites } from "utils/works/feature";
 
 import { Viewport } from "components/myComponents/layout/MyViewport";
 
-import { _apiGet, _apiPost, _apiPostAt } from "utils/ui-tools/web3-tools";
+import {
+  _apiGet,
+  _apiPost,
+  _apiPostAt,
+  _apiPostPayable,
+} from "utils/ui-tools/web3-tools";
 import { CVOverview } from "sections/Profile/state/CVOverview";
 
 import {
@@ -55,44 +60,24 @@ export const StateLaunchpadForm = () => {
   const { state, status, pointer } = useToolsState();
 
   let buyTokens = async (value) => {
-    await _apiPost(
+    await _apiPostPayable(
       "buyTokens",
       [parseInt(state?.launchpad?.launchpadID)],
-      ethers.utils.parseEther(value)
+      ethers.utils.parseEther(value)?._hex
     );
     await doStateLaunchpadTools(dispatch, state?.launchpad?.launchpadID);
   };
-  const handleSubmit = async (tokens) => {
-    await _apiPostAt({
-      args: [state?.launchpad?.datas?.address, tokens * 10 ** 18],
-      targetContract: "erc20",
-      func: "approve",
-      address: state?.launchpad?.datas?.tokenAddress,
-    });
-    await _apiPost("lockTokens", [
-      state?.launchpad?.launchpadID,
-      tokens * 10 ** 18,
-    ]);
-    await doStateLaunchpadTools(dispatch, state?.launchpad?.launchpadID);
-  };
+
   return (
     <LayoutForm
       stateInit={{
         allowed: true,
         placeholders: {
-          tokensLock: "Number of tokens to lock",
-          tokens: `Price: ${
-            state?.launchpad?.datas?.tiersDatas &&
-            ethers?.utils?.formatEther(
-              state?.launchpad?.datas?.tiersDatas?.[
-                state?.launchpad?.datas?.currentTier
-              ]?.tokenPrice
-            )
-          } ETH`,
+          tokens: `Price ETH`,
         },
         form: {
           tokens: 0,
-          tokensLock: 0,
+
           target: "formLaunchpad",
         },
       }}
@@ -100,26 +85,8 @@ export const StateLaunchpadForm = () => {
       {cv &&
         state?.launchpad?.datas?.status === 1 &&
         state?.launchpad?.datas.saleStart < Math.floor(Date.now() / 1000) && (
-          <div className=" flex flex-col">
-            <div className=" uppercase flex items-center c1">
-              Round{" "}
-              <span className=" ml-1">
-                {state?.launchpad?.datas?.currentTier + 1}
-              </span>
-              <span className="text-xs ml-10 c4 flex items-center">
-                <Icon icon={icfyETHER} className="text-sm" />
-                <span className="">
-                  {parseFloat(
-                    ethers.utils.formatEther(
-                      state?.launchpad?.datas?.tiersDatas?.[
-                        state?.launchpad?.datas?.currentTier
-                      ]?.tokenPrice
-                    )
-                  )}{" "}
-                  ETH
-                </span>
-              </span>
-            </div>
+          <div className=" flex px-5 py-2 flex-col">
+            <div className=" uppercase flex items-center c1"></div>
             <div className="flex items-end w-full justify-between">
               <MyInput
                 setter={buyTokens}
@@ -128,39 +95,27 @@ export const StateLaunchpadForm = () => {
                 type={"number"}
                 label={"Buy Tokens"}
                 target={"tokens"}
-                // min={parseFloat(
-                //   ethers.utils.formatEther(state?.launchpad?.datas?.minInvest)
-                // )}
+                min={parseFloat(
+                  ethers?.utils?.formatEther(state?.launchpad?.datas?.minInvest)
+                )}
                 max={parseFloat(
                   ethers.utils.formatEther(state?.launchpad?.datas?.maxInvest)
                 )}
-                result={{
-                  fixed: 3,
-                  text: "Tokens",
-                  value: parseFloat(
-                    ethers.utils.formatEther(
-                      state?.launchpad?.datas?.tiersDatas?.[
-                        state?.launchpad?.datas?.currentTier
-                      ]?.tokenPrice
-                    )
-                  ),
-                }}
+                // result={{
+                //   fixed: 3,
+                //   text: "Tokens",
+                //   value: parseFloat(
+                //     ethers.utils.formatEther(
+                //       state?.launchpad?.datas?.tiersDatas?.[
+                //         state?.launchpad?.datas?.currentTier
+                //       ]?.tokenPrice
+                //     )
+                //   ),
+                // }}
               ></MyInput>
             </div>
           </div>
         )}
-
-      {cv == state?.owner?.cvID && (
-        <MyInput
-          styles={"mt-1 w-fit"}
-          type={"number"}
-          icon={icfyLOCK}
-          setter={handleSubmit}
-          max={state?.launchpad?.datas?.balanceOwner}
-          target={"tokensLock"}
-          label={"Token to lock"}
-        />
-      )}
     </LayoutForm>
   );
 };

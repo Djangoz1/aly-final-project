@@ -3,6 +3,7 @@ import { useAuthState } from "context/auth";
 import { doInitStateForm, useFormDispatch, useFormState } from "context/form";
 import { useToolsState } from "context/tools";
 import React, { useState } from "react";
+import { controllers } from "utils/controllers";
 import { clientPocket } from "utils/ui-tools/pinata-tools";
 // import { createImageCIDOnPinata } from "utils/ui-tools/pinata-tools";
 import { v4 as uuidv4 } from "uuid";
@@ -39,13 +40,14 @@ export const MyInputFile = ({ metadatas, target, label, style, setter }) => {
   let handleChange = async (file) => {
     let _form = { ...form };
 
+    let formData = new FormData();
+    await formData.append(target, file);
+    console.log("testca", formData);
     _form[target] = file;
     doInitStateForm(dispatch, _form);
+
     if ((metadatas || setter) && !isLoading) {
       setIsLoading(true);
-      let formData = new FormData();
-
-      formData.append(target, file);
 
       try {
         if (setter) {

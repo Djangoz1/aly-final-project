@@ -12,7 +12,6 @@ import { MyTextArea } from "components/myComponents/form/MyTextArea";
 import { MyToggle } from "components/myComponents/form/MyToggle";
 import { ADDRESSES } from "constants/web3";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
-import { doStateCV } from "context/hub/cv";
 import {
   doStateProfileTools,
   useToolsDispatch,

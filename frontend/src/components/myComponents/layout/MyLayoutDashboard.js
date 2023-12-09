@@ -119,8 +119,8 @@ export const MyLayoutDashboard = ({
 
       {template === 0 ? (
         <>
-          <div className=" relative h-full flex w-full">
-            <div className="  border-r-white/5  fixed left-0 bottom-0 flex  flex-col-reverse h-full w-[24%] bgprim">
+          <div className=" relative h-full flex  w-full">
+            <div className="  border-r-white/5  fixed left-0 bottom-0 flex  flex-col-reverse h-full w-[18%] bgprim">
               <div className="flex flex-col h-full overflow-y-scroll hide-scrollbar pb-20 w-full">
                 {metadatas ? (
                   <MyLayoutHeader
@@ -146,51 +146,15 @@ export const MyLayoutDashboard = ({
                     </div>
                   </MyLayoutHeader>
                 ) : (
-                  // <div className="flex bg-gradient-to-r pt-3 pb-10 from-white/5 to-transparent relative px-4 flex-col">
-                  //   <div className="flex  mt-4 items-center">
-                  //     <Avatar CID={metadatas?.image} />
-
-                  //     <div className="flex ml-3 font-light c4 flex-col">
-                  //       <CVName metadata={metadatas} styles={"text-lg c3"} />
-                  //       <p className="mb-0 text-xs">{metadatas?.description}</p>
-                  //       <p className="font-light  text-xs">
-                  //         Créer le
-                  //         <span className="ml-2 font-semibold">
-                  //           {metadatas?.created}
-                  //         </span>
-                  //       </p>
-                  //     </div>
-                  //   </div>
-                  //   <MyStatus
-                  //     allowed={true}
-                  //     refresh={refresh}
-                  //     status={metadatas?.visibility ? 0 : 1}
-                  //     toStatus={metadatas?.visibility ? 1 : 0}
-                  //     padding={"px-2 py-1 "}
-                  //     style={
-                  //       "text-xs   mt-3 w-fit mb-2 h-fit rounded   font-bold "
-                  //     }
-                  //     target={"visibility"}
-                  //   ></MyStatus>
-                  //   <div className="flex w-full flex-wrap items-">
-                  //     <MySub style={"items-center flex"}>
-                  //       <Icon
-                  //         className="text-lg mr-2"
-                  //         icon={ENUMS?.domain[metadatas?.domain]?.icon}
-                  //       />
-                  //       {ENUMS?.domain[metadatas?.domain]?.name}
-                  //     </MySub>
-                  //   </div>
-                  // </div>
                   <></>
                 )}
                 <MyMenus current={url} menus={menus} />
               </div>
-              <div className=" relative">
+              <div className=" max-w-full relative">
                 <Header />
               </div>
             </div>
-            <div className="px-5 h-full w-[76%] ml-auto backdrop-blur">
+            <div className="px-5 h-full w-[82%] ml-auto backdrop-blur">
               {isLoading === false ? children : <MyLoader template={1} />}
             </div>
             {btn ? <div className="fixed bottom-5 right-5">{btn}</div> : <></>}

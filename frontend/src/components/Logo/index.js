@@ -6,7 +6,6 @@ import Link from "next/link";
 import "./style.css";
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "react-text-gradients";
-import { AnimatePresence, motion } from "framer-motion";
 import { v4 } from "uuid";
 export const Logo = ({ style, style1, styleD }) => {
   const [pointer, setPointer] = useState(0);
@@ -16,14 +15,7 @@ export const Logo = ({ style, style1, styleD }) => {
       href={"/"}
       className="c3 logo text-shadow uppercase font2  text-2xl  flex items-end font2 font-light "
     >
-      {/* <AnimatePresence> */}
-      <motion.div
-        key={v4()}
-        // initial={{ scale: 0.8, opacity: 0 }}
-        // animate={{ scale: 1, opacity: 1 }}
-        // transition={{ duration: 0.5 }}
-        className="flex  items-center"
-      >
+      <div className="flex  items-center">
         {/* <img src="/logo.png" className="w-12 h-12" /> */}
         <div
           className={`${styleD || "w-12 text-lg h-[30px]"} 
@@ -36,8 +28,7 @@ export const Logo = ({ style, style1, styleD }) => {
           <span className={`${style || "text-lg"} my-auto `}>ork</span>
         </div>
         {/* {titles[pointer]} */}
-      </motion.div>
-      {/* </AnimatePresence> */}
+      </div>
     </Link>
   );
 };

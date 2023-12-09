@@ -27,8 +27,8 @@ export const ChatBubble = ({
 
   return (
     !isForm?.no && (
-      <div className={"chat  chat-start " + style}>
-        {!image?.no && (
+      <div className={`chat     ${"chat-start" || style}`}>
+        {!image?.no && CID !== false && (
           <Avatar
             src={ai ? "/ai.png" : image}
             CID={CID}

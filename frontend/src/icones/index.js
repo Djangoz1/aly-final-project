@@ -5,6 +5,9 @@ export const icfy = {
     close: "ant-design:eye-invisible-outlined",
     open: "ic:outline-remove-red-eye",
   },
+  social: {
+    checkmark: "pepicons-print:checkmark-filled",
+  },
   like: "iconamoon:like-duotone",
   ux: {
     workspace: "ic:outline-workspace-premium",

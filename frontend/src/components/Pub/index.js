@@ -86,47 +86,39 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
       <div
         id={`pub${id}`}
         ref={ref}
-        className={`flex border _hover opacity-80 hover:opacity-100  border-t-0 border-b-1 ${
+        className={`flex border  _hover   border-t-0 border-b-1 ${
           [
             "border-white/10 hover:bg-black/20 hover:text-white",
             "bc1  hover:bg-neutral-400 bg3 hover:text-sky-950",
           ]?.[color || 0]
         } border-x-0  px-4 py-5  w-full items-start`}
       >
-        <div className="flex _hover hover:opacity-100 opacity-40 flex-col h-full  items-center ">
-          {modal && <LogoIc styles={"mb-5"} />}
-          <div className="avatar">
-            <Avatar
-              metadatas={_owner}
-              CID={_owner?.avatar}
-              style={`w-${styles?.img || "12"} mask mask-squircle `}
+        <Avatar metadatas={_owner} CID={_owner?.avatar} style={`w-12`} />
+
+        <div className={`flex h-max  w-full px-5 flex-col  `}>
+          <div className=" flex c4 items-center mb-1">
+            <CVName
+              styles={`${
+                ["c3 ", "c1"]?.[color || 0]
+              } mr-2 font-semibold text-sm`}
+              metadata={_owner}
+              cvID={_owner?.cvID}
             />
+            <Icon
+              icon={icfy.social.checkmark}
+              className="text-sky-500 text-sm"
+            />
+            <span className={` text-[8px] ml-2  whitespace-nowrap  `}>
+              • {fromTimestamp(_pub?.metadatas?.created)}
+            </span>
           </div>
-
-          <span className={`text-xs whitespace-nowrap  mt-3`}>
-            {fromTimestamp(_pub?.metadatas?.created)}
-          </span>
-        </div>
-
-        <div
-          className={`flex h-max  border border-l-1 w-full ${
-            ["border-white/10", "border-black/10"]?.[color || 0]
-          } border-y-0 border-r-0  px-5 flex-col ml-5 `}
-        >
-          <CVName
-            styles={`${
-              ["text-white/40 ", "c1"]?.[color || 0]
-            } mb-1 font-semibold text-sm`}
-            metadata={_owner}
-            cvID={_owner?.cvID}
-          />
 
           {!_pub?.metadatas?.code ? (
             <p
-              className={`text-[${styles?.size}] line-clamp-${
+              className={`text-sm mt-1 line-clamp-${
                 isClicked ? "none" : styles?.clamp
               } cursor-pointer whitespace-break-spaces ${
-                ["c3", "c1"]?.[color || 0]
+                ["text-slate-700 dark:text-slate-400", "c1"]?.[color || 0]
               } text-justify`}
               onClick={() => setIsClicked(!isClicked)}
             >
@@ -166,133 +158,106 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
               }
             />
           )}
-          {!modal && (
-            <div className="flex  mt-10 items-end">
-              <MyModal
-                styles={{
-                  btn: "btn btn-ghost btn-xs hover:text-info py-2 h-fit w-fit",
-                }}
-                btn={<Icon icon={icfy.eye.open} />}
-                modal={
-                  <Pub
-                    id={id}
-                    modal={true}
-                    styles={{ size: "18px", clamp: "none" }}
-                    _owner={_owner}
-                  />
-                }
-              />
-              <div className="flex w-full flex-col">
-                <div className="flex w-full justify-center items-center">
-                  <Link
-                    href={`#pub${id}`}
-                    onClick={() =>
-                      doStateIndexerTools(dispatch, {
-                        ...indexer,
-                        indexPub: {
-                          ...indexer?.indexPub,
-                          id: id,
-                          answer:
-                            id !== indexer?.indexPub?.id
-                              ? true
-                              : !indexer?.indexPub?.answer,
-                        },
-                      })
-                    }
-                    className={`flex text-[9px] border border-white/5  bg-white/5 btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer normal-case`}
-                  >
-                    <Icon icon={icfyBUBBLE} className=" mr-1" />
-                    Answers
-                    <MyNum
-                      toFix={0}
-                      num={_pub?.metadatas?.answers?.length}
-                      style=" border-2 border-l-white/10 border-white/0 pl-2 "
-                    ></MyNum>
-                  </Link>
-                  <button
-                    disabled={!cv}
-                    href={`#pub${id}`}
-                    onClick={() =>
-                      doStateIndexerTools(dispatch, {
-                        ...tools?.indexer,
+          <div className="flex gap-4  mt-10 items-center">
+            <button
+              onClick={() =>
+                doStateIndexerTools(dispatch, {
+                  ...indexer,
+                  indexPub: {
+                    ...indexer?.indexPub,
+                    id: id,
+                    answer:
+                      id !== indexer?.indexPub?.id
+                        ? true
+                        : !indexer?.indexPub?.answer,
+                  },
+                })
+              }
+              className={`flex border border-white/5 bg-gradient-to-l from-white/5 to-transparent text-[9px] normal-case btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer`}
+            >
+              <Icon icon={icfyBUBBLE} className="text-lg " />
+              {/* Answers */}
+              <MyNum
+                toFix={0}
+                num={_pub?.metadatas?.answers?.length}
+                style=" border-2 border-l-white/10 border-white/0 pl-2 "
+              ></MyNum>
+            </button>
 
-                        indexPub: {
-                          id: id,
-                          post:
-                            id !== tools?.state?.front?.indexPub?.id
-                              ? true
-                              : !tools?.state?.front?.indexPub?.post,
-                        },
-                      })
-                    }
-                    className="btn ml-10 border border-white/5 text-[9px] normal-case btn-xs btn-ghost"
-                  >
-                    <Icon icon={icfySEND} className=" mr-1" />
-                    Post
-                  </button>
-                </div>
-                {indexer?.indexPub?.id === id &&
-                  indexer?.indexPub?.post === true && (
-                    <CreatePub
-                      btn={<></>}
-                      refresh={state}
-                      styles={`flex btn btn-ghost btn-xs py-2 h-fit w-fit hover:text-secondary cursor-pointer ${
-                        !isConnected && "btn-disabled"
-                      }`}
-                      answerID={_pub?.metadatas?.id}
-                    />
-                  )}
-              </div>
+            <button
+              disabled={!cv}
+              className={`flex border border-white/5 bg-gradient-to-l from-white/5 to-transparent text-[9px] normal-case btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer ${
+                _pub?.metadatas?.likes?.filter(
+                  (el) => el?.userID == metadatas?.id
+                )?.[0]
+                  ? "hover:text-error"
+                  : "hover:text-success"
+              }`}
+              onClick={() => setterLike()}
+            >
+              {isDatas?.isLiked ? (
+                <>
+                  <Icon icon={icfy.like} className="text-lg text-success  " />
 
-              <button
-                disabled={!cv}
-                className={`flex border border-white/5 bg-gradient-to-l from-white/5 to-transparent text-[9px] normal-case btn btn-ghost btn-xs py-2 h-fit w-fit   cursor-pointer ${
-                  _pub?.metadatas?.likes?.filter(
-                    (el) => el?.userID == metadatas?.id
-                  )?.[0]
-                    ? "hover:text-error"
-                    : "hover:text-success"
-                }`}
-                onClick={() => setterLike()}
-              >
-                {isDatas?.isLiked ? (
-                  <>
-                    <Icon
-                      icon={icfy.like}
-                      className="text-lg text-success  mr-1"
-                    />
-                    {/* <Icon className={`text-lg mr-2 debug`} /> */}
-                    Liked
-                  </>
-                ) : (
-                  <>
-                    <Icon icon={icfy.like} className="text-lg  mr-1" />
-                    {/* <Icon className={`text-lg mr-2 debug`} /> */}
-                    Likes
-                  </>
-                )}
-                <MyNum
-                  toFix={0}
-                  num={isDatas?.likes}
-                  style=" border-2 border-l-white/10 border-white/0 pl-2 "
-                ></MyNum>
-              </button>
-              {_pub?.metadatas?.missionID ? (
-                <Link
-                  className="btn btn-ghost btn-xs py-2 h-fit w-fit"
-                  href={`/works/mission/${_pub?.datas?.missionID}`}
-                >
-                  <Icon
-                    icon={icfyMISSION}
-                    className=" text-blue-600 cursor-pointer"
-                  />
-                </Link>
+                  {/* Liked */}
+                </>
               ) : (
-                <button className="btn btn-ghost btn-xs py-2 h-fit w-fit">
-                  <Icon icon={icfyMISSION} className="  text-red-900" />
-                </button>
+                <>
+                  <Icon icon={icfy.like} className="text-lg  " />
+
+                  {/* Likes */}
+                </>
               )}
-            </div>
+              <MyNum
+                toFix={0}
+                num={isDatas?.likes}
+                style=" border-2 border-l-white/10 border-white/0 pl-2 "
+              ></MyNum>
+            </button>
+
+            <button
+              className="ml-auto mr-3"
+              disabled={!cv}
+              onClick={() =>
+                doStateIndexerTools(dispatch, {
+                  ...tools?.indexer,
+
+                  indexPub: {
+                    id: id,
+                    post:
+                      id !== tools?.state?.front?.indexPub?.id
+                        ? true
+                        : !tools?.state?.front?.indexPub?.post,
+                  },
+                })
+              }
+            >
+              <Icon icon={icfySEND} className="text-lg " />
+            </button>
+            {_pub?.metadatas?.missionID ? (
+              <Link
+                // className="ml-auto"
+                href={
+                  _pub?.metadatas?.missionID
+                    ? `/works/mission/${_pub?.datas?.missionID}`
+                    : "#"
+                }
+              >
+                <Icon icon={icfy.ux.mediation} className={"cursor-pointer"} />
+              </Link>
+            ) : (
+              <></>
+            )}
+          </div>
+          {indexer?.indexPub?.id === id && indexer?.indexPub?.post === true && (
+            <CreatePub
+              btn={<></>}
+              refresh={state}
+              styles={`flex btn btn-ghost btn-xs py-2 h-fit w-fit hover:text-secondary cursor-pointer ${
+                !isConnected && "btn-disabled"
+              }`}
+              answerID={_pub?.metadatas?.id}
+            />
           )}
         </div>
       </div>

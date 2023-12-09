@@ -1,5 +1,13 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { icfy, icfyCODE, icfyIMG, icfyINFO, icfyTIME, icsystem } from "icones";
+import {
+  icfy,
+  icfyCODE,
+  icfyHOME,
+  icfyIMG,
+  icfyINFO,
+  icfyTIME,
+  icsystem,
+} from "icones";
 import { styles } from "styles/style";
 import { EditTokenLaunchpad } from "sections/Launchpad/form/EditLockToken";
 import Link from "next/link";
@@ -168,11 +176,6 @@ export const menus_id = (target, id) => {
         title: "Overview",
         sub: [
           {
-            icon: icfyINFO,
-            title: "Informations",
-            url: "/profile/" + id + "/informations",
-          },
-          {
             icon: icfyIMG,
             title: "Gallery",
             url: "/profile/" + id + "/gallery",
@@ -254,12 +257,6 @@ export const menus_id = (target, id) => {
         title: "Overview",
         sub: [
           {
-            icon: icfyINFO,
-            title: "Informations",
-            url: "/launchpad/" + id + "/informations",
-          },
-
-          {
             icon: icfyIMG,
             title: "Gallery",
             url: "/launchpad/" + id + "/gallery",
@@ -278,7 +275,7 @@ export const menus_id = (target, id) => {
           {
             icon: icfy.msg.post,
             title: "Posts",
-            url: "/works/mission/" + id + "/social",
+            url: "/launchpad/" + id + "/social",
           },
         ],
       },
@@ -289,28 +286,18 @@ export const menus_id = (target, id) => {
         sub: [
           {
             icon: icfy.ux.workspace,
-            title: "Workspace",
+            title: "Overview",
             url: "/works/mission/" + id + "/",
           },
         ],
       },
       {
-        title: "Overview",
+        title: "Workspace",
         sub: [
           {
-            icon: icfyTIME,
-            title: "Agendas",
-            url: "/works/mission/" + id + "/agendas",
-          },
-          {
-            icon: icfyIMG,
-            title: "Gallery",
-            url: "/works/mission/" + id + "/gallery",
-          },
-          {
-            icon: icsystem.feature,
-            title: "Features",
-            url: "/works/mission/" + id + "/features",
+            icon: icfyHOME,
+            title: "Desk",
+            url: "/works/mission/" + id + "/desk",
           },
 
           {
@@ -338,6 +325,11 @@ export const menus_id = (target, id) => {
             icon: icfy.msg.post,
             title: "Posts",
             url: "/works/mission/" + id + "/social",
+          },
+          {
+            icon: icfyIMG,
+            title: "Gallery",
+            url: "/works/mission/" + id + "/gallery",
           },
         ],
       },

@@ -3,6 +3,7 @@ import { ImagePin } from "components/Image/ImagePin";
 import { BtnsSocial } from "components/btn/BtnsSocial";
 import { BtnFollow } from "components/btn/BtnsSocial/BtnFollow";
 import { CVName } from "components/inputs/inputsCV/CVName";
+import { MyBadge } from "components/myComponents/box/MyList";
 import { BtnGb1, BtnGr1 } from "components/myComponents/btn/MyGradientButton";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
@@ -113,7 +114,7 @@ export const AssetFreelancer = ({ owner, style }) => {
   useEffect(() => {
     if (!isImages && owner?.metadatas) {
       let images = [];
-      owner?.metadatas?.image && images.push(owner?.metadatas?.image);
+      owner?.metadatas?.avatar && images.push(owner?.metadatas?.avatar);
       owner?.metadatas?.cvImg && images.push(owner?.metadatas?.cvImg);
       owner?.metadatas?.banniere && images.push(owner?.metadatas?.banniere);
       setIsImages(images);
@@ -131,50 +132,29 @@ export const AssetFreelancer = ({ owner, style }) => {
   };
   return (
     <MyCard
-      styles={`relative  flex items-end h-[430px] min-h-[430px] w-[300px] ${style}`}
+      template={0}
+      styles={`relative  flex  h-fit  w-full flex-col ${style}`}
     >
-      <div className="absolute   h-1/2 top-0 left-0 w-full   flex flex-col">
-        <div className="mt-auto bg-gradient-to-br px-5 from-black/10  c3  via-black/20 to-black/30 transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col z-10">
-          <CVName
-            styles="text-xl"
-            cvID={owner?.cvID}
-            metadata={owner?.metadatas}
-          />
-
-          <p className="text-xs">{owner?.metadatas?.description}</p>
-          <div className="flex -mb-3 mt-1">
-            <span className="rounded-lg    bg-lime-300 shadow c1 font-semibold py-1 px-2 h-fit w-fit text-xs ">
-              {owner?.details?.wadge?.toFixed(4)} ETH
-            </span>
-            <span className="rounded-lg  ml-3 flex items-center   bg1 shadow c3 font-semibold py-1 px-2 h-fit w-fit text-xs ">
-              <Icon
-                icon={ENUMS.domain[owner?.metadatas?.domain]?.icon}
-                className={
-                  " mr-2 text-" + ENUMS.domain[owner?.metadatas?.domain]?.color
-                }
-              />
-              {ENUMS.domain[owner?.metadatas?.domain]?.name}
-            </span>
-          </div>
-        </div>
-
+      <div className="w-full h-full relative">
         <ImagePin
-          style={"absolute left-0 z-0 top-0 h-full w-full h-full"}
+          style={" z-1 h-[150px]   w-full "}
           CID={isImages?.[isPointerImg]}
+          metadatas={owner?.metadatas}
         />
         <Icon
           onClick={() => handleChangeImage(isPointerImg - 1)}
           icon={icfyARROWD}
-          className="absolute left-1  top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 rotate-90 text-white text-4xl transition-all cursor-pointer hover:scale-110"
+          className="absolute left-1  bottom-1 -translate-y-1/2 opacity-50 hover:opacity-100 rotate-90 text-white text-4xl transition-all cursor-pointer hover:scale-110"
         />
         <Icon
           onClick={() => handleChangeImage(isPointerImg + 1)}
           icon={icfyARROWD}
-          className="absolute right-1 top-1/2 -translate-y-1/2 -rotate-90 opacity-50 hover:opacity-100 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
+          className="absolute right-1 bottom-1 -translate-y-1/2 -rotate-90 opacity-50 hover:opacity-100 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
         />
         <MyStatus
-          style={`absolute top-3  py-1  px-2 text-xs left-3 z-1 `}
-          target={"visibility"}
+          padding={"px-2 py-1"}
+          style={`absolute top-1   text-xs left-1 z-1 `}
+          target={"profile"}
           status={owner?.metadatas?.visibility ? 0 : 1}
         />
         <div
@@ -190,12 +170,32 @@ export const AssetFreelancer = ({ owner, style }) => {
           />
         </div>
       </div>
-      <div className=" bottom-0 h-1/2 flex flex-col pt-10 pb-4 left-0 w-full px-2 ">
-        <div className="flex overflow-y-scroll  hide-scrollbar pb-3 flex-wrap w-full ">
-          {owner?.details?.badges?.map(
+      <div className="  c3  transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col min-w-full z-10">
+        <CVName
+          styles="text-xl"
+          cvID={owner?.cvID}
+          metadata={owner?.metadatas}
+        />
+
+        <p className="text-xs c4">{owner?.metadatas?.email}</p>
+        <div className="flex -mb-3 mt-1 gap-4">
+          <MyBadge color={1}>{owner?.details?.wadge?.toFixed(4)} ETH</MyBadge>
+          <MyBadge color={2}>
+            {ENUMS.domain[owner?.metadatas?.domain]?.name}
+          </MyBadge>
+        </div>
+      </div>
+
+      {owner?.metadatas?.skills?.length && (
+        <div
+          className="flex mt-10 overflow-y-scroll  hide-scrollbar pb-3 flex-wrap gap-4 w-full "
+          key={v4()}
+        >
+          {owner?.metadatas?.skills?.map(
             (el, i) =>
               i < 5 && (
-                <div
+                <MyBadge
+                  color={el}
                   key={v4()}
                   className="backdrop-blur  rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[10px] px-4 py-1 "
                 >
@@ -214,12 +214,12 @@ export const AssetFreelancer = ({ owner, style }) => {
                   ) : (
                     "... More"
                   )}
-                </div>
+                </MyBadge>
               )
           )}
           {owner?.metadatas?.skills?.map(
             (el, i) =>
-              owner.details.badges.length + i < 5 && (
+              owner?.details?.badges?.length + i < 5 && (
                 <div
                   key={v4()}
                   className="backdrop-blur rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[10px] px-4 py-1 "
@@ -239,7 +239,7 @@ export const AssetFreelancer = ({ owner, style }) => {
               )
           )}
         </div>
-      </div>
+      )}
     </MyCard>
   );
 };

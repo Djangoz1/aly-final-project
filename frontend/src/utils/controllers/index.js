@@ -1,5 +1,5 @@
 import { clientPocket } from "utils/ui-tools/pinata-tools";
-import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
+import { _apiGet, _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
 import { controllersPub } from "./social";
 import { controllersDispute } from "./escrow";
 import {
@@ -15,6 +15,92 @@ export const controllers = {
   create: {
     pub: (form) => controllersPub.create(form),
     dispute: (form) => controllersDispute.create(form),
+    feature: async ({
+      title,
+      value,
+      launchpadID,
+      description,
+      estimatedDays,
+      isInviteOnly,
+      specification,
+      abstract,
+      skills,
+      deployed,
+      image,
+      featureHash,
+      domain,
+      missionID,
+      missionHash,
+    }) => {
+      if (!missionID || !missionHash || !title) {
+        throw new Error(`Missing required value : {
+          missionID : ${missionID},
+          missionHash : ${missionHash},
+          title : ${title},
+        }`);
+      }
+      let uri = featureHash;
+
+      let feature = uri
+        ? await clientPocket.records.getOne("features", uri)
+        : undefined;
+      let featureID;
+      let metadatas = {
+        image: image || feature?.image,
+        missionID: missionHash,
+        domain: domain || feature?.domain,
+        abstract: abstract || feature?.abstract,
+        skills: skills || feature?.skills,
+        title: title,
+        description: description || feature?.description,
+      };
+      let formData = new FormData();
+      formData.append("image", metadatas?.image);
+
+      // formData.append("image", metadatas.image);
+      console.log("metada---------tas", metadatas);
+
+      if (featureHash) {
+        deployed = true;
+      } else {
+        let result = await clientPocket.records.create("features", metadatas);
+        await clientPocket.records.update("features", result.id, formData);
+        uri = result.id;
+      }
+      if (deployed) {
+        if (!description || !title || !domain) {
+          throw new Error(`Missing required deployed value: {
+            description : ${description},
+            title : ${title},
+            domain : ${domain},
+          } `);
+        }
+
+        if (launchpadID) {
+          await _apiPost("createFeatureLaunchpad", [
+            value,
+            missionID,
+            estimatedDays,
+            isInviteOnly,
+            uri,
+            specification,
+          ]);
+        } else {
+          await _apiPostPayable(
+            "createFeature",
+            [missionID, estimatedDays, isInviteOnly, uri, specification],
+            value
+          );
+        }
+        featureID = await _apiGet("tokensLengthOf", [ADDRESSES["featuresHub"]]);
+        await clientPocket.records.update("features", uri, {
+          deployedID: parseInt(featureID),
+          ...metadatas,
+          formData,
+        });
+      }
+      return { featureID, featureHash: uri };
+    },
     follow: async ({ followID, ownerID }) => {
       if (await controllers.get.profile.follow({ followID, ownerID })) {
         let followsList = await clientPocket.records.getList("follows", 1, 50, {
@@ -85,6 +171,7 @@ export const controllers = {
         });
         return followsList?.items?.length > 0;
       },
+
       list: async ({ userID, expand }) => {
         let result = await clientPocket.records.getList("follows", 1, 50, {
           filter: `ownerID = "${userID}"`,
@@ -109,13 +196,17 @@ export const controllers = {
       },
     },
     pub: {
-      list: ({ mission, userID }) => {
+      list: ({ mission, userID, launchpad }) => {
         if (mission) {
           return controllersPub.get.list({
             missionHash: mission?.metadatas?.id,
           });
         } else if (userID) {
           return controllersPub.get.list({ userID });
+        } else if (launchpad) {
+          return controllersPub.get.list({
+            launchpadHash: launchpad?.metadatas?.id,
+          });
         }
       },
     },
@@ -158,20 +249,22 @@ export const controllers = {
         }
         let list = [];
         console.log(expand);
-        if (expand) {
-          for (let index = 0; index < result.items.length; index++) {
-            let record = await clientPocket.records.getOne(
-              "messages",
-              result.items[index].id,
-              {
-                expand,
-              }
-            );
-            list.push(record);
-          }
-        } else {
-          list = [...result.items];
+
+        for (let index = 0; index < result.items.length; index++) {
+          let record = await clientPocket.records.getOne(
+            "messages",
+            result.items[index].id,
+            {
+              expand: expand
+                ? expand
+                : userID === result.items[index].senderID
+                ? "receiverID"
+                : "senderID",
+            }
+          );
+          list.push(record);
         }
+
         return list;
       },
     },
@@ -201,6 +294,40 @@ export const controllers = {
         }),
     },
     feature: {
+      item: async ({ featureID, featureHash, withOwner, expand }) => {
+        if (withOwner && !featureID) {
+          throw new Error("featureID is required for get owner");
+        }
+
+        let result = {};
+        if (featureID) {
+          let feature = await stateFeature(featureID);
+          featureHash = feature.metadatas.id;
+          result = {
+            featureID,
+            datas: {
+              specification: feature.datas.specification,
+              missionID: feature?.datas?.missionID,
+            },
+          };
+          if (withOwner) {
+            let owner = await controllers.get.profile.item({
+              cvID: feature.datas.owner,
+            });
+            result = {
+              ...result,
+
+              owner: { cvID: owner.cvID, metadatas: owner.metadatas },
+            };
+          }
+        }
+        let metadatas = await clientPocket.records.getOne(
+          "features",
+          featureHash,
+          { expand }
+        );
+        return { ...result, metadatas };
+      },
       list: async () => {
         let length = await _apiGet("tokensLengthOf", [
           ADDRESSES["featuresHub"],

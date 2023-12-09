@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { v4 } from "uuid";
 import { clientPocket } from "../../utils/ui-tools/pinata-tools";
 import { useAuthState } from "context/auth";
+import Link from "next/link";
 
 export const FormTxs = () => {
   let { metadatas } = useAuthState();
@@ -49,6 +50,12 @@ export const FormTxs = () => {
         Transaction confirmée !{" "}
       </span>
       <p className="text-[8px]">Hash #{state?.txs?.bc}</p>
+    </>,
+    <>
+      <h6 className="font3"> {form?.target} are ready !</h6>
+      <Link href={state?.txs?.result} className="text-xs text-info ">
+        Click to view !
+      </Link>
     </>,
   ];
   return (

@@ -32,21 +32,30 @@ import { controllers } from "utils/controllers";
 import { AssetFreelancer } from "components/assets/AssetProfile";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
-
+  let [isLoading, setIsLoading] = useState(null);
   let { metadatas } = useAuthState();
   let { state, pointer } = useToolsState();
   let dispatch = useToolsDispatch();
   let [isPointer, setIsPointer] = useState();
   useEffect(() => {
-    (async () =>
+    (async () => {
+      setIsLoading(true);
       doStateTools(dispatch, {
         lists: await controllers.get.profile.list({ filter: "" }),
-      }))();
+      });
+      setIsLoading(false);
+    })();
   }, []);
   console.log(state);
   return (
     <MyLayoutDashboard
+      refresh={async () =>
+        doStateTools(dispatch, {
+          lists: await controllers.get.profile.list({ filter: "" }),
+        })
+      }
       color={2}
+      isLoading={isLoading}
       target={"search"}
       owner={metadatas}
       url={"/search/"}
@@ -227,11 +236,11 @@ let Page = () => {
             </>
           </div>
         ) : (
-          []
+          <></>
         )}
-        <div className=" grid grid-cols-3  grid-rows-4 gap-4 overflow-y-scroll w-full min-h-screen pt-10 backdrop-blur h-fit">
+        <div className=" grid grid-cols-3  grid-rows-4 gap-5 overflow-y-scroll w-full min-h-screen pt-5 backdrop-blur h-fit">
           {state?.lists?.map((el) => (
-            <AssetFreelancer style={"   "} key={v4()} owner={el} />
+            <AssetFreelancer key={v4()} owner={el} />
           ))}
         </div>
         <div className="w-1/6  ml-auto overflow-y-scroll h-full  border border-white/5 border-r-white/0 border-b-white/0">

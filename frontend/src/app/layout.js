@@ -4,9 +4,6 @@ import "../styles/star-background.css";
 
 import { AccountProvider } from "context/account";
 
-import { CVProvider } from "context/hub/cv";
-import { FormProvider } from "context/form";
-import { LayoutTools } from "sections/Layout/LayoutTools";
 import { ToolsProvider } from "context/tools";
 
 export default function RootLayout({ children }) {
@@ -31,26 +28,16 @@ export default function RootLayout({ children }) {
         ></link>
       </head>
 
-      <script
-        src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"
-        async
-      ></script>
-      <script
-        src="https://threejs.org/examples/js/libs/stats.min.js"
-        async
-      ></script>
       <body className="bg-black min-h-100vh">
         <AccountProvider>
           <AuthProvider>
             <ToolsProvider>
-              <CVProvider>
-                {/* <div className="bg-animation">
+              {/* <div className="bg-animation">
                     <div id="stars"></div>
                     <div id="stars2"></div>
                     <div id="stars3"></div>
                   </div> */}
-                {children}
-              </CVProvider>
+              {children}
             </ToolsProvider>
           </AuthProvider>
         </AccountProvider>

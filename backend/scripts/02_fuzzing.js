@@ -3,18 +3,13 @@ const { main: deployMain } = require("./01_deploy");
 const { deleter } = require("./04_deletePin");
 
 const hre = require("hardhat");
-const {
-  _testInitFeature,
 
-  _testInitMission,
-  _testInitPub,
-  _testInitWorkerProposal,
-  _testInitArbitrator,
-} = require("../helpers/test_init");
 const {
   createURICV,
   getAllPinnedFiles,
   deleteAllPinnedFiles,
+  createURI,
+  createImage,
 } = require("../utils/pinata");
 const {
   _createCV,
@@ -23,6 +18,7 @@ const {
   _createPub,
   _createLaunchpad,
 } = require("../utils/web3-tools");
+const { fuzzing } = require("../constants/fuzzing");
 
 async function main() {
   await deleter();
@@ -44,140 +40,96 @@ async function main() {
     this.addr7,
   ] = await ethers.getSigners();
 
+  let accounts = [
+    this.owner,
+    this.addr1,
+    this.addr2,
+    this.addr3,
+    this.addr4,
+    this.addr5,
+    this.addr6,
+    this.addr7,
+  ];
   // await deleteAllPinnedFiles();
+  for (let index = 0; index < accounts.length; index++) {
+    const account = accounts[index];
+    let cv = await _createCV({
+      metadatas: {
+        username: fuzzing.accounts[index].username,
+        avatar: fuzzing.accounts[index]?.avatar,
+      },
+      account,
+      addressSystem: addressSystem.target,
+    });
+    console.log("cv#", cv, "created for ", fuzzing.accounts[index].username);
+  }
 
-  let cv = await _createCV("Django", this.owner, addressSystem.target);
-  console.log("cv#", cv, "created");
-  let launchpad = await _createLaunchpad({
-    account: this.owner,
-    addressSystem: addressSystem.target,
-  });
-  console.log("launchpad#", launchpad, "created");
+  for (let index = 0; index < fuzzing.missions.length; index++) {
+    const _mission = fuzzing.missions[index];
+    let mission = await _createMission({
+      account: this.owner,
+      addressSystem: addressSystem.target,
+      title: _mission.title,
 
-  cv = await _createCV("Testor1", this.addr1, addressSystem.target);
-  console.log("cv#", cv, "created");
-  cv = await _createCV("Testor2", this.addr2, addressSystem.target);
-  console.log("cv#", cv, "created");
-  cv = await _createCV("Testor3", this.addr3, addressSystem.target);
-  console.log("cv#", cv, "created");
-  cv = await _createCV("Testor4", this.addr4, addressSystem.target);
-  console.log("cv#", cv, "created");
-  cv = await _createCV("Testor5", this.addr5, addressSystem.target);
-  console.log("cv#", cv, "created");
-  cv = await _createCV("Testor6", this.addr6, addressSystem.target);
-  console.log("cv#", cv, "created");
-
-  let feature = await _createFeature({
-    account: this.owner,
-    accounts: [this.addr2, this.addr3, this.addr4],
-    specification: 8,
-    finish: true,
-    addressSystem: addressSystem.target,
-  });
-  let _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-    launchpad: true,
-    missionID: _missionID,
-    specification: 8,
-    finish: true,
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
-    title: "Dev Backend",
-    addressSystem: addressSystem.target,
-  });
-  _missionID = feature.missionID;
-  console.log(
-    "mission#",
-    _missionID,
-    "launchpad#",
-    feature.launchpadID,
-    "feature#",
-    feature?.id
-  );
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-    missionID: _missionID,
-    specification: 8,
-
-    accounts: [this.addr3],
-    title: "Toi t'es nickey",
-    addressSystem: addressSystem.target,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-    missionID: _missionID,
-    finish: true,
-    specification: 8,
-    title: "IA engeneer",
-    finish: true,
-    accounts: [this.addr4, this.addr4],
-    addressSystem: addressSystem.target,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-    missionID: _missionID,
-    finish: true,
-    specification: 8,
-    accounts: [this.addr5],
-    title: "Dev frontend",
-    addressSystem: addressSystem.target,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
-    addressSystem: addressSystem.target,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-
-    accounts: [this.addr1, this.addr2, this.addr3, this.addr4],
-    addressSystem: addressSystem.target,
-    specification: 5,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-
-    addressSystem: addressSystem.target,
-    specification: 5,
-  });
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-  feature = await _createFeature({
-    account: this.owner,
-    isInviteOnly: false,
-
-    addressSystem: addressSystem.target,
-    specification: 11,
-  });
-
-  [this.addr1, this.addr2, this.addr3, this.addr4].map((el) =>
-    apiPost.connect(el).askToJoin(feature?.id)
-  );
-  _missionID = feature.missionID;
-  console.log("mission#", _missionID, "feature#", feature?.id);
-
+      domain: _mission.domain,
+      abstract: _mission.abstract,
+      description: _mission.description,
+    });
+    for (let index = 0; index < _mission?.gallery?.length; index++) {
+      const element = _mission.gallery[index];
+      await createImage({
+        url: element,
+        metadatas: { missionID: mission.missionHash },
+      });
+    }
+    console.log(
+      "mission#",
+      mission.missionID,
+      " ",
+      _mission.title,
+      " created with ",
+      _mission.gallery.length || 0,
+      " images"
+    );
+    for (let _index = 0; _index < _mission.features.length; _index++) {
+      const _feature = _mission.features[_index];
+      let feature = await _createFeature({
+        account: this.owner,
+        accounts: [accounts[_feature.account]],
+        missionID: mission.missionID,
+        specification: _feature.specification,
+        domain: _feature.domain,
+        estimatedDays: _feature.estimatedDays,
+        title: _feature.title,
+        skills: _feature.skills,
+        description: _feature.description,
+        abstract: _feature.abstract,
+        addressSystem: addressSystem.target,
+      });
+      for (let index = 0; index < _feature.toDo.length; index++) {
+        const toDo = _feature.toDo[index];
+        let workflow = ["to do", "progress", "done"];
+        await createURI({
+          table: "toDo",
+          metadatas: {
+            description: toDo.description,
+            link: toDo?.link,
+            workflow: workflow[toDo.workflow],
+            featureID: feature.featureHash,
+          },
+        });
+      }
+      console.log(
+        "feature#",
+        feature.featureID,
+        " ",
+        _feature.title,
+        " created with ",
+        _feature?.toDo?.length || 0,
+        "to dos"
+      );
+    }
+  }
   return;
 
   // if (index === 0) {

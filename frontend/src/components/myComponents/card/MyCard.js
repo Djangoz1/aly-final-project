@@ -5,7 +5,8 @@ import { v4 } from "uuid";
 import { MySub } from "../text/MySub";
 import { icfy } from "icones";
 import { MyNum } from "../text/MyNum";
-
+import { MyTitle } from "../text/MyTitle";
+import "./style.css";
 export const MyCard = ({ head, children, template, icon, styles }) => {
   return (
     <div
@@ -13,10 +14,11 @@ export const MyCard = ({ head, children, template, icon, styles }) => {
         styles || "p-8 h-fit w-full flex   flex-col items-start"
       }   hover:-translate-y-[2px] _hover w-fit cursor-default relative transition-transform   rounded-md ${
         [
-          `shadowh bg-gradient-to-l backdrop-blur-[2px] bgprim`,
+          `shadowh  bg-gradient-to-l backdrop-blur-[2px] bgprim`,
           "bg-transparent border border-white/5 backdrop-blur hover:bg-white/5",
           `shadowh bg-gradient-to-l backdrop-blur-[2px] from-zinc-950 via-zinc-950 to-white/5`,
           ` backdrop-blur-xl bg-white/5 `,
+          " magicpattern ",
         ]?.[template || 0]
       }   c3`}
     >
@@ -57,7 +59,9 @@ export const MyCard1 = ({
   ];
   return (
     <div
-      className={`${styles}  box-border rounded-lg shadow-inner font2 backdrop-blur  flex justify-between  right-0  py-5 px-5`}
+      className={`${styles} ${
+        template === 2 ? "relative" : ""
+      }  box-border rounded-lg shadow-inner font2 backdrop-blur  flex justify-between  right-0  py-5 px-5`}
     >
       <div className="flex flex-col relative w-full  items-start">
         <div className="flex  items-center w-full">
@@ -96,25 +100,33 @@ export const MyCard1 = ({
   );
 };
 
-export const MyCardInfos = ({ style, arr, title, children }) => {
+export const MyCardInfos = ({
+  style,
+  styles,
+  template,
+  arr,
+  title,
+  children,
+}) => {
   return (
     <MyCard
-      template={1}
-      styles={style + " cursor-default flex flex-col px-5 py-3 "}
+      template={template || 1}
+      styles={
+        style +
+        " c4 hover:text-white/80 cursor-default flex flex-col px-5 py-3 "
+      }
     >
-      {title && (
-        <div className="w-full uppercase font-light c2 text-sm ">{title}</div>
-      )}
+      {title && <MyTitle>{title}</MyTitle>}
       {arr?.map(
         (el) =>
           el?.title && (
             <div
               key={v4()}
-              className="flex items-center relative text-left text-[10px] border py-4  border-t-0 border-x-0 border-white/10  justify-between"
+              className="flex  relative items-start text-left text-[10px] border py-4  border-t-0 border-x-0 border-white/5  justify-between"
             >
               <MySub
-                size={"9"}
-                style="w-1/2 flex items-center c4 hover:text-neutral-200 "
+                size={"8"}
+                style="w-1/3 flex inherit items-center c4 hover:text-neutral-200 "
               >
                 <Icon
                   icon={el?.icon || icfy.ux.admin}
@@ -122,7 +134,7 @@ export const MyCardInfos = ({ style, arr, title, children }) => {
                 />
                 {el?.title}
               </MySub>
-              <div className="w-1/2 flex items-center  ">
+              <div className="w-2/3 flex items-center  ">
                 {el?.num >= 0 ? <MyNum num={el?.num} /> : el?.value}
               </div>
             </div>

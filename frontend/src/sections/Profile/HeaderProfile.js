@@ -22,7 +22,6 @@ import { CreateMission } from "sections/works/Missions/form/create/CreateMission
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { DEV_DOMAIN } from "constants/languages";
 import { fromTimestamp } from "utils/ux-tools";
-import { doStateCV, useCVDispatch, useCVState } from "context/hub/cv";
 import { useAccount } from "wagmi";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { EditProfile } from "../Form/forms/edit/EditProfile";
@@ -32,7 +31,7 @@ import { MyHeaderCard } from "components/myComponents/card/MyCardList";
 import { BtnGb2, BtnGr2 } from "components/myComponents/btn/MyGradientButton";
 
 export const HeaderProfile = ({ path }) => {
-  let { cvID, datas, metadatas } = useCVState();
+  return <>wxt</>;
   let { cv } = useAuthState();
   let authState = useAuthState();
   let { address } = useAccount();

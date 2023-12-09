@@ -11,16 +11,19 @@ export const MyModal = ({
 
   style,
   id,
-
+  btnStyle,
   children,
 }) => {
+  if (!id) {
+    throw new Error("My Modal requires an id");
+  }
   let [isSelected, setIsSeleted] = useState(false);
 
   return (
     <>
       <motion.div
         layoutId={"modal#" + id}
-        className="relative"
+        className={btnStyle || "relative "}
         onClick={() => setIsSeleted(!isSelected)}
       >
         {btn}

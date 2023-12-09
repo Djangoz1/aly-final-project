@@ -5,6 +5,9 @@ library DataTypes {
     enum CourtIDs {
         Centralized,
         Kleros,
+        Decentralized,
+        Others,
+        Figma,
         React,
         Python,
         NodeJS,

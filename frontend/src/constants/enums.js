@@ -20,9 +20,21 @@ export const ENUMS_FEATURE_TYPE = ["New Feature", "Bug", "Improvement"];
 
 export const ENUMS = {
   languagesLevel: ["Notions", "Courant", "Professionnel", "Langue maternelle"],
+  colors: [
+    "bg-info",
+    "bg-success",
+    "bg-error",
+    "bg-primary",
+    "bg-secondary",
+    "bg-accent",
+    "bg-warning",
+  ],
   courts: [
     { badge: icfy.ux.admin, court: "Centralized" },
     { badge: icfyGITHUB, court: "Kleros" },
+    { badge: icfyREACT, court: "Decentralized" },
+    { badge: icfyREACT, court: "Others" },
+    { badge: icfyREACT, court: "Figma" },
     { badge: icfyREACT, court: "React" },
     { badge: icfyPYTHON, court: "Python" },
     { badge: icfy.technos.nodeJS, court: "NodeJS" },
@@ -69,6 +81,11 @@ export const ENUMS = {
       icon: icfy.domain.blockchain,
     },
     {
+      name: "compliance",
+      color: "warning",
+      icon: icfy.domain.blockchain,
+    },
+    {
       name: "gaming",
       color: "secondary",
       icon: icfy.domain.gaming,
@@ -80,6 +97,16 @@ export const ENUMS = {
     },
     {
       name: "designer",
+      color: "error",
+      icon: icfy.domain.designer,
+    },
+    {
+      name: "project manager",
+      color: "error",
+      icon: icfy.domain.designer,
+    },
+    {
+      name: "marketing",
       color: "error",
       icon: icfy.domain.designer,
     },

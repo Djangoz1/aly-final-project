@@ -28,13 +28,16 @@ async function main() {
     ADDRESSES.factory
   );
   let pairAddress = await factory.getPair(token, weth);
+
+  console.log(pairAddress);
+  const pair = await ethers.getContractAt("UniswapV2Pair", pairAddress);
+  // console.log("reserves", await pair.getReserves());
+
   if (pairAddress === "0x0000000000000000000000000000000000000000") {
     const tx = await factory.createPair(token, weth);
     await tx.wait();
     pairAddress = await factory.getPair(token, weth);
   }
-  const pair = await ethers.getContractAt("UniswapV2Pair", pairAddress);
-  console.log(await pair.getReserves());
 
   const jsonContent = {
     pair: pairAddress,

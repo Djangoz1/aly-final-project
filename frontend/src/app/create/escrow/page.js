@@ -16,39 +16,24 @@ import { MyFormCreate } from "components/myComponents/form/MyForm";
 import { useAuthState } from "context/auth";
 
 import { MySteps } from "components/myComponents/MySteps";
-import { MENUS, MENUS_CREATE_MISSION } from "constants/menus";
+import { MENUS } from "constants/menus";
 
 import { _form_create_mission } from "utils/ux-tools/form/mission";
 
 import {
   moock_create_escrow,
   moock_create_escrow_placeholder,
-  moock_create_mission,
-  moock_create_mission_placeholder,
 } from "constants/moock";
 
 import { _apiGetAt } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
-import { ethers } from "ethers";
-import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 
-import { icfyETHER } from "icones";
 import { CVName } from "components/inputs/inputsCV/CVName";
-import {
-  clientPocket,
-  createURI,
-  fetchJSONByCID,
-} from "utils/ui-tools/pinata-tools";
-import { useCVState } from "context/hub/cv";
-import {
-  FormCreateMission1,
-  FormCreateMission2,
-} from "sections/works/Missions/form/create/FormCreateMission";
+
 import { _form_create_escrow } from "../../../utils/ux-tools/form/escrow";
 import { FormCreateEscrow1 } from "sections/works/Escrows/form/create/FormCreateEscrow";
 import { useToolsState } from "context/tools";
 import { stateFeature } from "utils/ui-tools/state-tools";
-import { STATUS } from "constants/status";
 import { controllers } from "utils/controllers";
 
 const PageCreateEscrow = () => {
@@ -56,7 +41,6 @@ const PageCreateEscrow = () => {
   let dispatch = useAuthDispatch();
 
   let { metadatas, cv } = useAuthState();
-  let { cvID } = useCVState();
   let { state } = useToolsState();
   let [isState, setIsState] = useState(null);
   let stateInit = async () => {
@@ -107,19 +91,12 @@ const PageCreateEscrow = () => {
     }
   }, [cv]);
 
-  _form_create_escrow[0].title = (
-    <>
-      Salut <CVName metadata={metadatas} /> ! 👋
-    </>
-  );
-
   let submitForm = async (form) => {
     let hash = await controllers.create.dispute({
       ...form,
       feature: state.arr[form.feature],
     });
   };
-
   return (
     <MyLayoutApp target={"escrow"} url={"/create/escrow"} initState={isState}>
       <MyFormCreate

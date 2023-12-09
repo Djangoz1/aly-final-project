@@ -1,13 +1,17 @@
 import { Icon } from "@iconify/react";
 import { ImagePin } from "components/Image/ImagePin";
+import { MyBadge } from "components/myComponents/box/MyList";
 import { MyCardInfos } from "components/myComponents/card/MyCard";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyModal } from "components/myComponents/modal/MyModal";
+import { MyNum } from "components/myComponents/text/MyNum";
+import { MyTitle } from "components/myComponents/text/MyTitle";
 import { ENUMS } from "constants/enums";
 import { useToolsState } from "context/tools";
-import { icfy, icfyETHER } from "icones";
+import { icfy, icfyETHER, icfyTIME, icsystem } from "icones";
 import React, { useState } from "react";
+import { stateCV } from "utils/ui-tools/state-tools";
 import { fromTimestamp } from "utils/ux-tools";
 import { v4 } from "uuid";
 
@@ -18,6 +22,7 @@ export const CVInfos = () => {
   let infos = [
     {
       title: "Visibility",
+      icon: icfy.eye[state?.profile?.metadatas?.visibility ? "open" : "close"],
       value: (
         <MyStatus
           style={"text-[8px]"}
@@ -27,31 +32,55 @@ export const CVInfos = () => {
       ),
     },
     {
+      title: "Token accepted",
+      icon: icfy.bank.coin,
+
+      value: (
+        <MyStatus
+          style={"text-[8px]"}
+          target={"token"}
+          status={state?.profile?.datas?.acceptToken ? 0 : 1}
+        ></MyStatus>
+      ),
+    },
+    {
+      icon: icfyTIME,
+
       title: "Created at",
       value: fromTimestamp(state?.profile?.metadatas?.created),
     },
 
     {
+      icon: icfy.bank.dollars,
+
       title: "Wadge",
       value: (
         <>
-          <Icon icon={icfyETHER} className="text-lg mr-4" />
-          {state?.profile?.details?.wadge.toFixed(5)}
+          <span className="text-lg font-light mr-3">
+            {state?.profile?.details?.work?.wadge}
+          </span>
+          ETH
         </>
       ),
     },
 
     {
+      icon: icfy.bank.dollars,
+
       title: "Depense",
       value: (
         <>
-          <Icon icon={icfyETHER} className="text-lg mr-4" />
-          {state?.profile?.datas?.amount.toFixed(5)}
+          <span className="text-lg font-light mr-3">
+            {state?.profile?.details?.work?.depense}
+          </span>
+          ETH
         </>
       ),
     },
 
     {
+      icon: icfy.code.casual,
+
       title: (
         <div className="flex flex-col">
           Skills on chain
@@ -71,40 +100,56 @@ export const CVInfos = () => {
   ];
   let infosDatas = [
     {
+      icon: icsystem.mission,
+
       title: "Missions",
       num: state?.profile?.datas?.missions?.length,
     },
+
     {
-      title: "Features",
-      num: state?.profile?.datas?.features?.length || 0,
+      title: "Staked",
+      num: state?.profile?.datas?.balance,
     },
     {
+      title: "Features",
+      num: state?.profile?.datas?.features?.length,
+    },
+    {
+      icon: icsystem.feature,
+
       title: "Jobs",
       num: state?.profile?.datas?.proposals?.length,
     },
     {
+      icon: icsystem.social,
+
       title: "Pubs",
-      num: state?.profile?.datas?.pubs?.length,
+      num: state?.profile?.details?.social?.pubs,
+    },
+    {
+      icon: icfy.person.friend,
+
+      title: "Followers",
+      num: state?.profile?.details?.social?.followers,
+    },
+    {
+      icon: icfy.person.teal,
+      title: "Followed",
+      num: state?.profile?.details?.social?.followed,
     },
   ];
   let infosDispute = [
     {
+      icon: icsystem.escrow,
+
       title: "Disputes",
-      num: state?.profile?.details?.disputes?.length,
+      num: state?.profile?.details?.escrows.disputes,
     },
 
     {
-      title: "Invest on court",
-      value: (
-        <>
-          <Icon icon={icfyETHER} className="text-lg mr-4" />
-          {state?.profile?.details?.arbitrators?.totalBalance}
-        </>
-      ),
-    },
-    {
+      icon: icsystem.court,
       title: "Nombre Arbitration",
-      value: state?.profile?.details?.arbitrators?.totalArbitration,
+      value: state?.profile?.datas?.arbitrators?.length,
     },
 
     {
@@ -129,14 +174,22 @@ export const CVInfos = () => {
   ];
 
   let infosLaunchpad = [
-    { title: "Launchpads", value: state?.profile?.datas?.launchpads?.length },
     {
+      icon: icsystem.launchpad,
+
+      title: "Launchpads",
+      value: state?.profile?.datas?.launchpads?.length,
+    },
+    {
+      icon: icfy.bank.coin,
+
       title: "Amount raised",
       value: (
         <>
-          <Icon icon={icfyETHER} className="text-lg mr-4" />
-
-          {state?.profile?.details?.launchpads?.totalRaised}
+          <span className="text-lg font-light mr-3">
+            {state?.profile?.details?.launchpad?.raised}
+          </span>
+          ETH
         </>
       ),
     },
@@ -146,7 +199,7 @@ export const CVInfos = () => {
       title: "Identité",
       value: (
         <>
-          {state?.profile?.metadatas?.identity?.citizen}{" "}
+          {["Mr", "Mme"]?.[state?.profile?.metadatas?.identity?.citizen]}{" "}
           {state?.profile?.metadatas?.identity?.firstName}{" "}
           {state?.profile?.metadatas?.identity?.lastName}
         </>
@@ -154,7 +207,7 @@ export const CVInfos = () => {
     },
     {
       title: "Email",
-      value: <>{state?.profile?.metadatas?.identity?.email}</>,
+      value: <>{state?.profile?.metadatas.email}</>,
     },
     {
       title: "Phone",
@@ -182,18 +235,18 @@ export const CVInfos = () => {
     },
 
     {
-      title: (
-        <div className="flex flex-col">
-          Skills off chain
-          <div className="flex mt-1">
-            {state?.profile?.metadatas?.skills?.map((id) => (
+      title: <div className="flex flex-col">Skills off chain</div>,
+      value: (
+        <div className="w-full gap-3 overflow-x-auto grid grid-cols-5 mt-1">
+          {state?.profile?.metadatas?.skills?.map((id, i) => (
+            <MyBadge color={i} key={v4()}>
               <Icon
-                key={v4()}
                 icon={ENUMS.courts?.[id]?.badge}
-                className="text-white relative c2 text-3xl  "
+                className="text-xs my-auto mr-3"
               />
-            ))}
-          </div>
+              {ENUMS.courts?.[id]?.court}
+            </MyBadge>
+          ))}
         </div>
       ),
     },
