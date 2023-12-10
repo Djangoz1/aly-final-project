@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
@@ -27,7 +27,7 @@ export let _table_features = (features, owner) => {
       <div className="flex items-center ">
         <div>
           <Link
-            href={`/works/mission/${el?.datas?.missionID}#section2`}
+            href={`/mission/${el?.datas?.missionID}#section2`}
             className="font-bold  whitespace-nowrap hover:text-info"
           >
             {el?.metadatas?.title}

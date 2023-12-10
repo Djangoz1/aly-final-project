@@ -159,11 +159,10 @@ export const doStateToolsMission = async ({
       escrows: async () => {
         if (!_state?.features) {
           _state.features = await _controllers.features();
-          console.log("sdffstate", state?.features);
         }
-        console.log("tqt", state?.features);
+
         let result = await controllers.get.escrows.list({
-          features: state.features,
+          features: _state.features,
         });
         return result;
       },
@@ -237,7 +236,7 @@ export const doStateToolsMission = async ({
     dispatch({
       status: "success",
       state: _state,
-      url: "/works/mission/" + missionID,
+      url: "/mission/" + missionID,
     });
     return state;
   } else {
@@ -398,130 +397,6 @@ export const doStateToolsProfile = async ({
     return _state;
   } else {
     throw new Error("Error state profile tools: Invalid cvID");
-  }
-};
-
-export const doStateProfileTools = async ({ dispatch, cvID }) => {
-  dispatch({ status: "pending profile" });
-
-  if (cvID > 0) {
-    console.log("profile tools context", cvID);
-    let owner = await stateCV(cvID);
-    owner.details = {
-      wadge: 0,
-      // ! To fix
-      missions: [],
-      features: [],
-      arbitrators: [],
-      badges: [],
-      disputes: [],
-    };
-
-    for (let index = 0; index < owner?.datas?.proposals?.length; index++) {
-      const featureID = owner?.datas?.proposals?.[index];
-      let feature = {
-        datas: await _apiGet("datasOfFeature", [featureID]),
-        details: await _apiGet("datasOfWork", [featureID]),
-      };
-
-      !owner?.details?.badges.includes(feature?.datas?.specification) &&
-        owner?.details?.badges.push(feature?.datas?.specification);
-
-      // * Si status === validated chercher l'arbitratorID du worker
-      if (feature?.datas?.status === 2) {
-        let arbitration = await _apiGet("arbitrationOfCV", [
-          cvID,
-          feature?.datas?.specification,
-        ]);
-        if (!owner?.details?.arbitrators.includes(arbitration)) {
-          owner?.details?.arbitrators.push(arbitration);
-        }
-      }
-      if (feature?.details?.workerContest || feature?.details?.ownerContest) {
-        feature.datas.dispute = await _apiGet("disputeOfFeature", [featureID]);
-
-        owner.details.disputes.push(feature.datas.dispute);
-      }
-      owner?.details?.features?.push(feature);
-    }
-
-    for (let index = 0; index < owner?.datas?.missions?.length; index++) {
-      let missionID = owner?.datas?.missions?.[index];
-      let mission = await stateMission(missionID);
-
-      owner?.details?.missions?.push(mission);
-    }
-    let invites = await _apiGet("invitesOfCV", [cvID]);
-    owner.details.invites = [];
-    for (let index = 0; index < invites?.length; index++) {
-      let feature = await stateFeature(invites[index]);
-      owner.details.invites.push({
-        featureID: feature?.featureID,
-        title: feature?.metadatas?.title,
-        domain: feature?.metadatas?.attributes?.[0]?.domain,
-        specification: feature?.datas?.specification,
-        status: feature?.datas?.status,
-        specification: feature?.datas?.specification,
-        wadge: feature?.datas?.wadge,
-      });
-    }
-    let _pubs = await _apiGet("indexerOfToken", [cvID, ADDRESSES["pubsHub"]]);
-    owner.details.launchpads = { arr: [], totalRaised: 0 };
-
-    for (let index = 0; index < owner?.datas?.launchpads?.length; index++) {
-      let launchpad = await stateLaunchpad(owner?.datas?.launchpads?.[index]);
-      owner.details.launchpads.arr.push({
-        title: launchpad?.metadatas?.title,
-        domain: launchpad?.metadatas?.attributes?.[0]?.domain,
-        launchpadID: launchpad?.launchpadID,
-      });
-      owner.details.launchpads.totalRaised += parseInt(
-        launchpad.datas.amountRaised
-      );
-    }
-
-    let state = {
-      profile: owner,
-      pubs: _pubs,
-    };
-
-    dispatch({
-      status: "success",
-      state: state,
-    });
-    return state;
-  } else {
-    throw new Error("Error state profile tools: Invalid cvID");
-  }
-};
-
-export const doStateMissionTools = async (dispatch, missionID) => {
-  dispatch({ status: "pending mission" });
-
-  try {
-    let mission = await stateMission(missionID);
-    let owner = await stateCV(mission?.datas?.owner);
-
-    let features = [];
-
-    for (let index = 0; index < mission?.datas?.features?.length; index++) {
-      const featureID = mission?.datas?.features[index];
-      let feature = await stateFeature(featureID);
-      if (feature?.datas?.dispute) {
-        mission.datas.disputes++;
-      }
-      features.push(feature);
-    }
-
-    let state = {
-      mission,
-      owner,
-      features,
-    };
-    dispatch({ status: "success", state: state });
-    return state;
-  } catch (error) {
-    dispatch({ status: "error mission", error: { error } });
   }
 };
 

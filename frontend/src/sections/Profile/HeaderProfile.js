@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 
 import { MyHeader } from "components/myComponents/MyHeader";
 import { styles, themes } from "styles/style";
-import { CreateMission } from "sections/works/Missions/form/create/CreateMission";
+import { CreateMission } from "sections/missions/form/create/CreateMission";
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { DEV_DOMAIN } from "constants/languages";
 import { fromTimestamp } from "utils/ux-tools";

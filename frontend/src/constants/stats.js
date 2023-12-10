@@ -1,5 +1,5 @@
 import { Timer } from "components/Timer";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { calcTimeRemaining } from "helpers";
 import {
   icfyCHAT,

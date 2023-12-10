@@ -49,5 +49,5 @@ Page qui fonctionne
 - `/profile/${id}`
 - `/profile/${id}/missions`
 - `/profile/${id}/pubs`
-- `/works/mission/${id}`
-- `/works/mission/${id}/features`
+- `/mission/${id}`
+- `/mission/${id}/features`

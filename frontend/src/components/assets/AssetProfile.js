@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { ImagePin } from "components/Image/ImagePin";
 import { BtnsSocial } from "components/btn/BtnsSocial";
 import { BtnFollow } from "components/btn/BtnsSocial/BtnFollow";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyBadge } from "components/myComponents/box/MyList";
 import { BtnGb1, BtnGr1 } from "components/myComponents/btn/MyGradientButton";
 import { MyCard } from "components/myComponents/card/MyCard";

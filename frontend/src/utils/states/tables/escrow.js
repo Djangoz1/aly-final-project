@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";

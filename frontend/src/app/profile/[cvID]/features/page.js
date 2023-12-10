@@ -23,13 +23,14 @@ import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { MissionFeatures } from "sections/missions/state/MissionFeatures";
+import { CVName } from "components/links/CVName";
 import { MyBadge, MyList } from "components/myComponents/box/MyList";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
 import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
 import { MyCardInfos } from "components/myComponents/card/MyCard";
+import { FeatureName } from "components/links/FeatureName";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -81,7 +82,11 @@ function App({ params }) {
               <Icon icon={ENUMS.courts?.[el?.datas?.specification]?.badge} />
               {ENUMS.courts?.[el?.datas?.specification]?.court}
             </MyBadge>,
-            el?.metadatas?.title,
+            <FeatureName
+              metadatas={el?.metadatas}
+              missionID={el?.datas?.missionID}
+            />,
+
             <CVName cvID={el?.datas?.cvWorker} />,
             <MyStatus status={el?.datas?.status} target={"feature"} />,
             <MyBadge>{el?.datas?.wadge} ETH</MyBadge>,

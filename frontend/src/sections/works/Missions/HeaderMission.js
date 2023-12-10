@@ -1,5 +1,5 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyHeader } from "components/myComponents/MyHeader";
 import { ENUMS } from "constants/enums";
 import { MENUS, MENUS_ID } from "constants/menus";
@@ -21,9 +21,7 @@ export const HeaderMission = ({ path, owner }) => {
   return (
     <MyHeader
       path={
-        path
-          ? `/works/mission/${datas?.id}${path && path}`
-          : `/works/mission/${datas?.id}`
+        path ? `/mission/${datas?.id}${path && path}` : `/mission/${datas?.id}`
       }
       menus={menus}
       img={metadatas?.image}

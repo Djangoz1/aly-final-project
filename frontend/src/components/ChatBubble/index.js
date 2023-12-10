@@ -1,4 +1,4 @@
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { TextAI } from "components/myComponents/text/TextAI";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { useFormState } from "context/form";

@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyAsset } from "components/myComponents/MyAsset";
 import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
 import { BtnGb1 } from "components/myComponents/btn/MyGradientButton";

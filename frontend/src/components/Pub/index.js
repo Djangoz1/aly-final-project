@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { statePub } from "utils/ui-tools/state-tools";
 
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { ImagePin } from "components/Image/ImagePin";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
@@ -239,7 +239,7 @@ export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
                 // className="ml-auto"
                 href={
                   _pub?.metadatas?.missionID
-                    ? `/works/mission/${_pub?.datas?.missionID}`
+                    ? `/mission/${_pub?.datas?.missionID}`
                     : "#"
                 }
               >

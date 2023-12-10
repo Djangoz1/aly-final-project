@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { AssetProfile } from "components/assets/AssetProfile";
-import { MissionName } from "components/inputs/inputsMission/MissionName";
+import { MissionName } from "components/links/MissionName";
 import { MyCard1, MyCardInfos } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
 import { MyStatus } from "components/myComponents/item/MyStatus";

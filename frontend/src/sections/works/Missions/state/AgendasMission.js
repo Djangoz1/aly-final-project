@@ -17,6 +17,7 @@ import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { fromTimestamp } from "utils/ux-tools";
 import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
 import { ENUMS } from "constants/enums";
+import { Avatar, AvatarsList } from "components/profile/ProfileAvatar";
 
 export const AgendasMission = () => {
   const { cv } = useAuthState();
@@ -33,6 +34,9 @@ export const AgendasMission = () => {
           arr={state?.agendas?.events?.map((event, i) => {
             return {
               // icon: ENUMS.domain?.[],
+              icon: ENUMS.courts[
+                state?.features?.[event?.index]?.datas?.specification
+              ]?.badge,
               title: (
                 <>
                   <div className={`${colors?.[i]} badge badge-xs mr-2`} />
@@ -40,16 +44,23 @@ export const AgendasMission = () => {
                 </>
               ),
               value: (
-                <div className="flex flex-col">
-                  <div className="flex justify-between items-center">
-                    <p className="mr-2 text-white/40">Started At</p>
-                    <span>{fromTimestamp(event?.start?.getTime())}</span>
+                <>
+                  <div className="flex ml-10 debug flex-col">
+                    <div className="flex justify-between items-center">
+                      <p className="mr-2 text-white/40">Started At</p>
+                      <span>{fromTimestamp(event?.start?.getTime())}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="mr-2 text-white/40">Claimable At</p>
+                      <span>{fromTimestamp(event?.end?.getTime())}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <p className="mr-2 text-white/40">Claimable At</p>
-                    <span>{fromTimestamp(event?.end?.getTime())}</span>
-                  </div>
-                </div>
+                  <Avatar
+                    style={"ml-10"}
+                    _cvID={state?.features?.[event?.index]?.datas?.cvWorker}
+                    designation={true}
+                  />
+                </>
               ),
             };
           })}

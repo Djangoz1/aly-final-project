@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import {
   BtnG1,
   BtnGb1,

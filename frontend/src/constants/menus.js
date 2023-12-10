@@ -287,7 +287,7 @@ export const menus_id = (target, id) => {
           {
             icon: icfy.ux.workspace,
             title: "Overview",
-            url: "/works/mission/" + id + "/",
+            url: "/mission/" + id + "/",
           },
         ],
       },
@@ -297,23 +297,23 @@ export const menus_id = (target, id) => {
           {
             icon: icfyHOME,
             title: "Desk",
-            url: "/works/mission/" + id + "/desk",
+            url: "/mission/" + id + "/desk",
           },
 
           {
             icon: icfy.msg.casual,
             title: "Invitations",
-            url: "/works/mission/" + id + "/invitations",
+            url: "/mission/" + id + "/invitations",
           },
           {
             icon: icsystem.escrow,
             title: "Escrow",
-            url: "/works/mission/" + id + "/escrows",
+            url: "/mission/" + id + "/escrows",
           },
           {
             icon: icsystem.launchpad,
             title: "Launchpad",
-            url: "/works/mission/" + id + "/launchpads",
+            url: "/mission/" + id + "/launchpads",
           },
         ],
       },
@@ -324,12 +324,12 @@ export const menus_id = (target, id) => {
           {
             icon: icfy.msg.post,
             title: "Posts",
-            url: "/works/mission/" + id + "/social",
+            url: "/mission/" + id + "/social",
           },
           {
             icon: icfyIMG,
             title: "Gallery",
-            url: "/works/mission/" + id + "/gallery",
+            url: "/mission/" + id + "/gallery",
           },
         ],
       },
@@ -339,7 +339,7 @@ export const menus_id = (target, id) => {
           {
             icon: icfy.ux.edit,
             title: "Mission",
-            url: "/works/mission/" + id + "/settings",
+            url: "/mission/" + id + "/settings",
           },
         ],
       },
@@ -352,23 +352,23 @@ export let MENUS_ID = (id, owner, cvID) => {
   return {
     mission: [
       {
-        url: "//works/mission/" + id + "/test",
+        url: "//mission/" + id + "/test",
         title: "Overview",
       },
       {
-        url: "//works/mission/" + id + "/features/test",
+        url: "//mission/" + id + "/features/test",
         title: "Features",
       },
       {
-        url: "//works/mission/" + id + "/agenda/test",
+        url: "//mission/" + id + "/agenda/test",
         title: "Agenda",
       },
       {
-        url: "//works/mission/" + id + "/",
+        url: "//mission/" + id + "/",
         title: "Disputes",
       },
       {
-        url: "//works/mission/" + id + "/pubs/test",
+        url: "//mission/" + id + "/pubs/test",
         title: "Pubs",
       },
     ],

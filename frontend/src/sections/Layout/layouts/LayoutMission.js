@@ -93,7 +93,7 @@ export const LayoutMission = ({ missionID, url, children, controller }) => {
       }}
       header={state?.profile?.metadatas?.username}
       target={"mission"}
-      url={`/works/mission/${missionID}${url}`}
+      url={`/mission/${missionID}${url}`}
     >
       <div className="bgprim pb-20 min-h-screen w-full">{children}</div>
     </MyLayoutDashboard>

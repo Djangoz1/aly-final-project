@@ -31,12 +31,12 @@ import { ethers } from "ethers";
 import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 
 import { icfyETHER } from "icones";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { clientPocket, createURI } from "utils/ui-tools/pinata-tools";
 import {
   FormCreateMission1,
   FormCreateMission2,
-} from "sections/works/Missions/form/create/FormCreateMission";
+} from "sections/missions/form/create/FormCreateMission";
 
 import { FormResponseAI } from "sections/Form/FormResponseAI";
 import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
@@ -144,7 +144,7 @@ const PageCreateProfile = () => {
 
         await controllers.create.feature(datas);
       }
-      _txs.result = `/works/mission/${missionID}`;
+      _txs.result = `/mission/${missionID}`;
       await doStateTools(dispatch, {
         ...state,
         txs: { pointer: 3, ..._txs },

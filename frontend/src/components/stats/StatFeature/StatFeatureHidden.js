@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { ZERO_ADDRESS } from "constants/web3";
 import { selectDevDomain, selectLanguage } from "helpers";
 import Link from "next/link";

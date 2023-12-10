@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyAsset } from "components/myComponents/MyAsset";
 import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
 import { BtnGb1 } from "components/myComponents/btn/MyGradientButton";
@@ -43,6 +43,7 @@ import { Header } from "sections/Layout/Header";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 import { MyLayoutHeader } from "./MyLayoutHeader";
 import { useAccount } from "wagmi";
+import { MyHeaderDashboard } from "sections/Layout/headers/MyHeaderDashboard";
 
 export const MyLayoutDashboard = ({
   id,
@@ -150,14 +151,37 @@ export const MyLayoutDashboard = ({
                 )}
                 <MyMenus current={url} menus={menus} />
               </div>
-              <div className=" max-w-full relative">
-                <Header />
-              </div>
             </div>
-            <div className="px-5 h-full w-[82%] ml-auto backdrop-blur">
-              {isLoading === false ? children : <MyLoader template={1} />}
+            <div className=" min-h-screen bgprim  h-fit w-[81%] flex flex-col-reverse ml-auto backdrop-blur">
+              {isLoading === false ? (
+                <div className="w-full overflow-y-auto py-20 min-h-screen">
+                  {children}
+                </div>
+              ) : (
+                <MyLoader template={1} />
+              )}
             </div>
             {btn ? <div className="fixed bottom-5 right-5">{btn}</div> : <></>}
+          </div>
+          <div className=" max-w-full fixed top-0 right-0 w-[81%] min-h-[5vh] ">
+            <Header style={"bg-white/5 backdrop-blur-2xl  "}>
+              <MyHeaderDashboard
+                source={{
+                  title:
+                    state?.[target]?.metadatas?.title ||
+                    state?.[target]?.metadatas?.username,
+                  url: `/${target}/${id}`,
+                  icon: icsystem?.[target],
+                }}
+                arr={url
+                  .split("/")
+                  .filter((el) => el != id && el != target && el != "")
+                  .map((el, i) => ({
+                    title: el,
+                    url: `/${target}/${id}/${el}`,
+                  }))}
+              />
+            </Header>
           </div>
         </>
       ) : (

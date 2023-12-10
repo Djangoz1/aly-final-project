@@ -29,7 +29,7 @@ import { STATUS } from "constants/status";
 import Link from "next/link";
 import { ImagePin } from "components/Image/ImagePin";
 import { Avatar } from "components/profile/ProfileAvatar";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 
 function App({ params }) {
   const { cv } = useAuthState();

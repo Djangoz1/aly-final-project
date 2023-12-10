@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Timer } from "components/Timer";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { ENUMS_FEATURE_STATUS } from "constants/enums";
 import { calcTimestamp, parseTimestamp, selectDevDomain } from "helpers";
 import Link from "next/link";

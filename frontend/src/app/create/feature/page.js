@@ -8,7 +8,7 @@ import { useAuthState } from "context/auth";
 import { _form_create_feature } from "utils/ux-tools/form/feature";
 import { MENUS_CREATE_FEATURE } from "constants/menus";
 import { MySteps } from "components/myComponents/MySteps";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import {
   moock_create_feature,
   moock_create_feature_placeholders,
@@ -93,7 +93,7 @@ const PageCreateFeature = () => {
 
     console.log("state -----", test);
 
-    //   router.push("/works/mission/" + missionID + "#section2");
+    //   router.push("/mission/" + missionID + "#section2");
   };
 
   return (

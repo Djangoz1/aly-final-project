@@ -32,7 +32,7 @@ import { ProfileAvatar } from "components/profile/ProfileAvatar";
 import { MySelect } from "components/myComponents/form/MySelects";
 import { LayoutForm } from "sections/Form/LayoutForm";
 import { MyBadge } from "components/myComponents/box/MyList";
-import { MissionName } from "components/inputs/inputsMission/MissionName";
+import { MissionName } from "components/links/MissionName";
 import { NoItems } from "components/myComponents/layout/NoItems";
 
 function App({ params }) {

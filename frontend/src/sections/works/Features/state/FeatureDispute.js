@@ -81,28 +81,13 @@ export const FeatureDispute = ({ disputeID, dispute }) => {
   };
 
   let infosDispute = [
-    {
-      title: "Status",
-      value: (
-        <p
-          className={
-            "badge badge-xs h-fit text-xs px-2 badge-outline badge-" +
-            STATUS.dispute[isDispute?.datas?.rules?.status]?.color
-          }
-        >
-          {console.log(state?.features?.[index])}
-          <Icon
-            className="mr-4  my-1"
-            icon={STATUS.dispute[isDispute?.datas?.rules?.status]?.icon}
-          />
-          {STATUS.dispute[isDispute?.datas?.rules?.status]?.status}
-        </p>
-      ),
-    },
-
     isDispute && {
       title: "Created At",
-      value: parseTimestamp(isDispute?.datas?.timers?.createdAt || "Wait init"),
+      value: isDispute?.metadatas?.created,
+    },
+    isDispute && {
+      title: "Descripition",
+      value: isDispute?.metadatas?.description,
     },
     isDispute && {
       title: "Appeal",
@@ -174,8 +159,9 @@ export const FeatureDispute = ({ disputeID, dispute }) => {
 
   return (
     <>
-      <div className="flex flex-col w-full">
+      <>
         <MyCardInfos
+          template={6}
           title={"Escrow datas"}
           arr={infosDispute}
           style={"mr-3 w-full rounded-tl-none "}
@@ -217,101 +203,7 @@ export const FeatureDispute = ({ disputeID, dispute }) => {
             )}
           </div>
         </MyCardInfos>
-        <MyCardInfo
-          noBtn={true}
-          styles={"h-full flex flex-col   w-full"}
-          color={1}
-          header={{
-            badge: true,
-            icon: ENUMS.courts?.[isDispute?.datas?.courtID]?.badge,
-            title: `Dispute - ${isDispute?.metadatas?.title}`,
-          }}
-          main={{
-            title: "Metaevidence",
-            text: isDispute?.metadatas?.description,
-          }}
-        >
-          {console.log("isDispute", isDispute)}
-          <div className="   absolute bottom-4 right-4 flex items-center">
-            {isAllowance?.allow === 1 && (
-              <>
-                <MyBtnPost
-                  setter={() =>
-                    handlePost("acceptArbitration", [isDispute?.datas?.id])
-                  }
-                >
-                  Accept Arbitration
-                </MyBtnPost>
-                <MyBtnPost
-                  style={"btn-xs btn-error btn-outline ml-2"}
-                  setter={() =>
-                    handlePost("refuseArbitration", [isDispute?.datas?.id])
-                  }
-                >
-                  Refuse
-                </MyBtnPost>
-              </>
-            )}
-            {isDispute?.datas?.rules?.status === 2 &&
-              isAllowance?.allow === 3 && (
-                <>
-                  <MyBtnPost
-                    setter={async () => {
-                      await _apiPost("vote", [isDispute?.disputeID, 1]);
-                      fetch();
-                    }}
-                    style={"text-warning mr-4"}
-                  >
-                    Equal
-                  </MyBtnPost>
-                  <MyBtnPost
-                    setter={async () => {
-                      await _apiPost("vote", [isDispute?.disputeID, 2]);
-                      fetch();
-                    }}
-                    style={"text-info"}
-                  >
-                    Payer
-                  </MyBtnPost>
-                  <MyBtnPost
-                    setter={async () => {
-                      await _apiPost("vote", [isDispute?.disputeID, 3]);
-                      fetch();
-                    }}
-                    style={"text-success ml-4 "}
-                  >
-                    Payee
-                  </MyBtnPost>
-                </>
-              )}
-            {isDispute?.datas?.rules?.status === 3 &&
-              !isDispute?.datas?.rules?.appeal &&
-              (cv == isDispute?.datas?.payerID ||
-                cv == isDispute?.datas?.payeeID) && (
-                <>
-                  <MyBtnPost
-                    setter={async () => {
-                      await _apiPost("appeal", [isDispute?.disputeID]);
-                      fetch();
-                    }}
-                    style={"text-warning mr-4"}
-                  >
-                    Appeal
-                  </MyBtnPost>
-                  <MyBtnPost
-                    setter={async () => {
-                      await _apiPost("resolvedDispute", [isDispute?.disputeID]);
-                      fetch();
-                    }}
-                    style={"text-success"}
-                  >
-                    Resolved
-                  </MyBtnPost>
-                </>
-              )}
-          </div>
-        </MyCardInfo>
-      </div>
+      </>
     </>
   );
 };

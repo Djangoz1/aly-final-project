@@ -28,7 +28,7 @@ import {
 import { _apiGetAt } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 
 import { _form_create_escrow } from "../../../utils/ux-tools/form/escrow";
 import { FormCreateEscrow1 } from "sections/works/Escrows/form/create/FormCreateEscrow";

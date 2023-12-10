@@ -1,5 +1,5 @@
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyHeader } from "components/myComponents/MyHeader";
 import { ENUMS } from "constants/enums";
 import { MENUS, MENUS_ID } from "constants/menus";

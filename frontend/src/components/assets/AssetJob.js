@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
-import { MissionName } from "components/inputs/inputsMission/MissionName";
+import { CVName } from "components/links/CVName";
+import { MissionName } from "components/links/MissionName";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
 import { ENUMS } from "constants/enums";
 import { ADDRESSES } from "constants/web3";

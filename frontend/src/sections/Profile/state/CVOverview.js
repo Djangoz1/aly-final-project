@@ -35,8 +35,8 @@ import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyBtnPost } from "components/btn/MyBtnPost";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { doAuthCV, useAuthState } from "context/auth";
-import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
-import { MissionProfile } from "sections/works/Missions/state/MissionProfile";
+import { MissionFeatures } from "sections/missions/state/MissionFeatures";
+import { MissionProfile } from "sections/missions/state/MissionProfile";
 import { FeatureDispute } from "sections/works/Features/state/FeatureDispute";
 import { MyCard } from "components/myComponents/card/MyCard";
 import {

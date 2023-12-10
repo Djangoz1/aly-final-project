@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyToggle } from "components/myComponents/form/MyToggle";
 import { icfy, icfyINFO } from "icones";
 

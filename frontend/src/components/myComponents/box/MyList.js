@@ -129,7 +129,7 @@ export const MyBadge = ({ style, children, color }) => {
     <div
       className={`${
         style || "min-w-[40px] text-xs"
-      } flex rounded-full   px-2 py-1  justify-center leading-4 whitespace-nowrap w-fit flex-nowrap min-w-[40px] text-center    ${
+      } flex rounded-lg    px-2 py-1  justify-center leading-4 whitespace-nowrap w-fit flex-nowrap min-w-[40px] text-center    ${
         [
           "text-rose-800 bg-rose-100",
           "bg-gradient-to-l from-slate-800 border border-white/5 to-zinc-950 backdrop-blur",

@@ -3,20 +3,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
-import {
-  doStateProfileTools,
-  doStateToolsProfile,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
+import { useToolsState } from "context/tools";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
-
-// import {
-//   HEAD_table_features,
-//   // _table_features,
-// } from "utils/states/tables/feature";
+import { icfy, icfyETHER, icsystem } from "icones";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
@@ -24,19 +14,20 @@ import { ENUMS } from "constants/enums";
 import { v4 } from "uuid";
 
 import { MySub } from "components/myComponents/text/MySub";
-import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
+
 import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
-import { MyTable } from "components/myComponents/table/MyTable";
 
 import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
-import { MyBadge } from "components/myComponents/box/MyList";
+import { MyBadge, MyList } from "components/myComponents/box/MyList";
+import Link from "next/link";
+import { MissionName } from "components/links/MissionName";
+import { FeatureName } from "components/links/FeatureName";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -60,26 +51,6 @@ function App({ params }) {
     }
   }, [state?.jobs]);
 
-  //   let isTable = {
-  //     btn: "Missions",
-  //     table:,
-  //     head: ,
-  //     setState: stateMission,
-
-  //     // btns: MENUS_EDIT.mission,
-  //   };
-  console.log(state);
-  let dispatch = useToolsDispatch();
-  let [selectedID, setSelectedID] = useState(null);
-  let colors = [
-    "primary",
-    "secondary",
-    "info",
-    "success",
-    "error",
-    "accent",
-    "warning",
-  ];
   return (
     <LayoutProfile
       controller={"jobs"}
@@ -88,20 +59,31 @@ function App({ params }) {
       url={"/jobs"}
     >
       <div className="flex w-full flex-col-reverse">
-        <MyCard template={1} styles={"h-full  rounded-t-none w-full "}>
-          <div
-            ref={ref}
-            className="w-full h-full rounded-lg py-20 shadow backdrop-blur "
-          >
-            {/* <MyTable
-              list={_table_features(state?.jobs)}
-              head={HEAD_table_features}
+        <MyList
+          title={"Recent jobs"}
+          description={"All features works"}
+          head={["Date", "Court", "Mission", "Owner", "Status", "Amount"]}
+          arr={state?.jobs?.map((el) => [
+            el?.metadatas?.created,
+            <MyBadge color={1}>
+              <Icon icon={ENUMS.courts?.[el?.datas?.specification]?.badge} />
+              {ENUMS.courts?.[el?.datas?.specification]?.court}
+            </MyBadge>,
+            <FeatureName
+              missionID={el?.datas?.missionID}
+              metadatas={el?.metadatas}
+            />,
 
-              // btns={infos?.[state?.indexOverview]?.btns}
-              // editBtns={infos?.[state?.indexOverview]?.editBtns}
-            /> */}
-          </div>
-        </MyCard>
+            <CVName cvID={el?.datas?.owner} />,
+            <MyStatus
+              padding={"px-2 py-1"}
+              style={"text-[9px]"}
+              status={el?.datas?.status}
+              target={"feature"}
+            />,
+            <MyBadge>{el?.datas?.wadge} ETH</MyBadge>,
+          ])}
+        />
         <div className="flex relative w-full">
           <MyScrolledXDiv style={" gap-4  pr-[400px]   "}>
             <>
@@ -146,12 +128,22 @@ function App({ params }) {
                       />
                     </>
                   }
-                  title={el?.metadatas?.title}
+                  title={
+                    <FeatureName
+                      metadatas={el?.metadatas}
+                      missionID={el?.datas?.missionID}
+                    />
+                  }
                 >
                   <MyCardInfos
                     style={"min-w-[400px] w-full"}
                     template={5}
                     arr={[
+                      {
+                        title: "Mission",
+                        icon: icsystem.mission,
+                        value: <MissionName id={el?.datas?.missionID} />,
+                      },
                       {
                         title: "Domain",
                         icon: ENUMS.domain[el?.metadatas?.domain]?.icon,

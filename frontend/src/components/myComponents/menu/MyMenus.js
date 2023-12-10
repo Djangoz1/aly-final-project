@@ -1,33 +1,13 @@
-import {
-  doStateFormPointer,
-  useFormDispatch,
-  useFormState,
-} from "context/form";
-
 import React, { useEffect, useState } from "react";
 import { v4 } from "uuid";
-import {
-  doIndexTools,
-  doStateTools,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
+import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 import Link from "next/link";
-import { MyProgress } from "../layout/MyProgress";
-import { ENUMS } from "constants/enums";
 import { Icon } from "@iconify/react";
 import { icfy, icfyARROWD, icfyGITHUB, icsystem } from "icones";
 import { Avatar } from "components/profile/ProfileAvatar";
-import { MyMainBtn, MyMainBtn1 } from "../btn/MyMainBtn";
 import { MySub } from "../text/MySub";
 
-export const MyMenus = ({ menus, id, current, styles, setter }) => {
-  // let dispatch = useFormDispatch();
-  // let { pointer } = useFormState();
-  // let handleClick = (title, index) => {
-  //   doStateFormPointer(dispatch, index);
-  // };
-
+export const MyMenus = ({ menus, current }) => {
   let { url } = useToolsState();
 
   return (
@@ -75,7 +55,6 @@ export const MyMenusTabs = ({
   children,
   arr,
   styleOrigin,
-  target,
   color,
 }) => {
   let { pointer } = useToolsState();
@@ -153,8 +132,7 @@ export const MyMenusTabs = ({
           <Link
             onClick={() => setter(null)}
             key={v4()}
-            href={"#section" + pointer}
-            as={"#section" + pointer}
+            href={"#"}
             className={` relative  min-w-[70px]      overflow-hidden       text-sm    
             ${
               [
@@ -325,7 +303,7 @@ export const MyMenusTabs = ({
                     ["", "", "mx-3"]?.[template || 0]
                   }`}
                 >
-                  {target ? el?.[target] : el}
+                  {el}
                 </span>
                 {/* //! WTF */}
                 {/* {value === i && template === 1 ? (

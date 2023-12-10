@@ -1,7 +1,7 @@
 import { useToolsState } from "context/tools";
 import React from "react";
 import { Avatar } from "../../profile/ProfileAvatar";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { Icon } from "@iconify/react";
 import { MySub } from "components/myComponents/text/MySub";

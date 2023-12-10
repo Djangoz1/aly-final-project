@@ -41,8 +41,8 @@ import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MissionFeatures } from "sections/works/Missions/state/MissionFeatures";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { MissionFeatures } from "sections/missions/state/MissionFeatures";
+import { CVName } from "components/links/CVName";
 
 function App({ params }) {
   const { cv } = useAuthState();

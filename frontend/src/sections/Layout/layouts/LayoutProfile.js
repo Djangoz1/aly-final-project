@@ -115,7 +115,7 @@ export const LayoutProfile = ({ cvID, url, children, controller }) => {
         url={`/profile/${cvID}${url}`}
         // url={url}
       >
-        <div className="bgprim pb-20 min-h-screen w-full">{children}</div>
+        <div className=" pb-20 w-full">{children}</div>
       </MyLayoutDashboard>
     )
   );

@@ -191,6 +191,7 @@ export const stateDetailsCV = async ({
 };
 
 export const stateDispute = async (disputeID) => {
+  if (!disputeID) throw new Error("Dispute ID is required");
   let dispute = {
     ...(await _apiGet("datasOfDispute", [disputeID])),
     rules: null,
@@ -207,6 +208,7 @@ export const stateDispute = async (disputeID) => {
   dispute.timers = await _apiGet("timersOfDispute", [disputeID]);
   dispute.arbitrators = await _apiGet("arbitratorsOfDispute", [disputeID]);
   dispute.counters = await _apiGet("countersOfDispute", [disputeID]);
+  dispute.value = ethers.utils.formatEther(`${dispute?.value}`);
   console.log("dispute", dispute);
   let metadatas = await fetchJSONByCID({
     id: dispute?.tokenURI,
@@ -224,7 +226,7 @@ export const stateMission = async (missionID) => {
   } else if (missionID && missionID > 0) {
     let datas = await fetchMission(missionID);
 
-    let details = await stateDetailsMission({ features: datas?.features });
+    // let details = await stateDetailsMission({ features: datas?.features });
     let metadatas = await fetchJSONByCID({ id: datas?.uri, table: "missions" });
 
     let records = await clientPocket.records.getList(
@@ -236,14 +238,14 @@ export const stateMission = async (missionID) => {
       }
     );
 
-    details.social = {
+    datas.social = {
       followers: records.items,
     };
     let result = {
       missionID,
       datas,
       metadatas: metadatas,
-      details: details,
+      // details: details,
     };
     return result;
   }

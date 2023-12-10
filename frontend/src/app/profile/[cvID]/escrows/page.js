@@ -42,7 +42,7 @@ import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import {
   HEAD_table_arbitrators,
   _table_arbitrators,

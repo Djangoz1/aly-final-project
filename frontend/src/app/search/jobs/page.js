@@ -38,10 +38,10 @@ import { useAuthState } from "context/auth";
 import { controllers } from "utils/controllers";
 
 import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import Link from "next/link";
-import { MissionName } from "components/inputs/inputsMission/MissionName";
+import { MissionName } from "components/links/MissionName";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
   let [isLoading, setIsLoading] = useState(null);
@@ -284,7 +284,7 @@ let Page = () => {
               }}
               style={"mx-10 mx-auto   mb-20 h-fit "}
               key={v4()}
-              url={`/works/mission/${el?.datas?.missionID}`}
+              url={`/mission/${el?.datas?.missionID}`}
               title={
                 <>
                   <Link className="hover:text-info mx-auto"></Link>

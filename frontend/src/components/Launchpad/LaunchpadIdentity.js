@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { ImagePin } from "components/Image/ImagePin";
-import { CVName } from "components/inputs/inputsCV/CVName";
+import { CVName } from "components/links/CVName";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { icfyURL } from "icones";
 import React from "react";
