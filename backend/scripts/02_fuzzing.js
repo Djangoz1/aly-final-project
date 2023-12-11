@@ -63,7 +63,10 @@ async function main() {
     });
     console.log("cv#", cv, "created for ", fuzzing.accounts[index].username);
   }
-
+  await _createLaunchpad({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
   for (let index = 0; index < fuzzing.missions.length; index++) {
     const _mission = fuzzing.missions[index];
     let mission = await _createMission({
