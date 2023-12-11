@@ -36,7 +36,7 @@ export const CVName = ({ styles, metadata, cvID }) => {
   return (
     <Link
       ref={ref}
-      href={`/profile/${metadata?.cvID || cvID || cv}`}
+      href={metadata?.cvID || cvID ? `/profile/${metadata?.cvID || cvID}` : "#"}
       className={" w-fit hover:text-info " + styles}
     >
       {metadata?.username || isName || "No name"}

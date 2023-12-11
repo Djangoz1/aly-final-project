@@ -45,7 +45,7 @@ export const AgendasMission = () => {
               ),
               value: (
                 <>
-                  <div className="flex ml-10 debug flex-col">
+                  <div className="flex ml-10  flex-col">
                     <div className="flex justify-between items-center">
                       <p className="mr-2 text-white/40">Started At</p>
                       <span>{fromTimestamp(event?.start?.getTime())}</span>

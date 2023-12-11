@@ -38,7 +38,32 @@ export const EditProfile = ({ styles }) => {
 
   let [isIndex, setIsIndex] = useState(0);
 
-  let moock = toMockProfile({ address, metadatas, cvID: cv });
+  let moock = {
+    target: "Profile",
+    id: cv,
+    address: address,
+    username: metadatas?.username,
+    tjm: metadatas?.tjm,
+    description: metadatas?.description,
+    avatar: metadatas?.avatar,
+    visibility: metadatas?.visibility,
+    cvImg: metadatas?.cvImg,
+    banniere: metadatas?.banniere,
+    firstName: metadatas?.firstName,
+    lastName: metadatas?.lastName,
+    phone: metadatas?.phone,
+    email: metadatas?.email,
+    dateOfBirth: metadatas?.dateOfBirth,
+    citizen: metadatas?.citizen,
+    linkedin: metadatas?.social?.linkedin,
+    github: metadatas?.social?.github,
+    facebook: metadatas?.social?.facebook,
+    twitter: metadatas?.social?.twitter,
+    skills: metadatas?.skills,
+    domain: metadatas?.domain,
+    languages: metadatas?.languages,
+    created: metadatas?.created,
+  };
 
   return (
     <div className="  min-h-[60vh] w-full flex flex-col h-full">
@@ -65,7 +90,7 @@ export const EditProfile = ({ styles }) => {
           color={1}
           setter={(i) => setIsIndex(i)}
           // style={" w-1/5 rounded-none "}
-          arr={MENUS.profile?.edit}
+          arr={MENUS.profile?.edit.map((el) => el?.title)}
         />
         <div className="  px-3 py-5 h-full">
           {

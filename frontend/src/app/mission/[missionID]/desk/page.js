@@ -40,7 +40,6 @@ import { MyModal } from "components/myComponents/modal/MyModal";
 import { useRouter } from "next/navigation";
 import { MySub } from "components/myComponents/text/MySub";
 import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
-// import { AgendasMission } from "sections/missions/state/AgendasMission";
 import { MyToDo } from "components/myComponents/form/MyToDo";
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { AgendasMission } from "sections/works/Missions/state/AgendasMission";

@@ -8,7 +8,7 @@ import {
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "./web3";
 
-export const _STATUS = async ({ state, to, target }) => {
+export const _STATUS = async ({ state, metadatas, to, target }) => {
   let funcs = {
     token: [
       async () => await _apiPost("changeAcceptToken"),
@@ -16,7 +16,6 @@ export const _STATUS = async ({ state, to, target }) => {
     ],
     profile: [
       async () => {
-        let metadatas = { ...state?.profile?.metadatas };
         metadatas.visibility = true;
 
         let uri = await clientPocket.records.update(
@@ -26,9 +25,8 @@ export const _STATUS = async ({ state, to, target }) => {
         );
       },
       async () => {
-        let metadatas = { ...state?.profile?.metadatas };
         metadatas.visibility = false;
-
+        console.log("metadatas", metadatas);
         let uri = await clientPocket.records.update(
           "accounts",
           metadatas?.id,

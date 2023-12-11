@@ -31,6 +31,7 @@ import { controllers } from "utils/controllers";
 import { useFormState } from "context/form";
 import { ImagePin } from "components/Image/ImagePin";
 import { NoItems } from "components/myComponents/layout/NoItems";
+import { CVName } from "components/links/CVName";
 
 export const LayoutSocial = ({
   pubs,
@@ -178,7 +179,8 @@ let Page = ({ mission, launchpad, pubs, owner }) => {
 
                 <div className="grow space-y-1">
                   <h4 className="flex items-center gap-1 text-sm font-semibold">
-                    <span>{owner?.metadatas?.username}</span>
+                    <CVName metadata={owner?.metadatas} cvID={owner?.cvID} />
+
                     <Icon
                       className="h-5 w-5 text-sky-500"
                       icon={icfy.social.checkmark}

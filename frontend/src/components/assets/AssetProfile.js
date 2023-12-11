@@ -9,6 +9,8 @@ import { MyCard } from "components/myComponents/card/MyCard";
 import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyFunMenus } from "components/myComponents/menu/MyFunMenus";
+import { MyNum } from "components/myComponents/text/MyNum";
+import { MySub } from "components/myComponents/text/MySub";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
@@ -28,6 +30,7 @@ import {
   icfyFB,
   icfyGITHUB2,
   icfyLINKEDIN,
+  icsystem,
 } from "icones";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
@@ -132,8 +135,8 @@ export const AssetFreelancer = ({ owner, style }) => {
   };
   return (
     <MyCard
-      template={0}
-      styles={`relative  flex  h-fit  w-full flex-col ${style}`}
+      template={3}
+      styles={`relative  flex rounded-lg   h-fit  w-full flex-col ${style}`}
     >
       <div className="w-full h-full relative">
         <ImagePin
@@ -151,12 +154,7 @@ export const AssetFreelancer = ({ owner, style }) => {
           icon={icfyARROWD}
           className="absolute right-1 bottom-1 -translate-y-1/2 -rotate-90 opacity-50 hover:opacity-100 text-white text-4xl transition-all cursor-pointer  hover:scale-110 "
         />
-        <MyStatus
-          padding={"px-2 py-1"}
-          style={`absolute top-1   text-xs left-1 z-1 `}
-          target={"profile"}
-          status={owner?.metadatas?.visibility ? 0 : 1}
-        />
+
         <div
           className="
         bg-black/20 backdrop-blur rounded-full absolute  -top-2 z-3 -right-2"
@@ -171,34 +169,50 @@ export const AssetFreelancer = ({ owner, style }) => {
         </div>
       </div>
       <div className="  c3  transition-all backdrop-blur-none hover:backdrop-blur-xl  flex relative flex-col min-w-full z-10">
-        <CVName
-          styles="text-xl"
-          cvID={owner?.cvID}
-          metadata={owner?.metadatas}
-        />
+        <div className="flex justify-between">
+          <CVName
+            styles="text-sm"
+            cvID={owner?.cvID}
+            metadata={owner?.metadatas}
+          />
+          <MyStatus
+            padding={"px-2 py-1"}
+            style={`text-[8px]`}
+            target={"profile"}
+            status={owner?.metadatas?.visibility ? 0 : 1}
+          />
+        </div>
 
-        <p className="text-xs c4">{owner?.metadatas?.email}</p>
-        <div className="flex -mb-3 mt-1 gap-4">
-          <MyBadge color={1}>{owner?.details?.wadge?.toFixed(4)} ETH</MyBadge>
-          <MyBadge color={2}>
+        <p className="text-[9px] c4">{owner?.metadatas?.email}</p>
+        <div className="flex -mb-3 text-[10px] mt-1 gap-2">
+          {owner?.metadatas?.tjm ? (
+            <MyBadge color={1}>
+              <MySub size={8}>TJM:</MySub> {owner?.metadatas?.tjm} $
+            </MyBadge>
+          ) : (
+            <></>
+          )}
+          <MyBadge style={"text-[9px]"} color={owner?.metadatas?.domain}>
             {ENUMS.domain[owner?.metadatas?.domain]?.name}
+          </MyBadge>
+          <MyBadge style={"items-center gap-1"} color={1}>
+            <Icon icon={icsystem.mission} />
+            <MyNum num={owner?.datas?.missions?.length} />
+            <Icon className="ml-2" icon={icsystem.feature} />
+            <MyNum num={owner?.datas?.proposals?.length} />
           </MyBadge>
         </div>
       </div>
 
-      {owner?.metadatas?.skills?.length && (
+      {/* {owner?.metadatas?.skills?.length && (
         <div
-          className="flex mt-10 overflow-y-scroll  hide-scrollbar pb-3 flex-wrap gap-4 w-full "
+          className="flex  overflow-y-scroll  hide-scrollbar pb-3 flex-wrap gap-4 w-full "
           key={v4()}
         >
           {owner?.metadatas?.skills?.map(
             (el, i) =>
               i < 5 && (
-                <MyBadge
-                  color={el}
-                  key={v4()}
-                  className="backdrop-blur  rounded-full bg-white/10 text-white flex mr-3 mb-4 items-center relative text-[10px] px-4 py-1 "
-                >
+                <MyBadge color={el} key={v4()} style="text-[10px]">
                   {i !== 4 ? (
                     <>
                       <Icon
@@ -206,10 +220,6 @@ export const AssetFreelancer = ({ owner, style }) => {
                         className="mr-1 text-lg"
                       />
                       {ENUMS.courts[el].court}
-                      <Icon
-                        icon={icfy.ux.medal}
-                        className="absolute top-0 right-0 text-xs"
-                      />
                     </>
                   ) : (
                     "... More"
@@ -239,7 +249,7 @@ export const AssetFreelancer = ({ owner, style }) => {
               )
           )}
         </div>
-      )}
+      )} */}
     </MyCard>
   );
 };

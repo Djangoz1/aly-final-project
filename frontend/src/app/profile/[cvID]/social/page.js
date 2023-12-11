@@ -23,12 +23,8 @@ function App({ params }) {
   const { cv } = useAuthState();
 
   const { state, status, pointer } = useToolsState();
-  let [isLoading, setIsLoading] = useState(null);
-  let [isState, setIsState] = useState(null);
 
   const cvID = params.cvID;
-
-  let dispatch = useToolsDispatch();
 
   return (
     <LayoutProfile

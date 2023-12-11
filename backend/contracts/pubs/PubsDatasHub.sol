@@ -14,7 +14,8 @@ import {IPubsHub} from "../interfaces/pubs/IPubsHub.sol";
 contract PubsDatasHub is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _likeIDs;
-
+    IAddressSystem internal _iAS;
+    IPubsHub internal _iPH;
     /**
      * @dev storage indexer like for each pub
      * @notice uint param is for pub ID
@@ -47,9 +48,6 @@ contract PubsDatasHub is ERC721, Ownable {
         );
         _;
     }
-
-    IAddressSystem internal _iAS;
-    IPubsHub internal _iPH;
 
     modifier ifTokenExist(uint _id, address _contract) {
         require(

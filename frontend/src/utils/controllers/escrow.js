@@ -33,11 +33,20 @@ export const controllersDispute = {
   },
   get: {
     // indexer disputes ID
-    list: async ({ disputes }) => {
+    list: async ({ disputes, features }) => {
       if (disputes) {
         let lists = [];
         for (let index = 0; index < disputes.length; index++) {
           lists.push(await stateDispute(disputes[index]));
+        }
+        return lists;
+      } else if (features) {
+        let lists = [];
+        for (let index = 0; index < features.length; index++) {
+          lists.push({
+            ...(await stateDispute(features[index].datas?.dispute)),
+            feature: features[index],
+          });
         }
         return lists;
       }

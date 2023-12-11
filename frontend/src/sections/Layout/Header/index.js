@@ -85,12 +85,12 @@ export const Header = ({ children, style }) => {
   };
   return (
     <>
-      <motion.div
+      <div
         className={`flex w-full  ${
           style || "relative"
         } -z-1 box-border  flex-col min-h-[5vh] `}
       >
-        <motion.div className="relative   flex z-100 w-full py-5 px-5   box-border items-center justify-between backdrop-blur">
+        <div className="relative   flex z-100 w-full py-5 px-5   box-border items-center justify-between backdrop-blur">
           {children || <Logo styleD={"w-8 h-6 text-[6px] "} />}
           <button
             onClick={() => setIsClicked(!isClicked)}
@@ -103,9 +103,9 @@ export const Header = ({ children, style }) => {
             </div>
           </button>
           <MyProgress style="progress bg-white/40 opacity-50  mr-5 w-[97%]  absolute bottom-0 " />
-        </motion.div>
+        </div>
         <>{isClicked && <MyOverlay style={" "} setter={setIsClicked} />}</>
-      </motion.div>
+      </div>
       <motion.div
         initial={false}
         animate={isClicked ? "open" : "closed"}

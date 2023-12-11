@@ -12,7 +12,10 @@ interface ICVsHub {
 
     function cvOf(uint _cvID) external view returns (address);
 
-    function mint(address _from, string calldata _tokenURI) external;
+    function mint(
+        address _from,
+        string calldata _tokenURI
+    ) external returns (uint);
 
     function ownerOf(uint256 tokenId) external view returns (address owner);
 

@@ -5,6 +5,8 @@ import "./style.css";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
 import { useToolsState } from "context/tools";
+import { MySub } from "../text/MySub";
+import { useAuthState } from "context/auth";
 export const MyStatus = ({
   padding,
   status,
@@ -19,7 +21,7 @@ export const MyStatus = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { state, refresh } = useToolsState();
-
+  let { metadatas } = useAuthState();
   let handleClick = async () => {
     if (allowed && status != toStatus) {
       setIsLoading(true);
@@ -27,7 +29,12 @@ export const MyStatus = ({
       if (setter) {
         await setter();
       } else {
-        await _STATUS({ state: state, to: toStatus, target });
+        await _STATUS({
+          state: state,
+          metadatas: metadatas,
+          to: toStatus,
+          target,
+        });
       }
       if (refresh) {
         console.log(refresh);
@@ -45,7 +52,7 @@ export const MyStatus = ({
         className={` ${style || "  text-xs  "}
           ${
             allowed && status != toStatus
-              ? `p-0 super-btn   overflow-hidden `
+              ? `p-0 flex flex-col   overflow-hidden `
               : "uppercase"
           }
         `}
@@ -61,11 +68,7 @@ export const MyStatus = ({
  font-semibold
            ${padding || "py-2 px-5"}
          backdrop-blur
-        ${
-          allowed && status != toStatus
-            ? "hover:bg-zinc-900 h-full cursor-pointer"
-            : "cursor-default"
-        }
+        ${allowed && status != toStatus ? " cursor-pointer" : "cursor-default"}
           `}
         >
           {!isHovered && component ? (
@@ -98,6 +101,11 @@ export const MyStatus = ({
             </>
           )}
         </motion.div>
+        {allowed && status != toStatus && (
+          <MySub size={8} style={"c4"}>
+            Click to change status
+          </MySub>
+        )}
       </motion.button>
     </>
   );

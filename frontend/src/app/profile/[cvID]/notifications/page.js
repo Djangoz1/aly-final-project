@@ -28,12 +28,15 @@ import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { ProfileAvatar } from "components/profile/ProfileAvatar";
+import { Avatar, ProfileAvatar } from "components/profile/ProfileAvatar";
 import { MySelect } from "components/myComponents/form/MySelects";
 import { LayoutForm } from "sections/Form/LayoutForm";
 import { MyBadge } from "components/myComponents/box/MyList";
 import { MissionName } from "components/links/MissionName";
 import { NoItems } from "components/myComponents/layout/NoItems";
+import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
+import { FeatureName } from "components/links/FeatureName";
+import { CVName } from "components/links/CVName";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -116,14 +119,24 @@ function App({ params }) {
             <div className="w-full h-full rounded-lg  shadow backdrop-blur ">
               {state?.notifications?.demands?.length > 0 ? (
                 state?.notifications?.demands?.map((feature) => (
-                  <div
+                  <MyCardDropdown
+                    header={
+                      <>
+                        <MyNum num={feature?.details?.demands?.length}>
+                          <MySub size={7}>Demands</MySub>
+                        </MyNum>{" "}
+                      </>
+                    }
                     className="flex flex-col border border-white/0 border-t-white/5  pt-5 gap-2"
                     key={v4()}
+                    title={
+                      <FeatureName
+                        style={"uppercase font-medium text-white/70"}
+                        metadatas={feature?.metadatas}
+                        missionID={feature?.datas?.missionID}
+                      ></FeatureName>
+                    }
                   >
-                    <div className="flex items-center">
-                      <Icon className="mr-2 rotate-90" icon={icfy.ux.arrow} />
-                      <MySub>{feature?.metadatas?.title}</MySub>
-                    </div>
                     {feature?.details?.demands?.map((account, i) => (
                       <div
                         className={
@@ -138,10 +151,14 @@ function App({ params }) {
                           }`}
                         />
 
-                        <ProfileAvatar
-                          cvID={parseInt(account?.cvID)}
-                          style={"w-10 h-10 m-2"}
+                        <Avatar
+                          designation={true}
+                          style={"w-10 h-10 mr-10 "}
                           metadatas={account?.metadatas}
+                        />
+                        <CVName
+                          metadata={account?.metadatas}
+                          cvID={account?.cvID}
                         />
                         <MyBadge style={"ml-2"}>
                           <Icon
@@ -162,11 +179,13 @@ function App({ params }) {
                             style={"btn  btn-success  btn-xs"}
                             icon={icfy.ux.check.casual}
                             template={3}
-                          ></MyMainBtn>
+                          >
+                            Sign
+                          </MyMainBtn>
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </MyCardDropdown>
                 ))
               ) : (
                 <NoItems icon={icsystem.mission} />

@@ -6,35 +6,29 @@ import { useToolsState } from "context/tools";
 
 import { _apiGetAt, _apiPost } from "utils/ui-tools/web3-tools";
 
-import { Avatar, AvatarsList } from "components/profile/ProfileAvatar";
+import { Avatar } from "components/profile/ProfileAvatar";
 
 import { useAuthState } from "context/auth";
 
 import { Icon } from "@iconify/react";
 import { icfy, icfyETHER, icsystem } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { ENUMS } from "constants/enums";
 
 import { v4 } from "uuid";
-import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
+import { MyCardInfos } from "components/myComponents/card/MyCard";
 
 import { LayoutMission } from "sections/Layout/layouts/LayoutMission";
 import { MySub } from "components/myComponents/text/MySub";
 import { CVName } from "components/links/CVName";
-import { MyNum } from "components/myComponents/text/MyNum";
-import { controllers } from "utils/controllers";
 
-import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyBadge, MyList } from "components/myComponents/box/MyList";
-import { MyChart } from "components/myComponents/box/MyChart";
-import { MyModal } from "components/myComponents/modal/MyModal";
+
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyLayoutDetails } from "components/myComponents/layout/MyLayoutDetails";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -43,34 +37,6 @@ function App({ params }) {
 
   const missionID = params.missionID;
   // ! TO DO SECURE HTML
-
-  let [isWorkers, setIsWorkers] = useState(null);
-  useEffect(() => {
-    (async () => {
-      let lists = [];
-      for (
-        let index = 0;
-        index < state?.mission?.details?.features.length;
-        index++
-      ) {
-        const element = state?.mission?.details?.features[index];
-        let worker = await controllers.get.profile.item({
-          cvID: element?.cvWorker,
-        });
-        if (!lists.map((el) => el?.metadatas?.id).includes(worker.metadatas.id))
-          lists.push({
-            metadatas: {
-              username: worker?.metadatas?.username,
-              id: worker?.metadatas?.id,
-              avatar: worker?.metadatas?.avatar,
-              ["@collectionId"]: worker?.metadatas?.["@collectionId"],
-            },
-            designation: ENUMS.courts?.[element?.specification]?.court,
-          });
-      }
-      setIsWorkers(lists);
-    })();
-  }, [state?.mission?.details?.features]);
 
   return (
     <LayoutMission controller={"overview"} missionID={missionID} url={"/"}>
@@ -110,6 +76,7 @@ function App({ params }) {
                 <MyCardInfos
                   arr={[
                     {
+                      icon: ENUMS.courts[element?.datas?.specification]?.badge,
                       title: element?.metadatas?.title,
                       value: (
                         <div
@@ -142,7 +109,26 @@ function App({ params }) {
                   style={"w-full  "}
                   className=" hover:opacity-100 opacity-50 c3 flex flex-col"
                   key={v4()}
-                ></MyCardInfos>
+                >
+                  {element?.datas?.cvWorker ||
+                  cv == element?.datas?.owner ||
+                  element?.details?.workerDemand
+                    ?.map((el) => `${el}`)
+                    ?.includes(`${cv}`) ? (
+                    <></>
+                  ) : (
+                    <MyMainBtn
+                      template={1}
+                      color={2}
+                      style={"btn-xs ml-auto mt-2"}
+                      setter={async () => {
+                        await _apiPost("askToJoin", [element?.featureID]);
+                      }}
+                    >
+                      Join
+                    </MyMainBtn>
+                  )}
+                </MyCardInfos>
               ))}
             </article>
           </div>
@@ -226,13 +212,22 @@ function App({ params }) {
               title: "Technology",
               value: (
                 <div className="grid gap-2 grid-cols-5">
-                  {state?.mission?.details?.badges?.map((el) => (
-                    <Icon
-                      key={v4()}
-                      icon={ENUMS.courts?.[el]?.badge}
-                      className="text-white c2 text-[24px] "
-                    />
-                  ))}
+                  {state?.features
+                    ?.filter(
+                      (el, index, self) =>
+                        index ===
+                        self.findIndex(
+                          (o) =>
+                            o.datas?.specification == el?.datas?.specification
+                        )
+                    )
+                    ?.map((el) => (
+                      <Icon
+                        key={v4()}
+                        icon={ENUMS.courts?.[el?.datas?.specification]?.badge}
+                        className="text-white c2 text-[24px] "
+                      />
+                    ))}
                 </div>
               ),
             },
@@ -257,7 +252,6 @@ function App({ params }) {
                           (o) => o.datas?.cvWorker == el?.datas?.cvWorker
                         )
                     )
-
                     ?.map((el) => (
                       <Avatar
                         designation={true}

@@ -157,14 +157,12 @@ export const doStateToolsMission = async ({
         return await controllers.get.pub.list({ mission: mission });
       },
       escrows: async () => {
+        let features = _state?.features;
         if (!_state?.features) {
-          _state.features = await _controllers.features();
+          features = await _controllers.features();
         }
 
-        let result = await controllers.get.escrows.list({
-          features: _state.features,
-        });
-        return result;
+        return features?.filter((el) => el?.datas?.dispute);
       },
       overview: async () => {
         _state.features = await _controllers.features();

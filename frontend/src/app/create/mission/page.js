@@ -33,14 +33,18 @@ import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 import { icfyETHER } from "icones";
 import { CVName } from "components/links/CVName";
 import { clientPocket, createURI } from "utils/ui-tools/pinata-tools";
-import {
-  FormCreateMission1,
-  FormCreateMission2,
-} from "sections/missions/form/create/FormCreateMission";
+// import {
+//   FormCreateMission1,
+//   FormCreateMission2,
+// } from "sections/missions/form/create/FormCreateMission";
 
 import { FormResponseAI } from "sections/Form/FormResponseAI";
 import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
 import { controllers } from "utils/controllers";
+import {
+  FormCreateMission1,
+  FormCreateMission2,
+} from "sections/works/Missions/form/create/FormCreateMission";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();

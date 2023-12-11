@@ -94,15 +94,9 @@ function App({ params }) {
                     ></MySelect>
                   </LayoutForm>
                 ) : (
-                  <div className="flex w-full flex-wrap items-">
-                    <MySub style={"items-center flex"}>
-                      <Icon
-                        className="text-lg mr-2"
-                        icon={ENUMS?.domain[metadatas?.domain]?.icon}
-                      />
-                      {ENUMS?.domain[metadatas?.domain]?.name}
-                    </MySub>
-                  </div>
+                  <MySub style={"items-center flex"}>
+                    {ENUMS?.domain[state?.profile?.metadatas?.domain]?.name}
+                  </MySub>
                 ),
               icon: ENUMS.domain[state?.profile?.metadatas?.domain]?.icon,
             },

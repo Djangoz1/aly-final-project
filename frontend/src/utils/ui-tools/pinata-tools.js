@@ -7,11 +7,8 @@ import axios from "axios";
 import { ADDRESSES } from "constants/web3";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
-
-export const clientPocket = new PocketBase("http://127.0.0.1:8090");
-
-export const pinataGateway =
-  "https://copper-immense-nightingale-374.mypinata.cloud/ipfs/";
+export const urlPocket = "http://127.0.0.1:8090";
+export const clientPocket = new PocketBase(urlPocket);
 
 export const fetchJSONByCID = async ({ id, table, expand }) => {
   if (!id || !table) {

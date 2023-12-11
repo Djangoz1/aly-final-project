@@ -92,6 +92,7 @@ export const FormEditProfile1 = () => {
         styles={"w-full "}
         target={"description"}
       />
+      <MyInput type={"number"} metadatas={metadatas} target={"tjm"} />
     </div>
   );
 };

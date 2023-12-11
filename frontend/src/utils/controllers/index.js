@@ -286,15 +286,11 @@ export const controllers = {
     escrows: {
       list: ({ features }) =>
         controllersDispute.get.list({
-          disputes: features
-            ?.map((el) =>
-              el?.datas?.dispute > 0 ? el?.datas?.dispute : undefined
-            )
-            .filter((el) => el > 0),
+          features: features?.filter((el) => el?.datas?.dispute > 0),
         }),
     },
     feature: {
-      item: async ({ featureID, featureHash, withOwner, expand }) => {
+      item: async ({ featureID, _full, featureHash, withOwner, expand }) => {
         if (withOwner && !featureID) {
           throw new Error("featureID is required for get owner");
         }
@@ -305,10 +301,12 @@ export const controllers = {
           featureHash = feature.metadatas.id;
           result = {
             featureID,
-            datas: {
-              specification: feature.datas.specification,
-              missionID: feature?.datas?.missionID,
-            },
+            datas: _full
+              ? feature?.datas
+              : {
+                  specification: feature.datas.specification,
+                  missionID: feature?.datas?.missionID,
+                },
           };
           if (withOwner) {
             let owner = await controllers.get.profile.item({
@@ -328,13 +326,21 @@ export const controllers = {
         );
         return { ...result, metadatas };
       },
-      list: async () => {
+      list: async ({ expand }) => {
         let length = await _apiGet("tokensLengthOf", [
           ADDRESSES["featuresHub"],
         ]);
         let result = [];
+
         for (let index = 1; index < length; index++) {
-          let feature = { ...(await stateFeature(index)), owner: null };
+          let feature = {
+            ...(await controllers.get.feature.item({
+              featureID: index,
+              expand,
+              _full: true,
+            })),
+            owner: null,
+          };
 
           feature.owner = await fetchCV(feature?.datas?.owner);
           result.push(feature);

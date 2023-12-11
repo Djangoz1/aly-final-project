@@ -10,7 +10,7 @@ import { MyStatus } from "components/myComponents/item/MyStatus";
 import { ENUMS } from "constants/enums";
 import { STATUS } from "constants/status";
 import { ethers } from "ethers";
-import { icfy, icfyETHER, icfyTIME, icsystem } from "icones";
+import { icfy, icfyETHER, icfySEARCH, icfyTIME, icsystem } from "icones";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { stateLaunchpad } from "utils/ui-tools/state-tools";
@@ -72,6 +72,7 @@ export const MyLayoutDashboard = ({
   let { state, pointer } = useToolsState();
   let { metadatas, cv } = useAuthState();
   let { address } = useAccount();
+  console.log("MyLayoutDashboard state", state);
   let menus = noMenu
     ? undefined
     : _menus
@@ -121,7 +122,7 @@ export const MyLayoutDashboard = ({
       {template === 0 ? (
         <>
           <div className=" relative h-full flex  w-full">
-            <div className="  border-r-white/5  fixed left-0 bottom-0 flex  flex-col-reverse h-full w-[18%] bgprim">
+            <div className="  border-r-white/5  fixed left-0 bottom-0 flex  flex-col-reverse h-full 2xl:w-[12%] w-[18%] bgprim">
               <div className="flex flex-col h-full overflow-y-scroll hide-scrollbar pb-20 w-full">
                 {metadatas ? (
                   <MyLayoutHeader
@@ -152,7 +153,7 @@ export const MyLayoutDashboard = ({
                 <MyMenus current={url} menus={menus} />
               </div>
             </div>
-            <div className=" min-h-screen bgprim  h-fit w-[81%] flex flex-col-reverse ml-auto backdrop-blur">
+            <div className=" min-h-screen bgprim  h-fit 2xl:w-[87%] w-[81%] flex flex-col-reverse ml-auto backdrop-blur">
               {isLoading === false ? (
                 <div className="w-full overflow-y-auto py-20 min-h-screen">
                   {children}
@@ -163,15 +164,19 @@ export const MyLayoutDashboard = ({
             </div>
             {btn ? <div className="fixed bottom-5 right-5">{btn}</div> : <></>}
           </div>
-          <div className=" max-w-full fixed top-0 right-0 w-[81%] min-h-[5vh] ">
+          <div className=" max-w-full fixed top-0 right-0 2xl:w-[87%] w-[81%] min-h-[5vh] ">
             <Header style={"bg-white/5 backdrop-blur-2xl  "}>
               <MyHeaderDashboard
                 source={{
                   title:
                     state?.[target]?.metadatas?.title ||
-                    state?.[target]?.metadatas?.username,
+                    state?.[target]?.metadatas?.username ||
+                    target,
                   url: `/${target}/${id}`,
-                  icon: icsystem?.[target],
+                  icon:
+                    icsystem?.[target] || target === "search"
+                      ? icfySEARCH
+                      : undefined,
                 }}
                 arr={url
                   .split("/")

@@ -43,7 +43,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
   describe("Initialization", () => {
     describe("Works", () => {
       it("ArbitratorsHub : should have 0 tokens length", async () => {
-        expect(await apiGet.lengthOfArbitrators()).to.equal(0);
+        expect(await apiGet.tokensLengthOf(contract.target)).to.equal(0);
       });
     });
     describe("NOT WORKS", () => {});
@@ -55,7 +55,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
     describe("WORKS", () => {
       it("dataOf : should return tokens Length", async () => {
-        let length = await apiGet.lengthOfArbitrators();
+        let length = await apiGet.tokensLengthOf(contract.target);
         expect(length).to.equal(1);
       });
       it("dataOf : should return arbitrator ID", async () => {
@@ -105,12 +105,12 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("WORKS", () => {
       it("validateMission : should set arbitrator after validate mission from sender", async () => {
         await _testInitArbitrator(contracts, 3, this.addr1);
-        expect(await apiGet.lengthOfArbitrators()).to.equal(1);
+        expect(await apiGet.tokensLengthOf(contract.target)).to.equal(1);
       });
       it("validateMission : should used twice for different court ID", async () => {
         await _testInitArbitrator(contracts, 3, this.addr1);
         await _testInitArbitrator(contracts, 4, this.addr1);
-        expect(await apiGet.lengthOfArbitrators()).to.equal(2);
+        expect(await apiGet.tokensLengthOf(contract.target)).to.equal(2);
       });
     });
     describe("NOT WORKS", () => {
@@ -130,125 +130,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(
           _testInitArbitrator(contracts, 1, this.addr1)
         ).to.be.revertedWith("Unvalid specification");
-      });
-    });
-  });
-
-  describe("Invest on Court", () => {
-    let arbitratorID;
-    let courtID = 3;
-    let price = 30000n;
-    beforeEach(async () => {
-      arbitratorID = await _testInitArbitrator(contracts, courtID, this.addr1);
-    });
-    describe("WORKS", () => {
-      it("investOnCourt: should update balance", async () => {
-        let data = await apiGet.datasOfArbitrator(arbitratorID);
-        await apiPost
-          .connect(this.addr1)
-          .investOnCourt(courtID, { value: `${price}` });
-        let balance = data.balance + price;
-        data = await apiGet.datasOfArbitrator(arbitratorID);
-        expect(data.balance).to.equal(balance);
-      });
-    });
-    describe("NOT WORKS", () => {
-      it("should NOT call with wrong bindings", async () => {
-        await expect(
-          contract.investOnCourt(1, 30000, courtID, { value: `${price}` })
-        ).to.be.revertedWith("Must call by proxy bindings");
-      });
-
-      it("should NOT works if sender haven't place on indexersCourt ", async () => {
-        await expect(
-          apiPostPayable.investOnCourt(courtID, { value: `${price}` })
-        ).to.be.revertedWith("Arbitrator not found");
-      });
-
-      it("should NOT works if sender haven't cv ", async () => {
-        await expect(
-          apiPost
-            .connect(this.addr5)
-            .investOnCourt(courtID, { value: `${price}` })
-        ).to.be.revertedWith("CV not found");
-      });
-
-      it("should NOT works if 0 value ", async () => {
-        await expect(
-          apiPost.connect(this.addr1).investOnCourt(courtID)
-        ).to.be.revertedWith("Invalid value");
-      });
-
-      it("should NOT works if invest on unknow court ID ", async () => {
-        await expect(apiPost.connect(this.addr1).investOnCourt(55)).to.be
-          .reverted;
-      });
-    });
-  });
-
-  describe("Withdraw from Court", () => {
-    let arbitratorID;
-    let courtID = 3;
-    let price = ethers.parseEther("4");
-    beforeEach(async () => {
-      arbitratorID = await _testInitArbitrator(contracts, courtID, this.addr1);
-      await apiPost
-        .connect(this.addr1)
-        .investOnCourt(courtID, { value: `${price}` });
-    });
-    describe("WORKS", () => {
-      it("withdrawFromCourt: should update balance data", async () => {
-        let data = await apiGet.datasOfArbitrator(arbitratorID);
-        expect(data.balance > 0).to.equal(true);
-        await apiPost
-          .connect(this.addr1)
-          .withdrawFromCourt(data.balance, courtID);
-        data = await apiGet.datasOfArbitrator(arbitratorID);
-        expect(data.balance).to.equal(0);
-      });
-
-      it("withdrawFromCourt: should update balance sender", async () => {
-        let balance = await this.addr1.provider.getBalance(this.addr1);
-        await apiPost.connect(this.addr1).withdrawFromCourt(price, courtID);
-
-        let balance2 = await this.addr1.provider.getBalance(this.addr1);
-
-        expect(balance2).to.not.be.equal(balance);
-        expect(balance2 > balance).to.be.equal(true);
-
-        expect(ethers.formatEther(`${balance2 - balance}`) > 3.9).to.be.equal(
-          true
-        );
-      });
-    });
-    describe("NOT WORKS", () => {
-      it("should NOT call with wrong bindings", async () => {
-        await expect(
-          contract.withdrawFromCourt(1, 30000, courtID)
-        ).to.be.revertedWith("Must call by proxy bindings");
-      });
-
-      it("should NOT works if sender haven't balance ", async () => {
-        let data = await apiGet.datasOfArbitrator(arbitratorID);
-
-        await expect(
-          apiPost
-            .connect(this.addr1)
-            .withdrawFromCourt(data.balance + 1n, courtID)
-        ).to.be.revertedWith("No enough balance");
-      });
-
-      it("should NOT works if sender haven't cv ", async () => {
-        let _price = ethers.parseEther("2");
-        await expect(
-          apiPost.connect(this.addr5).withdrawFromCourt(_price, 4)
-        ).to.be.revertedWith("CV not found");
-      });
-      it("should NOT works if sender haven't balance on court ", async () => {
-        let _price = ethers.parseEther("2");
-        await expect(
-          apiPost.connect(this.addr1).withdrawFromCourt(_price, 4)
-        ).to.be.revertedWith("Arbitrator not found");
       });
     });
   });

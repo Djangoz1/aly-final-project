@@ -113,7 +113,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     describe("Launchpads Contracts", () => {
       it("Should deploy launchpadHub", async () => {
         let contracts = await _testInitLaunchpadsContracts(contract.target);
-        const launchpadHub = contracts.launchpadsHub;
+        const launchpadHub = contracts.hub;
         expect(await contract.launchpadsHub()).to.be.equal(launchpadHub.target);
       });
 
@@ -156,7 +156,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should deploy arbitratorsHub ", async () => {
         let escrows = await _testInitEscrowsContracts(contract.target);
-        const arbitratorsHub = contracts.escrows.arbitratorsHub;
+        const arbitratorsHub = escrows.arbitratorsHub;
         expect(await contract.arbitratorsHub()).to.equal(arbitratorsHub.target);
       });
 

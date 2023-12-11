@@ -199,24 +199,20 @@ export const stateDispute = async (disputeID) => {
     arbitrators: null,
     counters: null,
   };
-  let uriFeature = await _apiGet("tokenURIOf", [
-    dispute?.featureID,
-    ADDRESSES["featuresHub"],
-  ]);
 
   dispute.rules = await _apiGet("rulesOfDispute", [disputeID]);
   dispute.timers = await _apiGet("timersOfDispute", [disputeID]);
   dispute.arbitrators = await _apiGet("arbitratorsOfDispute", [disputeID]);
   dispute.counters = await _apiGet("countersOfDispute", [disputeID]);
   dispute.value = ethers.utils.formatEther(`${dispute?.value}`);
-  console.log("dispute", dispute);
+
   let metadatas = await fetchJSONByCID({
     id: dispute?.tokenURI,
     table: "escrows",
     expand: "featureID",
   });
-  let _metadatas = await fetchJSONByCID({ id: uriFeature, table: "features" });
-  metadatas.title = _metadatas?.title;
+  // let _metadatas = await fetchJSONByCID({ id: uriFeature, table: "features" });
+
   return { datas: dispute, disputeID, metadatas };
 };
 

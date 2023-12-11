@@ -48,8 +48,6 @@ export const LayoutProfile = ({ cvID, url, children, controller }) => {
       target: controller,
     });
 
-    console.log("_state", _state);
-
     setIsLoading(false);
   };
   useEffect(() => {
@@ -57,7 +55,6 @@ export const LayoutProfile = ({ cvID, url, children, controller }) => {
     console.log("Origin fetch");
   }, [cvID, url]);
 
-  console.log("layout profile state", state);
   if (!state?.profile?.datas?.features?.length) {
     menus[1].sub[2] = undefined;
   }

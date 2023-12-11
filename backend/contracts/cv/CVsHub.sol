@@ -49,7 +49,10 @@ contract CVsHub is ERC721URIStorage {
     /**
      * @notice cv accept token by default
      */
-    function mint(address _from, string calldata _tokenURI) external onlyProxy {
+    function mint(
+        address _from,
+        string calldata _tokenURI
+    ) external onlyProxy returns (uint) {
         require(balanceOf(_from) == 0, "CV already exist");
         _tokenIds.increment();
         uint256 newID = _tokenIds.current();
@@ -57,6 +60,7 @@ contract CVsHub is ERC721URIStorage {
         _setTokenURI(newID, _tokenURI);
         indexers[_from] = newID;
         _acceptToken[newID] = true;
+        return newID;
     }
 
     function setAcceptToken(uint _cvID) external onlyProxy {

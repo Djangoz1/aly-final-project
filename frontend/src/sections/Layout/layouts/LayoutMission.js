@@ -73,7 +73,6 @@ export const LayoutMission = ({ missionID, url, children, controller }) => {
     menus[1].sub[3] = undefined;
     menus[1].sub[0] = undefined;
   }
-  console.log("state", state);
   return (
     <MyLayoutDashboard
       _menus={menus}
@@ -95,7 +94,7 @@ export const LayoutMission = ({ missionID, url, children, controller }) => {
       target={"mission"}
       url={`/mission/${missionID}${url}`}
     >
-      <div className="bgprim pb-20 min-h-screen w-full">{children}</div>
+      <div className=" w-full">{children}</div>
     </MyLayoutDashboard>
   );
 };

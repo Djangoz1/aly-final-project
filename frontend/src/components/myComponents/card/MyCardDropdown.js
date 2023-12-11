@@ -30,7 +30,7 @@ export const MyCardDropdown = ({
           <MyTitle style=" text-sm w-fit whitespace-nowrap ">{title}</MyTitle>
           <div className="btn btn-ghost btn-xs  ml-5">
             <Icon
-              className={isClick ? "rotate-180" : ""}
+              className={`transition ${isClick ? "rotate-180" : ""}`}
               icon={icfy.ux.arrow}
             />
           </div>

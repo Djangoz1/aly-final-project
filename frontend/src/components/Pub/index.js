@@ -33,7 +33,7 @@ import { controllers } from "utils/controllers";
 export const Pub = ({ id, _pub, styles, bools, _owner, modal, color }) => {
   const [isDatas, setIsDatas] = useState(null);
 
-  console.log("------", _pub);
+  console.log("Pub ------", _pub);
   let [isClicked, setIsClicked] = useState(null);
   let { isConnected, address } = useAccount();
   let ref = useRef(null);

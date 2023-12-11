@@ -131,7 +131,11 @@ contract APIPost is Ownable {
      */
 
     function createCV(string calldata _tokenURI) external {
-        ICVsHub(_cvsHub).mint(msg.sender, _tokenURI);
+        uint cvID = ICVsHub(_cvsHub).mint(msg.sender, _tokenURI);
+        IArbitratorsHub(_iAS.arbitratorsHub()).setArbitrator(
+            cvID,
+            DataTypes.CourtIDs.Decentralized
+        );
     }
 
     // ************* -------- ************* //

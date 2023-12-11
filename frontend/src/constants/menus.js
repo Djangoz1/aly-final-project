@@ -302,8 +302,8 @@ export const menus_id = (target, id) => {
 
           {
             icon: icfy.msg.casual,
-            title: "Invitations",
-            url: "/mission/" + id + "/invitations",
+            title: "Notifications",
+            url: "/mission/" + id + "/notifications",
           },
           {
             icon: icsystem.escrow,

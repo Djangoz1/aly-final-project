@@ -66,12 +66,8 @@ export const FormTxs = () => {
         template={2}
         setter={setIsView}
         value={isView}
-        target={"value"}
-        arr={[
-          { value: "Transactions", url: "#" },
-          form?.aiAssisted ? { value: "Feedbacks", url: "#" } : undefined,
-        ]}
-      ></MyMenusTabs>
+        arr={["Transaction", form?.aiAssisted ? "Feedback" : undefined]}
+      />
       {/* <h6 className="font3">
                         </h6> */}
       {

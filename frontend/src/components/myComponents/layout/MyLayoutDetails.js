@@ -90,7 +90,7 @@ export const MyLayoutDetails = ({
         ))}
 
         {footers?.map((el) => (
-          <div key={v4()} className="flex gap-1 w-fit flex-col">
+          <div key={v4()} className="flex gap-1 mt-2 w-fit flex-col">
             <MySub style={"c4"}>{el?.title}</MySub>
             {el?.value}
           </div>

@@ -40,6 +40,7 @@ import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
 import { MySub } from "components/myComponents/text/MySub";
 import { MyBadge } from "components/myComponents/box/MyList";
 import { MissionName } from "components/links/MissionName";
+import { ethers } from "ethers";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -66,18 +67,22 @@ function App({ params }) {
               <>
                 <Icon icon={icfy.ux.admin} className="c4 text-lg mr-2" />
                 <MySub size={"8"}>
-                  <CVName cvID={el?.datas?.payerID} />
+                  <CVName cvID={el?.details?.dispute?.datas?.payerID} />
                 </MySub>
                 <Icon icon={icsystem?.feature} className="c4 text-lg mx-2" />
                 <MySub size={"8"}>
-                  <CVName cvID={el?.datas?.payeeID} />
+                  <CVName cvID={el?.details?.dispute?.datas?.payeeID} />
                 </MySub>
                 <Icon
                   icon={icfy.bank.dollars}
                   className="c4 text-lg ml-4 mr-2"
                 />
                 <MySub style={"flex gap-1 items-start"} size={"9"}>
-                  <MyNum num={el?.datas?.value} />
+                  <MyNum
+                    num={ethers?.utils?.formatEther(
+                      el?.details?.dispute?.datas?.value || 0
+                    )}
+                  />
                   <span className="c4">ETH</span>
                 </MySub>
               </>
@@ -87,7 +92,7 @@ function App({ params }) {
                 <MyStatus
                   padding={"px-2 py-1 "}
                   style={"w-full  text-[9px]"}
-                  status={el?.datas?.rules?.status}
+                  status={el?.details?.dispute?.datas?.rules?.status}
                   target={"dispute"}
                 />
               </div>
@@ -98,31 +103,47 @@ function App({ params }) {
               template={6}
               title={"Escrow datas"}
               arr={[
-                { title: "Created", value: el?.metadatas?.created },
+                {
+                  title: "Created",
+                  value: el?.details?.dispute?.metadatas?.created,
+                },
                 {
                   title: "Mission",
                   value: (
                     <MissionName
-                      missionHash={
-                        el?.metadatas?.["@expand"]?.featureID?.missionID
-                      }
+                      missionHash={el?.metadatas?.missionID}
                     ></MissionName>
                   ),
                 },
-                { title: "reason", value: el?.metadatas?.description },
+                {
+                  title: "reason",
+                  value: el?.details?.dispute?.metadatas?.description,
+                },
+                {
+                  title: "Plaignant",
+                  value: (
+                    <CVName
+                      cvID={
+                        el?.details?.workerContest
+                          ? el?.datas?.cvWorker
+                          : el?.datas?.owner
+                      }
+                    />
+                  ),
+                },
                 {
                   title: "evidence",
                   value: (
                     <article className="whitespace-break-spaces">
-                      {el?.metadatas?.["@expand"]?.featureID?.abstract ? (
+                      {el?.metadatas?.abstract ? (
                         <>
-                          {el?.metadatas?.["@expand"]?.featureID?.abstract}
+                          {el?.metadatas?.abstract}
                           <br />
                         </>
                       ) : (
                         <> </>
                       )}
-                      {el?.metadatas?.["@expand"]?.featureID?.description}
+                      {el?.metadatas?.description}
                     </article>
                   ),
                 },
@@ -130,14 +151,10 @@ function App({ params }) {
                   title: "Domain",
                   value: (
                     <MyBadge
-                      color={el?.metadatas?.["@expand"]?.featureID?.domain}
+                      color={el?.metadatas?.domain}
                       className="whitespace-break-spaces"
                     >
-                      {
-                        ENUMS.domain[
-                          el?.metadatas?.["@expand"]?.featureID?.domain
-                        ]?.name
-                      }
+                      {ENUMS.domain[el?.metadatas?.domain]?.name}
                     </MyBadge>
                   ),
                 },
@@ -145,49 +162,52 @@ function App({ params }) {
                   title: "skills required",
                   value: (
                     <div className="flex flex-wrap gap-4 w-1/2">
-                      {el?.metadatas?.["@expand"]?.featureID?.skills?.map(
-                        (el, i) => (
-                          <MyBadge style={"text-[8px]"} color={i} key={v4()}>
-                            {el}
-                          </MyBadge>
-                        )
-                      )}
+                      {el?.metadatas?.skills?.map((el, i) => (
+                        <MyBadge style={"text-[8px]"} color={i} key={v4()}>
+                          {el}
+                        </MyBadge>
+                      ))}
                     </div>
                   ),
                 },
                 {
                   title: "appeal",
 
-                  value: <MySub>{`${el?.datas?.rules?.appeal}`}</MySub>, // el?.datas?.rules?.appeal}</MySub>,
+                  value: (
+                    <MySub>{`${el?.details?.dispute?.datas?.rules?.appeal}`}</MySub>
+                  ), // el?.details?.dispute?.datas?.rules?.appeal}</MySub>,
                 },
                 {
                   title: "Période d'appel",
                   value: (
                     <MySub style={"text-xs"}>
-                      {el?.datas?.reclamationPeriod} Days
+                      {el?.details?.dispute?.datas?.reclamationPeriod} Days
                     </MySub>
                   ),
                 },
-                { title: "Min closed at", value: `${el?.datas?.appeal}` },
+                {
+                  title: "Min closed at",
+                  value: `${el?.details?.dispute?.datas?.appeal}`,
+                },
                 {
                   title: "Court",
                   value: (
-                    <MyBadge color={el?.datas?.courtID}>
-                      {ENUMS.courts[el?.datas?.courtID].court}
+                    <MyBadge color={el?.details?.dispute?.datas?.courtID}>
+                      {ENUMS.courts[el?.details?.dispute?.datas?.courtID].court}
                     </MyBadge>
                   ),
                 },
                 {
                   title: "Court",
-                  value: el?.datas?.nbArbitrators,
+                  value: el?.details?.dispute?.datas?.nbArbitrators,
                 },
                 {
                   title: "Decision",
-                  value: el?.datas?.decision ? (
+                  value: el?.details?.dispute?.datas?.decision ? (
                     [
-                      <CVName cvID={el?.datas?.payerID} />,
-                      <CVName cvID={el?.datas?.payeeID} />,
-                    ]?.[el?.datas?.decision]
+                      <CVName cvID={el?.details?.dispute?.datas?.payerID} />,
+                      <CVName cvID={el?.details?.dispute?.datas?.payeeID} />,
+                    ]?.[el?.details?.dispute?.datas?.decision]
                   ) : (
                     <MySub style={"text-xs"}>Waiting</MySub>
                   ),

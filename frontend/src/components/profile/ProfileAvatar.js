@@ -1,3 +1,4 @@
+"use client";
 import { ImagePin } from "components/Image/ImagePin";
 import { CVName } from "components/links/CVName";
 import { ADDRESSES } from "constants/web3";
@@ -78,22 +79,19 @@ export const Avatar = ({
   let ref = useRef(null);
   let isInView = useInView(ref);
   let [isMetadatas, setIsMetadatas] = useState(null);
-  console.log(_cvID);
   useEffect(() => {
-    if (_cvID && _cvID > 0 && isInView && !isMetadatas && !metadatas)
-      console.log("let go", _cvID);
-    console.log("designation", designation);
-    (async () => {
-      try {
-        let uri = await _apiGet("tokenURIOf", [_cvID, ADDRESSES["cvsHub"]]);
-        if (uri) {
-          let data = await clientPocket.records.getOne("accounts", uri);
-          setIsMetadatas(data);
+    if (_cvID && _cvID > 0 && !isMetadatas && !metadatas)
+      (async () => {
+        try {
+          let uri = await _apiGet("tokenURIOf", [_cvID, ADDRESSES["cvsHub"]]);
+          if (uri) {
+            let data = await clientPocket.records.getOne("accounts", uri);
+            setIsMetadatas(data);
+          }
+        } catch (error) {
+          console.error("error Avatar", { error });
         }
-      } catch (error) {
-        console.error("error Avatar", { error });
-      }
-    })();
+      })();
   }, [_cvID, isInView]);
 
   return (
@@ -109,6 +107,7 @@ export const Avatar = ({
           metadatas={metadatas || isMetadatas}
           src={src}
           noCircle={noCircle}
+          _cvID={_cvID}
           avatarStyle={avatarStyle}
           style={style}
           children={children}
@@ -134,13 +133,14 @@ const _AvatarHoverable = ({
   metadatas,
   src,
   designation,
+  _cvID,
   noCircle,
   avatarStyle,
   style,
   children,
   _children,
 }) => {
-  let key = v4();
+  let key = metadatas?.id;
   if (!metadatas) return <></>;
   const [hovered, setHovered] = useState(null);
   const x = useMotionValue(0); // going to set this value on mouse move
@@ -168,7 +168,6 @@ const _AvatarHoverable = ({
       {_children || <></>}
       <div
         className={`${style || ""} relative `}
-        key={key}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(null)}
       >
@@ -196,9 +195,11 @@ const _AvatarHoverable = ({
             >
               <div className="absolute inset-x-10 z-30 w-[20%] -bottom-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent h-px " />
               <div className="absolute left-10 w-[40%] z-30 -bottom-px bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px " />
-              <div className="font-bold text-white relative z-30 text-base">
-                {metadatas?.username}
-              </div>
+              <CVName
+                cvID={_cvID}
+                styles="font-bold text-white relative z-30 text-base"
+                metadata={metadatas}
+              ></CVName>
               <div className="text-white text-xs">{designation}</div>
             </motion.div>
           )}

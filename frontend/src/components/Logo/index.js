@@ -20,9 +20,7 @@ export const Logo = ({ style, style1, styleD }) => {
         <div
           className={`${styleD || "w-12 text-lg h-[30px]"} 
        border logoD leading-none  flex items-center justify-center  rounded-r-full  font2 `}
-        >
-          <Icon icon={icfy.ux.key} className=" text-[5px] text-white" />
-        </div>
+        />
         <div className={`flex items-center ${style1}`}>
           <span className={`${style || "text-lg"} my-auto `}>e</span>W
           <span className={`${style || "text-lg"} my-auto `}>ork</span>

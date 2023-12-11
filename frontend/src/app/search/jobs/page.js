@@ -1,7 +1,5 @@
 "use client";
 
-import { _table_features } from "utils/states/tables/feature";
-
 import {
   icfy,
   icfyETHER,
@@ -42,6 +40,13 @@ import { CVName } from "components/links/CVName";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import Link from "next/link";
 import { MissionName } from "components/links/MissionName";
+import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
+import { FeatureName } from "components/links/FeatureName";
+import { MyBadge } from "components/myComponents/box/MyList";
+import { MyCardInfos } from "components/myComponents/card/MyCard";
+import { MyNum } from "components/myComponents/text/MyNum";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { Avatar } from "components/profile/ProfileAvatar";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
   let [isLoading, setIsLoading] = useState(null);
@@ -53,7 +58,10 @@ export default function PageSearch({ params }) {
     (async () => {
       setIsLoading(true);
       doStateTools(dispatch, {
-        lists: await controllers.get.feature.list({ filter: "" }),
+        lists: await controllers.get.feature.list({
+          expand: "missionID",
+          filter: "",
+        }),
       });
       setIsLoading(false);
     })();
@@ -115,217 +123,233 @@ let Page = () => {
             </button>
           </LayoutForm>
         </div>
-        {isExtend ? (
-          <div className="w-full flex flex-col   items-center justify-between  h-fit bg3 p-3 mb-3">
-            <>
-              <div className="flex  c1 flex-col w-full overflow-scroll hide-scrollbar">
-                <MySub style={"mt-2 mb-5 font-bold"}>Language techno</MySub>
 
-                <MyMenusTabs
-                  template={2}
-                  color={0}
-                  setter={setIsCourt}
-                  value={isCourt}
-                  target={"title"}
-                  arr={ENUMS.courts.map((el) => ({
-                    title: el?.court,
-                    icon: el?.badge,
-                  }))}
-                >
-                  All
-                </MyMenusTabs>
-              </div>
-
-              <div className="flex c1 flex-col w-full">
-                <MySub style={"mt-2  mb-5 font-bold"}>Domaine</MySub>
-
-                <MyMenusTabs
-                  template={2}
-                  color={2}
-                  setter={setIsDomain}
-                  value={isDomain}
-                  target={"name"}
-                  arr={ENUMS.domain}
-                >
-                  All
-                </MyMenusTabs>
-
-                <div className="flex mr-5 flex-col">
-                  <MySub style={"mt-2  mb-5 font-bold"}>Invite only</MySub>
-
-                  <MyMenusTabs
-                    template={2}
-                    color={0}
-                    setter={setIsInvite}
-                    value={isInvite}
-                    arr={[
-                      <div className="flex items-center">
-                        <Icon icon={icfyLOCK} className="mr-3 text-error" />
-                        Yes
-                      </div>,
-                      <div className="flex items-center">
-                        <Icon icon={icfyUNLOCK} className="mr-3 text-success" />
-                        No
-                      </div>,
-                    ]}
-                  >
-                    All
-                  </MyMenusTabs>
-                </div>
-                <div className="flex flex-col">
-                  <MySub style={"mt-2  mb-5 font-bold"}>Visibility</MySub>
-
-                  <MyMenusTabs
-                    setter={setIsInvite}
-                    value={isInvite}
-                    template={2}
-                    color={2}
-                    arr={[
-                      <div className="flex items-center">
-                        {" "}
-                        <Icon
-                          icon={icfy.eye.open}
-                          className="mr-3 text-success"
-                        />
-                        Disponible
-                      </div>,
-                      <div className="flex items-center">
-                        {" "}
-                        <Icon
-                          icon={icfy.eye.close}
-                          className="mr-3 text-error"
-                        />
-                        Indisponible
-                      </div>,
-                    ]}
-                  >
-                    All
-                  </MyMenusTabs>
-                </div>
-                <div className="flex flex-row">
-                  <div className="flex flex-col ml-5">
-                    <MySub style={"mt-2  mb-5 font-bold"}>experience</MySub>
-
-                    <MyMenusTabs
-                      setter={setIsStarted}
-                      value={isStarted}
-                      template={2}
-                      color={0}
-                      arr={[
-                        <div className="flex items-center">Junior</div>,
-                        <div className="flex items-center">
-                          <Icon
-                            icon={icfy.eye.close}
-                            className="mr-3 text-error"
-                          />
-                          Senior
-                        </div>,
-                      ]}
-                    >
-                      All
-                    </MyMenusTabs>
-                  </div>
-                </div>
-              </div>
-            </>
-          </div>
-        ) : (
-          []
-        )}
-        <div className="flex box-border w-fit  justify-center flex-wrap">
+        <div className="grid box-border gap-2 h-fit w-full 2xl:grid-cols-3 lg:grid-cols-2 px-3 grid-cols-1  md:grid-cols-2  ">
           {state?.lists?.map((el) => (
-            <MyCardPrice
-              description={
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <Icon icon={icfy.work.casual} />
-                    <CVName
-                      cvID={el?.datas?.owner}
-                      metadata={el?.owner?.metadatas}
-                      styles={"text-xs text-white/60 mx-auto"}
+            <MyCardDropdown
+              style={"h-fit w-full"}
+              title={
+                <FeatureName
+                  missionID={el?.datas?.missionID}
+                  metadatas={el?.metadatas}
+                />
+              }
+              header={
+                <div className="flex items-center text-[9px] gap-4">
+                  <MyBadge style={"text-[9px]"} color={el?.metadatas?.domain}>
+                    {ENUMS.domain?.[el?.metadatas?.domain]?.name}
+                  </MyBadge>
+                  <MyBadge
+                    style={"text-[9px]"}
+                    color={el?.datas?.specification}
+                  >
+                    {ENUMS.courts?.[el?.datas?.specification]?.court}
+                  </MyBadge>
+                  <MySub size={8} style={"flex items-center gap-1"}>
+                    <MyNum num={el?.datas?.wadge}></MyNum>
+                    ETH
+                  </MySub>
+                </div>
+              }
+              footer={
+                <div className="flex w-full -mt-2 gap-2 flex-col">
+                  <div className="text-[9px] font-light">
+                    <MySub style={"c4 w-1/3"}>Resume</MySub>
+                    {el?.metadatas?.abstract}
+                  </div>
+                  <div className="flex items-center w-full gap-2">
+                    <MyStatus
+                      target={"feature"}
+                      status={el?.datas?.status}
+                      padding={"px-2 py-1"}
+                      style={"text-[9px] w-full"}
                     />
+
+                    <MyMainBtn
+                      template={1}
+                      style={"btn-xs text-[10px]"}
+                      url={`/mission/${el?.datas?.missionID}`}
+                    >
+                      View more
+                    </MyMainBtn>
                   </div>
                 </div>
               }
-              lists={[
-                {
-                  title: "On invitation",
-                  check: el?.datas?.isInviteOnly,
-                },
-                {
-                  title: "Accept token ERC 20",
-                  check: false,
-                },
-                {
-                  title: (
-                    <div className="flex items-center">
-                      <span className="c4 mr-2">Worker:</span>
-                      <CVName cvID={el?.datas?.cvWorker} />
-                    </div>
-                  ),
-                  check: el?.datas?.cvWorker > 0,
-                },
-                {
-                  title: (
-                    <MyStatus
-                      status={el?.datas?.status}
-                      normal={true}
-                      target={"feature"}
-                    />
-                  ),
-                  check: el?.datas?.status === 2,
-                },
-              ]}
-              price={el?.datas?.wadge}
-              color={el?.datas?.status}
-              badge={{
-                title: el?.metadatas?.title,
-                icon: ENUMS.courts?.[el?.datas?.specification]?.badge,
-              }}
-              style={"mx-10 mx-auto   mb-20 h-fit "}
               key={v4()}
-              url={`/mission/${el?.datas?.missionID}`}
-              title={
-                <>
-                  <Link className="hover:text-info mx-auto"></Link>
-                  {el?.datas?.status === 0 && (
-                    <span className="flex absolute top-3 right-1 items-center text-xs mx-auto text-white/90">
-                      {el?.datas?.wadge}
-                      <Icon icon={icfyETHER} className="mr-1 text-3xl" />
-                    </span>
-                  )}
-                  <MyStatus
-                    status={el?.datas?.status}
-                    style={"mx-auto my-1"}
-                    target={"feature"}
-                  />
-                </>
-              }
-              setter={
-                el?.datas?.status === 0
-                  ? () => _apiPost("askToJoin", [el?.featureID])
-                  : null
-              }
-              btn={
-                el?.datas?.status === 0 && cv && cv != el?.datas?.owner
-                  ? "Ask to join"
-                  : null
-              }
-              header={{
-                icon: ENUMS.courts?.[el?.datas?.specification]?.badge,
-                title: el?.metadatas?.title,
-                component: <MissionName id={el?.datas?.missionID} />,
-              }}
-              main={{
-                text: el?.metadatas?.description,
-              }}
             >
-              <div className="w-full flex flex-col text-justify items-start">
-                <MissionName id={el?.datas?.missionID} style={"text-xs mb-2"} />
-                <p className="line-clamp-6">{el?.metadatas?.description}</p>
-              </div>
-            </MyCardPrice>
+              <MyCardInfos
+                template={5}
+                arr={[
+                  {
+                    title: "owner",
+                    value: (
+                      <Avatar designation={true} _cvID={el?.datas?.owner} />
+                    ),
+                  },
+                  {
+                    title: "Invite only",
+                    value: `${el?.datas?.isInviteOnly ? "Yes" : "No"}`,
+                  },
+                  {
+                    title: "mission",
+                    value: (
+                      <MissionName
+                        id={el?.datas?.missionID}
+                        metadatas={el?.metadatas?.["@expand"]?.missionID?.title}
+                      />
+                    ),
+                  },
+
+                  {
+                    title: "description",
+                    value: (
+                      <div className="flex flex-col">
+                        <MySub size={8}>Mission</MySub>
+                        <article
+                          dangerouslySetInnerHTML={{
+                            __html: `
+                              ${el?.metadatas?.["@expand"]?.missionID?.abstract}
+                              ${el?.metadatas?.["@expand"]?.missionID?.description}
+                                `,
+                          }}
+                        />
+                        <MySub style={"mt-4"} size={8}>
+                          Feature
+                        </MySub>
+
+                        <article
+                          dangerouslySetInnerHTML={{
+                            __html: `${el?.metadatas?.abstract}
+                              ${el?.metadatas?.description}`,
+                          }}
+                        />
+                      </div>
+                    ),
+                  },
+                  {
+                    title: "skills required",
+                    value: (
+                      <div className="flex flex-wrap w-2/3 gap-1">
+                        {el?.metadatas?.skills?.map((el, i) => (
+                          <MyBadge color={i} style={"text-[10px]"}>
+                            {el}
+                          </MyBadge>
+                        ))}
+                      </div>
+                    ),
+                  },
+                  {
+                    title: "Temps estimés",
+                    num: el?.datas?.estimatedDays,
+                    value: "Days",
+                  },
+
+                  {
+                    title: "Currency",
+                    value: (
+                      <MyStatus
+                        style={"text-[9px]"}
+                        padding={"px-2 py-1"}
+                        target={"token"}
+                        status={el?.datas?.acceptToken ? 0 : 1}
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </MyCardDropdown>
           ))}
+          {/* // <MyCardPrice
+            //   description={
+            //     <div className="flex flex-col">
+            //       <div className="flex items-center">
+            //         <Icon icon={icfy.work.casual} />
+            //         <CVName
+            //           cvID={el?.datas?.owner}
+            //           metadata={el?.owner?.metadatas}
+            //           styles={"text-xs text-white/60 mx-auto"}
+            //         />
+            //       </div>
+            //     </div>
+            //   }
+            //   lists={[
+            //     {
+            //       title: "On invitation",
+            //       check: el?.datas?.isInviteOnly,
+            //     },
+            //     {
+            //       title: "Accept token ERC 20",
+            //       check: false,
+            //     },
+            //     {
+            //       title: (
+            //         <div className="flex items-center">
+            //           <span className="c4 mr-2">Worker:</span>
+            //           <CVName cvID={el?.datas?.cvWorker} />
+            //         </div>
+            //       ),
+            //       check: el?.datas?.cvWorker > 0,
+            //     },
+            //     {
+            //       title: (
+            //         <MyStatus
+            //           status={el?.datas?.status}
+            //           normal={true}
+            //           target={"feature"}
+            //         />
+            //       ),
+            //       check: el?.datas?.status === 2,
+            //     },
+            //   ]}
+            //   price={el?.datas?.wadge}
+            //   color={el?.datas?.status}
+            //   badge={{
+            //     title: el?.metadatas?.title,
+            //     icon: ENUMS.courts?.[el?.datas?.specification]?.badge,
+            //   }}
+            //   style={"mx-10 mx-auto   mb-20 h-fit "}
+            //   key={v4()}
+            //   url={`/mission/${el?.datas?.missionID}`}
+            //   title={
+            //     <>
+            //       <Link className="hover:text-info mx-auto"></Link>
+            //       {el?.datas?.status === 0 && (
+            //         <span className="flex absolute top-3 right-1 items-center text-xs mx-auto text-white/90">
+            //           {el?.datas?.wadge}
+            //           <Icon icon={icfyETHER} className="mr-1 text-3xl" />
+            //         </span>
+            //       )}
+            //       <MyStatus
+            //         status={el?.datas?.status}
+            //         style={"mx-auto my-1"}
+            //         target={"feature"}
+            //       />
+            //     </>
+            //   }
+            //   setter={
+            //     el?.datas?.status === 0
+            //       ? () => _apiPost("askToJoin", [el?.featureID])
+            //       : null
+            //   }
+            //   btn={
+            //     el?.datas?.status === 0 && cv && cv != el?.datas?.owner
+            //       ? "Ask to join"
+            //       : null
+            //   }
+            //   header={{
+            //     icon: ENUMS.courts?.[el?.datas?.specification]?.badge,
+            //     title: el?.metadatas?.title,
+            //     component: <MissionName id={el?.datas?.missionID} />,
+            //   }}
+            //   main={{
+            //     text: el?.metadatas?.description,
+            //   }}
+            // >
+            //   <div className="w-full flex flex-col text-justify items-start">
+            //     <MissionName id={el?.datas?.missionID} style={"text-xs mb-2"} />
+            //     <p className="line-clamp-6">{el?.metadatas?.description}</p>
+            //   </div>
+            // </MyCardPrice> */}
         </div>
         <div className="w-1/6  ml-auto overflow-y-scroll h-full  border border-white/5 border-r-white/0 border-b-white/0">
           <div className="border flex flex-wrap px-2 mb-5  border-t-white/5 border-white/0 py-4 gap-2">
