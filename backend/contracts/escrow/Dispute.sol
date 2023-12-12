@@ -47,7 +47,7 @@ contract Dispute is Ownable {
     }
     modifier onlyFromClient() {
         uint256 cvID = _cvOf(msg.sender);
-        DisputeDatas.Data memory _data = _data();
+        DisputeDatas.Data memory _data = _datas();
         require(
             _data.payerID == cvID || _data.payeeID == cvID,
             "Not part of dispute"
@@ -56,7 +56,7 @@ contract Dispute is Ownable {
     }
 
     modifier checkLink(uint _cvID) {
-        DisputeDatas.Data memory _data = _data();
+        DisputeDatas.Data memory _data = _datas();
         require(
             _data.payerID == _cvID || _data.payeeID == _cvID,
             "Not part of dispute"
@@ -94,7 +94,7 @@ contract Dispute is Ownable {
         onlyStatus(DisputeRules.Status.Initial, true)
         onlyProxy
     {
-        require(_timers().createdAt == 0, "Dispute already init");
+        require(_timersDatas().createdAt == 0, "Dispute already init");
 
         _selectArbitrators();
 
@@ -114,7 +114,7 @@ contract Dispute is Ownable {
         returns (bool)
     {
         IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
-        DisputeDatas.Data memory data = _data();
+        DisputeDatas.Data memory data = _datas();
 
         uint arbitratorID = _arbitratorOf(_cvID);
         uint _arbitratorsLength = _iDDH.addArbitratorOn(
@@ -143,7 +143,7 @@ contract Dispute is Ownable {
         IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         address arbitratorsHub = _iAS.arbitratorsHub();
         IArbitratorsHub _ArbitratorsHub = IArbitratorsHub(arbitratorsHub);
-        DisputeDatas.Data memory data = _data();
+        DisputeDatas.Data memory data = _datas();
         DisputeCounters.Data memory counters = _counters();
 
         uint256 arbitratorsSlot = data.nbArbitrators * 2;
@@ -205,7 +205,8 @@ contract Dispute is Ownable {
         onlyStatus(DisputeRules.Status.Initial, true)
     {
         require(
-            _timers().createdAt + _data().reclamationPeriod <= block.timestamp,
+            _timersDatas().createdAt + _datas().reclamationPeriod <=
+                block.timestamp,
             "Must wait started period"
         );
         _startedVotePeriod();
@@ -239,9 +240,9 @@ contract Dispute is Ownable {
     function _reclaimed(uint _winnerID) internal {
         require(_winnerID > 0, "Unclear decision");
         IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
-        DisputeDatas.Data memory data = _data();
+        DisputeDatas.Data memory data = _datas();
         IFeaturesHub _iFH = IFeaturesHub(_iAS.featuresHub());
-        bool success = _iFH.resolvedDispute(_winnerID, data.featureID);
+        _iFH.resolvedDispute(_winnerID, data.featureID);
         _iDDH.reclaimedFor(_tools.id);
     }
 
@@ -257,7 +258,7 @@ contract Dispute is Ownable {
     }
 
     function _checkCVLink(uint _cvID) internal view returns (bool) {
-        DisputeDatas.Data memory data = _data();
+        DisputeDatas.Data memory data = _datas();
         if (_cvID == data.payerID || _cvID == data.payeeID) {
             return true;
         } else {
@@ -269,7 +270,7 @@ contract Dispute is Ownable {
         internal
         onlyStatus(DisputeRules.Status.Tally, true)
     {
-        uint winnerID = DisputeTools.winner(_data(), _counters());
+        uint winnerID = DisputeTools.winner(_datas(), _counters());
         IDisputesDatasHub _iDDH = IDisputesDatasHub(_tools.datasHub);
         _iDDH.resolveDisputeOf(_tools.id);
         if (winnerID > 0) {
@@ -301,8 +302,8 @@ contract Dispute is Ownable {
         checkLink(_cvID)
     {
         DisputeRules.Data memory rules = _rules();
-        DisputeDatas.Data memory data = _data();
-        DisputeTimes.Data memory timers = _timers();
+        DisputeDatas.Data memory data = _datas();
+        DisputeTimes.Data memory timers = _timersDatas();
         require(timers.startedAt > 0, "Not started");
         require(
             (rules.status == DisputeRules.Status.Tally &&
@@ -323,7 +324,7 @@ contract Dispute is Ownable {
         return Bindings.cvOf(_for, _iAS.cvsHub());
     }
 
-    function _data() internal view returns (DisputeDatas.Data memory _data) {
+    function _datas() internal view returns (DisputeDatas.Data memory _data) {
         return IDisputesDatasHub(_tools.datasHub).datasOf(_tools.id);
     }
 
@@ -339,7 +340,11 @@ contract Dispute is Ownable {
         return IDisputesDatasHub(_tools.datasHub).rulesOf(_tools.id);
     }
 
-    function _timers() internal view returns (DisputeTimes.Data memory _data) {
+    function _timersDatas()
+        internal
+        view
+        returns (DisputeTimes.Data memory _data)
+    {
         return IDisputesDatasHub(_tools.datasHub).timersOf(_tools.id);
     }
 
@@ -347,7 +352,7 @@ contract Dispute is Ownable {
         return IDisputesDatasHub(_tools.datasHub).arbitratorsOf(_tools.id);
     }
 
-    function _arbitratorOf(uint _cvID) internal returns (uint) {
+    function _arbitratorOf(uint _cvID) internal view returns (uint) {
         return
             Bindings.arbitratorOf(
                 _cvID,

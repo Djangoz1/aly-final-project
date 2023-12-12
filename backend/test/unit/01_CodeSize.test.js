@@ -36,19 +36,17 @@ describe(`TEST CODE SIZE`, () => {
     afterEach(async () => {
       await codeSize(contracts.works.missionsHub.target);
       await codeSize(contracts.works.featuresHub.target);
-      await codeSize(contracts.works.workProposalHub.target);
       await codeSize(contracts.works.collectWorkInteraction.target);
     });
 
-    it(`MissionsHub | FeaturesHub | WorkProposal | CollectWorkInteraction`, () => {});
+    it(`MissionsHub | FeaturesHub  | CollectWorkInteraction`, () => {});
   });
   describe("CV contracts", () => {
     afterEach(async () => {
       await codeSize(contracts.cvs.hub.target);
-      await codeSize(contracts.cvs.datas.target);
     });
 
-    it(`CVsHub | CVsDatasHub`, () => {});
+    it(`CVsHub `, () => {});
   });
   describe("Escrow contracts", () => {
     afterEach(async () => {

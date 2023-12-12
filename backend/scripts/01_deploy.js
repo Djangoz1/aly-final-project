@@ -3,8 +3,7 @@ const fs = require("fs");
 const { promisify } = require("util");
 const writeFileAsync = promisify(fs.writeFile);
 
-const { router, weth } = require("../../fork/uni-periphery/addresses.json");
-const core = require("../../fork/uni-core/addresses.json");
+
 
 const {
   _testInitMissionsHub,
@@ -47,7 +46,6 @@ async function main() {
 
   const featuresHub = contracts.works.featuresHub;
 
-  const workProposalHub = contracts.works.workProposalHub;
 
   const pubsHub = contracts.pubs.hub;
 
@@ -72,23 +70,19 @@ async function main() {
 
   const arbitratorsHub = contracts.escrows.arbitratorsHub;
 
-  const cvsDatasHub = contracts.cvs.datas;
 
   const collectWorkInteraction = contracts.works.collectWorkInteraction;
 
   const pubsDatasHub = contracts.pubs.datas;
 
   const jsonContent = {
-    weth,
 
     token: token.target,
-    uniswapFactory: core.factory,
-    uniswapRouter: router,
+    
     accessControl: accessControl.target,
     cvsHub: cvsHub.target,
     missionsHub: missionsHub.target,
     featuresHub: featuresHub.target,
-    workProposalHub: featuresHub.target,
     pubsHub: pubsHub.target,
     launchpadsDatasHub: datas.target,
     launchpadsInvestorsHubs: investors.target,
@@ -102,7 +96,6 @@ async function main() {
     factory: factory.target,
     disputesHub: disputesHub.target,
     arbitratorsHub: arbitratorsHub.target,
-    cvsDatasHub: cvsDatasHub.target,
     collectWorkInteraction: collectWorkInteraction.target,
     pubsDatasHub: pubsDatasHub.target,
   };

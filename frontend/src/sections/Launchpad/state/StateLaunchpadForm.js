@@ -26,32 +26,14 @@ import {
   _apiPostAt,
   _apiPostPayable,
 } from "utils/ui-tools/web3-tools";
-import { CVOverview } from "sections/Profile/state/CVOverview";
 
-import {
-  AssetProfile1,
-  AssetProfileCard,
-} from "components/assets/AssetProfile";
 import { ethers } from "ethers";
-import { fromTimestamp } from "utils/ux-tools";
-import { STATUS } from "constants/status";
-import Link from "next/link";
-import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
-import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
-import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MyStatus } from "components/myComponents/item/MyStatus";
-import { MyForm } from "components/myComponents/form/MyForm";
+
 import { MyInput } from "components/myComponents/form/MyInput";
 import { LayoutForm } from "sections/Form/LayoutForm";
-import { useFormState } from "context/form";
-import { useRouter } from "next/navigation";
+
 import { useAccount } from "wagmi";
 import { v4 } from "uuid";
-import { MyBtnPost } from "components/btn/MyBtnPost";
-import { useInView } from "framer-motion";
-import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
-import { AssetLaunchpad } from "components/assets/AssetLaunchpad";
-import { StateLaunchpadInfos } from "sections/Launchpad/state/StateLaunchpadInfos";
 
 export const StateLaunchpadForm = () => {
   const { cv } = useAuthState();

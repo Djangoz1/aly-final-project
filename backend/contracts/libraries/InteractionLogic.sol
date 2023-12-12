@@ -10,7 +10,7 @@ library InteractionLogic {
     function _followMission(
         address _toFollow,
         address[] memory _followMissions
-    ) internal returns (address) {
+    ) internal pure returns (address) {
         require(_toFollow != address(0), "Should follow value address");
         bool allowedToFollow = true;
         for (uint256 i = 0; i < _followMissions.length; ) {

@@ -138,19 +138,17 @@ let _testInitCVsContracts = async (addressSystem) => {
   const hub = await ethers.deployContract("CVsHub", [addressSystem]);
   await hub.waitForDeployment();
   expect(await _iAS.cvsHub()).to.be.equal(hub.target);
-  const datas = await ethers.deployContract("CVsDatasHub", [addressSystem]);
-  await datas.waitForDeployment();
-  expect(await _iAS.cvsDatasHub()).to.be.equal(datas.target);
 
   return {
-    datas,
     hub,
   };
 };
 
 let _testInitaddressSystem = async () => {
+  console.log("oui");
   const addressSystem = await ethers.deployContract("AddressSystem");
   await addressSystem.waitForDeployment();
+  console.log("oui");
   return addressSystem;
 };
 
@@ -317,15 +315,8 @@ const _testInitWorksContracts = async (addressSystem) => {
     collectWorkInteraction.target
   );
 
-  const workProposalHub = await ethers.deployContract("WorkProposalHub", [
-    addressSystem,
-  ]);
-  await workProposalHub.waitForDeployment();
-  expect(await _iAS.workProposalHub()).to.be.equal(workProposalHub.target);
-
   return {
     missionsHub,
-    workProposalHub,
     featuresHub,
     collectWorkInteraction,
   };
@@ -404,50 +395,6 @@ const _testInitFeature = async (contracts, datas, workerAccount, account) => {
 // *:::::::::::::: --------------- ::::::::::::::* //
 // *:::::::::::::: WORKER PROPOSAL ::::::::::::::* //
 // *:::::::::::::: --------------- ::::::::::::::* //
-
-const _testInitWorkerProposal = async (
-  _accessControl,
-  account,
-  _featureID,
-  _datas
-) => {
-  datas = WORKER_PROPOSAL_DATAS_EXEMPLE;
-
-  if (_datas) {
-    datas = _datas;
-  }
-  const accessControl = await getProxy(_accessControl);
-  const _cv = await accessControl.cvOfByAddress(account.address);
-  const workProposalHub = await getContractAt(
-    "WorkProposalHub",
-    await accessControl.iWPH()
-  );
-  const targetID = parseInt(await workProposalHub.tokensLength()) + 1;
-  datas.id = targetID;
-
-  const json = await createURIWorkerProposal(datas);
-  const tokenURI = json.IpfsHash;
-
-  const beforeLength = parseInt(await workProposalHub.balanceOf(_cv));
-
-  const tx = await accessControl
-    .connect(account)
-    .createWorkerProposal(tokenURI, _featureID);
-  await tx.wait();
-
-  const afterLength = parseInt(await workProposalHub.balanceOf(_cv));
-  expect(beforeLength).to.equal(afterLength - 1);
-
-  const id = parseInt(await workProposalHub.tokensLength());
-
-  const _tokenURI = await workProposalHub.tokenURI(parseInt(id));
-  expect(_tokenURI).to.not.be.equal("");
-
-  const owner = await workProposalHub.ownerOf(id);
-  expect(owner).to.be.equal(_cv);
-
-  return id;
-};
 
 // *:::::::::::::: --------- ::::::::::::::* //
 // *:::::::::::::: LAUNCHPAD ::::::::::::::* //
@@ -617,7 +564,6 @@ module.exports = {
   _testInitWorksContracts,
   _testInitEscrowsContracts,
   _testInitArbitrator,
-  _testInitWorkerProposal,
   _testInitCV,
   _testInitPub,
   _testInitMission,

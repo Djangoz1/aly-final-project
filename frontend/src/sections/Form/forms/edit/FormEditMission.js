@@ -1,35 +1,11 @@
-import { Icon } from "@iconify/react";
-import { MyCheckboxes } from "components/myComponents/form/MyCheckboxes";
-import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
-import { MyInput } from "components/myComponents/form/MyInput";
-
-import {
-  MyInputFile,
-  MyInputsFile,
-} from "components/myComponents/form/MyInputsFile";
-import { MySelects } from "components/myComponents/form/MySelects";
+import { MyInputFile } from "components/myComponents/form/MyInputsFile";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
-import { MyToggle } from "components/myComponents/form/MyToggle";
 import { ADDRESSES } from "constants/web3";
-import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
-import {
-  doStateProfileTools,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
-import {
-  icfyFB,
-  icfyGITHUB2,
-  icfyLINKEDIN,
-  icfySEND,
-  icfyTWITTER,
-} from "icones";
+import { useAuthState } from "context/auth";
+import { useToolsDispatch, useToolsState } from "context/tools";
+
 import React from "react";
-import {
-  clientPocket,
-  createURI,
-  createURICv,
-} from "utils/ui-tools/pinata-tools";
+import { createURI } from "utils/ui-tools/pinata-tools";
 import { _apiPost } from "utils/ui-tools/web3-tools";
 import { useAccount } from "wagmi";
 let margin = "mb-8";
@@ -37,9 +13,7 @@ let margin = "mb-8";
 export const FormEditMission1 = () => {
   const { state } = useToolsState(null);
   const { cv, metadatas } = useAuthState();
-  const { address } = useAccount();
-  const dispatch = useToolsDispatch();
-  const dispatchCV = useAuthDispatch();
+
   let handleChange = async (value, target, attributes) => {
     let _metadatas = { ...metadatas };
     console.log("value", value);
@@ -72,9 +46,6 @@ export const FormEditMission1 = () => {
       uri,
       ADDRESSES.cvsHub,
     ]);
-
-    await doStateProfileTools({ dispatch, cvID: state?.profile?.cvID });
-    await doAuthCV(dispatchCV, address);
   };
   return (
     <div className="">

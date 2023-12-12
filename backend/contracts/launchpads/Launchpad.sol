@@ -189,7 +189,7 @@ contract Launchpad is Ownable {
     // *::::::::: USER BINDINGS :::::::::* //
     // *::::::::: ------------- :::::::::* //
 
-    function revertIfUncheck(bool success) internal {
+    function revertIfUncheck(bool success) internal pure {
         require(success, "Launchpad: Buy token");
     }
 

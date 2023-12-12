@@ -5,24 +5,12 @@ import {
   useToolsState,
 } from "context/tools";
 
-import { Icon } from "@iconify/react";
-import { icfy, icfyETHER } from "icones";
-
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet, _apiPost, _apiPostAt } from "utils/ui-tools/web3-tools";
 
 import { ethers } from "ethers";
 import { fromTimestamp } from "utils/ux-tools";
 
 import { MyCardInfos } from "components/myComponents/card/MyCard";
-
-import { MyInput } from "components/myComponents/form/MyInput";
-import { LayoutForm } from "sections/Form/LayoutForm";
-
-import { v4 } from "uuid";
-import { MyBtnPost } from "components/btn/MyBtnPost";
 
 export const StateLaunchpadInfos = () => {
   const { cv } = useAuthState();
@@ -31,6 +19,14 @@ export const StateLaunchpadInfos = () => {
   const { state, status, pointer } = useToolsState();
 
   let info1 = [
+    {
+      title: <>Description</>,
+      value: (
+        <article className="whitespace-break-spaces">
+          {state?.launchpad?.metadatas?.description}
+        </article>
+      ),
+    },
     {
       title: <>Capitalization min</>,
       num:

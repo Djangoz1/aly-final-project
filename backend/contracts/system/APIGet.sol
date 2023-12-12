@@ -17,7 +17,6 @@ import {DisputeDatas} from "../libraries/disputes/DisputeDatas.sol";
 import {DisputeCounters} from "../libraries/disputes/DisputeCounters.sol";
 import {DisputeRules} from "../libraries/disputes/DisputeRules.sol";
 import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
-import {ICVsDatasHub} from "../interfaces/cv/ICVsDatasHub.sol";
 import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 import {IDispute} from "../interfaces/escrow/IDispute.sol";
 import {IToken} from "../interfaces/erc/IToken.sol";

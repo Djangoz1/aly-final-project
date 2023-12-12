@@ -12,9 +12,6 @@ import {
 
 import { icfy } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
@@ -57,7 +54,6 @@ export const LayoutLaunchpad = ({ launchpadID, url, children, controller }) => {
     MENUS.mission.page[1].sub[6] = undefined;
   }
 
-  console.log("state", state);
   return (
     <MyLayoutDashboard
       isLoading={isLoading}
@@ -110,11 +106,13 @@ let Button = ({ controller, target, launchpadID }) => {
           title: "Message",
           text: "Send a direct message to owner of launchpad",
         },
-        {
-          icon: icfy.bank.dollars,
-          title: "Invest",
-          text: "Invest and help project to launch via our protocoles and receive token ERC20",
-        },
+
+        state?.launchpad?.datas?.status === 1 &&
+          state?.launchpad?.datas.saleStart < Math.floor(Date.now() / 1000) && {
+            icon: icfy.bank.dollars,
+            title: "Invest",
+            text: "Invest and help project to launch via our protocoles and receive token ERC20",
+          },
       ]}
       modals={[
         <CreatePub

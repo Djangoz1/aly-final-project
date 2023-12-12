@@ -10,11 +10,7 @@ interface IMissionsHub {
         uint _launchpadID
     ) external returns (uint);
 
-    function addFeature(
-        address _owner,
-        uint _missionID,
-        uint _featureID
-    ) external;
+    function addFeature(uint _missionID, uint _featureID) external;
 
     function closeMission(uint _missionID) external;
 

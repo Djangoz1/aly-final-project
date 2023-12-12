@@ -53,9 +53,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       expect(await contract.collectWorkInteraction()).to.equal(ZERO_ADDRESS);
       expect(await contract.disputesHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.arbitratorsHub()).to.equal(ZERO_ADDRESS);
-      expect(await contract.workProposalHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.disputesDatasHub()).to.equal(ZERO_ADDRESS);
-      expect(await contract.cvsDatasHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.cvsHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.pubsHub()).to.equal(ZERO_ADDRESS);
       expect(await contract.pubsDatasHub()).to.equal(ZERO_ADDRESS);
@@ -65,11 +63,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
     });
 
     describe("CV Contracts", () => {
-      it("Should deploy CVsDatasHub", async () => {
-        let contracts = await _testInitCVsContracts(contract.target);
-        const cvsDatasHub = contracts.datas;
-        expect(await contract.cvsDatasHub()).to.equal(cvsDatasHub.target);
-      });
       it("Should deploy CVsHub", async () => {
         let contracts = await _testInitCVsContracts(contract.target);
         const cvsHub = contracts.hub;
@@ -180,14 +173,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         expect(await contract.featuresHub()).to.equal(featuresHub.target);
       });
 
-      it("Should deploy workProposalHub", async () => {
-        const works = await _testInitWorksContracts(contract.target);
-        const workProposalHub = works.workProposalHub;
-        expect(await contract.workProposalHub()).to.equal(
-          workProposalHub.target
-        );
-      });
-
       it("Should deploy collect work interaction ", async () => {
         let works = await _testInitWorksContracts(contract.target);
         const collectWorkInteraction = works.collectWorkInteraction;
@@ -207,9 +192,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(contract.setCVsHub()).to.revertedWith(
           "CVsHub already init"
         );
-        await expect(contract.setCVsDatasHub()).to.revertedWith(
-          "CVsDatasHub already init"
-        );
       });
 
       it("Should NOT set workscontracts twice", async () => {
@@ -217,9 +199,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         await expect(contract.setFeaturesHub()).to.revertedWith(
           "FeaturesHub already init"
         );
-        await expect(contract.setWorkProposalHub()).to.revertedWith(
-          "workProposalHub already init"
-        );
+
         await expect(contract.setCollectWorkInteraction()).to.revertedWith(
           "CollectWorkInteraction already init"
         );

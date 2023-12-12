@@ -15,7 +15,6 @@ import {IBalancesHub} from "../interfaces/system/IBalancesHub.sol";
 import {IContract} from "../interfaces/system/IContract.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
-import {ICVsDatasHub} from "../interfaces/cv/ICVsDatasHub.sol";
 import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 import {IDispute} from "../interfaces/escrow/IDispute.sol";
 import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
@@ -79,7 +78,6 @@ contract APIPostPayable is Ownable {
         );
         _iAPIGet = IAPIGet(_iAS.apiGet());
         _cvsHub = _iAS.cvsHub();
-        _cvsDatasHub = _iAS.cvsDatasHub();
         _collectWorkInteraction = _iAS.collectWorkInteraction();
         _featuresHub = _iAS.featuresHub();
         _missionsHub = _iAS.missionsHub();
@@ -91,7 +89,6 @@ contract APIPostPayable is Ownable {
         require(
             address(_iAPIGet) != address(0) &&
                 _cvsHub != address(0) &&
-                _cvsDatasHub != address(0) &&
                 _launchpadsHub != address(0) &&
                 _pubsHub != address(0) &&
                 _pubsDatasHub != address(0) &&
@@ -297,7 +294,7 @@ contract APIPostPayable is Ownable {
     function buyTokens(uint _launchpadID) external payable {
         require(msg.value > 0, "Value must be more than 0");
 
-        bool success = ILaunchpad(_launchpadAddr(_launchpadID)).buyTokens(
+        ILaunchpad(_launchpadAddr(_launchpadID)).buyTokens(
             _cvOf(msg.sender),
             msg.value
         );

@@ -152,7 +152,7 @@ contract FeaturesHub is ERC721URIStorage, Ownable {
         ICollectWorkInteraction(_iAS.collectWorkInteraction()).addFeature(
             newFeatureID
         );
-        iMH.addFeature(_owner, _missionID, newFeatureID);
+        iMH.addFeature(_missionID, newFeatureID);
         return newFeatureID;
     }
 

@@ -18,7 +18,6 @@ import {IBalancesHub} from "../interfaces/system/IBalancesHub.sol";
 import {IContract} from "../interfaces/system/IContract.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {ICVsHub} from "../interfaces/cv/ICVsHub.sol";
-import {ICVsDatasHub} from "../interfaces/cv/ICVsDatasHub.sol";
 import {IArbitratorsHub} from "../interfaces/escrow/IArbitratorsHub.sol";
 import {IDispute} from "../interfaces/escrow/IDispute.sol";
 import {IDisputesHub} from "../interfaces/escrow/IDisputesHub.sol";
@@ -83,7 +82,6 @@ contract APIPost is Ownable {
         );
         _iAPIGet = IAPIGet(_iAS.apiGet());
         _cvsHub = _iAS.cvsHub();
-        _cvsDatasHub = _iAS.cvsDatasHub();
         _collectWorkInteraction = _iAS.collectWorkInteraction();
         _featuresHub = _iAS.featuresHub();
         _missionsHub = _iAS.missionsHub();
@@ -95,7 +93,6 @@ contract APIPost is Ownable {
         require(
             address(_iAPIGet) != address(0) &&
                 _cvsHub != address(0) &&
-                _cvsDatasHub != address(0) &&
                 _launchpadsHub != address(0) &&
                 _pubsHub != address(0) &&
                 _pubsDatasHub != address(0) &&
@@ -168,7 +165,7 @@ contract APIPost is Ownable {
         uint _launchpadID,
         string calldata _tokenURI
     ) external onlyCVOwner {
-        address _launchpadAddr = _launchpadAddr(_launchpadID);
+        address _launchpadAddr = _launchpadAddress(_launchpadID);
         uint missionPrice = _iBalancesHub.missionPrice();
         IToken _iToken = IToken(_iAS.token());
         uint tokenPrice = _iToken.price();
@@ -229,14 +226,14 @@ contract APIPost is Ownable {
         require(
             launchpadID > 0 &&
                 Bindings.ownerOf(launchpadID, _launchpadsHub) == msg.sender &&
-                _iToken.balanceOf(_launchpadAddr(launchpadID)) >= _value &&
+                _iToken.balanceOf(_launchpadAddress(launchpadID)) >= _value &&
                 _iAPIGet.statusOfLaunchpad(launchpadID) ==
                 DataTypes.LaunchpadStatus.Closed,
             "APIPost: Error create feature"
         );
         uint value = _value;
         bool success = _iToken.transferFrom(
-            _launchpadAddr(launchpadID),
+            _launchpadAddress(launchpadID),
             owner(),
             value
         );
@@ -268,6 +265,7 @@ contract APIPost is Ownable {
             address(this),
             _value
         );
+        require(success, "Error transfer");
         _createFeature(
             _value,
             _missionID,
@@ -613,7 +611,9 @@ contract APIPost is Ownable {
         return _iAPIGet.cvOf(_for);
     }
 
-    function _launchpadAddr(uint _launchpadID) internal view returns (address) {
+    function _launchpadAddress(
+        uint _launchpadID
+    ) internal view returns (address) {
         return _iAPIGet.addressOfLaunchpad(_launchpadID);
     }
 

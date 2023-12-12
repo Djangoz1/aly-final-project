@@ -1,49 +1,28 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("hardhat-gas-reporter");
 
+
+require("dotenv").config(); // Charge les variables d'environnement depuis le fichier .env
+
+const privateKey = process.env.PRIVATE_KEY;
+const infuraID = process.env.INFURA_ID;
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: {
-    compilers: [
-      {
-        version: "0.8.20",
-      },
-      {
-        version: "0.6.6",
-      },
-      {
-        version: "0.6.2",
-      },
-      {
-        version: "0.5.16",
-      },
-    ],
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 999999,
-      },
-      evmVersion: "istanbul",
-      viaIR: true,
-      outputSelection: {
-        "*": {
-          "*": [
-            "evm.bytecode.object",
-            "evm.deployedBytecode.object",
-            "abi",
-            "evm.bytecode.sourceMap",
-            "evm.deployedBytecode.sourceMap",
-            "metadata",
-          ],
-          "": ["ast"],
-        },
-      },
+  networks: {
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${infuraID}`,
+      chainId: 11155111,
+      accounts: [`0x${privateKey}`],
+    },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${infuraID}`,
+      accounts: [`0x${privateKey}`],
     },
   },
+  etherscan: {
+    apiKey: { sepolia: process.env.ETHERSCAN },
+  },
 
-  // gasReporter: {
-  //   currency: "USD",
-  //   gasPrice: 21,
-  //   enabled: true,
-  // },
+  solidity: "0.8.20",
+
+  
 };

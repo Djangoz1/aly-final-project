@@ -62,7 +62,7 @@ library DisputeTools {
         DisputeArbitrators.Status _status,
         IDisputesDatasHub _iEDH,
         Tools storage _tools
-    ) internal returns (bool) {
+    ) internal view returns (bool) {
         if (_iEDH.allowanceOf(_tools.id, _arbitratorID) == _status) {
             return true;
         } else return false;
@@ -79,7 +79,7 @@ library DisputeTools {
             _iEDH.voteOf(_tools.id, _arbitratorID) == DisputeRules.Vote.Waiting,
             "Already voted"
         );
-        DisputeCounters.Data memory _counter;
+
         DisputeCounters.Data memory _newCounter = DisputeCounters.vote(
             _vote,
             _iEDH.countersOf(_tools.id)

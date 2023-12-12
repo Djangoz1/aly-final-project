@@ -90,7 +90,6 @@ contract MissionsHub is ERC721URIStorage, Ownable {
     }
 
     function addFeature(
-        address _owner,
         uint _missionID,
         uint _featureID
     ) external onlyFeaturesHub {

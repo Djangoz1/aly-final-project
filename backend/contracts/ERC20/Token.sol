@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {DataTypes} from "../libraries/DataTypes.sol";
 import {IAddressSystem} from "../interfaces/system/IAddressSystem.sol";
 import {IAPIGet} from "../interfaces/system/IAPIGet.sol";
-import "../interfaces/fork/IUniswapV2Router02.sol";
-import "../interfaces/fork/IUniswapV2Factory.sol";
+// import "../interfaces/fork/IUniswapV2Router02.sol";
+// import "../interfaces/fork/IUniswapV2Factory.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract Token is ERC20, Ownable {
@@ -67,38 +67,38 @@ contract Token is ERC20, Ownable {
         return true;
     }
 
-    function getPair(
-        address _factory,
-        address _tokenB
-    ) external view returns (address) {
-        return IUniswapV2Factory(_factory).getPair(address(this), _tokenB);
-    }
+    // function getPair(
+    //     address _factory,
+    //     address _tokenB
+    // ) external view returns (address) {
+    //     return IUniswapV2Factory(_factory).getPair(address(this), _tokenB);
+    // }
 
-    function initPool(
-        address _router,
-        address _factory,
-        address _weth
-    ) external {
-        IERC20 weth = IERC20(_weth);
-        IUniswapV2Factory factory = IUniswapV2Factory(_factory);
-        factory.createPair(address(this), _weth);
-        uint amountTokenA = 1 ether;
-        uint amountTokenB = 0.5 ether;
-        IUniswapV2Router02 router = IUniswapV2Router02(_router);
-        approve(_router, amountTokenA);
-        weth.approve(_router, amountTokenB);
-        // Approbation pour le router d'utiliser nos tokens
-        router.addLiquidity(
-            address(this),
-            _weth,
-            amountTokenA,
-            amountTokenB,
-            0,
-            0,
-            owner(),
-            block.timestamp + block.timestamp
-        );
-    }
+    // function initPool(
+    //     address _router,
+    //     address _factory,
+    //     address _weth
+    // ) external {
+    //     IERC20 weth = IERC20(_weth);
+    //     IUniswapV2Factory factory = IUniswapV2Factory(_factory);
+    //     factory.createPair(address(this), _weth);
+    //     uint amountTokenA = 1 ether;
+    //     uint amountTokenB = 0.5 ether;
+    //     IUniswapV2Router02 router = IUniswapV2Router02(_router);
+    //     approve(_router, amountTokenA);
+    //     weth.approve(_router, amountTokenB);
+    //     // Approbation pour le router d'utiliser nos tokens
+    //     router.addLiquidity(
+    //         address(this),
+    //         _weth,
+    //         amountTokenA,
+    //         amountTokenB,
+    //         0,
+    //         0,
+    //         owner(),
+    //         block.timestamp + block.timestamp
+    //     );
+    // }
 
     function mintToLaunchpad(
         uint _launchpadID,

@@ -62,7 +62,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
       it("Should have an arbitrator", async () => {
         await apiPost.connect(this.addr1).createCV("tokenURI");
-        expect(await ap, lkù, iGet.lengthOfCourt(2)).to.be.equal(1);
+        expect(await apiGet.lengthOfCourt(2)).to.be.equal(1);
       });
 
       it("Should accept token", async () => {

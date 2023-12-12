@@ -22,7 +22,7 @@ contract AddressSystem is Ownable {
     address public collectWorkInteraction;
     address public disputesHub;
     address public arbitratorsHub;
-    address public workProposalHub;
+    // address public workProposalHub;
     address public disputesDatasHub;
 
     address public cvsDatasHub;
@@ -48,12 +48,12 @@ contract AddressSystem is Ownable {
             collectWorkInteraction != address(0) &&
             disputesHub != address(0) &&
             missionsHub != address(0) &&
-            cvsDatasHub != address(0) &&
+            // cvsDatasHub != address(0) &&
             challengersHub != address(0) &&
             challengesHub != address(0) &&
             cvsHub != address(0) &&
             featuresHub != address(0) &&
-            workProposalHub != address(0) &&
+            // workProposalHub != address(0) &&
             factory != address(0) &&
             disputesDatasHub != address(0) &&
             pubsHub != address(0) &&
@@ -138,11 +138,11 @@ contract AddressSystem is Ownable {
         _hasInit();
     }
 
-    function setWorkProposalHub() external {
-        require(workProposalHub == address(0), "workProposalHub already init");
-        workProposalHub = msg.sender;
-        _hasInit();
-    }
+    // function setWorkProposalHub() external {
+    //     require(workProposalHub == address(0), "workProposalHub already init");
+    //     workProposalHub = msg.sender;
+    //     _hasInit();
+    // }
 
     // -------------------------------- //
     // ************ ESCROW ************ //
@@ -211,11 +211,11 @@ contract AddressSystem is Ownable {
     // ************** CV ************** //
     // ************** -- ************** //
 
-    function setCVsDatasHub() external {
-        require(cvsDatasHub == address(0), "CVsDatasHub already init");
-        cvsDatasHub = msg.sender;
-        _hasInit();
-    }
+    // function setCVsDatasHub() external {
+    //     require(cvsDatasHub == address(0), "CVsDatasHub already init");
+    //     cvsDatasHub = msg.sender;
+    //     _hasInit();
+    // }
 
     function setCVsHub() external {
         require(cvsHub == address(0), "CVsHub already init");

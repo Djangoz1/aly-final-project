@@ -40,7 +40,7 @@ contract ChallengersHub is Ownable {
     }
 
     function indexerOf(uint _cvID) external view returns (uint[] memory) {
-        commitsOfCVs[_cvID];
+        return commitsOfCVs[_cvID];
     }
 
     function datasOf(

@@ -44,7 +44,7 @@ contract CollectWorkInteraction is Ownable {
 
     modifier onlyFeatureOpen(uint _featureID) {
         require(
-            _featureData(_featureID).status == DataTypes.FeatureStatus.Process,
+            _featureDatas(_featureID).status == DataTypes.FeatureStatus.Process,
             "Wrong feature status"
         );
         _;
@@ -61,7 +61,7 @@ contract CollectWorkInteraction is Ownable {
 
     function addFeature(uint _featureID) external onlyProxy {
         require(datas[_featureID].missionID == 0, "Data already set");
-        uint missionID = _featureData(_featureID).missionID;
+        uint missionID = _featureDatas(_featureID).missionID;
         datas[_featureID].missionID = missionID;
 
         indexerMissions[missionID].push(_featureID);
@@ -85,7 +85,7 @@ contract CollectWorkInteraction is Ownable {
         uint _featureID
     ) external onlyProxy onlyFeatureOpen(_featureID) {
         require(_cvID != _cvWorkerID, "Can't assign yourself");
-        require(_featureData(_featureID).startedAt == 0, "Already started");
+        require(_featureDatas(_featureID).startedAt == 0, "Already started");
         require(!featureToInvites[_featureID][_cvWorkerID], "Already invite");
         require(
             cvsToInvites[_cvWorkerID].length <= 100,
@@ -96,7 +96,7 @@ contract CollectWorkInteraction is Ownable {
     }
 
     function acceptJob(uint _cvID, uint _featureID) external onlyProxy {
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
+        DataTypes.FeatureData memory featureData = _featureDatas(_featureID);
         require(featureData.startedAt == 0, "Feature already start");
         require(featureToInvites[_featureID][_cvID], "Not invited");
         uint[] memory empty;
@@ -120,7 +120,7 @@ contract CollectWorkInteraction is Ownable {
     }
 
     function declineJob(uint _cvID, uint _featureID) external onlyProxy {
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
+        DataTypes.FeatureData memory featureData = _featureDatas(_featureID);
         require(featureToInvites[_featureID][_cvID] == true, "Not invited");
 
         require(featureData.startedAt == 0, "Feature already start");
@@ -158,7 +158,7 @@ contract CollectWorkInteraction is Ownable {
             }
         }
         require(allowed, "Already ask to join");
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
+        DataTypes.FeatureData memory featureData = _featureDatas(_featureID);
         require(featureData.isInviteOnly == false, "Only on invitation");
         require(featureData.cvWorker == 0, "Already have worker");
 
@@ -176,7 +176,7 @@ contract CollectWorkInteraction is Ownable {
         _checkWorkerDemand(_cvWorkerID, _featureID);
         require(datas[_featureID].signedWorker == 0, "Already have worker");
 
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
+        DataTypes.FeatureData memory featureData = _featureDatas(_featureID);
 
         featureData.cvWorker = _cvWorkerID;
         featureData.status = DataTypes.FeatureStatus.Process;
@@ -189,13 +189,14 @@ contract CollectWorkInteraction is Ownable {
         uint[] memory empty;
         datas[_featureID].workerDemand = empty;
         cvsToJobs[_cvWorkerID].push(_featureID);
+        return success;
     }
 
     function improveFeature(
         uint _featureID,
         uint16 _estimatedDays
     ) external onlyProxy onlyFeatureOpen(_featureID) {
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
+        DataTypes.FeatureData memory featureData = _featureDatas(_featureID);
 
         require(featureData.startedAt > 0, "Feature not started");
         require(
@@ -216,7 +217,7 @@ contract CollectWorkInteraction is Ownable {
         string memory _tokenURI
     ) external onlyProxy returns (bool) {
         IDisputesHub iDH = IDisputesHub(_iAS.disputesHub());
-        DataTypes.FeatureData memory featureData = _featureData(_featureID);
+        DataTypes.FeatureData memory featureData = _featureDatas(_featureID);
         require(
             featureData.status != DataTypes.FeatureStatus.Validated,
             "Wrong feature status"
@@ -260,6 +261,7 @@ contract CollectWorkInteraction is Ownable {
         success = _setFeature(_featureID, featureData);
 
         require(success, "Can't set feature");
+        return success;
     }
 
     function _checkWorkerDemand(
@@ -290,7 +292,7 @@ contract CollectWorkInteraction is Ownable {
         return Bindings.cvOf(_for, _iAS.cvsHub());
     }
 
-    function _featureData(
+    function _featureDatas(
         uint _featureID
     ) internal view returns (DataTypes.FeatureData memory) {
         return IFeaturesHub(_iAS.featuresHub()).dataOf(_featureID);

@@ -3,7 +3,6 @@ pragma solidity 0.8.20;
 
 interface IAddressSystem {
     // *********** CV *********** //
-    function cvsDatasHub() external view returns (address);
 
     function cvsHub() external view returns (address);
 
@@ -26,13 +25,9 @@ interface IAddressSystem {
     // *********** WORKS *********** //
     function collectWorkInteraction() external view returns (address);
 
-    function workProposalHub() external view returns (address);
-
     function missionsHub() external view returns (address);
 
     function featuresHub() external view returns (address);
-
-    function setWorkProposalHub() external;
 
     function setCollectWorkInteraction() external;
 

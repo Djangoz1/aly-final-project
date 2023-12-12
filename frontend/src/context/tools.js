@@ -225,7 +225,6 @@ export const doStateToolsMission = async ({
         return records.items;
       },
     };
-    console.log("controllers state", _state);
 
     if (_controllers[target]) {
       _state[target] = await _controllers[target]();
@@ -250,10 +249,6 @@ export const doStateToolsProfile = async ({
   dispatch({ status: "pending profile " + target });
   if (cvID > 0) {
     // console.log("owner profile", cvID);
-    console.log(
-      "-------- fucking disgrace -------",
-      await controllers.get.profile.item({ cvID })
-    );
 
     let owner = await controllers.get.profile.item({ cvID });
     let _state = {
@@ -269,7 +264,7 @@ export const doStateToolsProfile = async ({
     };
     let _controllers = {
       pubs: async () =>
-        await controllers.get.pub.list({ userID: owner.metadatas.id }),
+        await controllers.get.pub.list({ userID: owner?.metadatas?.id }),
 
       missions: async () => {
         let missions = [];
@@ -281,6 +276,15 @@ export const doStateToolsProfile = async ({
         }
 
         return missions;
+      },
+      launchpads: async () => {
+        let launchpads = [];
+        for (let index = 0; index < owner?.datas?.launchpads?.length; index++) {
+          const launchpadID = owner?.datas?.launchpads[index];
+          let launchpad = await stateLaunchpad(launchpadID);
+          launchpads.push({ ...launchpad, launchpadID });
+        }
+        return launchpads;
       },
       messages: async () => {
         let messages = await controllers.get.message.list({
