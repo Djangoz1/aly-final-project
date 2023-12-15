@@ -1,12 +1,12 @@
 import { prepareWriteContract, writeContract, readContract } from "@wagmi/core";
 import { ABI_API_P, ABI_API_G, ABIs } from "constants/web3";
 import { createPublicClient, http, parseAbiItem } from "viem";
-import { hardhat } from "viem/chains";
 import { ADDRESSES } from "constants/web3";
+import { CONFIG, configs } from "constants/config";
 
 // ?----- viem client for events
 export const viemClient = createPublicClient({
-  chain: hardhat,
+  chain: configs[CONFIG].viemChain,
   transport: http(),
 });
 

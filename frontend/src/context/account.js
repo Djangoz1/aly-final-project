@@ -5,14 +5,12 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { hardhat } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+import { CONFIG, configs } from "constants/config";
 
-const { chains, publicClient } = configureChains(
-  [hardhat],
-  [
-    //alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
-    publicProvider(),
-  ]
-);
+const { chains, publicClient } = configureChains(configs[CONFIG].chain, [
+  //alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
+  publicProvider(),
+]);
 
 const { connectors } = getDefaultWallets({
   appName: "My RainbowKit App",
