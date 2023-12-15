@@ -924,12 +924,15 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
       });
 
       it("Should update arbitrators length", async () => {
-        await apiPost.validFeature(1);
-
         let length = await apiGet.tokensLengthOf(
           contracts.escrows.arbitratorsHub.target
         );
-        expect(length).to.be.equal(1);
+        await apiPost.validFeature(1);
+        let _length = await apiGet.tokensLengthOf(
+          contracts.escrows.arbitratorsHub.target
+        );
+
+        expect(length).to.be.equal(_length - 1n);
       });
     });
 

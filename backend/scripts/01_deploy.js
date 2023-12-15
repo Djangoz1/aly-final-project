@@ -1,21 +1,20 @@
 const hre = require("hardhat");
 const fs = require("fs");
+const path = require("path");
+
+const abi_addr_s = require("../artifacts/contracts/system/AddressSystem.sol/AddressSystem.json");
+const abi_api_g = require("../artifacts/contracts/system/APIGet.sol/APIGet.json");
+const abi_cvh = require("../artifacts/contracts/cv/CVsHub.sol/CVsHub.json");
+const abi_api_p = require("../artifacts/contracts/system/APIPost.sol/APIPost.json");
+const abi_api_p_p = require("../artifacts/contracts/system/APIPostPayable.sol/APIPostPayable.json");
+const abi_bh = require("../artifacts/contracts/system/BalancesHub.sol/BalancesHub.json");
+const abi_l = require("../artifacts/contracts/launchpads/Launchpad.sol/Launchpad.json");
+const abi_erc20 = require("../artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json");
+
 const { promisify } = require("util");
 const writeFileAsync = promisify(fs.writeFile);
 
-
-
-const {
-  _testInitMissionsHub,
-  _testInitFactoryCV,
-  _testInitPubHub,
-  _testInitWorkerProposalHub,
-  _testInitAccessControl,
-  _testInitFeaturesHub,
-  _testInitLaunchpadContracts,
-  _testInitAll,
-} = require("../helpers/test_init");
-const CONTRACT_NAME = "FactoryCV";
+const { _testInitAll } = require("../helpers/test_init");
 
 // import ADDRS from "../../core/tasks/helpers/utils";
 async function main() {
@@ -46,7 +45,6 @@ async function main() {
 
   const featuresHub = contracts.works.featuresHub;
 
-
   const pubsHub = contracts.pubs.hub;
 
   const launchpadContracts = contracts.launchpads;
@@ -70,15 +68,13 @@ async function main() {
 
   const arbitratorsHub = contracts.escrows.arbitratorsHub;
 
-
   const collectWorkInteraction = contracts.works.collectWorkInteraction;
 
   const pubsDatasHub = contracts.pubs.datas;
 
   const jsonContent = {
-
     token: token.target,
-    
+
     accessControl: accessControl.target,
     cvsHub: cvsHub.target,
     missionsHub: missionsHub.target,
@@ -99,8 +95,50 @@ async function main() {
     collectWorkInteraction: collectWorkInteraction.target,
     pubsDatasHub: pubsDatasHub.target,
   };
-  console.log("ADDRESS content", jsonContent);
 
+  const abis = {
+    addressSystem: abi_addr_s.abi,
+    apiGet: abi_api_g.abi,
+    apiPost: abi_api_p.abi,
+    apiPostPayable: abi_api_p_p.abi,
+    cvsHub: abi_cvh.abi,
+    balancesHub: abi_bh.abi,
+    launchpad: abi_l.abi,
+    apiPostPayable: abi_api_p_p.abi,
+    erc20: abi_erc20.abi,
+  };
+  console.log("ADDRESS content", jsonContent);
+  let filePath = path.join(__dirname, "../../frontend/address.json");
+  fs.writeFile(
+    filePath,
+    JSON.stringify(jsonContent, null, 2),
+    "utf8",
+    function (err) {
+      if (err) {
+        console.log(
+          "Une erreur s'est produite lors de l'écriture du fichier JSON.",
+          err
+        );
+      } else {
+        console.log(
+          "Fichier address.json créé avec succès dans le dossier frontend."
+        );
+      }
+    }
+  );
+  filePath = path.join(__dirname, "../../frontend/abis.json"); // TESTNET :  "../../frontend/abistestnet.json";
+  fs.writeFile(filePath, JSON.stringify(abis, null, 2), "utf8", function (err) {
+    if (err) {
+      console.log(
+        "Une erreur s'est produite lors de l'écriture du fichier JSON.",
+        err
+      );
+    } else {
+      console.log(
+        "Fichier abis.json créé avec succès dans le dossier frontend."
+      );
+    }
+  });
   const jsonString = JSON.stringify(jsonContent, null, 2);
   await writeFileAsync("addresses.json", jsonString);
   console.log("JSON file created: addresses.json");

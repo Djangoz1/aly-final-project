@@ -4,13 +4,7 @@ const { deleter } = require("./04_deletePin");
 
 const hre = require("hardhat");
 
-const {
-  createURICV,
-  getAllPinnedFiles,
-  deleteAllPinnedFiles,
-  createURI,
-  createImage,
-} = require("../utils/pinata");
+const { createURI, createImage } = require("../utils/pinata");
 const {
   _createCV,
   _createMission,
@@ -63,10 +57,21 @@ async function main() {
     });
     console.log("cv#", cv, "created for ", fuzzing.accounts[index].username);
   }
-  await _createLaunchpad({
+  let launchpadID = await _createLaunchpad({
     account: this.owner,
     addressSystem: addressSystem.target,
   });
+  console.log("launchpad created at id ", launchpadID);
+  launchpadID = await _createLaunchpad({
+    account: this.owner,
+    addressSystem: addressSystem.target,
+  });
+  console.log("launchpad created at id ", launchpadID);
+  let datas = await apiGet.datasOfLaunchpad(launchpadID);
+  await apiPostPayable
+    .connect(this.addr2)
+    .buyTokens(launchpadID, { value: datas.maxInvest });
+
   for (let index = 0; index < fuzzing.missions.length; index++) {
     const _mission = fuzzing.missions[index];
     let mission = await _createMission({
@@ -94,14 +99,86 @@ async function main() {
       _mission.gallery.length || 0,
       " images"
     );
+    await _createFeature({
+      account: this.addr5,
+      accounts: [this.addr4],
+      specification: 6,
+      finish: true,
+      addressSystem: addressSystem.target,
+    });
+    await _createFeature({
+      account: this.addr5,
+
+      accounts: [this.addr2],
+      specification: 6,
+      finish: true,
+      addressSystem: addressSystem.target,
+    });
+    await _createFeature({
+      account: this.addr5,
+
+      accounts: [this.owner],
+      specification: 6,
+      finish: true,
+      addressSystem: addressSystem.target,
+    });
+
+    await _createFeature({
+      account: this.addr5,
+
+      accounts: [this.addr6],
+      specification: 6,
+      finish: true,
+      addressSystem: addressSystem.target,
+    });
+    let feature = await _createFeature({
+      account: this.addr5,
+
+      accounts: [this.addr3],
+      specification: 6,
+      finish: true,
+      addressSystem: addressSystem.target,
+    });
+
+    feature = await _createFeature({
+      account: this.addr5,
+      missionID: feature.missionID,
+      specification: 7,
+      addressSystem: addressSystem.target,
+    });
+
+    await apiPost.connect(this.addr5).inviteWorker(1, feature.featureID);
+
+    feature = await _createFeature({
+      account: this.owner,
+      accounts: [this.addr1],
+      specification: 6,
+      addressSystem: addressSystem.target,
+    });
+    let uri = await createURI({
+      table: "escrows",
+      metadatas: {
+        description:
+          "Je n'ai plus de nouvelles du dev depuis la création de la mission. Il ne répond pas à mes messages alors que je le vois publier sur son mur. Le temps file et j'ai peur qu'il attende la période d'unlock pour partir avec son salaire sans me délivrer ce que j'attendais",
+        featureID: feature.featureHash,
+      },
+    });
+    await apiPost.contestFeature(feature.featureID, 30, 3, uri);
+
+    let disputeID = await apiGet.tokensLengthOf(
+      await addressSystem.disputesHub()
+    );
+    console.log("dispute created at", disputeID);
+    await apiPost.initDispute(disputeID);
     for (let _index = 0; _index < _mission.features.length; _index++) {
       const _feature = _mission.features[_index];
       let feature = await _createFeature({
         account: this.owner,
-        accounts: [accounts[_feature.account]],
+        accounts: _feature?.account ? [accounts[_feature.account]] : undefined,
         missionID: mission.missionID,
         specification: _feature.specification,
         domain: _feature.domain,
+        isInviteOnly: false,
         estimatedDays: _feature.estimatedDays,
         title: _feature.title,
         skills: _feature.skills,
@@ -109,6 +186,7 @@ async function main() {
         abstract: _feature.abstract,
         addressSystem: addressSystem.target,
       });
+
       for (let index = 0; index < _feature.toDo.length; index++) {
         const toDo = _feature.toDo[index];
         let workflow = ["to do", "progress", "done"];
@@ -129,7 +207,14 @@ async function main() {
         _feature.title,
         " created with ",
         _feature?.toDo?.length || 0,
-        "to dos"
+        "to dos "
+      );
+      console.log(
+        _feature.account
+          ? `${
+              fuzzing.accounts[_feature.account]?.username
+            } is worker of feature`
+          : "No worker on feature"
       );
     }
   }

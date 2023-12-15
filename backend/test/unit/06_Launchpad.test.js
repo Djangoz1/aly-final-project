@@ -1063,7 +1063,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
           apiPost
             .connect(this.addr1)
             .createMissionLaunchpad(launchpadID, "tokenURI")
-        ).to.be.revertedWith("APIPost: Error create mission");
+        ).to.be.revertedWith("ERC20: insufficient allowance");
       });
     });
   });

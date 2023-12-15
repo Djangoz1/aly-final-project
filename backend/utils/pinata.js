@@ -1,13 +1,7 @@
 require("dotenv").config();
-let addresses = require("../addresses.json");
 
-const key = process.env.PINATA_KEY;
-const secret = process.env.PINATA_SECRET;
-const pinataSDK = require("@pinata/sdk");
-const pinata = new pinataSDK(key, secret);
 const axios = require("axios");
 const fs = require("fs");
-const { getContractAt } = require("../helpers/test_init");
 const {
   MISSION_DATAS_URI_EXEMPLE,
   FEATURE_DATAS_URI_EXEMPLE,
@@ -174,12 +168,9 @@ let createURICV = async ({ username, description, avatar }) => {
   }
 };
 
-const createURIMission = async ({ title, description, userID, image }) => {
-  if (!userID) {
-    throw new Error("Missing mission owner value");
-  }
+const createURIMission = async ({ title, description, image }) => {
   let moock = { ...MISSION_DATAS_URI_EXEMPLE };
-  moock.userID = userID;
+
   if (title) {
     moock.title = title;
   }
@@ -187,7 +178,7 @@ const createURIMission = async ({ title, description, userID, image }) => {
     moock.description = description;
   }
   if (image) {
-    // moock.image = image;
+    moock.image = image;
   }
 
   try {

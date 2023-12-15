@@ -19,9 +19,9 @@ let transactionCost = async (tx) => {
   return gasUsed;
 };
 
-const getAccount = (accounts, address) =>
-  accounts.filter((el) => (el.address === address ? el : null));
-
+const getAccount = (accounts, address) => {
+  return accounts.filter((el) => el.address === address);
+};
 const CV_DATAS_URI_EXEMPLE = {
   // cvImg: "img/cv.jpeg",
   username: "Django",
@@ -79,6 +79,7 @@ const PUB_DATAS_URI_EXEMPLE = {
 
 const MISSION_DATAS_URI_EXEMPLE = {
   title: "Work3 Mission",
+  company: "Dework",
   description:
     "This is a part where content value stored. I can write everything I want to describe my mission. This description must provide a maximum of information about the mission. This is a kind of roadmap.",
   // image: "img/mission.png",

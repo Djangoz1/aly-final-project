@@ -437,7 +437,6 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   disputeID,
                   index
                 );
-
                 if (allowed == 1) {
                   const address = await arbitratorsHub.ownerOf(index);
                   let cvID = await apiGet.cvOf(address);
@@ -461,10 +460,10 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                     let data = await apiGet.datasOfDispute(disputeID);
 
                     let counter = 0;
-                    for (let index = 1; index <= addrs.length; index++) {
+                    for (let index = 0; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
-                        let account = getAccount(accounts, user.addr)[0];
+                        let account = getAccount(accounts, user?.addr)[0];
                         await apiPost
                           .connect(account)
                           .acceptArbitration(disputeID);
@@ -482,7 +481,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   it("acceptArbitration : Should update arbritators length", async () => {
                     let data = await apiGet.datasOfDispute(disputeID);
                     let counter = 0;
-                    for (let index = 1; index <= addrs.length; index++) {
+                    for (let index = 0; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let user = addrs[index];
                         let account = getAccount(accounts, user.addr)[0];
@@ -501,7 +500,7 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
                   it("acceptArbitration : Should update dispute status if nbArbitrators == nbAccept", async () => {
                     let data = await apiGet.datasOfDispute(disputeID);
                     let counter = 0;
-                    for (let index = 1; index <= addrs.length; index++) {
+                    for (let index = 0; index <= addrs.length; index++) {
                       if (counter < data.nbArbitrators) {
                         let account = getAccount(
                           accounts,
@@ -562,25 +561,32 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
 
                   it("Should can NOT accept arbitration if not invited", async () => {
                     let data = await apiGet.datasOfDispute(disputeID);
-                    let courtLength = await apiGet.lengthOfCourt(data.courtID);
-                    let _addrs = [];
-                    for (let index = 1; index <= courtLength; index++) {
-                      let allowed = await apiGet.allowanceOfArbitrator(
-                        disputeID,
-                        index
-                      );
+                    let court = await apiGet.indexerOfCourt(data.courtID);
+                    let indexer = await apiGet.indexerOfToken(
+                      disputeID,
+                      await addressSystem.disputesDatasHub()
+                    );
 
-                      if (allowed == 0) {
-                        const address = await arbitratorsHub.ownerOf(index);
-                        _addrs.push({ addr: address, arbitratorID: index });
+                    let _addrs = [];
+                    for (let index = 0; index <= court.length; index++) {
+                      if (!indexer.includes(court[index])) {
+                        const address = await arbitratorsHub.ownerOf(
+                          court[index]
+                        );
+                        _addrs.push({
+                          addr: address,
+                          arbitratorID: court[index],
+                        });
                         break;
                       }
                     }
 
                     let account = getAccount(accounts, _addrs[0].addr);
 
+                    // console.log(accounts);
+
                     await expect(
-                      apiPost.connect(account[0]).acceptArbitration(disputeID)
+                      apiPost.acceptArbitration(disputeID)
                     ).to.be.revertedWith("Not allowed");
                   });
                 });

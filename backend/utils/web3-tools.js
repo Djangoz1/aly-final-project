@@ -94,7 +94,7 @@ let _createMission = async ({
 
   let uri = await createURIMission({
     title,
-    userID: userID,
+
     description,
   });
 
@@ -205,7 +205,6 @@ let _createFeature = async ({
     await apiPost.connect(account).inviteWorker(cvID, featureID);
     await apiPost.connect(_account).acceptJob(featureID);
 
-    console.log(cvID, " is worker");
     if (finish) {
       await apiPost.connect(account).validFeature(featureID);
     }
@@ -219,12 +218,7 @@ let _createFeature = async ({
   };
 };
 
-let _createLaunchpad = async ({
-  account,
-  addressSystem,
-  launchpadDatas,
-  tiersDatas,
-}) => {
+let _createLaunchpad = async ({ account, addressSystem, launchpadDatas }) => {
   let tokens = 3000000n;
 
   let _iAS = await getContractAt("AddressSystem", addressSystem);
@@ -263,7 +257,8 @@ let _createLaunchpad = async ({
     maxInvest:
       launchpadDatas?.maxInvest || launchpadDatas?.maxCap || moock.maxCap,
 
-    saleStart: launchpadDatas?.saleStart || saleStart,
+    // saleStart: launchpadDatas?.saleStart || saleStart,
+    saleStart: 10, // ! test value
     saleEnd: launchpadDatas?.saleEnd || moock.saleEnd,
     amountRaised: 0,
     totalUser: launchpadDatas?.totalUser || moock.totalUser,

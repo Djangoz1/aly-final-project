@@ -63,9 +63,9 @@ describe(`Contract ${CONTRACT_NAME} `, () => {
         ).to.be.revertedWith("Must call function with proxy bindings");
       });
       it("Should NOT add feature out of bindings features hub", async () => {
-        await expect(
-          contract.addFeature(this.owner.address, 1, 1)
-        ).to.be.revertedWith("Must call function with featuresHub bindings");
+        await expect(contract.addFeature(1, 1)).to.be.revertedWith(
+          "Must call function with featuresHub bindings"
+        );
       });
     });
   });

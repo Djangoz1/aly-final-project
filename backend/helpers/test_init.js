@@ -145,10 +145,8 @@ let _testInitCVsContracts = async (addressSystem) => {
 };
 
 let _testInitaddressSystem = async () => {
-  console.log("oui");
   const addressSystem = await ethers.deployContract("AddressSystem");
   await addressSystem.waitForDeployment();
-  console.log("oui");
   return addressSystem;
 };
 

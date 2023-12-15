@@ -34,7 +34,6 @@ let fuzzing = {
       ],
       features: [
         {
-          account: 1,
           title: "👩‍💻 Frontend Developer",
           abstract:
             "The mission is to create a user interface for a freelance decentralized application (dApp) with integration to blockchain technology, to be built using Next.js. The client is seeking advice on best practices for optimization.",
@@ -185,7 +184,7 @@ let fuzzing = {
             "Creating a decentralized application for freelancing services, with various blockchain components and a frontend in Next.js, backend in Golang.",
           description:
             "To design, develop, and integrate smart contracts for freelancing, escrow, launchpad, monetized content, challenges, and governance token. To ensure each module's secure and efficient operation within the DeWork platform. The mission involves the creation of DeWork, a decentralized application (dApp) providing a freelancing platform. The backend will be programmed in Golang and the frontend in Next.js. The blockchain features include smart contracts for freelancing agreements, an escrow system with an arbitration mechanism, a crowdfunding launchpad, a marketplace for monetized content, a challenge system for companies and freelancers, an ERC20 governance token, and implementation of the ERC721URIStorage protocol.",
-          specification: 6,
+          specification: 2,
           skills: [
             "Solidity",
             "Ether.js or web3.js",

@@ -242,33 +242,7 @@ contract APIPostPayable is Ownable {
             _datas.saleStart = block.timestamp;
         }
 
-        // uint256[] memory _maxTierCaps = new uint256[](_tierDatas.length);
-        // uint256[] memory _minTierCaps = new uint256[](_tierDatas.length);
-        // uint256[] memory _tokenPrice = new uint256[](_tierDatas.length);
-
-        // for (uint256 index = 0; index < _tierDatas.length; index++) {
-        //     DataTypes.TierData memory _tierData = _tierDatas[index];
-        //     _maxTierCaps[index] = _tierData.maxTierCap;
-        //     _minTierCaps[index] = _tierData.minTierCap;
-        //     _tokenPrice[index] = _tierData.tokenPrice;
-        //     _datas.maxCap += _tierData.maxTierCap;
-        //     _datas.minCap += _tierData.minTierCap;
-        //     require(
-        //         _tierData.tokenPrice < _datas.maxCap &&
-        //             _tierData.tokenPrice < _datas.maxInvest &&
-        //             _datas.minInvest <= _tierData.maxTierCap,
-        //         "LaunchpadHub: Missmatch value"
-        //     );
-        // }
-
-        // _datas.numberOfTier = uint8(_tierDatas.length);
-
-        //
-        uint newID = ILaunchpadHub(_launchpadsHub).mint(
-            cvID,
-            _datas
-            // _tierDatas
-        );
+        uint newID = ILaunchpadHub(_launchpadsHub).mint(cvID, _datas);
         require(newID > 0, "Invalid launchpad ID");
 
         //!>>
@@ -279,15 +253,7 @@ contract APIPostPayable is Ownable {
             _iAS.launchpadsDatasHub()
         );
         cLD.setLaunchpadData(newID, _datas);
-        // cLD._setTiers(
-        //     _tierDatas.length,
-        //     newID,
-        //     _maxTierCaps,
-        //     _minTierCaps,
-        //     _tokenPrice
-        // );
-        //
-        // ILaunchpadsDatasHub(_iAS.launchpadsDatasHub()).setTokenURI(
+
         cLD.setTokenURI(msg.sender, newID, _tokenURI);
     }
 
