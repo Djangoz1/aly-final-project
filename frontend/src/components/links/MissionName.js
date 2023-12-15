@@ -8,7 +8,7 @@ import { stateMission } from "utils/ui-tools/state-tools";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { fetchMission } from "utils/works";
 
-export const MissionName = ({ id, missionHash, metadatas, style }) => {
+export const MissionName = ({ id, missionHash, url, metadatas, style }) => {
   let [isName, setIsName] = useState(null);
   const ref = useRef(null);
   const isInView = useInView(ref);
@@ -44,8 +44,8 @@ export const MissionName = ({ id, missionHash, metadatas, style }) => {
   ) : (
     <Link
       ref={ref}
-      className={`hover:text-info ${style}`}
-      href={`/mission/${id}`}
+      className={`${url === false ? "" : "hover:text-info"} ${style}`}
+      href={url === false ? "#" : url || `/mission/${id}`}
     >
       {metadatas?.title || isName || "No name"}
     </Link>

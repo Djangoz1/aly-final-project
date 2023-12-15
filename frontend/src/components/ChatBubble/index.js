@@ -1,6 +1,7 @@
 import { CVName } from "components/links/CVName";
 import { TextAI } from "components/myComponents/text/TextAI";
 import { Avatar } from "components/profile/ProfileAvatar";
+import { ENUMS } from "constants/enums";
 import { useFormState } from "context/form";
 import React, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
@@ -27,8 +28,8 @@ export const ChatBubble = ({
 
   return (
     !isForm?.no && (
-      <div className={`chat     ${"chat-start" || style}`}>
-        {!image?.no && CID !== false && (
+      <div className={`flex flex-col   ${"chat-start" || style}`}>
+        {!image?.no && CID !== false && image !== false && (
           <Avatar
             src={ai ? "/ai.png" : image}
             CID={CID}
@@ -36,29 +37,17 @@ export const ChatBubble = ({
             noCircle={true}
           ></Avatar>
         )}
-        <div className="chat-header">
+        <div className="text-xs">
           {ai ? "Aly" : name}
           {/* <span className="text-xs  opacity-50">Mission name</span> */}
         </div>
         <div
-          className={`chat-bubble ${
-            [
-              "",
-              "chat-bubble-success",
-              "chat-bubble-error",
-              "chat-bubble-secondary",
-              "chat-bubble-primary",
-              [],
-            ][color ? color : _form ? _form(form)?.color : 0]
+          className={`h-fit rounded-lg font-light text-[10px] px-4 py-2 ${
+            ["bg-white/20 backdrop-blur", ...ENUMS?.colors]?.[
+              color ? color : _form ? _form(form)?.color : 0
+            ]
           } `}
         >
-          {(_form && _form?.(form)?.text) ||
-            (text && (
-              <TextAI
-                style={" text-xs"}
-                text={_form ? _form(form)?.text : text}
-              ></TextAI>
-            ))}
           {_form ? _form(form).children : children || undefined}
         </div>
         {footer ? (

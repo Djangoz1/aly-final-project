@@ -6,8 +6,9 @@ import {
 } from "context/form";
 import { useToolsState } from "context/tools";
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4, v4 } from "uuid";
 import { MyInput } from "./MyInput";
+import { MyMainBtn } from "../btn/MyMainBtn";
 export const MySelects = ({ selects, styles }) => {
   let { form, placeholders, checked, pointer } = useFormState();
   let formState = useFormState();
@@ -42,7 +43,15 @@ export const MySelects = ({ selects, styles }) => {
     </div>
   );
 };
-export const MySelect = ({ arr, target, label, setter, styles }) => {
+export const MySelect = ({
+  arr,
+  style,
+  template,
+  target,
+  label,
+  setter,
+  styles,
+}) => {
   let { form, placeholders, checked, pointer } = useFormState();
   let dispatch = useFormDispatch();
   let { refresh } = useToolsState();
@@ -59,7 +68,21 @@ export const MySelect = ({ arr, target, label, setter, styles }) => {
       }
     }
   };
-  return (
+  return [
+    <div className={`flex items-center gap-2 ${style || "flex-wrap"}`}>
+      {arr?.map((el, i) => (
+        <MyMainBtn
+          _refresh={false}
+          style={"font-light  backdrop-blur  btn-sm px-3 py-2 "}
+          color={form?.[target] == i ? 0 : 2}
+          icon={false}
+          key={v4()}
+          setter={() => handleChange(form?.[target] == i ? null : i)}
+        >
+          {el}
+        </MyMainBtn>
+      ))}
+    </div>,
     <div
       className={`flex hover:text-white flex-col  ${
         form?.[target] && "text-white"
@@ -88,6 +111,6 @@ export const MySelect = ({ arr, target, label, setter, styles }) => {
             )
         )}
       </select>
-    </div>
-  );
+    </div>,
+  ]?.[template || 0];
 };

@@ -16,9 +16,6 @@ import { useAuthState } from "context/auth";
 import { Icon } from "@iconify/react";
 import { icfy, icfyCODE, icfyETHER, icsystem } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { ENUMS } from "constants/enums";
@@ -84,6 +81,7 @@ function App({ params }) {
                     {el?.datas &&
                       el?.datas?.status !== 2 &&
                       el?.datas?.status !== 3 &&
+                      el?.datas?.cvWorker &&
                       (cv == state?.owner?.cvID ||
                         cv == el?.datas?.cvWorker) && (
                         <>
@@ -98,19 +96,46 @@ function App({ params }) {
                           </MyMainBtn>
                         </>
                       )}
+                    {el?.datas?.status === 0 &&
+                      !el?.datas?.cvWorker &&
+                      !el?.details?.workerDemand
+                        ?.map((el) => `${el}`)
+                        ?.includes(`${cv}`) &&
+                      cv != state?.owner?.cvID && (
+                        <>
+                          <MyMainBtn
+                            setter={async () =>
+                              await _apiPost("askToJoin", [el?.featureID])
+                            }
+                            style={"btn-xs"}
+                            icon={false}
+                            template={1}
+                          >
+                            Propose to work
+                          </MyMainBtn>
+                        </>
+                      )}
+
                     <MyStatus
                       padding={"px-2 py-1 "}
                       style={"w-full  text-[9px]"}
                       status={
                         el?.datas?.status >= 0
-                          ? el?.datas?.status
+                          ? el?.datas?.cvWorker
+                            ? el?.datas?.status
+                            : "hiring"
                           : "notDeployed"
                       }
-                      target={el?.datas?.status >= 0 ? "feature" : "_feature"}
+                      target={
+                        el?.datas?.status >= 0 && el?.datas?.cvWorker
+                          ? "feature"
+                          : "_feature"
+                      }
                     />
                     {el?.datas &&
                       el?.datas?.status !== 2 &&
                       el?.datas?.status !== 3 &&
+                      el?.datas?.cvWorker &&
                       (cv == state?.owner?.cvID ||
                         cv == el?.datas?.cvWorker) && (
                         <>
@@ -271,11 +296,20 @@ function App({ params }) {
                   el?.metadatas?.title,
                   ENUMS.courts[el?.datas?.specification]?.court,
                   <MyStatus
-                    padding={"px-3 py-1 text-[9px]"}
+                    padding={"px-2 py-1 "}
+                    style={"w-full  text-[9px]"}
                     status={
-                      el?.datas?.status >= 0 ? el?.datas?.status : "notDeployed"
+                      el?.datas?.status >= 0
+                        ? el?.datas?.cvWorker
+                          ? el?.datas?.status
+                          : "hiring"
+                        : "notDeployed"
                     }
-                    target={el?.datas?.status >= 0 ? "feature" : "_feature"}
+                    target={
+                      el?.datas?.status >= 0 && el?.datas?.cvWorker
+                        ? "feature"
+                        : "_feature"
+                    }
                   />,
                   <CVName cvID={el?.datas?.cvWorker} />,
                   <MyBadge>{el?.datas?.wadge} ETH</MyBadge>,

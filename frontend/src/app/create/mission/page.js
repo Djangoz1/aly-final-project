@@ -2,12 +2,9 @@
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import React, { useEffect, useState } from "react";
 
-import { _form_create_profile } from "utils/ux-tools/form/profile";
-
 import { useAccount } from "wagmi";
 
 import { _apiGet, _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
-import { useAuthDispatch } from "context/auth";
 
 import { Icon } from "@iconify/react";
 
@@ -15,152 +12,52 @@ import { MyFormCreate } from "components/myComponents/form/MyForm";
 
 import { useAuthState } from "context/auth";
 
-import { MySteps } from "components/myComponents/MySteps";
-import { MENUS_CREATE_MISSION } from "constants/menus";
-
-import { _form_create_mission } from "utils/ux-tools/form/mission";
-
 import {
+  MOOCK,
   moock_create_mission,
   moock_create_mission_placeholder,
 } from "constants/moock";
 
 import { _apiGetAt } from "utils/ui-tools/web3-tools";
-import { ADDRESSES } from "constants/web3";
+
 import { ethers } from "ethers";
-import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
 
-import { icfyETHER } from "icones";
-import { CVName } from "components/links/CVName";
-import { clientPocket, createURI } from "utils/ui-tools/pinata-tools";
-// import {
-//   FormCreateMission1,
-//   FormCreateMission2,
-// } from "sections/missions/form/create/FormCreateMission";
-
-import { FormResponseAI } from "sections/Form/FormResponseAI";
-import { doStateTools, useToolsDispatch, useToolsState } from "context/tools";
-import { controllers } from "utils/controllers";
 import {
-  FormCreateMission1,
-  FormCreateMission2,
-} from "sections/works/Missions/form/create/FormCreateMission";
+  FormInputsAI,
+  FormResponseAI,
+  formLabelAI,
+} from "sections/Form/FormResponseAI";
+import { useToolsDispatch, useToolsState } from "context/tools";
+import { controllers } from "utils/controllers";
+import { MySelect } from "components/myComponents/form/MySelects";
+import { ENUMS } from "constants/enums";
+import { MyInputFile } from "components/myComponents/form/MyInputsFile";
+import { MyTextArea } from "components/myComponents/form/MyTextArea";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { MissionName } from "components/links/MissionName";
+import { LaunchpadName } from "components/links/LaunchpadName";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
   let dispatch = useToolsDispatch();
   let { state, pointer } = useToolsState();
-  let [price, setPrice] = useState(0.5); // ! balancesHub.missionPrice()
+  let [price, setPrice] = useState(null); // ! balancesHub.missionPrice()
   let { metadatas, cv, datas } = useAuthState();
 
-  _form_create_mission[0].title = (
-    <>
-      Salut <CVName metadata={metadatas} /> ! 👋
-    </>
-  );
-
   let submitForm = async (form) => {
-    let _txs = { db: null, bc: null, result: null, submit: true };
-    await doStateTools(dispatch, {
-      ...state,
-      txs: { pointer: 0, ..._txs },
-    });
-
     let aiAssist = form?.aiAssisted;
-    let metadatas = {
-      description: aiAssist
-        ? form?.ai?.recommandations?.detail
-        : form?.description,
-      abstact: aiAssist ? form?.ai?.recommandations?.abstract : form?.abstract,
-      title: aiAssist ? form?.ai?.recommandations?.name : form?.title,
-      budget: aiAssist
-        ? form?.ai?.recommandations?.budget?.total
-        : form?.budget,
-      image: form?.image,
-      banniere: form?.banniere,
-      reference: form?.reference ? parseInt(form?.reference) : undefined,
 
-      domain: parseInt(form?.domain),
-      owner: cv,
-    };
-
-    const record = await clientPocket.records.create("missions", metadatas);
-
-    _txs.db = record;
-
-    await doStateTools(dispatch, {
-      ...state,
-      txs: { pointer: 1, ..._txs },
+    return await controllers.create.mission(...form, {
+      launchpads: datas?.launchpads,
+      missions: datas?.missions,
     });
-
-    //   ! Recuperation de l'ID
-    let uri = record.id;
-
-    //   ! Decoment for create mission only on db
-    // return;
-
-    let hash;
-    let price = await _apiGetAt({
-      func: "missionPrice",
-      targetContract: "balancesHub",
-    });
-
-    console.log("ici", form);
-    try {
-      console.log("wtf", form);
-      if (form?.launchpad >= 0 && form?.launchpad !== null) {
-        hash = await _apiPost("createMissionLaunchpad", [
-          datas?.launchpads[parseInt(form?.launchpad)],
-          uri,
-        ]);
-      } else {
-        console.log("wtf-----", form);
-        hash = await _apiPostPayable("createMission", [uri], price);
-      }
-    } catch (error) {
-      await clientPocket.records.delete("missions", uri);
-
-      return;
-    }
-
-    let missionID = await _apiGet("tokensLengthOf", [ADDRESSES["missionsHub"]]);
-
-    _txs.bc = hash;
-    await doStateTools(dispatch, {
-      ...state,
-      txs: { pointer: 2, ..._txs },
-    });
-
-    if (aiAssist) {
-      for (
-        let index = 0;
-        index < form?.ai?.recommandations?.roles.length;
-        index++
-      ) {
-        let element = form?.ai?.recommandations?.roles[index];
-        let datas = {
-          missionID: missionID,
-          missionHash: uri,
-          title: element?.role_name,
-          abstract: element?.reason,
-          skills: JSON.stringify(element?.skills_required, null, 2),
-        };
-
-        await controllers.create.feature(datas);
-      }
-      _txs.result = `/mission/${missionID}`;
-      await doStateTools(dispatch, {
-        ...state,
-        txs: { pointer: 3, ..._txs },
-      });
-    }
   };
 
   useEffect(() => {
     (async () => {
       if (!price) {
         setPrice(
-          ethers.formatEther(
+          ethers.utils.formatEther(
             await _apiGetAt({
               func: "missionPrice",
               targetContract: "balancesHub",
@@ -178,48 +75,130 @@ const PageCreateProfile = () => {
       initState={{ allowed: true }}
     >
       <MyFormCreate
+        template={1}
         title={"Create Mission"}
-        submit={submitForm}
         stateInit={{
           allowed: price ? true : undefined,
           form: {
-            ...moock_create_mission,
+            ...MOOCK?.mission.form,
             price,
           },
-          placeholders: moock_create_mission_placeholder,
           checked: [[], []],
         }}
-        side={<MySteps arr={MENUS_CREATE_MISSION} />}
-        arr={_form_create_mission}
         components={[
           {
+            component: <FormInputsAI />,
+            label: formLabelAI,
+          },
+          {
             component: (
-              <MyFormInfo
-                title={
-                  <>
-                    <Icon
-                      icon={icfyETHER}
-                      className="mr-2 text-white text-2xl"
-                    />
-                    <span>{price} ETH</span>
-                  </>
-                }
+              <div className="flex  ">
+                <MySelect
+                  style={"w-1/3 justify-center  flex-wrap mx-auto"}
+                  target={"domain"}
+                  arr={ENUMS.domain.map((el) => (
+                    <>
+                      <Icon icon={el?.icon} />
+                      {el.name}
+                    </>
+                  ))}
+                ></MySelect>
+              </div>
+            ),
+            label: "What is the domain of your mission ?",
+          },
+
+          {
+            component: (
+              <>
+                <>
+                  <div className="flex gap-3 ">
+                    <MyInputFile target={"image"}></MyInputFile>
+                    <MyInputFile target={"banniere"}></MyInputFile>
+                  </div>
+                </>
+              </>
+            ),
+            label: "Please post an images for your project ?",
+          },
+          {
+            component: (
+              <div className="w-3/4 flex  flex-col gap-2">
+                <div className="gap-3 flex">
+                  <MyInput label={false} styles={"w-full"} target={"title"} />
+                  <MyInput label={false} styles={"w-full"} target={"company"} />
+                </div>
+                <MyTextArea
+                  label={false}
+                  styles={" w-full  min-h-[10vh] "}
+                  target={"abstract"}
+                />
+              </div>
+            ),
+            label: "Please provide a short description of your project",
+          },
+          {
+            component: (
+              <MyTextArea
+                label={false}
+                styles={" max-h-[48vh] min-h-[30vh] "}
+                target={"description"}
               />
             ),
-            label: "Information",
+            label: "Please details what is perimeter of your mission",
           },
           {
-            component: <FormCreateMission1 />,
-            label: "Blockchain",
+            component: (
+              <div className="flex gap-3 w-1/3 items-center justify-center flex-col">
+                <MyInput
+                  label={false}
+                  styles={"w-full"}
+                  type={"number"}
+                  target={"budget"}
+                />
+
+                <MyInput
+                  styles={"w-full"}
+                  label={false}
+                  type={"number"}
+                  target={"features"}
+                />
+              </div>
+            ),
+            label: "What is your budget and how many roles you want create ?",
           },
+
+          datas?.missions?.length && {
+            component: (
+              <MySelect
+                style={"w-2/3  flex-col"}
+                arr={datas?.missions?.map((el) => (
+                  <MissionName url={false} id={el} />
+                ))}
+                target={"mission"}
+              ></MySelect>
+            ),
+            label:
+              "This mission have a linked with one of your past missions ?",
+          },
+          datas?.launchpads?.length && {
+            component: (
+              <MySelect
+                style={"w-2/3  flex-col"}
+                arr={datas?.launchpads?.map((el) => (
+                  <LaunchpadName url={false} launchpadID={el} />
+                ))}
+                target={"launchpad"}
+              ></MySelect>
+            ),
+            label: "Do you want use launchpad budget to create your mission ?",
+          },
+
           {
-            component: <FormCreateMission2 />,
-            label: "Dontkno",
+            component: <FormResponseAI />,
           },
         ]}
-      >
-        {pointer === 3 ? <FormResponseAI /> : undefined}
-      </MyFormCreate>
+      ></MyFormCreate>
     </MyLayoutApp>
   );
 };

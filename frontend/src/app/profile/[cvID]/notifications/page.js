@@ -8,12 +8,6 @@ import { useToolsDispatch, useToolsState } from "context/tools";
 import { Icon } from "@iconify/react";
 import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
 
-import {
-  HEAD_table_features,
-  _table_features,
-} from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 import { ENUMS } from "constants/enums";
@@ -46,14 +40,7 @@ function App({ params }) {
   const cvID = params.cvID;
 
   let [isLength, setIsLength] = useState(null);
-  //   let isTable = {
-  //     btn: "Missions",
-  //     table:,
-  //     head: ,
-  //     setState: stateMission,
 
-  //     // btns: MENUS_EDIT.mission,
-  //   };
   useEffect(() => {
     let demands = 0;
     let invites = state?.notifications?.invitations?.length;
@@ -63,7 +50,6 @@ function App({ params }) {
 
     setIsLength({ demands, invites });
   }, [state?.notifications]);
-  console.log(state);
 
   return (
     <LayoutProfile

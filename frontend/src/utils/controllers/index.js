@@ -1,5 +1,10 @@
-import { clientPocket } from "utils/ui-tools/pinata-tools";
-import { _apiGet, _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
+import { clientPocket, urlPocket } from "utils/ui-tools/pinata-tools";
+import {
+  _apiGet,
+  _apiGetAt,
+  _apiPost,
+  _apiPostPayable,
+} from "utils/ui-tools/web3-tools";
 import { controllersPub } from "./social";
 import { controllersDispute } from "./escrow";
 import {
@@ -10,7 +15,36 @@ import {
 } from "utils/ui-tools/state-tools";
 import { ADDRESSES } from "constants/web3";
 import { fetchCV } from "utils/cvs";
+import axios from "axios";
+import { ethers } from "ethers";
+export const createURI = async (table, metadatas) => {
+  let formData = new FormData();
 
+  for (const key in metadatas) {
+    if (metadatas.hasOwnProperty(key) && metadatas[key]) {
+      formData.append(key, metadatas[key]);
+    }
+  }
+
+  try {
+    const { data } = await axios.post(
+      `${urlPocket}/api/collections/${table}/records`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // Définissez le type de contenu approprié
+        },
+      }
+    );
+
+    return data?.id;
+  } catch (error) {
+    console.error(
+      "Erreur " + table + " :",
+      error.response ? error.response.data : error.message
+    );
+  }
+};
 export const controllers = {
   create: {
     pub: (form) => controllersPub.create(form),
@@ -54,18 +88,14 @@ export const controllers = {
         title: title,
         description: description || feature?.description,
       };
-      let formData = new FormData();
-      formData.append("image", metadatas?.image);
 
-      // formData.append("image", metadatas.image);
-      console.log("metada---------tas", metadatas);
-
+      console.log(metadatas);
       if (featureHash) {
         deployed = true;
       } else {
-        let result = await clientPocket.records.create("features", metadatas);
-        await clientPocket.records.update("features", result.id, formData);
-        uri = result.id;
+        let result = await createURI("features", metadatas);
+
+        uri = result;
       }
       if (deployed) {
         if (!description || !title || !domain) {
@@ -95,11 +125,111 @@ export const controllers = {
         featureID = await _apiGet("tokensLengthOf", [ADDRESSES["featuresHub"]]);
         await clientPocket.records.update("features", uri, {
           deployedID: parseInt(featureID),
-          ...metadatas,
-          formData,
         });
       }
-      return { featureID, featureHash: uri };
+      return {
+        featureID,
+        featureHash: uri,
+        missionID,
+        url: "/mission/" + missionID + "/desk",
+      };
+    },
+    mission: async ({
+      ai,
+      price,
+      description,
+      datas,
+      launchpads,
+      domain,
+      launchpad,
+      abstract,
+      title,
+      budget,
+      image,
+      company,
+      banniere,
+      reference,
+    }) => {
+      let aiAssisted = ai?.recommandations ? true : false;
+      let metadatas = {
+        description: aiAssisted ? ai?.recommandations?.detail : description,
+        abstact: aiAssisted ? ai?.recommandations?.abstract : abstract,
+        title: aiAssisted ? ai?.recommandations?.name : title,
+        budget: aiAssisted ? ai?.recommandations?.budget?.total : budget,
+        image: image,
+        company: company,
+        banniere: banniere,
+        reference: reference ? datas?.missions[parseInt(reference)] : undefined,
+
+        domain: parseInt(domain),
+      };
+      console.log(metadatas);
+      try {
+        let uri = await createURI("missions", metadatas);
+        if (!price) {
+          throw new Error("Missing price");
+        }
+        let hash;
+        try {
+          if (launchpad >= 0 && launchpad !== null) {
+            if (launchpads) {
+              throw new Error("Launchpads wasn't found");
+            }
+            hash = await _apiPost("createMissionLaunchpad", [
+              launchpads[parseInt(launchpad)],
+              uri,
+            ]);
+          } else {
+            hash = await _apiPostPayable(
+              "createMission",
+              [uri],
+              await _apiGetAt({
+                func: "missionPrice",
+                targetContract: "balancesHub",
+              })
+            );
+          }
+        } catch (error) {
+          await clientPocket.records.delete("missions", uri);
+
+          return;
+        }
+        let missionID = await _apiGet("tokensLengthOf", [
+          ADDRESSES["missionsHub"],
+        ]);
+
+        let featuresHash = [];
+        if (aiAssisted) {
+          for (
+            let index = 0;
+            index < ai?.recommandations?.roles.length;
+            index++
+          ) {
+            let element = ai?.recommandations?.roles[index];
+            let datas = {
+              missionID: missionID,
+              missionHash: uri,
+              title: element?.role_name,
+              abstract: element?.reason,
+              deployed: false,
+              skills: JSON.stringify(element?.skills_required, null, 2),
+            };
+
+            let feature = await controllers.create.feature(datas);
+            featuresHash.push(feature.featureHash);
+          }
+        }
+
+        return {
+          featuresHash,
+          url: `/mission/${missionID}`,
+          label: `${title}`,
+          missionID,
+          missionHash: hash,
+        };
+      } catch (error) {
+        console.error("create mission ", { error });
+      }
     },
     follow: async ({ followID, ownerID }) => {
       if (await controllers.get.profile.follow({ followID, ownerID })) {

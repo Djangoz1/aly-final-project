@@ -43,7 +43,7 @@ export let MyInput = ({
             { [target]: form?.[target] }
           );
         } else {
-          setter(form?.[target]);
+          await setter(form?.[target]);
         }
 
         // await setter(form?.[target], target);
@@ -118,8 +118,8 @@ export let MyInput = ({
         </label>
       )}
       <div
-        className={`bg-gradient-to-bl from-zinc-900 border-white/5 border to-white/5 w-full  py-1  flex items-center h-fit rounded-lg  ${
-          !isFocus ? "" : ""
+        className={` border border-white/5 backdrop-blur  w-full  py-1  flex items-center h-fit rounded-lg  ${
+          !isFocus ? "" : "bg-white/5"
         }`}
       >
         {icon && !metadatas && !setter ? (
@@ -142,8 +142,8 @@ export let MyInput = ({
               : ""
           }
           className={` c3 w-full ${
-            isFocus && "border-success/20"
-          }   appearance-none input-ghost input-xs input font-light  py-1 h-fit `}
+            isFocus && "border-none"
+          }   appearance-none bg-white/0  input-xs input font-light  py-1 h-fit `}
         />
         {metadatas || setter ? (
           <div

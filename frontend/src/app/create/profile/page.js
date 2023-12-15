@@ -29,6 +29,7 @@ import {
 } from "sections/Form/forms/create/FormCreateProfile1";
 import { MyCardList } from "components/myComponents/card/MyCardList";
 import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
+import { createURI } from "utils/controllers";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
@@ -70,12 +71,10 @@ const PageCreateProfile = () => {
         domain: form.domain,
       };
 
-      console.log("metadatas", metadatas);
-      const client = clientPocket;
-      const record = await client.records.create("accounts", metadatas);
+      const record = await createURI("accounts", metadatas);
       console.log("record", record);
 
-      let tokenURI = record.id;
+      let tokenURI = record;
       await _apiPost("createCV", [tokenURI]);
       await doAuthCV(dispatch, address);
     }

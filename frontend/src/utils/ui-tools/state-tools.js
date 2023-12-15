@@ -13,9 +13,7 @@ import { STATUS } from "constants/status";
 import { controllers } from "utils/controllers";
 
 export const stateCV = async (cvID) => {
-  if (cvID?.cvID) {
-    return cvID;
-  } else if (cvID && cvID > 0) {
+  if (cvID && cvID > 0) {
     let result = {
       cvID: cvID,
       metadatas: await fetchCV(cvID),

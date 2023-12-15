@@ -1,50 +1,34 @@
 "use client";
-// import { Header } from "sections/Layout/Header";
-// import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
-// import { useEffect, useState } from "react";
-// import { useAccount } from "wagmi";
-// import { Hero } from "sections/Hero";
-// import { Missions } from "sections/Missions";
-import { Layout } from "sections/Layout";
-import { MySection } from "components/myComponents/MySection";
+
 import { styles } from "styles/style";
 import { Icon } from "@iconify/react";
-import { Logo, LogoIc } from "components/Logo";
-import { LinearGradient } from "react-text-gradients";
-import { Hg, Hg1 } from "components/text/HeroGradient";
-import { icfy, icfyARROWD, icfyCODE, icfyETHER, icfyROCKET } from "icones";
 
-import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import { Viewport } from "components/myComponents/layout/MyViewport";
+import { LinearGradient } from "react-text-gradients";
+import { Hg } from "components/text/HeroGradient";
+import { icfy, icfyCODE, icfyROCKET } from "icones";
+
 import { useEffect, useState } from "react";
 import { _apiGet, _apiGetAt } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { ethers } from "ethers";
 import { MyCardPrice } from "components/myComponents/card/MyCardPrice";
 import { useToolsDispatch, useToolsState } from "context/tools";
-import { MyCardList } from "components/myComponents/card/MyCardList";
+
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyNum } from "components/myComponents/text/MyNum";
-import { HeroScroll, HeroScrollPreview } from "sections/Hero/HeroScrollPreview";
-import { Footer } from "sections/Layout/Footer";
+import { HeroScroll } from "sections/Hero/HeroScrollPreview";
+
 import { Header } from "sections/Layout/Header";
-import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
+
 import { MyFooter } from "components/myComponents/layout/MyFooter";
 import { MyCard } from "components/myComponents/card/MyCard";
-import { MyTitle } from "components/myComponents/text/MyTitle";
-import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
+
 import { MySub } from "components/myComponents/text/MySub";
 import { v4 } from "uuid";
 import { LayoutTools } from "sections/Layout/LayoutTools";
 
 export default function Home() {
-  // const { address, isConnected } = useAccount();
-  // const { cv } = useAuthState();
-  // const dispatch = useAuthDispatch();
-
   const [isState, setIsState] = useState(null);
-  const dispatch = useToolsDispatch();
-  const { state } = useToolsState();
 
   useEffect(() => {
     if (isState === null)
@@ -83,20 +67,7 @@ export default function Home() {
 
   return (
     <LayoutTools>
-      {/* <div className="bg-animation">
-        <div id="stars"></div>
-        <div id="stars2"></div>
-        <div id="stars3"></div>
-      </div> */}
-
-      <body
-        template={2}
-        notLoad={true}
-        initState={isState}
-        url={`/`}
-        className="snap-y"
-        target={"home"}
-      >
+      <div className="snap-y">
         <>
           <section
             full={true}
@@ -489,7 +460,7 @@ export default function Home() {
         <div className="fixed top-0 left-0 w-full">
           <Header />
         </div>
-      </body>
+      </div>
     </LayoutTools>
   );
 }

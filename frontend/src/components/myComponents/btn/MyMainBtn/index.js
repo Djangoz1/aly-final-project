@@ -46,11 +46,15 @@ export const MyMainBtn = ({
       href={url || "#"}
       onClick={handleClick}
       disabled={disabled}
-      className={`${
-        style || (template != 1 && "c3")
-      } w-fit flex   flex-row items-center     transition  ${
+      className={`${style} w-fit flex gap-2   items-center     transition  ${
         [
-          "font-semibold  hover:[box-shadow:rgb(171,_196,_245)_0px_0px] max-w-full grid-cols-2 bg1 shadowh _hover px-8 py-2 [box-shadow:rgb(171,_196,_245)_-8px_8px] ",
+          `btn normal-case  ${
+            [
+              "bg-white text-black  hover:bg-white/90 ",
+              "btn-ghost",
+              "bg-white/5 hover:bg-black backdrop-blur  text-white",
+            ]?.[color || 0]
+          }`,
           `font-semibold ${
             [
               "text-white hover:text-black bg-gradient-to-r hover:from-white/10 hover:to-white   from-black to-transparent border-white/40",
@@ -68,21 +72,7 @@ export const MyMainBtn = ({
       {isLoading ? (
         <span className="loading  loading-bars mx-10 loading-xs"></span>
       ) : (
-        <>
-          {children ? (
-            <p
-              className={` ${
-                [
-                  `${!icon?.no && "mr-6"} btn btn-ghost uppercase`,
-                  " ",
-                  `${!icon?.no && "mr-2"} `,
-                ]?.[template || 0]
-              }   `}
-            >
-              {children}
-            </p>
-          ) : undefined}
-        </>
+        <>{children ? children : <></>}</>
       )}
       {!icon?.no && icon !== false && (
         <Icon
@@ -97,33 +87,5 @@ export const MyMainBtn = ({
         />
       )}
     </Link>
-  );
-};
-
-export const MyMainBtn1 = ({
-  children,
-  setter,
-  color,
-  url,
-  disabled,
-  style,
-}) => {
-  let _color = {
-    error: "error",
-    success: "success",
-  };
-  return (
-    <button
-      className={`btn-white  overflow-hidden  rounded-lg text-xs uppercase px-3 py-2  ${_color?.[color]} ${style}`}
-      disabled={disabled}
-      onClick={setter}
-      href={url || "#"}
-    >
-      {children}
-      <span className="b1"></span>
-      <span className="b2"></span>
-      <span className="b3"></span>
-      <span className="b4"></span>
-    </button>
   );
 };

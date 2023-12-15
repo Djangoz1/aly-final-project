@@ -23,14 +23,6 @@ export const MyTextArea = ({
   let { form, placeholders, pointer, modal, checked } = useFormState();
   let [value, setValue] = useState(null);
   let dispatch = useFormDispatch();
-  let [isFocus, setIsFocus] = useState(null);
-
-  let handleFocus = () => {
-    setIsFocus(true);
-  };
-  let handleBlur = () => {
-    setIsFocus(false);
-  };
 
   useEffect(() => {
     if (target && !value) setValue(form?.[target]);
@@ -63,33 +55,33 @@ export const MyTextArea = ({
   };
 
   return (
-    <div className={`flex w-full flex-col  ${form?.[target] && "text-white"}`}>
+    <div
+      className={`flex  w-full relative  flex-col  ${
+        form?.[target] && "text-white"
+      }`}
+    >
       {!label?.no && label !== false && (
         <label className="text-light font-light text-xs mb-1 uppercase ">
           {label || target} {checked?.[pointer]?.includes(target) && " *"}
         </label>
       )}
-      <div className="w-full h-full relative">
-        <textarea
-          rows={rows || undefined}
-          onChange={(e) => handleChange(e.target.value)}
-          value={value || undefined}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          className={`textarea font2 bg-gradient-to-bl from-zinc-900 to-white/5 w-full   font-light ${
-            !isFocus ? "" : "shadow1"
-          }  ${styles || "min-h-[10vh] max-h-[30vh]"}`}
-          placeholder={placeholders?.[target]}
-        ></textarea>
-        {setter || metadatas ? (
-          <MyMainBtn
-            icon={icfySEND}
-            template={1}
-            setter={handlePost}
-            style={"absolute btn-xs top-2 right-2   text-2xl c2"}
-          ></MyMainBtn>
-        ) : undefined}
-      </div>
+      <textarea
+        rows={rows || undefined}
+        onChange={(e) => handleChange(e.target.value)}
+        value={value || undefined}
+        className={`textarea backdrop-blur font2 border focus:bg-white/5 border-white/5 bg-white/0    font-light  ${
+          styles || "min-h-[10vh] max-h-[40vh] "
+        }`}
+        placeholder={placeholders?.[target]}
+      ></textarea>
+      {setter || metadatas ? (
+        <MyMainBtn
+          icon={icfySEND}
+          template={1}
+          setter={handlePost}
+          style={"absolute btn-xs top-2 right-2   text-2xl c2"}
+        ></MyMainBtn>
+      ) : undefined}
     </div>
   );
 };

@@ -1,17 +1,10 @@
 import { ADDRESSES } from "constants/web3";
-import { ethers } from "ethers";
 import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import { _apiGet } from "utils/ui-tools/web3-tools";
-import { fetchStatOfMission } from "utils/works";
 
 export let fetchCV = async (cvID) => {
   if (cvID && cvID > 0) {
-    let length = await _apiGet("tokensLengthOf", [ADDRESSES["cvsHub"]]);
-    if (cvID > length || !cvID) {
-      throw new Error("Error fetchCV: Invalid tokenID");
-    }
     let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
-
     let json = await fetchJSONByCID({ id: uri, table: "accounts" });
 
     return json;
@@ -29,7 +22,20 @@ export let fetchStatsOfCV = async (cvID) => {
       cvID,
       ADDRESSES["featuresHub"],
     ]);
+    let arbitrators = await _apiGet("indexerOfToken", [
+      cvID,
+      ADDRESSES["arbitratorsHub"],
+    ]);
+    let disputesInvites = [];
+    for (let index = 0; index < arbitrators.length; index++) {
+      const arbitratorID = arbitrators[index];
 
+      let invites = await _apiGet("indexerOfToken", [
+        arbitratorID,
+        ADDRESSES["disputesDatasHub"],
+      ]);
+      disputesInvites.push(...invites);
+    }
     // let pubs = await _apiGet("indexerOfToken", [cvID, ADDRESSES["pubsHub"]]);
 
     let launchpads = await _apiGet("indexerOfToken", [
@@ -56,10 +62,10 @@ export let fetchStatsOfCV = async (cvID) => {
       features,
       proposals: _jobs,
       // pubs,
-      arbitrators: await _apiGet("indexerOfToken", [
-        cvID,
-        ADDRESSES["arbitratorsHub"],
-      ]),
+      arbitrators: arbitrators,
+      disputes: {
+        eligible: disputesInvites,
+      },
       invitations,
       notifications,
       launchpads,

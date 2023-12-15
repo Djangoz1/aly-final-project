@@ -89,6 +89,23 @@ function App({ params }) {
             }
             footer={
               <div className="w-full gap-2 items-center flex mt-auto">
+                {el?.details?.dispute?.datas?.rules?.status == 0 &&
+                (el?.datas?.owner == cv || el?.datas?.cvWorker == cv) ? (
+                  <MyMainBtn
+                    setter={async () => {
+                      await _apiPost("initDispute", [
+                        el?.details?.dispute?.datas?.id,
+                      ]);
+                    }}
+                    template={1}
+                    style={"btn-xs"}
+                    icon={icsystem.escrow}
+                  >
+                    Init
+                  </MyMainBtn>
+                ) : (
+                  <></>
+                )}
                 <MyStatus
                   padding={"px-2 py-1 "}
                   style={"w-full  text-[9px]"}

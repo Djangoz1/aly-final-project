@@ -2,29 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 
-import { Layout } from "sections/Layout";
-import { useRouter } from "next/navigation";
-
-import { MySection } from "components/myComponents/MySection";
-
 import { styles } from "styles/style";
-import { Scene } from "spline/Scene";
 
 import { ADDRESSES } from "constants/web3";
 import { _apiGet } from "utils/ui-tools/web3-tools";
-import { fetchJSONByCID } from "utils/ui-tools/pinata-tools";
-import { MyAsset } from "components/myComponents/MyAsset";
+
 import { useAuthState } from "context/auth";
-import { v4 } from "uuid";
-import { ethers } from "ethers";
-import { fromTimestamp } from "utils/ux-tools";
-import { stateLaunchpad } from "utils/ui-tools/state-tools";
-import { Hg, Hg1 } from "components/text/HeroGradient";
-import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
-import { icfy, icfyROCKET } from "icones";
+import { icfy } from "icones";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import { Viewport } from "components/myComponents/layout/MyViewport";
-import Link from "next/link";
+
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
 import { LinearGradient } from "react-text-gradients";
 

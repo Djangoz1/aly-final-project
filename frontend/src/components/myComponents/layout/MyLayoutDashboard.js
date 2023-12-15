@@ -151,6 +151,7 @@ export const MyLayoutDashboard = ({
                   <></>
                 )}
                 <MyMenus current={url} menus={menus} />
+                {side ? side : <></>}
               </div>
             </div>
             <div className=" min-h-screen bgprim  h-fit 2xl:w-[87%] w-[81%] flex flex-col-reverse ml-auto backdrop-blur">

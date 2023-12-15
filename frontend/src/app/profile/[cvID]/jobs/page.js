@@ -65,7 +65,7 @@ function App({ params }) {
           head={["Date", "Court", "Mission", "Owner", "Status", "Amount"]}
           arr={state?.jobs?.map((el) => [
             el?.metadatas?.created,
-            <MyBadge color={1}>
+            <MyBadge color={el?.datas?.specification}>
               <Icon icon={ENUMS.courts?.[el?.datas?.specification]?.badge} />
               {ENUMS.courts?.[el?.datas?.specification]?.court}
             </MyBadge>,

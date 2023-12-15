@@ -1,13 +1,26 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { stateLaunchpad } from "utils/ui-tools/state-tools";
 
-export const LaunchpadName = ({ launchpadID, metadatas }) => {
+export const LaunchpadName = ({ url, launchpadID, metadatas, style }) => {
+  let [isMetadatas, setIsMetadatas] = useState(null);
+  useEffect(() => {
+    if (!isMetadatas && !metadatas) {
+      (async () => {
+        let launchpad = await stateLaunchpad(launchpadID);
+
+        setIsMetadatas(launchpad?.metadatas);
+      })();
+    }
+  }, [launchpadID]);
   return (
     <Link
-      href={"/launchpad/" + launchpadID}
-      className={"w-fit hover:text-info"}
+      href={url === false ? "#" : "/launchpad/" + launchpadID}
+      className={`w-fit ${url === false ? "" : "hover:text-info"} ${
+        style || ""
+      }`}
     >
-      {metadatas?.title}
+      {metadatas?.title || isMetadatas?.title || "No name"}
     </Link>
   );
 };

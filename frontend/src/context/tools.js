@@ -340,8 +340,21 @@ export const doStateToolsProfile = async ({
           index++
         ) {
           let arbitrator = owner?.datas?.arbitrators?.[index];
-          arbitrators.push(await stateArbitrator(arbitrator));
+          let invitations = await _apiGet("indexerOfToken", [
+            arbitrator,
+            ADDRESSES["disputesDatasHub"],
+          ]);
+          let arr = [];
+          for (let index = 0; index < invitations.length; index++) {
+            const disputeID = invitations[index];
+            arr.push(await stateDispute(disputeID));
+          }
+          arbitrators.push({
+            ...(await stateArbitrator(arbitrator)),
+            invitations: arr,
+          });
         }
+
         return arbitrators;
       },
       overview: async () => {
@@ -350,11 +363,12 @@ export const doStateToolsProfile = async ({
           ..._state.profile,
           details: await stateDetailsCV({
             cvID,
-            ..._state.profile.datas,
-            id: _state.profile.metadatas.id,
+            ..._state?.profile?.datas,
+            id: _state?.profile?.metadatas?.id,
           }),
         };
       },
+
       notifications: async () => {
         let notifications = [];
         for (let index = 0; index < owner?.datas?.features?.length; index++) {

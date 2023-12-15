@@ -8,40 +8,44 @@ import {
 } from "context/form";
 import axios from "axios";
 import { v4 } from "uuid";
-import { MyCard } from "components/myComponents/card/MyCard";
-import { Icon } from "@iconify/react";
-import { icfy, icfyAI, icsystem } from "icones";
+
+import { icfy, icsystem } from "icones";
 import {
   motion,
   AnimatePresence,
   useAnimation,
   useInView,
 } from "framer-motion";
-import { MyNum } from "components/myComponents/text/MyNum";
+
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MyLoader } from "components/myComponents/layout/MyLoader";
+
 import { ElementResponseAI } from "./ElementResponseAI";
-import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
-import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
-import { ChatBubble } from "components/ChatBubble";
-import { doStateTools } from "context/tools";
-import { MyInput } from "components/myComponents/form/MyInput";
 import { stateMission } from "utils/ui-tools/state-tools";
 import { useAuthState } from "context/auth";
 import { ENUMS } from "constants/enums";
+import { MyFlowScheme } from "components/myComponents/layout/MyFlowScheme";
+
+import { MyBadge } from "components/myComponents/box/MyList";
+import { MyTitle } from "components/myComponents/text/MyTitle";
+import { MySub } from "components/myComponents/text/MySub";
+import { MySelect } from "components/myComponents/form/MySelects";
 
 export const FormResponseAI = () => {
   const { form, target } = useFormState();
   const { datas } = useAuthState();
   console.log(form);
-  let ref = useRef(null);
-  let isInView = useInView(ref);
   let dispatch = useFormDispatch();
   const { pointer } = useFormState();
   let aiResponse = form?.ai?.recommandations;
-  const [prompt, setPrompt] = useState(null);
   let [isLoading, setIsLoading] = useState(null);
-  console.log("proooomùpt ---------", prompt);
+  if (form?.ai === 0) {
+    return (
+      <TextAI
+        text={"You don't want' help from Aly 😡"}
+        style={"  gap-2   items-center h-full justify-center "}
+      ></TextAI>
+    );
+  }
   let iaInstructions = async () => {
     const parts = [];
     if (form.target === "feature") {
@@ -99,17 +103,14 @@ export const FormResponseAI = () => {
     }
     return parts;
   };
-  useEffect(() => {
-    (async () => {
-      let parts = await iaInstructions();
-      // Constructing the final prompt
-      setPrompt(`Here is my description of mission:\n\n${parts.join("\n")}`);
-    })();
-  }, [isInView]);
-  let fetchAI = async () => {
+
+  let fetchAI = async (prompt) => {
+    let parts = await iaInstructions();
     const data = {
-      mission: prompt,
+      mission:
+        prompt || `Here is my description of mission:\n\n${parts.join("\n")}`,
     };
+    // Constructing the final prompt
 
     doInitStateForm(dispatch, {
       ...form,
@@ -142,401 +143,150 @@ export const FormResponseAI = () => {
   };
 
   useEffect(() => {
-    if (!aiResponse && prompt && isInView) {
+    if (!aiResponse && form?.ai === 1) {
       fetchAI();
       console.log("fetch ai response");
     }
-  }, [form?.description, isInView]);
+  }, [form?.description]);
 
   console.log("airesponse :", aiResponse);
 
-  const [selectedId, setSelectedId] = useState(null);
   return (
-    <>
-      <div ref={ref} className="flex px-8 relative flex-col  w-full ">
-        <div className="flex  w-full  flex-col-reverse ">
-          {!isLoading ? (
-            <MyCard
-              template={3}
-              styles={"py-4 flex flex-col min-h-[80vh] px-4 w-full"}
-              className="flex relative px-2 py-3 border rounded-lg border-white/5 flex-col w-1/3"
-            >
-              <MyNum
-                num={aiResponse?.budget?.total}
-                style={"absolute top-2 right-2"}
-              >
-                ${" "}
-              </MyNum>
-              <ChatBubble
-                ai={true}
-                style={"ml-4"}
-                text={"Let's see what I've cooked..."}
-              />
-              {aiResponse?.roles?.length === 0 && (
-                <ChatBubble
-                  ai={true}
-                  style={"ml-4"}
-                  text={"I didn't find any specific task for your project ..."}
-                >
-                  <p className="text-warning text-[9px]">
-                    Maybe you can reload or build by own
-                  </p>
-                </ChatBubble>
-              )}
+    <div className=" w-full relative h-full px-4">
+      {isLoading === true ? (
+        <TextAI
+          text={"Please wait while creation of your project"}
+          style={"  gap-2   items-center h-full justify-center "}
+        >
+          <MyBadge style={"mb-10 gap-2 text-[9px] font-light"} color={1}>
+            <span className="opacity-40 loading loading-spinner loading-xs" />{" "}
+            Let's see what I'm cooking
+          </MyBadge>
+        </TextAI>
+      ) : (
+        <MyMainBtn
+          style={"btn-sm font-light text-xs mx-auto"}
+          color={2}
+          icon={icfy.ux.refresh}
+          setter={() => fetchAI()}
+          _refresh={false}
+        >
+          Reload AI
+        </MyMainBtn>
+      )}
 
-              {aiResponse?.budget?.total &&
-              form?.budget != aiResponse?.budget?.total ? (
-                <ChatBubble
-                  ai={true}
-                  style={"ml-4"}
-                  text={`I advise you to opt for a budget of ${aiResponse?.budget?.total} $`}
-                >
-                  <span className="line-through text-error  text-xs">
-                    {form?.budget}
-                  </span>
-                </ChatBubble>
-              ) : undefined}
-              {aiResponse?.budget?.roles_budget?.length !==
-                aiResponse?.roles?.length && (
-                <ChatBubble
-                  ai={true}
-                  style={"ml-4"}
-                  text={
-                    "I had difficulty providing you with a budget, perhaps you should modify/give me a budget"
-                  }
-                />
-              )}
-              <ElementResponseAI
-                target={"title"}
-                title={`Project names`}
-                text={aiResponse?.name}
-                setter={(value) =>
-                  doInitStateForm(dispatch, {
-                    ...form,
-                    ai: {
-                      ...form?.ai,
-                      recommandations: {
-                        ...form?.ai?.recommandations,
-                        name: value,
-                      },
-                    },
-                  })
-                }
-              />
-              <ElementResponseAI
-                target={"budget"}
-                title={`Total budget`}
-                text={aiResponse?.budget?.total}
-                setter={(value) =>
-                  doInitStateForm(dispatch, {
-                    ...form,
-                    ai: {
-                      ...form?.ai,
-                      recommandations: {
-                        ...form?.ai?.recommandations,
-                        budget: {
-                          ...form?.ai?.recommandations?.budget,
-                          total: value,
-                        },
-                      },
-                    },
-                  })
-                }
-              >
-                $
-              </ElementResponseAI>
+      {form?.target !== "feature" && aiResponse?.name ? (
+        <div className="relative w-full  h-full ">
+          <MyFlowScheme
+            main={{
+              title: aiResponse?.name,
+              modal: (
+                <>
+                  <ElementResponseAI
+                    target={"abstract"}
+                    text={aiResponse?.abstract}
+                  />
+                  <ElementResponseAI
+                    target={"description"}
+                    text={aiResponse?.detail}
+                  />
 
-              <ElementResponseAI
-                style={"whitespace-break-spaces"}
-                target={"description"}
-                title={"Abstract description :"}
-                text={aiResponse?.abstract}
-                setter={(value) =>
-                  doInitStateForm(dispatch, {
-                    ...form,
-                    ai: {
-                      ...form?.ai,
-                      recommandations: {
-                        ...form?.ai?.recommandations,
-                        abstract: value,
-                      },
-                    },
-                  })
-                }
-              />
-
-              <ElementResponseAI
-                target={"description"}
-                title={"Detail :"}
-                text={aiResponse?.detail}
-                setter={(value) =>
-                  doInitStateForm(dispatch, {
-                    ...form,
-                    ai: {
-                      ...form?.ai,
-                      recommandations: {
-                        ...form?.ai?.recommandations,
-                        detail: value,
-                      },
-                    },
-                  })
-                }
-              />
-
-              <div className="flex mt-auto gap-5  justify-between">
-                <MyMainBtn
-                  template={1}
-                  color={1}
-                  setter={() => doStateFormPointer(dispatch, pointer - 1)}
-                  icon={{ no: true }}
-                  style={"flex items-center w-fit"}
-                >
-                  <span className="flex items-center">
-                    Previous
-                    <Icon icon={icfy.ux.arrow} className={`-rotate-90 `} />
-                  </span>
-                </MyMainBtn>
-                <MyInput
-                  label={false}
-                  styles={"w-full "}
-                  target={"chatAI"}
-                  setter={(value) => {
-                    const parts = [];
-
-                    parts.push(
-                      `Previous:${JSON.stringify(aiResponse, 2, null)}`
-                    );
-                    // Add project description
-                    parts.push(`Update: "${value}"`);
-                    parts.push(
-                      `Instructions:\n\n${iaInstructions().join("\n")}`
-                    );
-
-                    // Handle budget
-
-                    // Constructing the final prompt
-                    let _prompt = `Here is your previous response and I want to update only few modifications (Keep the rest):\n\n${parts.join(
-                      "\n"
-                    )}`;
-                    setPrompt(_prompt);
-                    console.log(_prompt);
-                    setIsLoading(true);
-                    fetchAI();
-                    setIsLoading(false);
-                  }}
-                />
-
-                <MyMainBtn
-                  template={1}
-                  color={0}
-                  setter={() => doStateFormPointer(dispatch, pointer + 1)}
-                  icon={{ no: true }}
-                  style={"flex items-center w-fit"}
-                >
-                  <span className="flex items-center">
-                    Next
-                    <Icon icon={icfy.ux.arrow} className={`rotate-90 `} />
-                  </span>
-                </MyMainBtn>
-              </div>
-            </MyCard>
-          ) : (
-            <div className=" flex  w-full h-[40vh]">
-              <MyLoader template={1} style={"mx-auto my-auto"} />
-            </div>
-          )}
-
-          <div className="flex flex-col">
-            <div className="flex -z-1 justify-between items-center">
-              {form?.target === "mission" ? (
-                <h6 className="flex items-center justify-end">
-                  Nombre de tâches :{" "}
-                  <MyNum style={"ml-2"} num={aiResponse?.roles?.length || 0} />
-                </h6>
-              ) : (
-                <></>
-              )}
-              {selectedId === null ? (
-                <MyMainBtn
-                  style={"-z-2 relative  ml-auto"}
-                  template={2}
-                  setter={() => fetchAI()}
-                  icon={{ no: true }}
-                >
-                  {isLoading ? (
-                    <span className="loading loading-ring "></span>
-                  ) : (
-                    <Icon icon={icfy.ux.refresh} />
-                  )}
-                </MyMainBtn>
-              ) : (
-                <></>
-              )}
-            </div>
-            {aiResponse?.roles?.length > 0 ? (
-              <MyScrolledXDiv>
-                <MyFramerModal
-                  selectedId={selectedId}
-                  setSelectedId={setSelectedId}
-                  style={
-                    "on_hover my-3 min-w-[430px] flex flex-col h-[150px] p-2 mr-2 bg-white/5  "
-                  }
-                  arr={aiResponse?.roles?.map((el, index) => (
+                  {aiResponse?.budget?.total ? (
                     <>
-                      {form?.target === "mission" ? (
-                        <button
-                          onClick={() =>
-                            doInitStateForm(dispatch, {
-                              ...form,
-                              ai: {
-                                ...form?.ai,
-                                recommandations: {
-                                  ...form?.ai?.recommandations,
-                                  roles:
-                                    form?.ai?.recommandations?.roles?.filter(
-                                      (el, i) => i !== index
-                                    ),
-                                },
-                              },
-                            })
-                          }
-                          className="btn on_hover_view btn-ghost btn-xs absolute top-1 right-1"
-                        >
-                          <Icon
-                            icon={icfy.ux.garbage}
-                            className="text-error "
-                          />
-                        </button>
-                      ) : (
-                        <></>
-                      )}
-                      <TextAI text={el?.role_name} style={" font-semibold "}>
-                        <div className="flex items-center my-3 flex-wrap grid-row-2 gap-2">
-                          {el?.skills_required?.map((el1, index1) => (
-                            <div
-                              className={`cursor-pointer badge py-[2px] relative on_hover h-fit text-[9px] badge-xs badge-${
-                                ["primary", "warning", "info", "success"]?.[
-                                  index1
-                                ]
-                              }`}
-                              key={v4()}
-                              onClick={() => {
-                                let skills = aiResponse?.roles?.[
-                                  index
-                                ]?.skills_required?.filter(
-                                  (el, i) => i !== index1
-                                );
-                                let roles = [...aiResponse?.roles];
-                                roles[index].skills_required = skills;
-                                doInitStateForm(dispatch, {
-                                  ...form,
-                                  ai: {
-                                    ...form?.ai,
-                                    recommandations: {
-                                      ...form?.ai?.recommandations,
-                                      roles,
-                                    },
-                                  },
-                                });
-                              }}
-                            >
-                              <Icon
-                                className="absolute translate-x-1/2 -translate-y-1/2 text-lg on_hover_view top-0 right-0 text-error     "
-                                icon={icfy.ux.remove}
-                              />
-                              <TextAI style={"text-xs"} text={el1}></TextAI>
-                            </div>
-                          ))}
-                        </div>
-                      </TextAI>
-                      {aiResponse?.budget?.roles_budget?.[index]
-                        ?.allocated_budget ? (
-                        <div className="flex mt-auto items-center">
-                          <Icon
-                            icon={icfy.bank.dollars}
-                            className="mr-2 text-2xl"
-                          />
-                          <TextAI
-                            text={aiResponse?.budget?.roles_budget?.[
-                              index
-                            ]?.allocated_budget
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-                          ></TextAI>
-                        </div>
-                      ) : undefined}
+                      <MySub>Budget</MySub>
+                      <p className="c3 font-light font3">
+                        {aiResponse?.budget?.total} $
+                      </p>
                     </>
-                  ))}
-                >
-                  <TextAI
-                    text={aiResponse?.roles?.[selectedId]?.role_name}
-                    style={" font-semibold "}
-                  >
-                    <div className="flex items-center my-3 flex-wrap gap-2">
-                      {aiResponse?.roles?.[selectedId]?.skills_required?.map(
-                        (el1, index1) => (
-                          <div
-                            className={`cursor-pointer badge py-[2px] relative on_hover h-fit text-[9px] badge-xs badge-${
-                              ["primary", "warning", "info", "success"]?.[
-                                index1
-                              ]
-                            }`}
-                            key={v4()}
-                            onClick={() => {
-                              let skills = aiResponse?.roles?.[
-                                selectedId
-                              ]?.skills_required?.filter(
-                                (el, i) => i !== index1
-                              );
-                              let roles = [...aiResponse?.roles];
-                              roles[selectedId].skills_required = skills;
-                              doInitStateForm(dispatch, {
-                                ...form,
-                                ai: {
-                                  ...form?.ai,
-                                  recommandations: {
-                                    ...form?.ai?.recommandations,
-                                    roles,
-                                  },
-                                },
-                              });
-                            }}
-                          >
-                            <Icon
-                              className="absolute translate-x-1/2 -translate-y-1/2 text-lg on_hover_view top-0 right-0 text-error     "
-                              icon={icfy.ux.remove}
-                            />
-                            <TextAI style={"text-xs"} text={el1}></TextAI>
-                          </div>
-                        )
-                      )}
+                  ) : (
+                    <p className="font-light text-xs">Budget not matches</p>
+                  )}
+                </>
+              ),
+              icon: ENUMS.domain[parseInt(form?.domain || 0n)]?.icon,
+            }}
+            arr={
+              aiResponse?.roles?.map((el, i) => ({
+                title: el?.role_name,
+                modal: (
+                  <>
+                    <MySub size={11}>{el?.role_name}</MySub>
+
+                    <div className="w-full flex my-4 flex-wrap gap-2">
+                      {el?.skills_required?.map((e, i) => (
+                        <MyBadge
+                          style={" text-[9px] c3 truncate "}
+                          key={v4()}
+                          color={1}
+                        >
+                          <span className="max-w-[100px] hover:max-w-fit truncate">
+                            {e}
+                          </span>
+                        </MyBadge>
+                      ))}
                     </div>
-                  </TextAI>
-                  <span className="text-xs">
-                    {aiResponse?.roles?.[selectedId]?.reason}
-                  </span>
-                  {aiResponse?.budget?.roles_budget?.[selectedId]
-                    ?.allocated_budget ? (
-                    <div className="flex mt-auto items-center">
-                      <Icon
-                        icon={icfy.bank.dollars}
-                        className="mr-2 text-2xl"
-                      />
-                      <TextAI
-                        text={aiResponse?.budget?.roles_budget?.[
-                          selectedId
-                        ]?.allocated_budget
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-                      ></TextAI>
-                    </div>
-                  ) : undefined}
-                </MyFramerModal>
-              </MyScrolledXDiv>
-            ) : undefined}
-          </div>
+                    <TextAI
+                      size={10}
+                      text={el?.reason}
+                      className="text-xs mb-4 font-light hover:text-white/70"
+                    />
+                    {aiResponse?.budget?.roles_budget?.[i] ? (
+                      <>
+                        <MyTitle>Budget</MyTitle>
+                        <p className="text-xs c3 font-light">
+                          {
+                            aiResponse?.budget?.roles_budget?.[i]
+                              ?.allocated_budget
+                          }
+                        </p>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                ),
+              })) || []
+            }
+          />
         </div>
+      ) : (
+        aiResponse?.name && <FeaturesAI />
+      )}
+    </div>
+  );
+};
+export const formLabelAI = "Would you like to use AI ?";
+export const FormInputsAI = () => {
+  return (
+    <div className="flex  ">
+      <MySelect
+        target={"ai"}
+        arr={["✋ I want to create by my hand", "🤖 I want to use Aly "]}
+      ></MySelect>
+    </div>
+  );
+};
+
+const FeaturesAI = () => {
+  let { form } = useFormState();
+  let ai = form?.ai?.recommandations;
+  return (
+    <div className="flex w-1/2 justify-center py-10 items-center flex-col h-fit mx-auto my-auto ">
+      <div className="flex flex-wrap w-4/5 justify-center gap-2">
+        {ai?.roles?.[0]?.skills_required?.map((el, i) => (
+          <MyBadge color={1} key={v4}>
+            {el}
+          </MyBadge>
+        ))}
       </div>
-    </>
+      <ElementResponseAI
+        text={ai?.roles?.[0]?.reason}
+        target={"abstract"}
+        title={"Abstract"}
+      />
+      <ElementResponseAI text={ai?.name} target={"description"} />
+      <ElementResponseAI text={ai?.abstract} />
+      <ElementResponseAI text={ai?.detail} />
+    </div>
   );
 };

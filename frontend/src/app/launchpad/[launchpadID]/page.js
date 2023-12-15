@@ -4,32 +4,23 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useToolsDispatch, useToolsState } from "context/tools";
 
-import { _apiPost } from "utils/ui-tools/web3-tools";
+import { _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
 
 import { useAuthState } from "context/auth";
 
-import { Icon } from "@iconify/react";
 import { icfy, icfyETHER, icfyTIME } from "icones";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
-import { v4 } from "uuid";
-
-import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
-
-import { MySub } from "components/myComponents/text/MySub";
 import { LayoutLaunchpad } from "sections/Layout/layouts/LayoutLaunchpad";
-import { ethers } from "ethers";
+
 import { MyCountdown } from "components/myComponents/MyCountdown";
-import { MyLayoutHeader } from "components/myComponents/layout/MyLayoutHeader";
-import { MyChart } from "components/myComponents/box/MyChart";
-import { MyNum } from "components/myComponents/text/MyNum";
-import { MyCard } from "components/myComponents/card/MyCard";
 import { StateLaunchpadInfos } from "sections/Launchpad/state/StateLaunchpadInfos";
-import { MyTitle } from "components/myComponents/text/MyTitle";
-import { MyBadge } from "components/myComponents/box/MyList";
 import { MyLayoutDetails } from "components/myComponents/layout/MyLayoutDetails";
 import { Avatar } from "components/profile/ProfileAvatar";
+import { LayoutForm } from "sections/Form/LayoutForm";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { ethers } from "ethers";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -50,6 +41,33 @@ function App({ params }) {
         <StateLaunchpadInfos />
         <MyLayoutDetails
           footers={[
+            {
+              title: "Invest",
+              value: (
+                <LayoutForm
+                  stateInit={{
+                    allowed: true,
+                    form: { target: "invest", buy: 0 },
+                    placeholders: { buy: "ETH value" },
+                  }}
+                >
+                  <MyInput
+                    target={"buy"}
+                    label={false}
+                    // max={ethers.utils.formatEther(
+                    //   state?.launchpad?.datas?.maxInvest
+                    // )}
+                    setter={async (value) =>
+                      await _apiPostPayable(
+                        "buyTokens",
+                        [parseInt(state?.launchpad?.launchpadID)],
+                        ethers.utils.parseEther(value)._hex
+                      )
+                    }
+                  />
+                </LayoutForm>
+              ),
+            },
             {
               title: "Owner",
               value: (

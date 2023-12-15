@@ -39,9 +39,12 @@ import {
   FormCreateLaunchpad2,
   FormCreateLaunchpad3,
 } from "sections/Launchpad/form/FormCreateLaunchpad";
+import { createURI } from "utils/controllers";
 
 const PageCreateLaunchpad = () => {
   let { address, isConnected } = useAccount();
+  let { cv, metadatas } = useAuthState();
+
   let dispatch = useAuthDispatch();
   let [isPrice, setIsPrice] = useState(null);
   let submitForm = async (form) => {
@@ -49,26 +52,23 @@ const PageCreateLaunchpad = () => {
       let metadatas = {
         title: form?.title,
         description: form?.description,
-        domain: parseInt(form?.domain),
+        domain: form?.domain,
         bio: form?.bio,
         image: form?.image,
         banniere: form?.banniere,
         website: form?.website,
-        social: JSON.stringify(
-          {
-            facebook: form?.facebook,
-            github: form?.github,
-            linkedin: form?.linkedin,
-            twitter: form?.twitter,
-          },
-          null,
-          2
-        ),
+        // social: {
+        //   facebook: form?.facebook,
+        //   github: form?.github,
+        //   linkedin: form?.linkedin,
+        //   twitter: form?.twitter,
+        // },
       };
+      console.log(metadatas);
 
-      const record = await clientPocket.records.create("launchpads", metadatas);
+      const record = await createURI("launchpads", metadatas);
       let price = ethers?.utils?.parseEther(isPrice);
-      let tokenURI = record.id;
+      let tokenURI = record;
       let saleStart = new Date(form.saleStart).getTime();
       let saleEnd = new Date(form.saleEnd).getTime();
 
@@ -101,7 +101,6 @@ const PageCreateLaunchpad = () => {
       return;
     }
   };
-  let { cv, metadatas } = useAuthState();
 
   useEffect(() => {
     if (!isPrice) {

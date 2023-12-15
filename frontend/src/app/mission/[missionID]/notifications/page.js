@@ -23,15 +23,15 @@ import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyNum } from "components/myComponents/text/MyNum";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { Avatar, ProfileAvatar } from "components/profile/ProfileAvatar";
-import { MySelect } from "components/myComponents/form/MySelects";
+
 import { LayoutForm } from "sections/Form/LayoutForm";
 import { MyBadge } from "components/myComponents/box/MyList";
-import { MissionName } from "components/links/MissionName";
-import { NoItems } from "components/myComponents/layout/NoItems";
+
 import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
 import { FeatureName } from "components/links/FeatureName";
 import { CVName } from "components/links/CVName";
 import { LayoutMission } from "sections/Layout/layouts/LayoutMission";
+import { NoItems } from "components/myComponents/layout/NoItems";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -39,15 +39,6 @@ function App({ params }) {
   const { state, status, pointer } = useToolsState();
   const missionID = params.missionID;
 
-  let [isLength, setIsLength] = useState(null);
-  //   let isTable = {
-  //     btn: "Missions",
-  //     table:,
-  //     head: ,
-  //     setState: stateMission,
-
-  //     // btns: MENUS_EDIT.mission,
-  //   };
 
   return (
     <LayoutMission
@@ -90,6 +81,7 @@ function App({ params }) {
             </div>
             <div className="w-full h-full rounded-lg  shadow backdrop-blur ">
               {state?.features
+                ?.filter((feature) => feature?.details?.workerDemand?.length)?.length ?  state?.features
                 ?.filter((feature) => feature?.details?.workerDemand?.length)
                 ?.map((feature) => (
                   <MyCardDropdown
@@ -160,7 +152,8 @@ function App({ params }) {
                       </div>
                     ))}
                   </MyCardDropdown>
-                ))}
+                ))
+              : <NoItems target={'Notifications'}/>}
             </div>
           </MyCard>
         </div>

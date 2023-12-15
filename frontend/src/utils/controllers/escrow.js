@@ -1,11 +1,11 @@
 import { clientPocket } from "utils/ui-tools/pinata-tools";
 import { stateDispute } from "utils/ui-tools/state-tools";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
+import { createURI } from ".";
 
 export const controllersDispute = {
   create: async (form) => {
     let id = parseInt(form.feature.id);
-    console.log("wshhh start", form);
     let metadatas = {
       description: form.description,
       image: form?.image,
@@ -13,7 +13,7 @@ export const controllersDispute = {
     };
 
     if (form?.appeal > 0 && form?.arbitrators >= 3) {
-      const record = await clientPocket.records.create("escrows", metadatas);
+      const record = await createURI("escrows", metadatas);
       let uri = record?.id;
 
       let hash = await _apiPost("contestFeature", [

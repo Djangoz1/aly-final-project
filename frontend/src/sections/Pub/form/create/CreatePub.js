@@ -62,8 +62,6 @@ export const CreatePub = ({ answerID, refresh, mission, style, btn }) => {
     }
 
     if (isConnected) {
-      console.log("form", form);
-
       form = { ...form, code: false };
 
       if (isClicked === 1) {
@@ -76,27 +74,7 @@ export const CreatePub = ({ answerID, refresh, mission, style, btn }) => {
       form.owner = metadatas;
       form.answerID = answerID;
       form.mission = mission;
-      console.log("ezgkljzgkzgj", form);
       let result = await controllers.create.pub(form);
-      console.log("result", result);
-
-      if (refresh) {
-        refresh();
-      }
-      return;
-      // let { uri, uriPayable } = await createURIPub(form);
-      // if (uriPayable) {
-      //   await _apiPost("createPayablePub", [
-      //     uri,
-      //     ethers.utils.parseEther(form?.amount)?._hex,
-      //     uriPayable,
-      //   ]);
-      // } else if (answerID > 0) {
-      //   await _apiPost("createPubAnswer", [answerID, uri]);
-      // } else if (missionID > 0) {
-      //   await _apiPost("createPubMission", [missionID, uri]);
-      // } else {
-      // }
 
       await doAuthCV(dispatchAuth, address);
       if (refresh) {

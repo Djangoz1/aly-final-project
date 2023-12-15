@@ -6,55 +6,18 @@ import { MyInput } from "components/myComponents/form/MyInput";
 import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
 import { MySelect, MySelects } from "components/myComponents/form/MySelects";
 import { MyTextArea } from "components/myComponents/form/MyTextArea";
+import { NoItems } from "components/myComponents/layout/NoItems";
 import { MySub } from "components/myComponents/text/MySub";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { DEV_DOMAIN } from "constants/languages";
 import { useAuthState } from "context/auth";
 import { doInitStateForm, useFormDispatch, useFormState } from "context/form";
-import { icfy } from "icones";
+import { icfy, icsystem } from "icones";
 import React, { useEffect, useState } from "react";
 import { stateLaunchpad, stateMission } from "utils/ui-tools/state-tools";
 import { v4 } from "uuid";
 
 let margin = "mb-4";
-export const FormCreateMission1 = () => {
-  return (
-    <div>
-      <div className="flex my-5 ">
-        <MySub style={"w-[20%] c4"}>Informations</MySub>
-        <div className="gap-3 flex">
-          <MyInput target={"title"} />
-          <MyInput label={"Company name"} target={"company"} />
-        </div>
-      </div>
-      <div className="flex my-10 ">
-        <MySub style={"w-[20%] c4"}>Domaine</MySub>
-        <MySelect
-          arr={DEV_DOMAIN.map((el) => el?.name)}
-          target={"domain"}
-          label={false}
-        />
-      </div>
-      <div className="flex my-10  w-full">
-        <MySub style={"w-[20%] c4"}>Description</MySub>
-        <div className="flex flex-col">
-          <MyInputsFile
-            styles={"  mr-5"}
-            inputs={[
-              { label: "Image", target: "image" },
-              { label: "Bannière", target: "banniere" },
-            ]}
-          />
-          <MyTextArea styles={margin + "  min-h-[10vh] "} target={"abstract"} />
-          <MyTextArea
-            styles={margin + " h-full w-full min-h-[30vh] "}
-            target={"description"}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export const FormCreateMission2 = () => {
   let { datas } = useAuthState();
@@ -80,7 +43,7 @@ export const FormCreateMission2 = () => {
   }, [datas]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex w-full items-center gap-4">
       {isDatas?.missions?.length ? (
         <div className="flex  my-5 ">
           <MySub style={"w-[20%] c4"}>Missions</MySub>
@@ -116,7 +79,7 @@ export const FormCreateMission2 = () => {
           </MyScrolledXDiv>
         </div>
       ) : (
-        <></>
+        <NoItems icon={icsystem.mission} template={1} target={"missions"} />
       )}
 
       {isDatas?.launchpads?.length ? (
@@ -151,16 +114,8 @@ export const FormCreateMission2 = () => {
           </MyScrolledXDiv>
         </div>
       ) : (
-        <></>
+        <NoItems icon={icsystem.launchpad} template={1} target={"launchpads"} />
       )}
-      <div className="flex my-5 ">
-        <MySub style={"w-[20%] c4"}>Budget</MySub>
-        <MyInput label={false} type={"number"} target={"budget"} />
-      </div>
-      <div className="flex my-5 ">
-        <MySub style={"w-[20%] c4"}>Tasks</MySub>
-        <MyInput label={false} type={"number"} target={"features"} />
-      </div>
     </div>
   );
 };

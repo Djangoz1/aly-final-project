@@ -6,17 +6,13 @@ import { useAuthState } from "context/auth";
 import { useToolsDispatch, useToolsState } from "context/tools";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
-
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
+import { icfy, icfyETHER, icsystem } from "icones";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { ENUMS } from "constants/enums";
 import { v4 } from "uuid";
 
 import { MySub } from "components/myComponents/text/MySub";
-import { MyFramerModal } from "components/myComponents/box/MyFramerModals";
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
 
 import { MyScrolledXDiv } from "components/myComponents/box/MyScrolledXDiv";
@@ -25,8 +21,7 @@ import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { CVName } from "components/links/CVName";
 import { MyBadge, MyList } from "components/myComponents/box/MyList";
-import { MyTitle } from "components/myComponents/text/MyTitle";
-import { MyCardIc } from "components/myComponents/card/MyCardIc";
+
 import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
 import { MyCardInfos } from "components/myComponents/card/MyCard";
 import { FeatureName } from "components/links/FeatureName";
@@ -53,7 +48,6 @@ function App({ params }) {
     }
   }, [state?.features]);
 
-  console.log("state", state);
   let dispatch = useToolsDispatch();
   let [selectedID, setSelectedID] = useState(null);
   let colors = [
@@ -87,7 +81,22 @@ function App({ params }) {
             />,
 
             <CVName cvID={el?.datas?.cvWorker} />,
-            <MyStatus status={el?.datas?.status} target={"feature"} />,
+            <MyStatus
+              padding={"px-2 py-1 "}
+              style={"w-full  text-[9px]"}
+              status={
+                el?.datas?.status >= 0
+                  ? el?.datas?.cvWorker
+                    ? el?.datas?.status
+                    : "hiring"
+                  : "notDeployed"
+              }
+              target={
+                el?.datas?.status >= 0 && el?.datas?.cvWorker
+                  ? "feature"
+                  : "_feature"
+              }
+            />,
             <MyBadge>{el?.datas?.wadge} ETH</MyBadge>,
           ])}
         />
@@ -132,13 +141,28 @@ function App({ params }) {
                       )}
                       <MyStatus
                         padding={"px-2 py-1 "}
-                        status={el?.datas?.status}
-                        style={" w-full text-xs"}
-                        target={"feature"}
+                        style={"w-full  text-[9px]"}
+                        status={
+                          el?.datas?.status >= 0
+                            ? el?.datas?.cvWorker
+                              ? el?.datas?.status
+                              : "hiring"
+                            : "notDeployed"
+                        }
+                        target={
+                          el?.datas?.status >= 0 && el?.datas?.cvWorker
+                            ? "feature"
+                            : "_feature"
+                        }
                       />
                     </>
                   }
-                  title={el?.metadatas?.title}
+                  title={
+                    <FeatureName
+                      metadatas={el?.metadatas}
+                      missionID={el?.datas?.missionID}
+                    />
+                  }
                 >
                   <MyCardInfos
                     style={"w-full min-w-[500px]"}

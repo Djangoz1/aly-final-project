@@ -156,6 +156,7 @@ export let moock_create_mission = {
   title: null,
   domain: null,
   image: null,
+  abstract: null,
   budget: null,
   company: null,
   features: null,
@@ -172,10 +173,15 @@ export let moock_create_mission_placeholder = {
   domain: "What's domain of mission ?",
   image: null,
   company: "Name of your company",
+  abstract: "Hi, for a new <>project name</> we're looking ...",
   budget: "Budget max (en €)",
   features: "Nombre de tâches maximum",
   banniere: null,
-  description: "Write your description of mission",
+  description: `The mission consists to <>purpose</> with <>techno</>.
+I want this features on my project : 
+<>
+  features lists
+</>`,
   reference: "Reference of mission",
   launchpad: "Is it finance from a launchpad ?",
 };
@@ -204,13 +210,13 @@ export let moock_create_feature = {
 export let moock_create_feature_placeholders = {
   title: "Recherche développeur frontend",
   domain: "What's domain of feature ?",
-  description: "Write your description ...",
+  description: moock_create_mission_placeholder.description,
   missionID: "Pour quelle mission ? ",
   specification: "Quelle technologie ?",
-  abstract: "Write your short description ...",
-  wadge: "10",
+  abstract: moock_create_mission_placeholder.abstract,
+  wadge: "1.2 ETH",
   worker: "Name of worker",
-  estimatedDays: "10",
+  estimatedDays: "10 Days",
 };
 
 // ********** --------- ********** //
@@ -285,4 +291,15 @@ export let moock_create_launchpad_placeholder = {
   title: "Title project",
   description: "Write your description project ...",
   domain: "What's domain of project",
+};
+
+export const MOOCK = {
+  mission: {
+    form: moock_create_mission,
+    placeholders: moock_create_mission_placeholder,
+  },
+  feature: {
+    form: moock_create_feature,
+    placeholders: moock_create_feature_placeholders,
+  },
 };

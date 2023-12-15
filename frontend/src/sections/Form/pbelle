@@ -1,0 +1,191 @@
+<div className="flex    flex-col-reverse ">
+  <div className="flex flex-col">
+    <div className="flex -z-1 justify-between items-center">
+      {form?.target === "mission" ? (
+        <h6 className="flex items-center justify-end">
+          Nombre de tâches :{" "}
+          <MyNum style={"ml-2"} num={aiResponse?.roles?.length || 0} />
+        </h6>
+      ) : (
+        <></>
+      )}
+      {selectedId === null ? (
+        <MyMainBtn
+          style={"-z-2 relative  ml-auto"}
+          template={2}
+          setter={() => fetchAI()}
+          icon={{ no: true }}
+        >
+          {isLoading ? (
+            <span className="loading loading-ring "></span>
+          ) : (
+            <Icon icon={icfy.ux.refresh} />
+          )}
+        </MyMainBtn>
+      ) : (
+        <></>
+      )}
+    </div>
+    {/* {aiResponse?.roles?.length > 0 ? (
+              <MyScrolledXDiv>
+                <MyFramerModal
+                  selectedId={selectedId}
+                  setSelectedId={setSelectedId}
+                  style={
+                    "on_hover my-3 min-w-[430px] flex flex-col h-[150px] p-2 mr-2 bg-white/5  "
+                  }
+                  arr={aiResponse?.roles?.map((el, index) => (
+                    <>
+                      {form?.target === "mission" ? (
+                        <button
+                          onClick={() =>
+                            doInitStateForm(dispatch, {
+                              ...form,
+                              ai: {
+                                ...form?.ai,
+                                recommandations: {
+                                  ...form?.ai?.recommandations,
+                                  roles:
+                                    form?.ai?.recommandations?.roles?.filter(
+                                      (el, i) => i !== index
+                                    ),
+                                },
+                              },
+                            })
+                          }
+                          className="btn on_hover_view btn-ghost btn-xs absolute top-1 right-1"
+                        >
+                          <Icon
+                            icon={icfy.ux.garbage}
+                            className="text-error "
+                          />
+                        </button>
+                      ) : (
+                        <></>
+                      )}
+                      <TextAI text={el?.role_name} style={" font-semibold "}>
+                        <div className="flex items-center my-3 flex-wrap grid-row-2 gap-2">
+                          {el?.skills_required?.map((el1, index1) => (
+                            <div
+                              className={`cursor-pointer badge py-[2px] relative on_hover h-fit text-[9px] badge-xs badge-${
+                                ["primary", "warning", "info", "success"]?.[
+                                  index1
+                                ]
+                              }`}
+                              key={v4()}
+                              onClick={() => {
+                                let skills = aiResponse?.roles?.[
+                                  index
+                                ]?.skills_required?.filter(
+                                  (el, i) => i !== index1
+                                );
+                                let roles = [...aiResponse?.roles];
+                                roles[index].skills_required = skills;
+                                doInitStateForm(dispatch, {
+                                  ...form,
+                                  ai: {
+                                    ...form?.ai,
+                                    recommandations: {
+                                      ...form?.ai?.recommandations,
+                                      roles,
+                                    },
+                                  },
+                                });
+                              }}
+                            >
+                              <Icon
+                                className="absolute translate-x-1/2 -translate-y-1/2 text-lg on_hover_view top-0 right-0 text-error     "
+                                icon={icfy.ux.remove}
+                              />
+                              <TextAI style={"text-xs"} text={el1}></TextAI>
+                            </div>
+                          ))}
+                        </div>
+                      </TextAI>
+                      {aiResponse?.budget?.roles_budget?.[index]
+                        ?.allocated_budget ? (
+                        <div className="flex mt-auto items-center">
+                          <Icon
+                            icon={icfy.bank.dollars}
+                            className="mr-2 text-2xl"
+                          />
+                          <TextAI
+                            text={aiResponse?.budget?.roles_budget?.[
+                              index
+                            ]?.allocated_budget
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                          ></TextAI>
+                        </div>
+                      ) : undefined}
+                    </>
+                  ))}
+                >
+                  <TextAI
+                    text={aiResponse?.roles?.[selectedId]?.role_name}
+                    style={" font-semibold "}
+                  >
+                    <div className="flex items-center my-3 flex-wrap gap-2">
+                      {aiResponse?.roles?.[selectedId]?.skills_required?.map(
+                        (el1, index1) => (
+                          <div
+                            className={`cursor-pointer badge py-[2px] relative on_hover h-fit text-[9px] badge-xs badge-${
+                              ["primary", "warning", "info", "success"]?.[
+                                index1
+                              ]
+                            }`}
+                            key={v4()}
+                            onClick={() => {
+                              let skills = aiResponse?.roles?.[
+                                selectedId
+                              ]?.skills_required?.filter(
+                                (el, i) => i !== index1
+                              );
+                              let roles = [...aiResponse?.roles];
+                              roles[selectedId].skills_required = skills;
+                              doInitStateForm(dispatch, {
+                                ...form,
+                                ai: {
+                                  ...form?.ai,
+                                  recommandations: {
+                                    ...form?.ai?.recommandations,
+                                    roles,
+                                  },
+                                },
+                              });
+                            }}
+                          >
+                            <Icon
+                              className="absolute translate-x-1/2 -translate-y-1/2 text-lg on_hover_view top-0 right-0 text-error     "
+                              icon={icfy.ux.remove}
+                            />
+                            <TextAI style={"text-xs"} text={el1}></TextAI>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </TextAI>
+                  <span className="text-xs">
+                    {aiResponse?.roles?.[selectedId]?.reason}
+                  </span>
+                  {aiResponse?.budget?.roles_budget?.[selectedId]
+                    ?.allocated_budget ? (
+                    <div className="flex mt-auto items-center">
+                      <Icon
+                        icon={icfy.bank.dollars}
+                        className="mr-2 text-2xl"
+                      />
+                      <TextAI
+                        text={aiResponse?.budget?.roles_budget?.[
+                          selectedId
+                        ]?.allocated_budget
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      ></TextAI>
+                    </div>
+                  ) : undefined}
+                </MyFramerModal>
+              </MyScrolledXDiv>
+            ) : undefined} */}
+  </div>
+</div>;

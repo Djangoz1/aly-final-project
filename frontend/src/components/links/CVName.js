@@ -8,9 +8,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { clientPocket, fetchJSONByCID } from "utils/ui-tools/pinata-tools";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
-export const CVName = ({ styles, metadata, cvID }) => {
+export const CVName = ({ styles, metadata, cvHash, cvID }) => {
   const { cv } = useAuthState();
-  if (cvID == 0) {
+  if (cvID == 0 && !cvHash) {
     return "No worker";
   }
   const [isName, setIsName] = useState(null);
@@ -18,7 +18,8 @@ export const CVName = ({ styles, metadata, cvID }) => {
   let isInView = useInView(ref);
   let state = async () => {
     try {
-      let uri = await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]);
+      let uri =
+        cvHash || (await _apiGet("tokenURIOf", [cvID, ADDRESSES["cvsHub"]]));
       let data = await clientPocket.records.getOne("accounts", uri);
       setIsName(data?.username);
       console.log("fetch cvName ...", data?.username);

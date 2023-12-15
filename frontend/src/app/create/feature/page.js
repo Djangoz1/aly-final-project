@@ -1,81 +1,59 @@
 "use client";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import { Viewport } from "components/myComponents/layout/MyViewport";
 import React from "react";
 
 import { useAuthState } from "context/auth";
 
-import { _form_create_feature } from "utils/ux-tools/form/feature";
-import { MENUS_CREATE_FEATURE } from "constants/menus";
-import { MySteps } from "components/myComponents/MySteps";
-import { CVName } from "components/links/CVName";
-import {
-  moock_create_feature,
-  moock_create_feature_placeholders,
-} from "constants/moock";
-import PocketBase from "pocketbase";
-import { createURIFeature } from "utils/ui-tools/pinata-tools";
+import { MOOCK } from "constants/moock";
+
 import { _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
 import { ethers } from "ethers";
-import { MyFormInfo } from "components/myComponents/form/MyFormInfo";
-import Link from "next/link";
-import { Icon } from "@iconify/react";
-import { icfy } from "icones";
 import { MyFormCreate } from "components/myComponents/form/MyForm";
-import {
-  FormCreateFeature1,
-  FormCreateFeature2,
-} from "sections/works/Features/form/create/FormCreateFeature";
 import { useToolsState } from "context/tools";
 import { useRouter } from "next/navigation";
 import { controllers } from "utils/controllers";
 import { stateMission } from "utils/ui-tools/state-tools";
 import { ENUMS } from "constants/enums";
+import {
+  FormInputsAI,
+  FormResponseAI,
+  formLabelAI,
+} from "sections/Form/FormResponseAI";
+import { MySelect } from "components/myComponents/form/MySelects";
+import { Icon } from "@iconify/react";
+import { MissionName } from "components/links/MissionName";
+import { MyInputFile } from "components/myComponents/form/MyInputsFile";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { MyTextArea } from "components/myComponents/form/MyTextArea";
 const PageCreateFeature = () => {
   let { datas, metadatas, cv } = useAuthState();
   let account = useAuthState();
 
   let { state } = useToolsState();
-  console.log("state", state);
 
   let router = useRouter();
-  let form = _form_create_feature;
-  form[0].title = (
-    <>
-      Salut <CVName metadata={metadatas} /> ! 👋
-    </>
-  );
 
-  let moock = moock_create_feature;
-  form[0].info =
-    datas?.missions?.length == 0 ? (
-      <span className="text-error">Please create mission first</span>
-    ) : undefined;
-
-  form[0].error = datas?.missions?.length == 0 ? true : undefined;
-  console.log("-------------------------");
+  let moock = { ...MOOCK.feature.form };
 
   let submitForm = async (form) => {
     let missionID = datas?.missions[parseInt(form?.missionID || 0n)];
     let value = await ethers.utils.parseEther(form?.wadge);
     let mission = await stateMission(missionID);
+    let aiAssisted = form?.ai?.recommandations ? true : false;
 
+    let ai = form?.ai?.recommandations;
     let _form = {
-      description: form?.aiAssisted
-        ? `${form?.ai?.recommandations?.roles?.[0]?.reason}
-      ${form?.ai?.recommandations?.detail}
-      `
+      description: aiAssisted
+        ? `${ai?.name}<br/>${ai?.abstract}<br/>${ai?.detail}`
         : form?.description,
-      title: form?.title,
+      title: ai?.roles?.[0]?.role_name || form?.title,
       image: form?.image,
-      abstract: form?.aiAssisted
-        ? form?.ai?.recommandations?.abstract
-        : form?.abstract,
+      abstract: aiAssisted ? ai?.roles?.[0]?.reason : form?.abstract,
       domain: parseInt(form?.domain),
 
-      skills: form?.aiAssisted
-        ? form?.ai?.recommandations?.roles?.[0]?.skills_required
-        : form?.skills,
+      skills: aiAssisted
+        ? JSON.stringify(ai?.roles?.[0]?.skills_required, null, 2)
+        : JSON.stringify(form?.skills, null, 2),
       missionHash: mission?.metadatas?.id, // ! Change to cvID
       missionID: missionID,
       launchpadID: mission?.datas?.launchpad,
@@ -84,7 +62,7 @@ const PageCreateFeature = () => {
       featureHash: form?.featureHash,
       specification: parseInt(form.specification),
       estimatedDays: parseInt(form.estimatedDays),
-      isInviteOnly: form.onlyInvite,
+      isInviteOnly: form.onlyInvite > 0 ? false : true,
     };
 
     console.log("----------", _form);
@@ -93,6 +71,7 @@ const PageCreateFeature = () => {
 
     console.log("state -----", test);
 
+    return test;
     //   router.push("/mission/" + missionID + "#section2");
   };
 
@@ -103,13 +82,12 @@ const PageCreateFeature = () => {
       target={"feature"}
     >
       <MyFormCreate
-        title={"Create Feature"}
-        side={<MySteps arr={MENUS_CREATE_FEATURE} />}
+        template={1}
+        submit={submitForm}
         stateInit={{
           allowed: true,
           form: {
             ...moock,
-            target: "feature",
             title: state?.form?.feature?.title || null,
             description: state?.form?.feature?.description,
             missionID: datas?.missions
@@ -119,7 +97,6 @@ const PageCreateFeature = () => {
             abstract: state?.form?.feature?.abstract,
             skills: state?.form?.skills,
           },
-          placeholders: moock_create_feature_placeholders,
           checked: [
             [],
             [],
@@ -128,14 +105,131 @@ const PageCreateFeature = () => {
             // ["missionID", "specification", "wadge", "worker", "estimatedDays"],
           ],
         }}
-        btn={"Create feature"}
-        arr={form}
-        components={[
-          {},
-          { component: <FormCreateFeature1 />, label: "Blockchain" },
-          { component: <FormCreateFeature2 />, label: "Lorem" },
-        ]}
-        submit={submitForm}
+        components={
+          datas?.missions?.length
+            ? [
+                {
+                  component: <FormInputsAI />,
+                  label: formLabelAI,
+                },
+                {
+                  component: (
+                    <MySelect
+                      style={"w-1/3 justify-center  flex-wrap mx-auto"}
+                      target={"domain"}
+                      arr={ENUMS.domain.map((el) => (
+                        <>
+                          <Icon icon={el?.icon} />
+                          {el.name}
+                        </>
+                      ))}
+                    ></MySelect>
+                  ),
+                  label: "What is the domain of your feature ?",
+                },
+                {
+                  component: (
+                    <MySelect
+                      style={"w-1/3 justify-center  flex-wrap mx-auto"}
+                      target={"specification"}
+                      arr={ENUMS.courts.map((el) => (
+                        <>
+                          <Icon icon={el?.badge} />
+                          {el.court}
+                        </>
+                      ))}
+                    ></MySelect>
+                  ),
+                  label: "What is the specific technology of your feature ?",
+                },
+                {
+                  component: (
+                    <MySelect
+                      style={"w-1/2 justify-center  flex-wrap mx-auto"}
+                      target={"missionID"}
+                      arr={datas?.missions.map((el) => (
+                        <MissionName id={el} url={false} />
+                      ))}
+                    ></MySelect>
+                  ),
+
+                  label: "For wich mission would you like to create feature ?",
+                },
+                {
+                  component: <MyInputFile target={"image"} />,
+                  label: "Do you want add an image for your feature ?",
+                },
+                {
+                  component: (
+                    <div className="w-full flex flex-col gap-2">
+                      <MyInput
+                        styles={"w-full"}
+                        target={"title"}
+                        label={false}
+                      />
+                      <MyTextArea
+                        styles={"min-h-[10vh] max-h-[20vh]  "}
+                        target={"abstract"}
+                        label={false}
+                      />
+                    </div>
+                  ),
+                  label: "Please provide a short informations for your feature",
+                },
+                {
+                  component: (
+                    <MyTextArea
+                      styles={"min-h-[25vh] max-h-fit  "}
+                      target={"description"}
+                      label={false}
+                    />
+                  ),
+                  label: "Please provide details informations for your feature",
+                },
+                {
+                  component: (
+                    <div className="flex flex-col w-full gap-1">
+                      <MyInput
+                        styles={"w-full"}
+                        label={false}
+                        target={"wadge"}
+                        type={"number"}
+                      />
+
+                      <MyInput
+                        label={false}
+                        styles={"w-full"}
+                        target={"estimatedDays"}
+                        type={"number"}
+                      />
+                    </div>
+                  ),
+                  label:
+                    "Please provide wadge and estimated days to your feature",
+                },
+                {
+                  component: (
+                    <MySelect
+                      style={"w-1/3 justify-center  flex-wrap mx-auto"}
+                      target={"onlyInvite"}
+                      arr={[
+                        "✋ Only on invitations",
+                        "👍 Open to all",
+                        "plus d'1 mission",
+                        "plus de 3 missions",
+                        "plus de 5 missions",
+                        "plus de 10 missions",
+                      ]}
+                    ></MySelect>
+                  ),
+                  label: "Do you want open candidatures for you features ? ",
+                },
+                {
+                  component: <FormResponseAI />,
+                },
+              ]
+            : [{ component: <></>, label: "Please create mission first" }]
+        }
       />
     </MyLayoutApp>
   );

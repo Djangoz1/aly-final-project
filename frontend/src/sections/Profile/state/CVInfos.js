@@ -207,7 +207,7 @@ export const CVInfos = () => {
     },
     {
       title: "Email",
-      value: <>{state?.profile?.metadatas.email}</>,
+      value: <>{state?.profile?.metadatas?.email}</>,
     },
     {
       title: "Phone",
@@ -238,15 +238,33 @@ export const CVInfos = () => {
       title: <div className="flex flex-col">Skills off chain</div>,
       value: (
         <div className="w-full gap-3 overflow-x-auto grid grid-cols-5 mt-1">
-          {state?.profile?.metadatas?.skills?.map((id, i) => (
-            <MyBadge color={i} key={v4()}>
+          {Array.isArray(state?.profile?.metadatas?.skills) ? (
+            state?.profile?.metadatas?.skills?.map((id, i) => (
+              <MyBadge color={i} key={v4()}>
+                <Icon
+                  icon={ENUMS.courts?.[id]?.badge}
+                  className="text-xs my-auto mr-3"
+                />
+                {ENUMS.courts?.[id]?.court}
+              </MyBadge>
+            ))
+          ) : state?.profile?.metadatas?.skills?.length ? (
+            <MyBadge color={parseInt(state?.profile?.metadatas?.skills)}>
               <Icon
-                icon={ENUMS.courts?.[id]?.badge}
+                icon={
+                  ENUMS.courts?.[parseInt(state?.profile?.metadatas?.skills)]
+                    ?.badge
+                }
                 className="text-xs my-auto mr-3"
               />
-              {ENUMS.courts?.[id]?.court}
+              {
+                ENUMS.courts?.[parseInt(state?.profile?.metadatas?.skills)]
+                  ?.court
+              }
             </MyBadge>
-          ))}
+          ) : (
+            <>Please provide a skills</>
+          )}
         </div>
       ),
     },

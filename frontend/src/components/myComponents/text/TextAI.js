@@ -1,7 +1,7 @@
 import { useInView, motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-export const TextAI = ({ text, style, children }) => {
+export const TextAI = ({ text, style, size, children }) => {
   const textArray = text?.length > 0 && text.split("");
   let ref = useRef(null);
   let isInView = useInView(ref);
@@ -12,8 +12,8 @@ export const TextAI = ({ text, style, children }) => {
     }
   }, [isInView]);
   return (
-    <div className={`flex flex-col ${style}`}>
-      <div className="">
+    <div className={`flex flex-col   ${style}`}>
+      <div className="h-fit leading-0">
         <AnimatePresence>
           {text ? (
             textArray?.map((char, index) => (
@@ -21,6 +21,9 @@ export const TextAI = ({ text, style, children }) => {
                 ref={index === textArray.length - 1 ? ref : undefined}
                 // className={style}
                 key={index}
+                className={` font3 ${
+                  size ? `text-[${size}px]` : "text-3xl"
+                }  font-light`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}

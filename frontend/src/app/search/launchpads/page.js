@@ -1,7 +1,5 @@
 "use client";
 
-import { _table_features } from "utils/states/tables/feature";
-
 import { icfy, icfyLOCK, icfySEARCH, icfyUNLOCK, icsystem } from "icones";
 import { useEffect, useState } from "react";
 
@@ -33,21 +31,28 @@ import { AssetFreelancer } from "components/assets/AssetProfile";
 import { AssetLaunchpad } from "components/assets/AssetLaunchpad";
 export default function PageSearch({ params }) {
   let { address } = useAccount();
-
+  let [isLoading, setIsLoading] = useState(null);
   let { metadatas } = useAuthState();
   let { state, pointer } = useToolsState();
   let dispatch = useToolsDispatch();
   let [isPointer, setIsPointer] = useState();
+  let loadState = async () =>
+    doStateTools(dispatch, {
+      lists: await controllers.get.launchpad.list({ filter: "" }),
+    });
   useEffect(() => {
-    (async () =>
-      doStateTools(dispatch, {
-        lists: await controllers.get.launchpad.list({ filter: "" }),
-      }))();
+    (async () => {
+      setIsLoading(true);
+      await loadState();
+      setIsLoading(false);
+    })();
   }, []);
   console.log(state);
   return (
     <MyLayoutDashboard
+      isLoading={isLoading}
       color={2}
+      refresh={loadState}
       target={"search"}
       owner={metadatas}
       url={"/search/launchpads"}

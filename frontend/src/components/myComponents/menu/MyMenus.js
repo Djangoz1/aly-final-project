@@ -222,7 +222,7 @@ export const MyMenusTabs = ({
                 key={v4()}
                 href={el?.url || "#section" + pointer}
                 as={el?.url || "#section" + pointer}
-                className={` relative  min-w-[70px]      overflow-hidden       text-sm    
+                className={` backdrop-blur relative  min-w-[70px]      overflow-hidden       text-sm    
             ${
               [
                 "hover:border-gray-300 hover:text-gray-600 hover:bg-black/5 rounded-t-lg items-center gap-2 px-3 inline-flex justify-center h-full text-center border-b-4 py-2 rounded-tr-lg",

@@ -1,5 +1,7 @@
 import { clientPocket } from "utils/ui-tools/pinata-tools";
 import { _apiPost } from "utils/ui-tools/web3-tools";
+import { createURI } from ".";
+import { ethers } from "ethers";
 
 export const controllersPub = {
   create: async (form) => {
@@ -13,13 +15,29 @@ export const controllersPub = {
         postID: form?.answerID,
         missionID: form?.mission?.metadatas?.id,
         launchpadID: form?.launchpadID,
-        title: form?.title,
+        title: form?.payable ? form?.title : undefined,
         tags: form?.tags,
         userID: form.owner.id,
+        preview: form?.payable ? form?.preview : undefined,
       };
 
-      let record = await clientPocket.records.create("posts", metadatas);
+      if (form?.payable && !form?.preview && !form?.file && !form?.amount) {
+        throw new Error("Missing file, amount or preview");
+      }
+      let record = await createURI("posts", metadatas);
       let hash;
+
+      if (form?.payable) {
+        hash = await createURI("payable_posts", {
+          file: form?.file,
+          postID: record,
+        });
+        await _apiPost("createPayablePub", [
+          record,
+          ethers.utils.parseEther(form?.amount)?._hex,
+          hash,
+        ]);
+      }
       //   if (!answerID) {
       //     hash = await _apiPost("createPub", [record.faispayablepubmetadatas]);
       //   }

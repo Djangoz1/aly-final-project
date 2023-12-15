@@ -4,44 +4,27 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
 import {
-  doStateProfileTools,
   doStatePubsTools,
   doStateTools,
   useToolsDispatch,
   useToolsState,
 } from "context/tools";
 
-import {
-  stateCV,
-  stateDetailsCV,
-  stateFeature,
-  stateMission,
-  statePub,
-} from "utils/ui-tools/state-tools";
-
-import { calcTimestamp, parseTimestamp, selectDevDomain } from "helpers";
+import { parseTimestamp } from "helpers";
 
 import { Icon } from "@iconify/react";
 import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
 import { getWalletClient } from "@wagmi/core";
 
-import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
-import { Viewport } from "components/myComponents/layout/MyViewport";
-
 import { _apiGet, _apiPostPayable } from "utils/ui-tools/web3-tools";
-import { ABIs, ADDRESSES } from "constants/web3";
-import { MyModal } from "components/myComponents/modal/MyModal";
+
 import { ImagePin } from "components/Image/ImagePin";
-import { CVOverview } from "sections/Profile/state/CVOverview";
+
 import { ENUMS } from "constants/enums";
 
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { v4 } from "uuid";
-import { EditWorker } from "sections/works/Features/form/edit/EditWorker";
-import { CVInfos } from "sections/Profile/state/CVInfos";
+
 import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 import { MySub } from "components/myComponents/text/MySub";
@@ -49,11 +32,12 @@ import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { MyNum } from "components/myComponents/text/MyNum";
-import { MyCard, MyCardInfos } from "components/myComponents/card/MyCard";
+import { MyCardInfos } from "components/myComponents/card/MyCard";
 import { ethers } from "ethers";
 import { useAccount } from "wagmi";
-import { pinataGateway } from "utils/ui-tools/pinata-tools";
+import { pinataGateway, urlPocket } from "utils/ui-tools/pinata-tools";
 import { FileDisplay } from "components/FileDisplay";
+import { CVName } from "components/links/CVName";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -61,7 +45,7 @@ function App({ params }) {
   const { address } = useAccount();
   const { state, status, pointer } = useToolsState();
   let [isLoading, setIsLoading] = useState(null);
-
+  let [isClicked, setIsClicked] = useState(null);
   let [isBlob, setIsBlob] = useState(null);
   let dispatch = useToolsDispatch();
   let fetchState = async () => {
@@ -78,7 +62,6 @@ function App({ params }) {
       console.log("Origin fetchState pubs");
     }
   }, [status, cv]);
-  console.log("payable", state?.pubs?.arr?.[state?.front?.index]?.payable);
   useEffect(() => {
     (async () => {
       console.log(
@@ -90,10 +73,9 @@ function App({ params }) {
           state?.pubs?.arr?.[state?.front?.index]?.payable?.metadatas?.file
         }`; // Remplacez <CID> par l'identifiant du contenu de Pinata
 
-        console.log("uri", uri);
         //   fetchJSONByCID
         // Construisez l'URL complète en ajoutant "https://gateway.pinata.cloud/ipfs/" devant l'URI
-        const url = `${pinataGateway}${uri}`;
+        const url = `${urlPocket}${uri}`;
 
         // Utilisez fetchState pour récupérer le contenu
         fetch(url)
@@ -117,7 +99,6 @@ function App({ params }) {
     })();
   }, [state?.front?.index]);
 
-  console.log("status", status);
   let setTrending = (index) => {
     let arr = state?.trending?.arr;
     if (!arr?.length > 0) {
@@ -133,65 +114,69 @@ function App({ params }) {
       trending: { arr: arr, more: state?.trending?.more },
     });
   };
-  console.log("state hub ", state);
   return (
     <MyLayoutDashboard
       isLoading={isLoading}
       noMenu={true}
       template={0}
       target={"pub"}
-    >
-      <>
-        <div className="debug w-full flex h-full relative">
-          <div className="w-1/6 border border-white/5 border-l-0 border-b-0 h-full">
-            {state?.pubs?.arr?.map((el, i) => (
-              <div
-                onClick={() =>
-                  doStateTools(dispatch, {
-                    ...state,
-                    front: { ...state?.front, index: i },
-                  })
-                }
-                className={`w-full flex flex-col  pb-3  ${
-                  state?.front?.index === i
-                    ? "opacity-100 bg-white/5"
-                    : "opacity-60 hover:opacity-80"
-                }`}
-                key={v4()}
-              >
-                <ImagePin style={`mb-2`} CID={el?.metadata?.preview} />
-                <div className="flex w-full text-xs items-center">
-                  <Avatar
-                    noCircle={true}
-                    CID={el?.metadata?.owner?.image}
-                    metadatas={el?.metadata?.owner}
-                    style={"w-8 mr-3"}
-                  />
-                  <p className="font-light text-white">
-                    {el?.metadata?.owner?.username}{" "}
-                  </p>
-                  <div className="flex flex-col ml-auto items-end">
-                    <div className="flex items-center text-xs">
-                      <MyNum num={parseInt(el?.payable?.datas?.viewers)}>
-                        <Icon className=" c2 ml-3" icon={icfy.person.friend} />
-                      </MyNum>
-                    </div>
-                    <div className="flex w-full items-center text-xs">
-                      <MyNum
-                        toFix={4}
-                        num={ethers.utils.formatEther(
-                          el?.payable?.datas?.amount || 0
-                        )}
-                      >
-                        <MySub style="ml-1">ETH</MySub>
-                        <Icon className="ml-3 c2 " icon={icfyETHER} />
-                      </MyNum>
-                    </div>
+      side={
+        <div className="w-full px-2  h-full">
+          {state?.pubs?.arr?.map((el, i) => (
+            <div
+              onClick={() =>
+                doStateTools(dispatch, {
+                  ...state,
+                  front: { ...state?.front, index: i },
+                })
+              }
+              className={`w-full flex flex-col  pb-3  ${
+                state?.front?.index === i
+                  ? "opacity-100 bg-white/5"
+                  : "opacity-60 hover:opacity-80"
+              }`}
+              key={v4()}
+            >
+              <ImagePin
+                style={`mb-2`}
+                CID={el?.metadata?.preview}
+                metadatas={el?.metadata}
+              />
+              <MySub>{el?.metadata?.title}</MySub>
+              <div className="flex w-full text-xs items-center">
+                <Avatar
+                  _cvID={el?.owner}
+                  designation={true}
+                  style={"w-8 mr-3"}
+                />
+
+                <div className="flex flex-col ml-auto items-end">
+                  <div className="flex items-center text-xs">
+                    <MyNum num={parseInt(el?.payable?.datas?.viewers)}>
+                      <Icon className=" c2 ml-3" icon={icfy.person.friend} />
+                    </MyNum>
+                  </div>
+                  <div className="flex w-full items-center text-xs">
+                    <MyNum
+                      toFix={4}
+                      num={ethers.utils.formatEther(
+                        el?.payable?.datas?.amount || 0
+                      )}
+                    >
+                      <MySub style="ml-1">ETH</MySub>
+                      <Icon className="ml-3 c2 " icon={icfyETHER} />
+                    </MyNum>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
+      }
+      url={"/community/hub"}
+    >
+      <>
+        <div className=" w-full flex h-full relative">
           <div className="w-full overflow-y-scroll mx-8 flex flex-col border bgprim border-white/0 border-t-white/5 h-full pt-5">
             <MyMenusTabs
               template={2}
@@ -209,17 +194,17 @@ function App({ params }) {
               {"Post"}
             </MyMenusTabs>
 
-            {state?.front?.list ? (
+            {state?.front?.index >= 0 ? (
               <div className="mt-5 px-2 flex flex-col w-full">
                 <div className="flex w-full">
                   <MyCardInfos
-                    style={" w-[400px]  mr-auto "}
+                    style={" w-full   "}
                     title={
                       <span className="flex items-center w-full">
                         {
                           state?.pubs?.arr?.[state?.front?.index]?.metadata
                             ?.title
-                        }{" "}
+                        }
                         <MySub
                           style={"text-neutral-700 ml-auto hover:text-white"}
                         >
@@ -230,9 +215,14 @@ function App({ params }) {
                     arr={[
                       {
                         title: "Owner",
-                        value:
-                          state?.pubs?.arr?.[state?.front?.index]?.metadata
-                            ?.owner?.username,
+                        value: (
+                          <CVName
+                            cvHash={
+                              state?.pubs?.arr?.[state?.front?.index]?.metadata
+                                ?.userID
+                            }
+                          />
+                        ),
                       },
                       {
                         title: "Buyers",
@@ -253,17 +243,15 @@ function App({ params }) {
                       },
                       {
                         title: "Posted at",
-                        value: parseTimestamp(
-                          Math.floor(
-                            state?.pubs?.arr?.[state?.front?.index]?.metadata
-                              ?.created / 1000
-                          )
-                        ),
+                        value:
+                          state?.pubs?.arr?.[state?.front?.index]?.metadata
+                            ?.created,
                       },
                     ]}
                   >
                     <div className="flex  mt-auto items-end">
                       <MyMainBtn
+                        style={"btn-xs"}
                         setter={async () => {
                           await _apiPostPayable(
                             "buyPub",
@@ -306,7 +294,6 @@ function App({ params }) {
                 {isBlob && (
                   <FileDisplay style={"w-[600px] mt-3"} blob={isBlob} />
                 )}
-                {console.log(isBlob)}
                 <MyCardInfos title={"Description"} style={"w-full  my-5"}>
                   <p className="text-xs font-light whitespace-break-spaces">
                     {

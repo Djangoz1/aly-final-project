@@ -130,7 +130,20 @@ export const STATUS = {
       bg: " border-error/40 bg-error/10 ",
     },
   ],
-
+  arbitrator: [
+    {
+      status: "On court",
+      icon: icfy.code.tool,
+      color: "success",
+      bg: " border-success/40 bg-success/10 ",
+    },
+    {
+      status: "Banned",
+      icon: icfy.code.tool,
+      color: "error",
+      bg: " border-error/40 bg-error/10 ",
+    },
+  ],
   arbitratorForDispute: [
     {
       status: "Waiting",
