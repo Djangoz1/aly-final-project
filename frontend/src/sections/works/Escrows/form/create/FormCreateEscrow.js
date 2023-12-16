@@ -31,18 +31,7 @@ export const FormCreateEscrow1 = () => {
       </div>
       <div className="flex   w-full">
         <MySub style={"w-[25%] c4"}>Work protocole</MySub>
-        <div className="flex gap-4">
-          <MySelect
-            styles={margin}
-            target="feature"
-            arr={state?.arr?.map((el) => el?.title)}
-          />
-          <MySelect
-            styles={margin}
-            target="court"
-            arr={["Centralized", "Kleros", "Decentralized"]}
-          />
-        </div>
+        <div className="flex gap-4"></div>
       </div>
       <div className="flex   w-full">
         <MySub style={"min-w-[25%] c4"}>Proofs</MySub>

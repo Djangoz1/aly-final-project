@@ -1,122 +1,103 @@
 "use client";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import React, { useEffect, useState } from "react";
-
-import { _form_create_profile } from "utils/ux-tools/form/profile";
-
-import { useAccount } from "wagmi";
-
-import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
-import { useAuthDispatch } from "context/auth";
-
-import { Icon } from "@iconify/react";
-
 import { MyFormCreate } from "components/myComponents/form/MyForm";
-
 import { useAuthState } from "context/auth";
 
-import { MySteps } from "components/myComponents/MySteps";
-import { MENUS } from "constants/menus";
-
-import { _form_create_mission } from "utils/ux-tools/form/mission";
-
-import {
-  moock_create_escrow,
-  moock_create_escrow_placeholder,
-} from "constants/moock";
-
-import { _apiGetAt } from "utils/ui-tools/web3-tools";
-import { ADDRESSES } from "constants/web3";
-
-import { CVName } from "components/links/CVName";
-
-import { _form_create_escrow } from "../../../utils/ux-tools/form/escrow";
-import { FormCreateEscrow1 } from "sections/works/Escrows/form/create/FormCreateEscrow";
 import { useToolsState } from "context/tools";
-import { stateFeature } from "utils/ui-tools/state-tools";
-import { controllers } from "utils/controllers";
+import { MySelect } from "components/myComponents/form/MySelects";
+import { FeatureName } from "components/links/FeatureName";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { MyInputFile } from "components/myComponents/form/MyInputsFile";
+import { MyTextArea } from "components/myComponents/form/MyTextArea";
 
 const PageCreateEscrow = () => {
-  let { address, isConnected } = useAccount();
-  let dispatch = useAuthDispatch();
-
-  let { metadatas, cv } = useAuthState();
+  let { metadatas, datas, cv } = useAuthState();
   let { state } = useToolsState();
-  let [isState, setIsState] = useState(null);
-  let stateInit = async () => {
-    let jobs = await _apiGet("jobsOfCV", [cv]);
 
-    let features = await _apiGet("indexerOfToken", [
-      cv,
-      ADDRESSES["featuresHub"],
-    ]);
-
-    let arr = [];
-    for (let index = 0; index < jobs?.length; index++) {
-      let id = jobs[index];
-      let feature = await stateFeature(id);
-      if (feature?.datas?.status == 0 || feature?.datas?.status == 1)
-        arr.push({
-          title: "#" + parseInt(id) + " " + feature?.metadatas.title + " - job",
-          id,
-          hash: feature.metadatas.id,
-          max: await _apiGet("lengthOfCourt", [feature?.datas?.specification]),
-        });
-    }
-    for (let index = 0; index < features?.length; index++) {
-      let id = features[index];
-
-      let feature = await stateFeature(id);
-
-      if (
-        (feature?.datas?.status == 0 || feature?.datas?.status == 1) &&
-        feature?.datas?.startedAt > 0
-      )
-        arr.push({
-          title:
-            "#" + parseInt(id) + " " + feature?.metadatas.title + " - owner",
-          id,
-          hash: feature.metadatas.id,
-
-          max: await _apiGet("lengthOfCourt", [feature?.datas?.specification]),
-        });
-    }
-
-    setIsState({ arr });
-  };
-
-  useEffect(() => {
-    if (!isState && cv > 0) {
-      stateInit();
-    }
-  }, [cv]);
-
-  let submitForm = async (form) => {
-    let hash = await controllers.create.dispute({
-      ...form,
-      feature: state.arr[form.feature],
-    });
-  };
   return (
-    <MyLayoutApp target={"escrow"} url={"/create/escrow"} initState={isState}>
+    <MyLayoutApp
+      initState={{ form: state?.form, allowed: true }}
+      target={"escrow"}
+      url={"/create/escrow"}
+    >
       <MyFormCreate
         title={"Create Escrow"}
-        submit={submitForm}
         stateInit={{
-          allowed: true,
-          form: moock_create_escrow,
-          placeholders: moock_create_escrow_placeholder,
-          checked: [[], []],
+          allowed: datas?.features?.length > 0 || datas?.proposals?.length > 0,
         }}
-        side={<MySteps arr={MENUS.escrow.create} />}
-        arr={_form_create_escrow}
         components={[
           {
-            label: "Information",
+            component: (
+              <MySelect
+                style={"max-w-[50vw] flex-wrap justify-center"}
+                target="feature"
+                arr={
+                  !datas
+                    ? []
+                    : [
+                        ...datas?.features.map((el) => (
+                          <>
+                            Owner -
+                            <FeatureName featureID={el} />
+                          </>
+                        )),
+                        ...datas?.proposals.map((el) => (
+                          <>
+                            Worker -
+                            <FeatureName featureID={el} />
+                          </>
+                        )),
+                      ]
+                }
+              />
+            ),
+            label: "For wich feature would you declare a dispute ?",
           },
           {
-            component: <FormCreateEscrow1 />,
-            label: "Blockchain",
+            component: (
+              <MySelect
+                target="court"
+                arr={["Centralized", "Kleros", "Decentralized"]}
+              />
+            ),
+            label: "Do you want to switch court for your dispute ?",
+          },
+          {
+            component: (
+              <MyInput
+                min={3}
+                styles={"w-1/3"}
+                type={"number"}
+                target={"arbitrators"}
+                label={false}
+              />
+            ),
+            label: "How many arbitrators do you want ?",
+          },
+          {
+            component: (
+              <MyInput
+                min={1}
+                styles={"w-1/3"}
+                type={"number"}
+                label={false}
+                target={"appeal"}
+              />
+            ),
+            label: "How many days do you allowed for declare an appeal ?",
+          },
+          {
+            component: (
+              <div className="flex w-full flex-col items-center gap-4">
+                <MyInputFile target={"image"} />
+                <MyTextArea
+                  styles={"w-full min-h-[30vh]"}
+                  label={false}
+                  target={"description"}
+                />
+              </div>
+            ),
+            label: "Please provide evidences for arbitrators",
           },
         ]}
       />

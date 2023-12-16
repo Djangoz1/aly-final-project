@@ -7,21 +7,7 @@ import abis from "../../abis.json";
 import { hardhat, sepolia } from "wagmi/chains";
 import { hardhat as _hardhat, sepolia as _sepolia } from "viem/chains";
 
-export const CONFIG = "TESTNET"; // "Testnet";
-export const ABI_ADDRESS_SYSTEM = {
-  LOCAL: abis.addressSystem,
-  TESTNET: testnetabis.addressSystem,
-}[CONFIG];
-export const ABI_API_G = { LOCAL: abis.apiGet, TESTNET: testnetabis.apiGet }[
-  CONFIG
-];
-export const ABI_API_P = { LOCAL: abis.apiPost, TESTNET: testnetabis.apiPost }[
-  CONFIG
-];
-export const ABI_API_P_P = {
-  LOCAL: abis.apiPostPayable,
-  TESTNET: testnetabis.apiPostPayable,
-}[CONFIG];
+export const CONFIG = "TESTNET"; // "TESTNET" || "LOCAL";
 
 export const configs = {
   LOCAL: {
@@ -39,7 +25,3 @@ export const configs = {
     viemChain: _sepolia,
   },
 };
-// module.exports = {
-//   configs,
-//   CONFIG,
-// };

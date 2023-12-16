@@ -47,8 +47,151 @@ export const createURI = async (table, metadatas) => {
 };
 export const controllers = {
   create: {
+    profile: async ({
+      username,
+      banniere,
+      email,
+      cvImg,
+      firstName,
+      image,
+      lastName,
+      description,
+      visibility,
+      phone,
+      dateOfBirth,
+      citizen,
+      linkedin,
+      github,
+      twitter,
+      facebook,
+      domain,
+      skills,
+      languages,
+    }) => {
+      let metadatas = {
+        username: username,
+        description,
+        visibility: visibility === 1,
+
+        banniere,
+        email,
+
+        cvImg,
+        identity: JSON.stringify(
+          {
+            firstName,
+            lastName,
+            phone,
+            dateOfBirth,
+            citizen,
+          },
+          null,
+          2
+        ),
+        social: JSON.stringify(
+          {
+            linkedin,
+            github,
+            twitter,
+            facebook,
+          },
+          null,
+          2
+        ),
+        avatar: image,
+        languages: JSON.stringify(languages, null, 2),
+        skills: JSON.stringify(skills, null, 2),
+        domain: domain,
+      };
+
+      const record = await createURI("accounts", metadatas);
+
+      await _apiPost("createCV", [record]);
+      let cvID = await _apiGet("tokensLength", [ADDRESSES.cvsHub]);
+      return { id: cvID, cvHash: record, url: "/profile" + cvID };
+    },
+    launchpad: async ({
+      title,
+      saleStart,
+      saleEnd,
+      maxCap,
+      minCap,
+      maxInvest,
+      minInvest,
+      description,
+      domain,
+      bio,
+      facebook,
+      linkedin,
+      twitter,
+      github,
+      image,
+      banniere,
+      website,
+      company,
+    }) => {
+      let metadatas = {
+        title,
+        description,
+        domain,
+        bio,
+        image,
+        banniere,
+        website,
+        social: JSON.stringify(
+          {
+            facebook,
+            github,
+            linkedin,
+            twitter,
+          },
+          null,
+          2
+        ),
+        company,
+      };
+      console.log(metadatas);
+
+      const record = await createURI("launchpads", metadatas);
+      let price = await _apiGetAt({
+        targetContract: "balancesHub",
+        func: "launchpadPrice",
+      });
+      let tokenURI = record;
+
+      let launchpadData = {
+        id: 0,
+        minCap: ethers.utils.parseEther(minCap)._hex,
+        maxCap: ethers.utils.parseEther(maxCap)._hex,
+
+        minInvest: ethers.utils.parseEther(minInvest)._hex,
+        maxInvest: ethers.utils.parseEther(maxInvest)._hex,
+
+        saleStart: new Date(saleStart).getTime(),
+        saleEnd: new Date(saleEnd).getTime(),
+
+        amountRaised: 0n,
+        totalUser: 0n,
+      };
+
+      await _apiPostPayable(
+        "createLaunchpad",
+        [launchpadData, tokenURI],
+        `${price}`
+      );
+
+      let launchpadID = await _apiGet("tokensLengthOf", [
+        ADDRESSES["launchpadHub"],
+      ]);
+
+      return {
+        id: launchpadID,
+        hash: tokenURI,
+        url: "/launchpad/" + launchpadID,
+      };
+    },
     pub: (form) => controllersPub.create(form),
-    dispute: (form) => controllersDispute.create(form),
+    escrow: (form) => controllersDispute.create(form),
     feature: async ({
       title,
       value,

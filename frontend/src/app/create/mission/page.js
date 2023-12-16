@@ -3,23 +3,11 @@ import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 import React, { useEffect, useState } from "react";
 
 import { useAccount } from "wagmi";
-
-import { _apiGet, _apiPost, _apiPostPayable } from "utils/ui-tools/web3-tools";
-
 import { Icon } from "@iconify/react";
-
 import { MyFormCreate } from "components/myComponents/form/MyForm";
-
 import { useAuthState } from "context/auth";
-
-import {
-  MOOCK,
-  moock_create_mission,
-  moock_create_mission_placeholder,
-} from "constants/moock";
-
+import { MOOCK } from "constants/moock";
 import { _apiGetAt } from "utils/ui-tools/web3-tools";
-
 import { ethers } from "ethers";
 
 import {
@@ -37,21 +25,11 @@ import { MyInput } from "components/myComponents/form/MyInput";
 import { MissionName } from "components/links/MissionName";
 import { LaunchpadName } from "components/links/LaunchpadName";
 
-const PageCreateProfile = () => {
+const PageCreateMission = () => {
   let { address, isConnected } = useAccount();
-  let dispatch = useToolsDispatch();
-  let { state, pointer } = useToolsState();
+
   let [price, setPrice] = useState(null); // ! balancesHub.missionPrice()
   let { metadatas, cv, datas } = useAuthState();
-
-  let submitForm = async (form) => {
-    let aiAssist = form?.aiAssisted;
-
-    return await controllers.create.mission(...form, {
-      launchpads: datas?.launchpads,
-      missions: datas?.missions,
-    });
-  };
 
   useEffect(() => {
     (async () => {
@@ -72,7 +50,7 @@ const PageCreateProfile = () => {
     <MyLayoutApp
       target={"mission"}
       url={"/create/mission"}
-      initState={{ allowed: true }}
+      initState={{ allowed: cv }}
     >
       <MyFormCreate
         template={1}
@@ -193,7 +171,6 @@ const PageCreateProfile = () => {
             ),
             label: "Do you want use launchpad budget to create your mission ?",
           },
-
           {
             component: <FormResponseAI />,
           },
@@ -203,4 +180,4 @@ const PageCreateProfile = () => {
   );
 };
 
-export default PageCreateProfile;
+export default PageCreateMission;

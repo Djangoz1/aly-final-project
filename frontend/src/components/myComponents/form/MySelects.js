@@ -49,6 +49,7 @@ export const MySelect = ({
   template,
   target,
   label,
+  _withError,
   setter,
   styles,
 }) => {
@@ -68,16 +69,47 @@ export const MySelect = ({
       }
     }
   };
+
   return [
     <div className={`flex items-center gap-2 ${style || "flex-wrap"}`}>
-      {arr?.map((el, i) => (
+      {(() =>
+        Array.isArray(form?.[target])
+          ? [
+              ...arr,
+              ...form?.[target]?.filter((el, _i) => typeof el === "string"),
+            ]
+          : arr)()?.map((el, i) => (
         <MyMainBtn
           _refresh={false}
           style={"font-light  backdrop-blur  btn-sm px-3 py-2 "}
-          color={form?.[target] == i ? 0 : 2}
+          color={
+            Array.isArray(form?.[target])
+              ? form?.[target]?.includes(i) || form?.[target]?.includes(el)
+                ? 0
+                : 2
+              : arr?.length === 2 && _withError !== false
+              ? form?.[target] == i
+                ? i === 0
+                  ? 3
+                  : 4
+                : 2
+              : form?.[target] == i
+              ? 0
+              : 2
+          }
           icon={false}
           key={v4()}
-          setter={() => handleChange(form?.[target] == i ? null : i)}
+          setter={() =>
+            handleChange(
+              Array.isArray(form?.[target])
+                ? form?.[target]?.includes(i) || form?.[target]?.includes(el)
+                  ? form?.[target]?.filter((_el) => _el !== i && _el !== el)
+                  : [...form?.[target], i]
+                : form?.[target] == i
+                ? null
+                : i
+            )
+          }
         >
           {el}
         </MyMainBtn>

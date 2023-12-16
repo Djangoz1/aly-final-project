@@ -1,16 +1,7 @@
-import abi_addr_s from "../../../backend/artifacts/contracts/system/AddressSystem.sol/AddressSystem.json";
-import abi_api_g from "../../../backend/artifacts/contracts/system/APIGet.sol/APIGet.json";
-import abi_cvh from "../../../backend/artifacts/contracts/cv/CVsHub.sol/CVsHub.json";
-import abi_api_p from "../../../backend/artifacts/contracts/system/APIPost.sol/APIPost.json";
-import abi_api_p_p from "../../../backend/artifacts/contracts/system/APIPostPayable.sol/APIPostPayable.json";
-import abi_bh from "../../../backend/artifacts/contracts/system/BalancesHub.sol/BalancesHub.json";
-import abi_l from "../../../backend/artifacts/contracts/launchpads/Launchpad.sol/Launchpad.json";
-// import abi_erc20 from "../../../backend/artifacts/contracts/ERC20/ERC20Token.sol/ERC20Token.json";
-import abi_erc20 from "../../../backend/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json";
-export const ABI_ADDRESS_SYSTEM = abi_addr_s.abi;
-export const ABI_API_G = abi_api_g.abi;
-export const ABI_API_P = abi_api_p.abi;
-export const ABI_API_P_P = abi_api_p_p.abi;
+export const ABI_ADDRESS_SYSTEM = configs[CONFIG].abis.addressSystem;
+export const ABI_API_G = configs[CONFIG].abis.apiGet;
+export const ABI_API_P = configs[CONFIG].abis.apiPost;
+export const ABI_API_P_P = configs[CONFIG].abis.apiPostPayable;
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 

@@ -83,7 +83,6 @@ const PageCreateFeature = () => {
     >
       <MyFormCreate
         template={1}
-        submit={submitForm}
         stateInit={{
           allowed: true,
           form: {

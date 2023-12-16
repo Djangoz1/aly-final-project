@@ -32,13 +32,7 @@ import { MySelect } from "components/myComponents/form/MySelects";
 
 export const FormResponseAI = () => {
   const { form, target } = useFormState();
-  const { datas } = useAuthState();
-  console.log(form);
-  let dispatch = useFormDispatch();
-  const { pointer } = useFormState();
-  let aiResponse = form?.ai?.recommandations;
-  let [isLoading, setIsLoading] = useState(null);
-  if (form?.ai === 0) {
+  if (form?.aiAssisted !== 1) {
     return (
       <TextAI
         text={"You don't want' help from Aly 😡"}
@@ -46,6 +40,12 @@ export const FormResponseAI = () => {
       ></TextAI>
     );
   }
+  const { datas } = useAuthState();
+  console.log(form);
+  let dispatch = useFormDispatch();
+  const { pointer } = useFormState();
+  let aiResponse = form?.ai?.recommandations;
+  let [isLoading, setIsLoading] = useState(null);
   let iaInstructions = async () => {
     const parts = [];
     if (form.target === "feature") {
@@ -143,7 +143,7 @@ export const FormResponseAI = () => {
   };
 
   useEffect(() => {
-    if (!aiResponse && form?.ai === 1) {
+    if (!aiResponse && form?.aiAssisted === 1) {
       fetchAI();
       console.log("fetch ai response");
     }
@@ -260,7 +260,7 @@ export const FormInputsAI = () => {
   return (
     <div className="flex  ">
       <MySelect
-        target={"ai"}
+        target={"aiAssisted"}
         arr={["✋ I want to create by my hand", "🤖 I want to use Aly "]}
       ></MySelect>
     </div>

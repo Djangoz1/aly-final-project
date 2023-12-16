@@ -4,6 +4,13 @@
 
 import { ethers } from "ethers";
 
+export let moock_social_placeholders = {
+  linkedin: "URL de ...",
+  facebook: "URL de ...",
+  twitter: "URL de ...",
+  github: "URL de ...",
+};
+
 export let moock_create_post = {
   target: "Post",
   description: null,
@@ -20,7 +27,7 @@ export let moock_create_post = {
 
 export let moock_create_profile = {
   id: null,
-  target: "create profile",
+
   address: null,
   username: null,
   description: null, // bio
@@ -51,10 +58,7 @@ export let moock_create_profile_placeholder = {
   lastName: "Doe",
   phone: "07.83.91.30.31",
   email: "jg.djangone@gmail.com",
-  linkedin: "URL de ...",
-  facebook: "URL de ...",
-  twitter: "URL de ...",
-  github: "URL de ...",
+  ...moock_social_placeholders,
 };
 
 export let moock_create_profile_checked = [
@@ -184,6 +188,7 @@ I want this features on my project :
 </>`,
   reference: "Reference of mission",
   launchpad: "Is it finance from a launchpad ?",
+  ...moock_social_placeholders,
 };
 
 // ************ ------- ************ //
@@ -224,8 +229,6 @@ export let moock_create_feature_placeholders = {
 // ********** --------- ********** //
 
 export let moock_create_launchpad = {
-  target: "Launchpad",
-
   maxCap: null, // bio
   minCap: null, // uri
   minInvest: null,
@@ -282,15 +285,10 @@ export let moock_create_launchpad_placeholder = {
   maxInvest: "15 ETH", // uri
   saleStart: "Date de début",
   saleEnd: "Date de fin",
-
-  linkedin: "URL linkedin",
-  facebook: "URL facebook",
-
-  twitter: "URL twitter",
-  github: "URL Github",
   title: "Title project",
   description: "Write your description project ...",
   domain: "What's domain of project",
+  ...moock_social_placeholders,
 };
 
 export const MOOCK = {
@@ -298,8 +296,23 @@ export const MOOCK = {
     form: moock_create_mission,
     placeholders: moock_create_mission_placeholder,
   },
+  profile: {
+    form: moock_create_profile,
+    placeholders: moock_create_profile_placeholder,
+    checked: moock_create_profile_checked,
+  },
   feature: {
     form: moock_create_feature,
     placeholders: moock_create_feature_placeholders,
+  },
+  launchpad: {
+    form: moock_create_launchpad,
+    placeholders: moock_create_launchpad_placeholder,
+    checked: moock_create_launchpad_checked,
+    superChecked: moock_create_launchpad_superchecked,
+  },
+  escrow: {
+    form: moock_create_escrow,
+    placeholders: moock_create_escrow_placeholder,
   },
 };

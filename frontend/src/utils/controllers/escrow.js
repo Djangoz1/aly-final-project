@@ -1,32 +1,48 @@
 import { clientPocket } from "utils/ui-tools/pinata-tools";
-import { stateDispute } from "utils/ui-tools/state-tools";
+import { stateDispute, stateFeature } from "utils/ui-tools/state-tools";
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { createURI } from ".";
 
 export const controllersDispute = {
-  create: async (form) => {
-    let id = parseInt(form.feature.id);
+  create: async ({
+    feature,
+    appeal,
+    arbitrators,
+    description,
+    image,
+    datas,
+  }) => {
+    if (!datas) {
+      throw new Error("create dispute: Missing argument");
+    }
+    let featureID = [...datas.features, ...datas.proposals][feature];
+    let _feature = await stateFeature(featureID);
     let metadatas = {
-      description: form.description,
-      image: form?.image,
-      featureID: form.feature.hash,
+      description: description,
+      image: image,
+      featureID: _feature.metadatas.id,
     };
 
-    if (form?.appeal > 0 && form?.arbitrators >= 3) {
+    if (appeal > 0 && arbitrators >= 3) {
       const record = await createURI("escrows", metadatas);
       let uri = record?.id;
 
       let hash = await _apiPost("contestFeature", [
-        id,
-        parseInt(form?.appeal),
-        parseInt(form?.arbitrators),
+        featureID,
+        parseInt(appeal),
+        parseInt(arbitrators),
         uri,
       ]);
 
       let disputeID = await _apiGet("disputeOfFeature", [id]);
+      await _apiPost("initDispute", [disputeID]);
 
-      hash = await _apiPost("initDispute", [disputeID]);
-      return hash;
+      return {
+        hash,
+        id,
+        url: "/mission/" + _feature.datas.missionID,
+        label: _feature.metadatas.title,
+      };
     } else {
       throw new Error("Missing escrow values");
     }

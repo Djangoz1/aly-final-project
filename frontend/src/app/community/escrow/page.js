@@ -4,20 +4,17 @@ import React, { useEffect, useState } from "react";
 
 import { styles } from "styles/style";
 
-import { ADDRESSES } from "constants/web3";
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { useAuthState } from "context/auth";
 
 import { Hg1 } from "components/text/HeroGradient";
-import { MyCardInfo } from "components/myComponents/card/MyCardInfo";
+
 import { icfy } from "icones";
 
-import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import { Viewport } from "components/myComponents/layout/MyViewport";
 import { MyCardIc } from "components/myComponents/card/MyCardIc";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { doPointerTools, useToolsDispatch, useToolsState } from "context/tools";
+import { useToolsDispatch, useToolsState } from "context/tools";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 
 const EscrowPage = () => {
@@ -32,6 +29,7 @@ const EscrowPage = () => {
     <>
       <MyLayoutDashboard
         template={2}
+        url={"/community/escrow"}
         target={"escrowIntro"}
         noMenu={true}
         menus={[{ title: "hero" }, { title: "intro" }]}

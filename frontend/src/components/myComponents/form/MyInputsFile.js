@@ -100,7 +100,7 @@ export const MyInputFile = ({
                       {form?.[target]?.name ? (
                         <>📸 Image</>
                       ) : (
-                        <>Upload a {target || label || "File"}</>
+                        <>Upload a {label || target || "File"}</>
                       )}
                     </span>
                   </label>

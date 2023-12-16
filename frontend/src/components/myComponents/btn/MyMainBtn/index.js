@@ -53,6 +53,8 @@ export const MyMainBtn = ({
               "bg-white text-black  hover:bg-white/90 ",
               "btn-ghost",
               "bg-white/5 hover:bg-black backdrop-blur  text-white",
+              "btn-error font-bold text-white",
+              "btn-success font-bold ",
             ]?.[color || 0]
           }`,
           `font-semibold ${

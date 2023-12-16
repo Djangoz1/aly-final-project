@@ -10,10 +10,8 @@ import {
   useToolsState,
 } from "context/tools";
 
-import { parseTimestamp } from "helpers";
-
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
+import { icfy, icfyETHER } from "icones";
 import { getWalletClient } from "@wagmi/core";
 
 import { _apiGet, _apiPostPayable } from "utils/ui-tools/web3-tools";
@@ -35,7 +33,7 @@ import { MyNum } from "components/myComponents/text/MyNum";
 import { MyCardInfos } from "components/myComponents/card/MyCard";
 import { ethers } from "ethers";
 import { useAccount } from "wagmi";
-import { pinataGateway, urlPocket } from "utils/ui-tools/pinata-tools";
+import { urlPocket } from "utils/ui-tools/pinata-tools";
 import { FileDisplay } from "components/FileDisplay";
 import { CVName } from "components/links/CVName";
 

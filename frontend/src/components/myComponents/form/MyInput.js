@@ -14,9 +14,11 @@ import { clientPocket } from "utils/ui-tools/pinata-tools";
 export let MyInput = ({
   target,
   min,
+
   max,
   index,
   label,
+  _placeholder,
   children,
   step,
   type,
@@ -25,6 +27,7 @@ export let MyInput = ({
   styles,
   metadatas,
   result,
+  color,
 }) => {
   let [isLoading, setIsLoading] = useState(false);
   let { form, placeholders, superChecked, checked, pointer, disabled } =
@@ -43,12 +46,15 @@ export let MyInput = ({
             { [target]: form?.[target] }
           );
         } else {
-          await setter(form?.[target]);
+          await setter(form?.[target], form, (form) => {
+            console.log("load", form);
+            doInitStateForm(dispatch, { ...form, [target]: null });
+          });
         }
 
         // await setter(form?.[target], target);
         setIsLoading(false);
-        handleChange(null);
+        // handleChange(null);
         if (refresh) {
           refresh();
         }
@@ -118,8 +124,11 @@ export let MyInput = ({
         </label>
       )}
       <div
-        className={` border border-white/5 backdrop-blur  w-full  py-1  flex items-center h-fit rounded-lg  ${
-          !isFocus ? "" : "bg-white/5"
+        className={` border  border-white/5 backdrop-blur  w-full  py-1  flex items-center h-fit rounded-lg  ${
+          [
+            !isFocus ? "" : "bg-white/5",
+            ` ${!isFocus ? "bg-white/80" : "bg3"}`,
+          ]?.[color || 0]
         }`}
       >
         {icon && !metadatas && !setter ? (
@@ -129,7 +138,7 @@ export let MyInput = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           type={type ? type : "text"}
-          placeholder={placeholders?.[target]}
+          placeholder={_placeholder || placeholders?.[target]}
           onChange={(e) => handleChange(e.target.value)}
           min={min || null}
           max={max || null}
@@ -141,14 +150,19 @@ export let MyInput = ({
               ? form?.[target]
               : ""
           }
-          className={` c3 w-full ${
-            isFocus && "border-none"
-          }   appearance-none bg-white/0  input-xs input font-light  py-1 h-fit `}
+          className={` w-full ${isFocus && "border-none"} font3
+          ${
+            ["c3 font-medium", "c1 font-black placeholder:text-black  "]?.[
+              color || 0
+            ]
+          } appearance-none bg-white/0  input-xs input placeholder:font-light   py-1 h-fit `}
         />
         {metadatas || setter ? (
           <div
             onClick={handlePost}
-            className="btn btn-ghost btn-xs px-2 py-0 c2    w-fit h-fit"
+            className={`btn btn-ghost btn-xs px-2 py-0 w-fit h-fit ${
+              ["c2", "c1"]?.[color || 0]
+            }`}
           >
             {isLoading ? (
               <span className="loading  loading-bars  loading-xs "></span>

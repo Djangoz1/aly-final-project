@@ -3,17 +3,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useAuthState } from "context/auth";
-import {
-  doStateProfileTools,
-  useToolsDispatch,
-  useToolsState,
-} from "context/tools";
+import { useToolsDispatch, useToolsState } from "context/tools";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
-
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
+import { icfy } from "icones";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
@@ -21,13 +14,10 @@ import { ADDRESSES } from "constants/web3";
 import { ENUMS } from "constants/enums";
 import { v4 } from "uuid";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
-import { STATUS } from "constants/status";
 import { MySub } from "components/myComponents/text/MySub";
 import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
-import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MyCardStat } from "components/myComponents/card/MyCardStat";
 import { MyTitle } from "components/myComponents/text/MyTitle";
-import { MyCountdown } from "components/myComponents/MyCountdown";
 import { MyNum } from "components/myComponents/text/MyNum";
 
 function App({ params }) {
@@ -69,7 +59,6 @@ function App({ params }) {
       });
     }
 
-    // let _state = await doStateProfileTools({ dispatch, cvID });
     setIsState({ courts, datas });
     setIsLoading(false);
   };
@@ -82,6 +71,7 @@ function App({ params }) {
 
   return (
     <MyLayoutDashboard
+      url={"/community/escrow/lists"}
       initState={isState}
       isLoading={isLoading}
       template={0}
@@ -90,7 +80,6 @@ function App({ params }) {
       //   info: <>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</>,
       // }}
 
-      refresh={() => doStateProfileTools({ dispatch, cvID })}
       owner={metadatas}
       price={state?.profile?.datas?.amount}
       allowed={cv == cvID}

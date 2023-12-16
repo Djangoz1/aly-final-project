@@ -1,123 +1,16 @@
 "use client";
 import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
-import React, { useEffect, useState } from "react";
-
-import { _form_create_profile } from "utils/ux-tools/form/profile";
-
-import { useAccount } from "wagmi";
-
-import {
-  moock_create_launchpad,
-  moock_create_launchpad_checked,
-  moock_create_launchpad_placeholder,
-  moock_create_launchpad_superchecked,
-} from "constants/moock";
-
-import {
-  _apiGet,
-  _apiGetAt,
-  _apiPost,
-  _apiPostAt,
-  _apiPostPayable,
-} from "utils/ui-tools/web3-tools";
-import { useAuthDispatch, useAuthState } from "context/auth";
-import { clientPocket, createURILaunchpad } from "utils/ui-tools/pinata-tools";
-
-import {
-  MENU_LAUNCHPAD,
-  _form_create_launchpad,
-} from "utils/ux-tools/form/launchpad";
-
-import { ethers } from "ethers";
-import { Icon } from "@iconify/react";
-import { icfy, icfyROCKET } from "icones";
-import { styles, themes } from "styles/style";
-import { ADDRESSES } from "constants/web3";
+import { useAuthState } from "context/auth";
 import { MyFormCreate } from "components/myComponents/form/MyForm";
-import {
-  FormCreateLaunchpad1,
-  FormCreateLaunchpad2,
-  FormCreateLaunchpad3,
-} from "sections/Launchpad/form/FormCreateLaunchpad";
-import { createURI } from "utils/controllers";
+import { MySelect } from "components/myComponents/form/MySelects";
+import { ENUMS } from "constants/enums";
+import { MyInput } from "components/myComponents/form/MyInput";
+import { MyInputsFile } from "components/myComponents/form/MyInputsFile";
+import { FormSocial, labelFormSocial } from "components/myComponents/form";
+import { MyTextArea } from "components/myComponents/form/MyTextArea";
 
 const PageCreateLaunchpad = () => {
-  let { address, isConnected } = useAccount();
   let { cv, metadatas } = useAuthState();
-
-  let dispatch = useAuthDispatch();
-  let [isPrice, setIsPrice] = useState(null);
-  let submitForm = async (form) => {
-    if (isConnected) {
-      let metadatas = {
-        title: form?.title,
-        description: form?.description,
-        domain: form?.domain,
-        bio: form?.bio,
-        image: form?.image,
-        banniere: form?.banniere,
-        website: form?.website,
-        // social: {
-        //   facebook: form?.facebook,
-        //   github: form?.github,
-        //   linkedin: form?.linkedin,
-        //   twitter: form?.twitter,
-        // },
-      };
-      console.log(metadatas);
-
-      const record = await createURI("launchpads", metadatas);
-      let price = ethers?.utils?.parseEther(isPrice);
-      let tokenURI = record;
-      let saleStart = new Date(form.saleStart).getTime();
-      let saleEnd = new Date(form.saleEnd).getTime();
-
-      let maxCap = ethers.utils.parseEther(form.maxCap);
-      let minCap = ethers.utils.parseEther(form.minCap);
-      let minInvest = ethers.utils.parseEther(form.minInvest);
-      let maxInvest = ethers.utils.parseEther(form.maxInvest);
-      let launchpadData = {
-        id: 0,
-        minCap: BigInt(minCap._hex),
-        maxCap: BigInt(maxCap._hex),
-        minInvest: BigInt(minInvest._hex),
-        maxInvest: BigInt(maxInvest._hex),
-        saleStart: BigInt(saleStart),
-        saleEnd: BigInt(saleEnd),
-        amountRaised: 0n,
-        totalUser: 0n,
-      };
-
-      await _apiPostPayable(
-        "createLaunchpad",
-        [launchpadData, tokenURI],
-        `${price._hex}`
-      );
-
-      let launchpadID = await _apiGet("tokensLengthOf", [
-        ADDRESSES["launchpadHub"],
-      ]);
-
-      return;
-    }
-  };
-
-  useEffect(() => {
-    if (!isPrice) {
-      (async () => {
-        setIsPrice(
-          ethers.utils.formatEther(
-            await _apiGetAt({
-              func: "launchpadPrice",
-              targetContract: "balancesHub",
-            })
-          )
-        );
-      })();
-    }
-  }, []);
-
-  _form_create_launchpad[0].title = `Hello ${metadatas?.username} ! 👋`;
 
   return (
     <MyLayoutApp
@@ -126,28 +19,136 @@ const PageCreateLaunchpad = () => {
       initState={{ allowed: true }}
     >
       <MyFormCreate
-        title={"Create Launchpad"}
+        template={1}
         stateInit={{
-          allowed: isPrice ? true : false,
-          form: { ...moock_create_launchpad, price: isPrice },
-          placeholders: moock_create_launchpad_placeholder,
-          checked: moock_create_launchpad_checked,
-          superChecked: moock_create_launchpad_superchecked,
+          allowed: cv > 0,
         }}
-        submit={submitForm}
-        arr={_form_create_launchpad}
         components={[
-          { component: <></>, label: "Introduction" },
+          {
+            component: (
+              <>
+                <MySelect
+                  style={"w-[30vw] flex-wrap justify-center "}
+                  label={false}
+                  arr={ENUMS.domain.map((el) => el.name)}
+                  target="domain"
+                />
+                <MyInput
+                  label={false}
+                  _placeholder={"Add domain"}
+                  target={"add"}
+                  setter={(el, form, dispatch) => {
+                    dispatch({ ...form, domain: [...form?.domain, el] });
+                  }}
+                  color={1}
+                  styles={"bottom-0 absolute w-1/2 left-1/2 -translate-x-1/2"}
+                />
+              </>
+            ),
+            label: "Your launchpad concern wich domain ?",
+          },
+          {
+            component: (
+              <MyInputsFile
+                inputs={[{ target: "image" }, { target: "banniere" }]}
+              />
+            ),
+            label: "Please add images to feed your wall",
+          },
+          {
+            component: (
+              <div className={"flex gap-5 w-full flex-col"}>
+                <MyInput styles={"w-full"} target={"title"} />
+                <MyInput styles={"w-full"} target={"company"} />
+                <MyInput styles={"w-full"} target={"website"} />
+              </div>
+            ),
+            label: "Please provide informations about your launchpad",
+          },
+          {
+            component: <FormSocial />,
+            label: labelFormSocial,
+          },
+          {
+            component: (
+              <MyTextArea
+                label={false}
+                target={"bio"}
+                styles={"min-h-[10vh] w-2/3 mx-auto"}
+              />
+            ),
+            label: "Please provide a short description about your launchpad",
+          },
 
-          { component: <FormCreateLaunchpad1 />, label: "Informations" },
-          { component: <FormCreateLaunchpad3 />, label: "Protocole" },
+          {
+            component: (
+              <MyTextArea
+                label={false}
+                target={"description"}
+                styles={"min-h-[30vh] w-full mx-auto"}
+              />
+            ),
+            label: "Please provide description of your project",
+          },
+          {
+            component: (
+              <div className="flex gap-5 w-full">
+                <MyInput
+                  label={"Min invest"}
+                  type={"number"}
+                  styles={"w-full"}
+                  target={"minInvest"}
+                />
+                <MyInput
+                  styles={"w-full"}
+                  label={"Max invest"}
+                  target={"maxInvest"}
+                  type={"number"}
+                />
+              </div>
+            ),
+            label: "Please provides a fork's invest for one user (address)",
+          },
+          {
+            component: (
+              <div className="flex gap-5 w-full">
+                <MyInput
+                  styles={"w-full"}
+                  target={"saleStart"}
+                  label={"Date de début"}
+                  type={"date"}
+                />
+                <MyInput
+                  styles={"w-full"}
+                  target={"saleEnd"}
+                  label={"Date de fin"}
+                  type={"date"}
+                />
+              </div>
+            ),
+            label: "Please provide a window invest for your launchpad",
+          },
+          {
+            component: (
+              <div className="flex gap-5 w-full">
+                <MyInput
+                  styles={"w-full"}
+                  target={"minCap"}
+                  label={"Min cap"}
+                  type={"number"}
+                />
+
+                <MyInput
+                  styles={"w-full"}
+                  target={"maxCap"}
+                  label={"Max cap"}
+                  type={"number"}
+                />
+              </div>
+            ),
+            label: "Please provide a capitalization's fork for your launchpad",
+          },
         ]}
-        btn={
-          <>
-            <Icon icon={icfyROCKET} className={""} />
-            Create launchpad
-          </>
-        }
       />
     </MyLayoutApp>
   );
