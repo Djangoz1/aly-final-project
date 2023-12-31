@@ -1,3 +1,4 @@
+"use client";
 import { v4 as uuidv4, v4 } from "uuid";
 import { Logo } from "components/Logo";
 import "./style.css";
@@ -7,208 +8,301 @@ import { useAccount } from "wagmi";
 import { useAuthState } from "context/auth";
 import { BtnAuth } from "components/btn/BtnAuth";
 import { Icon } from "@iconify/react";
-import {
-  icfy,
-  icfyARROWD,
-  icfyCV,
-  icfyHAMBURGER,
-  icfyHOME,
-  icfyINFO,
-  icfyMAIL,
-  icfyMISSION,
-  icfyROCKET,
-  icfySEARCH,
-  icfySETTINGS,
-} from "icones";
-import { MyOverlay } from "components/myComponents/MyOverlay";
-import { useAnimation, motion, AnimatePresence } from "framer-motion";
+import { icfy, icfySEARCH, icfySETTINGS, icsystem } from "icones";
+
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { MyProgress } from "components/myComponents/layout/MyProgress";
 import { useToolsState } from "context/tools";
 
+import { Fragment } from "react";
+import { Popover, Transition } from "@headlessui/react";
+
+import { Avatar } from "components/profile/ProfileAvatar";
+
+export const Element = ({ object }) => {
+  let { url } = useToolsState();
+  return (
+    <Popover className="relative">
+      <Popover.Button
+        className={`uppercase  border-b px-3   pb-1  text-xs font-light ${
+          url?.includes(object?.title)
+            ? " c3   border-white/30 "
+            : "c4 border-transparent hover:border-white/30 hover:text-white"
+        }`}
+      >
+        <span>{object?.title}</span>
+      </Popover.Button>
+
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 translate-y-1"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 translate-y-1"
+      >
+        <Popover.Panel className="absolute left-1/2 z-10 mt-5 flex w-screen max-w-max -translate-x-1/2 px-4">
+          <div className="w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+            <div className="p-4">
+              {object?.arr?.map((item) => (
+                <div
+                  key={item.name}
+                  className="group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50"
+                >
+                  <div className="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                    <Icon
+                      className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
+                      aria-hidden="true"
+                      icon={item?.icon || icfy.ux.admin}
+                    />
+                  </div>
+                  <div>
+                    <a href={item.href} className="font-semibold text-gray-900">
+                      {item.name}
+                      <span className="absolute inset-0" />
+                    </a>
+                    <p className="mt-1 text-gray-600">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
+              {object?.actions?.map((item) => (
+                <Link
+                  key={v4()}
+                  href={item.href}
+                  className="flex items-center justify-center gap-x-2.5 p-3 font-semibold text-gray-900 hover:bg-gray-100"
+                >
+                  <Icon
+                    className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
+                    aria-hidden="true"
+                    icon={item?.icon || icfy.ux.admin}
+                  />
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Popover.Panel>
+      </Transition>
+    </Popover>
+  );
+};
+
 export const Header = ({ children, style }) => {
-  const { cv } = useAuthState();
+  const { cv, metadatas } = useAuthState();
   let [isClicked, setIsClicked] = useState(null);
   let { isConnected } = useAccount();
 
-  const { pointer } = useToolsState();
-  const controls = useAnimation();
+  const { pointer, state, target, url } = useToolsState();
 
-  const links = [
-    { path: "/", icon: icfyHOME, title: "Home" },
-    {
-      path: "/community",
-      icon: icfyMAIL,
-      title: "Community",
-      subs: [
-        { path: "/community/launchpad", icon: icfyROCKET, title: "Launchpad" },
-        {
-          path: "/community/escrow",
-          icon: icfy.court.injustice,
-          title: "Escrow",
-        },
-        { path: "/community/escrow", icon: icfy.msg.chat, title: "Social" },
-      ],
-    },
-    {
-      path: `/profile/${cv}`,
-      icon: icfyCV,
-      title: "Profile",
-    },
-    {
-      path: `/profile/${cv}/social`,
-      icon: icfy.person.friend,
-      title: "Social",
-    },
+  let { scrollYProgress, scrollY } = useScroll();
 
-    {
-      path: `/profile/${cv}/agendas`,
-      icon: icfy.ux.calendar,
-      title: "Agendas",
-    },
-    { path: `/search`, icon: icfySEARCH, title: "Search" },
-    { path: `/profile/${cv}/settings`, icon: icfySETTINGS, title: "Settings" },
-    { path: `/about`, icon: icfyINFO, title: "About" },
-  ];
+  //** Check si isScrollY > 200 faire disparaître le header * /
+  //** si isScrollY < latest faire apparaître le header * /
+  //** si isScrollY > latest faire disparaître le header * /
+  //** si isScrollY < 200 faire apparaître le header * /
+  const [isScrollY, setIsScrollY] = useState(0);
+  const [isOnView, setIsOnView] = useState(true);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 200 && latest > isScrollY && isOnView) {
+      setIsOnView(false);
+    } else if (latest < isScrollY && !isOnView) {
+      setIsOnView(true);
+    }
+    setIsScrollY(latest);
+  });
 
-  let [subOpen, setSubOpen] = useState(null);
-  const sidebarVariants = {
-    open: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.45 },
-    },
-    closed: {
-      opacity: 0,
-      x: 200, // Déplace la sidebar vers la gauche
-      transition: { duration: 0.3 },
-    },
-  };
   return (
     <>
-      <div
-        className={`flex w-full  ${
-          style || "relative"
-        } -z-1 box-border  flex-col min-h-[5vh] `}
+      {/* <motion.div
+        onViewportLeave={() => setIsOnView(false)}
+        onViewportEnter={() => setIsOnView(true)}
+        className="h-[9vh] w-full"
+      ></motion.div> */}
+      <motion.header
+        animate={{ y: isOnView ? 0 : -100, opacity: isOnView ? 1 : 0 }}
+        initial={{ y: isOnView ? -100 : -100, opacity: isOnView ? 0 : 0 }}
+        transition={{ duration: 0.4, type: "spring" }}
+        className={`flex    border-b border-white/5 w-full items-center ${style}`}
       >
-        <div className="relative   flex z-100 w-full py-5 px-5   box-border items-center justify-between backdrop-blur">
-          {children || <Logo styleD={"w-8 h-6 text-[6px] "} />}
-          <button
-            onClick={() => setIsClicked(!isClicked)}
-            className="cursor-pointer absolute right-4 z-1000"
-          >
-            <div className={`burger_btn ${isClicked && "burger_btn_clicked"}`}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </button>
-          <MyProgress style="progress bg-white/40 opacity-50  mr-5 w-[97%]  absolute bottom-0 " />
+        <div className="w-[16vw] mr-10 pl-5">
+          <Logo styleD={"w-8 h-6 text-[6px] "} />
         </div>
-        <>{isClicked && <MyOverlay style={" "} setter={setIsClicked} />}</>
-      </div>
-      <motion.div
-        initial={false}
-        animate={isClicked ? "open" : "closed"}
-        variants={sidebarVariants}
-        className={`h-full fixed  max-w-full backdrop-blur-2xl  right-0    bg3 font2 top-0        flex flex-col items-start   ${
-          isClicked ? "w-[25vw]" : "w-0"
-        }`}
-      >
-        <div className="fixed top-0 left-0 px-10 flex  border-box flex-col h-fit py-5 w-full  ">
-          <button
-            onClick={() => setIsClicked(!isClicked)}
-            className="btn btn-ghost absolute top-0 right-0 c1"
-          >
-            <Icon icon={icfy.ux.check.uncheck}></Icon>
-          </button>
-          {isConnected && (
-            <div className=" whiteglass-text overflow-hidden items-center rounded-full bg-white c1 input-group my-2">
-              <Icon icon={icfySEARCH} className="mr-2  font-bold ml-2 " />
-              <input
-                type="text"
-                className="input py-2 input-xs h-full w-full input-ghost ml-2"
-                placeholder="Search ..."
-              />
-            </div>
-          )}
-          {links?.map((el) => (
-            <div
-              className="flex text-xl mb-5 font-bold  whiteglass-text z-1000  flex-col w-full   "
-              key={v4()}
-            >
-              {!el?.subs && (
-                <Link
-                  className=" c1 hover:text-black hover:opacity-100 flex py-2 items-center"
-                  href={el?.path}
-                >
-                  <Icon icon={el?.icon} className="mr-3" />
-                  {el?.title}
-                </Link>
-              )}
-              {el?.subs && (
-                <button
-                  onClick={() =>
-                    setSubOpen(subOpen === el?.title ? null : el?.title)
-                  }
-                  className=" c1  opacity-80  hover:opacity-100  py-2 transition-all flex items-center"
-                >
-                  {/* <Icon icon={el?.icon} className="mr-3" /> */}
-                  {el?.title}
-                  <Icon
-                    icon={icfyARROWD}
-                    className={`ml-3 transition-all ${
-                      subOpen === el?.title ? "rotate-180" : "rotate-0"
-                    }`}
-                  />
-                </button>
-              )}
-              {subOpen === el?.title &&
-                el?.subs?.map((sub) => (
-                  <Link
-                    href={sub?.path}
-                    key={v4()}
-                    className="ml-5 c1 hover:text-black flex   items-center"
-                  >
-                    <Icon icon={sub?.icon} className="mr-3" />
-                    {sub?.title}
-                  </Link>
-                ))}
-            </div>
-          ))}
+        <div className="flex   gap-10  items-center w-full ">
+          {[
+            {
+              title: "profile",
+              actions: [
+                {
+                  icon: icfy.msg.casual,
+                  name: "Notifications",
+                  href: `/profile/${cv}/notifications`,
+                },
+                {
+                  name: "Settings",
+                  icon: icfySETTINGS,
+                  href: `/profile/${cv}/settings`,
+                },
+              ],
+              arr: [
+                {
+                  name: "Workspace",
+                  description: "Get a better understanding of your traffic",
+                  href: `/profile/${cv}`,
+                },
 
-          <BtnAuth />
-          <span className="py-4"></span>
-          <label className="mt-4 theme-switch">
-            <input type="checkbox" className="theme-switch__checkbox" />
-            <div className="theme-switch__container">
-              <div className="theme-switch__clouds"></div>
-              <div className="theme-switch__stars-container">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 144 55"
-                  fill="none"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </div>
-              <div className="theme-switch__circle-container">
-                <div className="theme-switch__sun-moon-container">
-                  <div className="theme-switch__moon">
-                    <div className="theme-switch__spot"></div>
-                    <div className="theme-switch__spot"></div>
-                    <div className="theme-switch__spot"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </label>
+                {
+                  name: "Escrows",
+                  description: "Connect with third-party tools",
+                  href: `/profile/${cv}/escrows`,
+                  icon: icsystem.escrow,
+                },
+                {
+                  name: "Launchpads",
+                  description: "Connect with third-party tools",
+                  href: `/profile/${cv}/escrows`,
+
+                  icon: icsystem.launchpad,
+                },
+              ],
+            },
+            {
+              title: "marketplace",
+              arr: [
+                {
+                  name: "To do",
+                  description: "Coming soon",
+                  href: "#",
+                },
+              ],
+            },
+            {
+              title: "social",
+              arr: [
+                {
+                  name: "Community",
+                  description: "Coming soon",
+                  href: "#",
+                  icon: icfy.msg.post,
+                },
+                {
+                  icon: icfy.person.team,
+                  name: "My profile",
+                  description: "Get a better understanding of your traffic",
+                  href: `/profile/${cv}/social`,
+                },
+                {
+                  icon: icfy.msg.casual,
+                  name: "Messages",
+                  description: "Get a better understanding of your traffic",
+                  href: `/profile/${cv}/messages`,
+                },
+              ],
+            },
+            {
+              title: "about",
+
+              arr: [
+                {
+                  icon: icsystem.escrow,
+                  name: "Disputes",
+                  description: "Get a better understanding of your traffic",
+                },
+
+                {
+                  name: "Missions",
+                  description: "Connect with third-party tools",
+                },
+                {
+                  name: "Social",
+                  description: "Connect with third-party tools",
+                },
+                {
+                  name: "Courts",
+                  description: "Connect with third-party tools",
+                },
+                {
+                  name: "Launchpads",
+                  description: "Coming soon",
+                },
+              ],
+            },
+            {
+              title: "search",
+              arr: [
+                {
+                  name: "Freelancers",
+                  description: "Lorem ipsium dolor et",
+                  href: "/search",
+                },
+                {
+                  name: "Missions",
+                  description: "Lorem ipsium dolor et",
+                  href: "/search/jobs",
+                },
+                {
+                  name: "Courts",
+                  description: "Coming soon",
+                },
+                {
+                  name: "Launchpads",
+                  description: "Lorem ipsium dolor et",
+                  href: "/search/launchpads",
+                },
+              ],
+            },
+            {
+              title: "create",
+              arr: [
+                {
+                  name: "Mission",
+                  description: "Launch a project with AI assist",
+                  href: "/create/mission",
+                  icon: icsystem.mission,
+                },
+                {
+                  icon: icsystem.profile,
+                  name: "Account",
+                  description: "Join our community",
+                  href: `/create/profile`,
+                },
+                {
+                  icon: icsystem.launchpad,
+                  name: "Launchpad",
+                  description: "Launch a project with our community",
+                  href: `/create/launchpad`,
+                },
+                {
+                  icon: icsystem.escrow,
+                  name: "Escrow",
+                  description:
+                    "Declare a dispute between you and workers or project manager",
+                  href: `/create/escrow`,
+                },
+              ],
+            },
+          ].map((el) => (
+            <Element object={el} key={v4()}>
+              {el}
+            </Element>
+          ))}
+          <div className="ml-auto mr-10">
+            {cv ? (
+              <Avatar
+                metadatas={metadatas}
+                CID={metadatas?.avatar}
+                style={"w-12 "}
+              />
+            ) : (
+              <BtnAuth />
+            )}
+          </div>
         </div>
-      </motion.div>
+
+        <MyProgress style="progress bg-white/40 opacity-50   w-[97%]  absolute bottom-0 " />
+      </motion.header>
     </>
   );
 };

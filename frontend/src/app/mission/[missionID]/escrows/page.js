@@ -15,9 +15,6 @@ import { useAuthState } from "context/auth";
 import { Icon } from "@iconify/react";
 import { icfy, icfyCODE, icfyETHER, icsystem } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { ENUMS } from "constants/enums";
@@ -34,8 +31,7 @@ import { MyCountdown, MyCounter } from "components/myComponents/MyCountdown";
 import { MyStatus } from "components/myComponents/item/MyStatus";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { STATUS } from "constants/status";
-import { MENUS } from "constants/menus";
-import { FeatureDispute } from "sections/works/Features/state/FeatureDispute";
+
 import { MyCardDropdown } from "components/myComponents/card/MyCardDropdown";
 import { MySub } from "components/myComponents/text/MySub";
 import { MyBadge } from "components/myComponents/box/MyList";

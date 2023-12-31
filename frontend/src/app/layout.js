@@ -5,6 +5,7 @@ import "../styles/star-background.css";
 import { AccountProvider } from "context/account";
 
 import { ToolsProvider } from "context/tools";
+import { Header } from "sections/Layout/Header";
 
 export default function RootLayout({ children }) {
   return (
@@ -28,16 +29,19 @@ export default function RootLayout({ children }) {
         ></link>
       </head>
 
-      <body className="bg-black min-h-100vh">
+      <body className=" min-h-screen dark overflow-y-scroll pt-20 relative overflow-x-hidden bg-[#121312] box-border">
         <AccountProvider>
           <AuthProvider>
             <ToolsProvider>
-              {/* <div className="bg-animation">
-                    <div id="stars"></div>
-                    <div id="stars2"></div>
-                    <div id="stars3"></div>
-                  </div> */}
-              {children}
+              <main className=" w-screen   min-h-[92vh] box-border flex flex-col z-1 relative">
+                {children}
+              </main>
+
+              <Header
+                style={
+                  "bg-white/5 backdrop-blur-xl fixed top-0 left-0 w-screen h-[9vh] "
+                }
+              />
             </ToolsProvider>
           </AuthProvider>
         </AccountProvider>

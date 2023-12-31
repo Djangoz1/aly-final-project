@@ -1,8 +1,7 @@
 import {
   icfy,
-  icfyAI,
   icfyC,
-  icfyGAMING,
+  icfyFIGMA,
   icfyGITHUB,
   icfyHTML,
   icfyJAVA,
@@ -32,9 +31,9 @@ export const ENUMS = {
   courts: [
     { badge: icfy.ux.admin, court: "Centralized" },
     { badge: icfyGITHUB, court: "Kleros" },
-    { badge: icfyREACT, court: "Decentralized" },
-    { badge: icfyREACT, court: "Others" },
-    { badge: icfyREACT, court: "Figma" },
+    { badge: icfy.domain.blockchain, court: "Decentralized" },
+    { badge: icfy.domain.enterprise, court: "Others" },
+    { badge: icfyFIGMA, court: "Figma" },
     { badge: icfyREACT, court: "React" },
     { badge: icfyPYTHON, court: "Python" },
     { badge: icfy.technos.nodeJS, court: "NodeJS" },
@@ -128,6 +127,4 @@ export const ENUMS = {
       icon: icfy.domain.blockchain,
     },
   ],
-
-  feature: {},
 };

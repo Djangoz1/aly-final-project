@@ -7,16 +7,16 @@ import { icfy, icfyARROWD, icfyGITHUB, icsystem } from "icones";
 import { Avatar } from "components/profile/ProfileAvatar";
 import { MySub } from "../text/MySub";
 
-export const MyMenus = ({ menus, current }) => {
+export const MyMenus = ({ menus }) => {
   let { url } = useToolsState();
 
   return (
-    <div className={`flex px-5 box-border flex-col`}>
+    <div className={`flex  box-border flex-col`}>
       {menus?.map(
         (el, index) =>
           el?.title && (
-            <div key={v4()} className={"flex my-4 flex-col"}>
-              <div className="flex mb-1 items-center">
+            <div key={v4()} className={"flex my-4 flex-col "}>
+              <div className="flex pl-2 mb-3 items-center">
                 <MySub style={"whitespace-nowrap c4"}>{el?.title}</MySub>
                 <div className="w-full ml-2 border border-white/5" />
               </div>
@@ -25,18 +25,16 @@ export const MyMenus = ({ menus, current }) => {
                   subElem?.title && (
                     <Link
                       href={`${subElem?.url ? `${subElem?.url}` : "#"}`}
-                      className={`flex indicator items-center font-light hover:text-white rounded-lg hover:bg-white/5 text-xs p-2  w-full relative ${
-                        current == subElem?.url ? "bg-white/10 c3" : "c4"
+                      className={`flex px-3 gap-4 indicator border-l-4 items-center font-light   hover:bg-white/5 text-xs py-2  w-full relative ${
+                        url == subElem?.url
+                          ? "bg-white/10 text-blue-900 border-blue-900 "
+                          : " opacity-50 border-transparent hover:text-blue-900 hover:opacity-100  hover:border-blue-900 "
                       }`}
                       key={v4()}
                     >
-                      <Icon icon={subElem?.icon} className="text-[24px] mr-3" />{" "}
-                      {subElem?.title}
-                      {current == subElem?.url ? (
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 pl-1 py-3 translate-x-1/2 rounded-full gb1 g1" />
-                      ) : (
-                        <></>
-                      )}
+                      <Icon icon={subElem?.icon} className="text-[18px] mr-3" />
+
+                      <span className="text-white">{subElem?.title}</span>
                     </Link>
                   )
               )}
@@ -220,8 +218,8 @@ export const MyMenusTabs = ({
               <Link
                 onClick={() => setter(i)}
                 key={v4()}
-                href={el?.url || "#section" + pointer}
-                as={el?.url || "#section" + pointer}
+                href={el?.url || "#"}
+                as={el?.url || "#"}
                 className={` backdrop-blur relative  min-w-[70px]      overflow-hidden       text-sm    
             ${
               [

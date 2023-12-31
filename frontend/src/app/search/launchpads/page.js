@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 
 import { Icon } from "@iconify/react";
 
-import { _apiPost } from "utils/ui-tools/web3-tools";
-
 import { useAccount } from "wagmi";
 import { MyInput } from "components/myComponents/form/MyInput";
 import { LayoutForm } from "sections/Form/LayoutForm";
@@ -23,19 +21,25 @@ import {
 } from "context/tools";
 import { MySub } from "components/myComponents/text/MySub";
 import { v4 } from "uuid";
-import { MyTitle } from "components/myComponents/text/MyTitle";
-import { MyBtns } from "components/myComponents/btn/MyBtns";
+
 import { useAuthState } from "context/auth";
 import { controllers } from "utils/controllers";
-import { AssetFreelancer } from "components/assets/AssetProfile";
+
 import { AssetLaunchpad } from "components/assets/AssetLaunchpad";
+import { MyTitle } from "components/myComponents/text/MyTitle";
+import { LaunchpadName } from "components/links/LaunchpadName";
+import { CVName } from "components/links/CVName";
+import { MyStatus } from "components/myComponents/item/MyStatus";
+import { MyBadge } from "components/myComponents/box/MyList";
+import { MyCountdown, MyTimer } from "components/myComponents/MyCountdown";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyNum } from "components/myComponents/text/MyNum";
 export default function PageSearch({ params }) {
-  let { address } = useAccount();
   let [isLoading, setIsLoading] = useState(null);
   let { metadatas } = useAuthState();
   let { state, pointer } = useToolsState();
   let dispatch = useToolsDispatch();
-  let [isPointer, setIsPointer] = useState();
+
   let loadState = async () =>
     doStateTools(dispatch, {
       lists: await controllers.get.launchpad.list({ filter: "" }),
@@ -47,7 +51,7 @@ export default function PageSearch({ params }) {
       setIsLoading(false);
     })();
   }, []);
-  console.log(state);
+
   return (
     <MyLayoutDashboard
       isLoading={isLoading}
@@ -83,11 +87,7 @@ let Page = () => {
   };
   return (
     <>
-      <div
-        id={1}
-        className="flex relative   hide-scrollbar
-      h-full   w-full"
-      >
+      <div className="flex relative mt-20 w-full">
         <div className="flex  c1 absolute -translate-y-full -top-5 right-5 items-center">
           <LayoutForm
             stateInit={{
@@ -97,153 +97,104 @@ let Page = () => {
             }}
           >
             <MyInput label={false} target={"search"} icon={icfySEARCH} />
-            <button
-              onClick={() => setIsExtend(!isExtend)}
-              className=" btn btn-outline relative  "
-            >
-              <Icon icon={icfy.ux.filter} className="text-3xl c3  " />
-            </button>
           </LayoutForm>
         </div>
-        {isExtend ? (
-          <div className="w-full flex flex-col   items-center justify-between  h-fit bg3 p-3 mb-3">
-            {/* <MyMenusTabs
-          target={"value"}
-          value={isPointer}
-          color={0}
-          setter={setIsPointer}
-          arr={[
-            { value: "Jobs", icon: icsystem.feature },
-            { value: "Freelancers", icon: icsystem.profile },
-            { value: "Launchpad", ic: icsystem.escrow },
-            { value: "Disputes", icon: icsystem.escrow },
-          ]}
-        /> */}
 
-            <>
-              <div className="flex  c1 flex-col w-full overflow-scroll hide-scrollbar">
-                <MySub style={"mt-2 mb-5 font-bold"}>Language techno</MySub>
-
-                <MyMenusTabs
-                  template={2}
-                  color={0}
-                  setter={setIsCourt}
-                  value={isCourt}
-                  target={"title"}
-                  arr={ENUMS.courts.map((el) => ({
-                    title: el?.court,
-                    icon: el?.badge,
-                  }))}
-                >
-                  All
-                </MyMenusTabs>
-              </div>
-
-              <div className="flex c1 flex-col w-full">
-                <MySub style={"mt-2  mb-5 font-bold"}>Domaine</MySub>
-
-                <MyMenusTabs
-                  template={2}
-                  color={2}
-                  setter={setIsDomain}
-                  value={isDomain}
-                  target={"name"}
-                  arr={ENUMS.domain}
-                >
-                  All
-                </MyMenusTabs>
-
-                <div className="flex mr-5 flex-col">
-                  <MySub style={"mt-2  mb-5 font-bold"}>Invite only</MySub>
-
-                  <MyMenusTabs
-                    template={2}
-                    color={0}
-                    setter={setIsInvite}
-                    value={isInvite}
-                    arr={[
-                      <div className="flex items-center">
-                        <Icon icon={icfyLOCK} className="mr-3 text-error" />
-                        Yes
-                      </div>,
-                      <div className="flex items-center">
-                        <Icon icon={icfyUNLOCK} className="mr-3 text-success" />
-                        No
-                      </div>,
-                    ]}
-                  >
-                    All
-                  </MyMenusTabs>
-                </div>
-                <div className="flex flex-col">
-                  <MySub style={"mt-2  mb-5 font-bold"}>Visibility</MySub>
-
-                  <MyMenusTabs
-                    setter={setIsInvite}
-                    value={isInvite}
-                    template={2}
-                    color={2}
-                    arr={[
-                      <div className="flex items-center">
-                        {" "}
-                        <Icon
-                          icon={icfy.eye.open}
-                          className="mr-3 text-success"
+        <div className="flex w-full gap-4 flex-col">
+          {state?.lists?.map((el, index) => (
+            <div
+              key={v4()}
+              className="px-4 py-3 hover:bg-white/10 backdrop-blur hover:border-white/15 border border-white/5 rounded-xl bg-white/5 rouded-lg shadow flex items-center justify-between w-full"
+            >
+              <div className="flex flex-col flex-auto h-full  gap-2">
+                <div className="flex justify-between w-full">
+                  <MyTitle>{el?.metadatas?.title}</MyTitle>
+                  <div className="flex gap-2 justify-end">
+                    {el?.datas?.status !== 3 ? (
+                      <div className="c4 flex items-center gap-4">
+                        <MySub size={8}>
+                          {el?.datas?.status === 1 ? "End" : "Started"}
+                        </MySub>
+                        <MyCountdown
+                          style={"text-error"}
+                          size={8}
+                          timestamp={parseInt(
+                            el?.datas?.status === 1
+                              ? el?.datas?.saleEnd
+                              : el?.datas?.saleStart
+                          )}
                         />
-                        Disponible
-                      </div>,
-                      <div className="flex items-center">
-                        {" "}
-                        <Icon
-                          icon={icfy.eye.close}
-                          className="mr-3 text-error"
-                        />
-                        Indisponible
-                      </div>,
-                    ]}
-                  >
-                    All
-                  </MyMenusTabs>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <MyMainBtn color={2} style={"btn-xs"} icon={icfy.ux.star} />
+                  </div>
                 </div>
-                <div className="flex flex-row">
-                  <div className="flex flex-col ml-5">
-                    <MySub style={"mt-2  mb-5 font-bold"}>experience</MySub>
+                <div className="flex c4 gap-2   items-center">
+                  {el?.metadatas?.company ? (
+                    <div className="flex gap-2 items-center">
+                      <div className="p-2 rounded bg-white/5 ">
+                        <Icon icon={icsystem.mission} />
+                      </div>
+                      <div className="flex flex-col">
+                        <MySub size={8}>Company</MySub>
+                        <p
+                          className={
+                            "c3 whitespace-nowrap max-w-[100px] truncate hover:max-w-fit text-xs"
+                          }
+                        >
+                          {el?.metadatas?.company}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  <div className="flex items-center c4 gap-2">
+                    <div className="p-2 rounded bg-white/5 ">
+                      <Icon icon={icfy.ux.admin} />
+                    </div>
+                    <div className="flex flex-col">
+                      <MySub size={8}>Owner</MySub>
+                      <CVName styles={"c3 text-xs"} metadata={el?.owner} />
+                    </div>
+                  </div>
+                </div>
+                {el?.metadatas?.description ? (
+                  <p className="text-[9px] w-full text-white/70 font-light py-4">
+                    {el?.metadatas?.description}
+                  </p>
+                ) : (
+                  <></>
+                )}
+                <div className="mt-auto flex items-center w-full gap-2">
+                  <MyStatus status={el?.datas?.status} target={"launchpad"} />
+                  <MyBadge color={1}>
+                    {ENUMS.domain[el?.metadatas?.domain]?.name}
+                  </MyBadge>
+                  <div className="flex gap-3 ml-auto items-center">
+                    <div className="flex items-center gap-2 c4">
+                      <MySub size={8}>Total users</MySub>
+                      <MyNum style={"c3"} num={el?.datas?.totalUser}></MyNum>
+                    </div>
+                    <div className="flex items-center c4 gap-2">
+                      <MySub size={8}>Amount raised</MySub>
+                      <MyNum style={"c3"} num={el?.datas?.amountRaised}>
+                        <span className="c4 ml-1 text-xs">ETH</span>
+                      </MyNum>
+                    </div>
 
-                    <MyMenusTabs
-                      setter={setIsStarted}
-                      value={isStarted}
-                      template={2}
-                      color={0}
-                      arr={[
-                        <div className="flex items-center">Junior</div>,
-                        <div className="flex items-center">
-                          <Icon
-                            icon={icfy.eye.close}
-                            className="mr-3 text-error"
-                          />
-                          Senior
-                        </div>,
-                      ]}
+                    <MyMainBtn
+                      url={"/launchpad/" + el?.launchpadID}
+                      style={"btn-sm"}
                     >
-                      All
-                    </MyMenusTabs>
+                      View more
+                    </MyMainBtn>
                   </div>
                 </div>
               </div>
-            </>
-          </div>
-        ) : (
-          []
-        )}
-        <div className="flex flex-wrap">
-          {state?.lists?.map((el, index) => (
-            <AssetLaunchpad
-              id={el?.launchpadID}
-              state={el}
-              style={"w-full  mb-3 h-fit "}
-              key={v4()}
-              color={2}
-            />
+            </div>
           ))}
         </div>
 

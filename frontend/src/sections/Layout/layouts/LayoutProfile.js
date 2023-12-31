@@ -12,9 +12,6 @@ import {
 import { Icon } from "@iconify/react";
 import { icfy, icsystem } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 import { MyModal } from "components/myComponents/modal/MyModal";
@@ -22,7 +19,7 @@ import { CreatePub } from "sections/Pub/form/create/CreatePub";
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 import { menus_id } from "constants/menus";
 import { LayoutForm } from "sections/Form/LayoutForm";
-import { MySelect, MySelects } from "components/myComponents/form/MySelects";
+import { MySelect } from "components/myComponents/form/MySelects";
 import { stateFeature } from "utils/ui-tools/state-tools";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MySub } from "components/myComponents/text/MySub";
@@ -36,7 +33,6 @@ export const LayoutProfile = ({ cvID, url, children, controller }) => {
   const { state, status, pointer } = useToolsState();
   let [isLoading, setIsLoading] = useState(null);
 
-  let menus = menus_id("profile", cvID);
   let dispatch = useToolsDispatch();
   let fetch = async () => {
     setIsLoading(true);
@@ -55,44 +51,9 @@ export const LayoutProfile = ({ cvID, url, children, controller }) => {
     console.log("Origin fetch");
   }, [cvID, url]);
 
-  if (!state?.profile?.datas?.features?.length) {
-    menus[1].sub[2] = undefined;
-  }
-  if (!state?.profile?.datas?.missions?.length) {
-    menus[1].sub[1] = undefined;
-  }
-  if (!state?.profile?.datas?.proposals?.length) {
-    menus[1].sub[3] = undefined;
-  }
-  if (!state?.profile?.datas?.launchpads?.length) {
-    menus[1].sub[4] = undefined;
-  }
-  if (!state?.profile?.datas?.arbitrators?.length) {
-    menus[1].sub[6] = undefined;
-  }
-  if (cv != cvID) {
-    menus[1].sub[5] = undefined;
-  } else if (
-    state?.profile?.datas?.invitations?.length > 0 ||
-    state?.profile?.datas?.notifications > 0
-  ) {
-    menus[1].sub[5].title = (
-      <>
-        Notifications{" "}
-        <span className="indicator-item badge  badge-xs badge-primary">
-          {parseInt(
-            state?.profile?.datas?.invitations?.length +
-              state?.profile?.datas?.notifications
-          )}
-        </span>
-      </>
-    );
-  }
-
   return (
     cvID && (
       <MyLayoutDashboard
-        _menus={menus}
         isLoading={isLoading}
         template={0}
         id={cvID}

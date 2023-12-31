@@ -1,5 +1,3 @@
-import { DEV_DOMAIN, DEV_LANGUAGES } from "constants/languages";
-
 export const parseTimestamp = (_timestamp) => {
   let timestamp;
 
@@ -75,25 +73,4 @@ export const calcTimestamp = (_timestamp, _dayValue) => {
   const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 
   return { days, hours, minutes };
-};
-
-export const selectLanguage = (string) => {
-  let result;
-  for (let index = 0; index < DEV_LANGUAGES.length; index++) {
-    const element = DEV_LANGUAGES[index];
-    if (element.name === string) {
-      result = element;
-    }
-  }
-  return result;
-};
-export const selectDevDomain = (string) => {
-  let result;
-  for (let index = 0; index < DEV_DOMAIN.length; index++) {
-    const element = DEV_DOMAIN[index];
-    if (element.name === string) {
-      result = element;
-    }
-  }
-  return result;
 };

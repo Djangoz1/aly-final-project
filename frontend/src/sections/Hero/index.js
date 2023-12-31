@@ -1,11 +1,10 @@
 import { Icon } from "@iconify/react";
 import { MyCard } from "components/myComponents/card/MyCard";
 import { MyBottomSection, MySection } from "components/myComponents/MySection";
-import { rocket } from "constants/spline";
+
 import { icfySEARCH } from "icones";
 import React from "react";
-import { LinearGradient } from "react-text-gradients";
-import { Rocket, Scene } from "spline/Scene";
+
 import { inputStyle } from "styles/style";
 
 export const Hero = () => {

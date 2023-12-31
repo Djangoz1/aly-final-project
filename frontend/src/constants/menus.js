@@ -289,6 +289,11 @@ export const menus_id = (target, id) => {
             title: "Overview",
             url: "/mission/" + id + "/",
           },
+          {
+            icon: icfyINFO,
+            title: "Whitepaper",
+            url: "/mission/" + id + "/whitepaper",
+          },
         ],
       },
       {

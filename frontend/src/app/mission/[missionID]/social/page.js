@@ -8,9 +8,6 @@ import { _apiPost } from "utils/ui-tools/web3-tools";
 
 import { useAuthState } from "context/auth";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { LayoutMission } from "sections/Layout/layouts/LayoutMission";

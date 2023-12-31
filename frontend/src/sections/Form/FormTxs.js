@@ -25,14 +25,13 @@ export const FormTxs = () => {
   let { metadatas, datas } = useAuthState();
   let { state, target } = useToolsState();
   let { form } = useFormState();
-  controllers;
 
   let ai = form?.ai?.recommandations;
   let resumes = {
     escrow: [
       {
         target: "feature",
-        value: form?.feature >= 0 && (
+        value: form?.feature != null && (
           <FeatureName
             featureID={
               [...datas?.features, ...datas?.proposals]?.[form?.feature]
@@ -43,8 +42,8 @@ export const FormTxs = () => {
       {
         target: "court",
         value:
-          form?.court >= 0 ? (
-            <>You decide to switch to {ENUMS.courts[form?.court].court}</>
+          form?.court !== null ? (
+            <>You decide to switch to {ENUMS.courts[form?.court]?.court}</>
           ) : (
             "You stay on initial court"
           ),

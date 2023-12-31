@@ -1,5 +1,6 @@
 import { useInView, motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { v4 } from "uuid";
 
 export const TextAI = ({ text, style, size, children }) => {
   const textArray = text?.length > 0 && text.split("");

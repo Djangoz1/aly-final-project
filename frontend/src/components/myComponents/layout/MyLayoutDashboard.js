@@ -47,17 +47,13 @@ import { MyHeaderDashboard } from "sections/Layout/headers/MyHeaderDashboard";
 
 export const MyLayoutDashboard = ({
   id,
-  setter,
-  lists,
-  side,
-  price,
+
   color,
-  statusObj,
-  owner,
+
   url,
-  allowed,
+
   target,
-  header,
+
   noMenu,
   refresh,
   _menus,
@@ -82,11 +78,6 @@ export const MyLayoutDashboard = ({
     : MENUS[target].page;
 
   useEffect(() => {
-    if (pointer === 0) {
-      template = 0;
-    }
-  }, [pointer]);
-  useEffect(() => {
     if (refresh)
       doStateToolsRefresh({
         dispatch,
@@ -102,196 +93,23 @@ export const MyLayoutDashboard = ({
   return (
     <MyLayoutApp
       initState={initState}
-      template={template}
       id={id}
       url={_url}
+      background={false}
       target={target}
     >
-      {template !== 2 &&
-        template !== 0 &&
-        menus
-          ?.filter((el) => el?.title)
-          ?.map(
-            (el, i) =>
-              el?.title !== undefined &&
-              i < menus?.length - 1 && (
-                <Viewport key={v4()} id={el?.title} index={i}></Viewport>
-              )
-          )}
-
-      {template === 0 ? (
+      <>
+        <div className="w-[16vw] pr-2     flex divide-y divide-white/10 flex-col h-screen fixed pt-3 top-[9vh] left-0 ">
+          <MyMenus menus={menus} />
+        </div>
         <>
-          <div className=" relative h-full flex  w-full">
-            <div className="  border-r-white/5  fixed left-0 bottom-0 flex  flex-col-reverse h-full 2xl:w-[12%] w-[18%] bgprim">
-              <div className="flex flex-col h-full overflow-y-scroll hide-scrollbar pb-20 w-full">
-                {metadatas ? (
-                  <MyLayoutHeader
-                    cvID={cv}
-                    username={metadatas?.username}
-                    image={metadatas?.avatar}
-                    target={"profile"}
-                    statusObj={{
-                      current: metadatas?.visibility ? 0 : 1,
-                      to: metadatas?.visibility ? 1 : 0,
-                    }}
-                    allowed={true}
-                    metadatas={metadatas}
-                  >
-                    <div className="flex w-full flex-wrap items-">
-                      <MySub style={"items-center flex"}>
-                        <Icon
-                          className="text-lg mr-2"
-                          icon={ENUMS?.domain[metadatas?.domain]?.icon}
-                        />
-                        {ENUMS?.domain[metadatas?.domain]?.name}
-                      </MySub>
-                    </div>
-                  </MyLayoutHeader>
-                ) : (
-                  <></>
-                )}
-                <MyMenus current={url} menus={menus} />
-                {side ? side : <></>}
-              </div>
-            </div>
-            <div className=" min-h-screen bgprim  h-fit 2xl:w-[87%] w-[81%] flex flex-col-reverse ml-auto backdrop-blur">
-              {isLoading === false ? (
-                <div className="w-full overflow-y-auto py-20 min-h-screen">
-                  {children}
-                </div>
-              ) : (
-                <MyLoader template={1} />
-              )}
-            </div>
-            {btn ? <div className="fixed bottom-5 right-5">{btn}</div> : <></>}
+          <div className="    relative  rounded-lg  2xl:w-[87%] w-[81%] flex flex-col-reverse ml-auto mr-5  ">
+            {isLoading === false ? children : <MyLoader template={1} />}
           </div>
-          <div className=" max-w-full fixed top-0 right-0 2xl:w-[87%] w-[81%] min-h-[5vh] ">
-            <Header style={"bg-white/5 backdrop-blur-2xl  "}>
-              <MyHeaderDashboard
-                source={{
-                  title:
-                    state?.[target]?.metadatas?.title ||
-                    state?.[target]?.metadatas?.username ||
-                    target,
-                  url: `/${target}/${id}`,
-                  icon:
-                    icsystem?.[target] || target === "search"
-                      ? icfySEARCH
-                      : undefined,
-                }}
-                arr={url
-                  .split("/")
-                  .filter((el) => el != id && el != target && el != "")
-                  .map((el, i) => ({
-                    title: el,
-                    url: `/${target}/${id}/${el}`,
-                  }))}
-              />
-            </Header>
-          </div>
+
+          {btn ? <div className="fixed bottom-5 right-5">{btn}</div> : <></>}
         </>
-      ) : (
-        <Viewport
-          fixed={template !== 2 ? true : false}
-          key={v4()}
-          full={template === 2 ? true : undefined}
-          background={template === 2 ? true : undefined}
-          id={template === 2 ? 0 : menus?.[pointer]?.title}
-          index={template === 2 ? 0 : menus?.length - 1}
-        >
-          {!isLoading ? (
-            <>
-              {
-                [
-                  /** Template 0  is managed differently */
-                  <></>,
-                  <MyDashboard
-                    owner={owner}
-                    target={target}
-                    allowed={allowed}
-                    side={side}
-                    color={color}
-                    menus={menus}
-                    setter={setter}
-                    statusObj={statusObj}
-                    style={"h-full w-full overflow-hidden  my-5 mb-20"}
-                    price={price}
-                    btn={{
-                      title: btn?.title,
-                      info: btn?.info,
-                      url: btn?.url,
-                    }}
-
-                    // arr={lists}
-                  >
-                    {pointer === 0 ? (
-                      <div className="flex flex-col  c1 w-full  max-h-[60vh]  mb-auto ">
-                        <div className="grid grid-cols-3 mt-10 grid-rows-2 gap-4">
-                          {lists?.map((el, i) =>
-                            el?.title ? (
-                              <MyCardFolder
-                                key={v4()}
-                                image={el?.image || `/${el?.title}.png`}
-                                title={el?.title}
-                                url={el?.url}
-                                color={i}
-                              >
-                                {el?.description}
-                              </MyCardFolder>
-                            ) : undefined
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col  c1 w-full  max-h-[60vh]  mb-auto ">
-                        <div className="  rounded-0   hide-scrollbar overflow- h-full mb-2">
-                          {children}
-                        </div>
-                      </div>
-                    )}
-                  </MyDashboard>,
-
-                  <div className="w-full flex flex-col  h-full">
-                    <div className="flex w-full relative">
-                      {!noMenu ? (
-                        <MyMenusTabs
-                          style={"w-full"}
-                          color={color || 1}
-                          target={"title"}
-                          arr={menus}
-                          value={pointer}
-                          setter={(index) => doPointerTools(dispatch, index)}
-                        />
-                      ) : undefined}
-                      {statusObj ? (
-                        <MyStatus
-                          allowed={allowed}
-                          refresh={refresh}
-                          status={statusObj?.current}
-                          toStatus={statusObj?.to}
-                          style={
-                            "text-xs  bg-black/20 backdrop-blur-2xl absolute top-0 right-0 rounded   font-bold "
-                          }
-                          target={target}
-                        ></MyStatus>
-                      ) : undefined}
-                    </div>
-                    <div className="h-full flex">
-                      {side ? <div className="w-fit">{side} </div> : undefined}{" "}
-                      {children}
-                    </div>
-                  </div>,
-                  <div className="w-full h-full  ">{children} </div>,
-                ][template || 0]
-              }
-            </>
-          ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <MyLoader />
-            </div>
-          )}
-        </Viewport>
-      )}
+      </>
     </MyLayoutApp>
   );
 };

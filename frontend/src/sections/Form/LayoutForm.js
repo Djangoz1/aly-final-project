@@ -1,16 +1,13 @@
-import { MySection } from "components/myComponents/MySection";
 import {
   FormProvider,
   doInitStateForm,
   doStateFormChecked,
-  doStateFormDisabled,
-  doStateFormRefresh,
   useFormDispatch,
   useFormState,
 } from "context/form";
-import { useInView } from "framer-motion";
+
 import React, { useEffect, useRef } from "react";
-import { Layout } from "sections/Layout";
+
 import { useAccount } from "wagmi";
 
 export const LayoutForm = ({ stateInit, children }) => {

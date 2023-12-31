@@ -29,22 +29,20 @@ export const MyCardPrice = ({
 
   return (
     <MyCard
-      styles={`${style && style} px-8 pt-4 pb-8 ${size || " min-w-[282px]"}`}
-      template={template}
+      styles={`${style && style}  flex ${
+        active
+          ? "bg-gradient-to-tr from-[#232F41] to-[#10172B] via-[#171E33]"
+          : "border border-white/20"
+      }  flex-col px-8   py-8 ${size || " min-w-[282px]"}`}
+      template={5}
     >
       <div
-        className={`mb-4 rounded-lg ${
-          colors[color || 0].bg
-        } flex items-center px-5 py-2 ${colors[color || 0].text}`}
+        className={` rounded-lg  flex items-center  ${colors[color || 0].text}`}
       >
         <Icon icon={badge?.icon} className="mr-3" />
         <p className="font-bold ">{badge?.title}</p>
       </div>
-      <div className="mb-6 font-light c4 md:mb-10 lg:mb-12">
-        {description ||
-          "Lorem ipsum dolor sit amet consectetur adipiscing elit ut aliquam, purussit"}
-      </div>
-      <h2 className="my-6 pb-8 text-3xl items-start flex font-extrabold md:text-5xl">
+      <span className="mb-6 mt-3   items-start flex font-extrabold text-2xl">
         {price ? (
           <>
             {price}
@@ -54,41 +52,38 @@ export const MyCardPrice = ({
         ) : (
           "Free"
         )}
-      </h2>
-      {!btn?.no && (
-        <Link
-          href={url || "#"}
-          className={`mb-5 inline-block  shadowh _hover w-full rounded-lg  px-6 py-4 text-center font-bold  transition hover:border-black  lg:mb-8 ${
-            active
-              ? "bg-[#c9fd02] text-black hover:text-[#c9fd02]  hover:bg-neutral-900"
-              : "bg-neutral-900 c4 hover:bg-[#c9fd02] hover:text-black"
-          }`}
-        >
-          Get started
-        </Link>
-      )}
+      </span>
+      <div className="mb-6 font-light c4 text-xs md:mb-10 lg:mb-12">
+        {description ||
+          "Lorem ipsum dolor sit amet consectetur adipiscing elit ut aliquam, purussit"}
+      </div>
+
       {lists?.map((el) =>
         el?.title ? (
-          <div key={v4()} className="mt-2 flex items-center flex-row">
+          <div key={v4()} className="mb-5 flex items-center flex-row">
             <div
-              className={`mr-5  w-fit p-2 rounded-full shadow ${
-                el?.check ? colors[color || 0]?.bg : "bg-error/40"
+              className={`mr-5 text-white  h-6 w-6 rounded-full text-lg flex items-center justify-center shadow ${
+                el?.check ? "bg-green-800" : "bg-error/40"
               }`}
             >
-              <Icon
-                icon={el?.check ? icfy.ux.check.casual : icfy.ux.check.uncheck}
-              />
+              {el?.check ? "✓" : "⛌"}
             </div>
 
-            <div
-              className={`whitespace-nowrap ${
-                el?.check ? "text-success/70" : "text-error"
-              }`}
-            >
-              {el?.title}
-            </div>
+            <div className={`whitespace-nowrap opacity-50`}>{el?.title}</div>
           </div>
         ) : undefined
+      )}
+      {btn !== false && (
+        <Link
+          href={url || "#"}
+          className={`mt-5  w-full rounded-lg  py-2 hover:scale-105 text-center font-bold  transition  border   ${
+            active
+              ? "bg-[#125C40] border-transparent "
+              : "border-[#125C40] text-[#125C40]   "
+          }`}
+        >
+          Get started today
+        </Link>
       )}
     </MyCard>
   );

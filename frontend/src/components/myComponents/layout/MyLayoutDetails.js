@@ -18,11 +18,7 @@ export const MyLayoutDetails = ({
   _size,
 }) => {
   return (
-    <div
-      className={`flex ${style || ""} ${
-        _size || "w-1/3"
-      } flex-col relative px-5 border-t border-white/5 gap-3`}
-    >
+    <div className={`flex ${style || ""} flex-col relative gap-3`}>
       {/* <Avatar metadatas={}/> */}
       <MyTitle style={"border-b py-5 border-white/5"}>
         Selected details{" "}
@@ -44,10 +40,12 @@ export const MyLayoutDetails = ({
             (el?.title || el?.value) && (
               <div
                 key={v4()}
-                className="flex w-full items-center rounded-lg shadow-xl backdrop-blur gap-3 px-2 py-1 bg-white/5"
+                className="flex w-full border border-white/5  items-center rounded-lg shadow-xl c4 hover:text-white/70 backdrop-blur gap-3 px-2 py-1 bg-white/5 hover:bg-white/10"
               >
-                <Icon icon={el?.icon} className="text-sky-800 text-[30px]" />
-                <div className="flex flex-col ">
+                <div className="p-2 rounded-lg bg-white/5 border border-white/5 ">
+                  <Icon icon={el?.icon} className="text-[20px]" />
+                </div>
+                <div className="flex h-full justify-evenly flex-col ">
                   <MySub size={9} style={"c4 text-[7px] "}>
                     {el?.title}
                   </MySub>
@@ -90,8 +88,8 @@ export const MyLayoutDetails = ({
         ))}
 
         {footers?.map((el) => (
-          <div key={v4()} className="flex gap-1 mt-2 w-fit flex-col">
-            <MySub style={"c4"}>{el?.title}</MySub>
+          <div key={v4()} className="flex gap-1 mt-5 w-fit flex-col">
+            <MySub style={"c4 mb-2"}>{el?.title}</MySub>
             {el?.value}
           </div>
         ))}

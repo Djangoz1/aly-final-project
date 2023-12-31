@@ -98,7 +98,7 @@ export const MyCountdown = ({ count, timestamp, style, size, range }) => {
           >
             <span style={{ "--value": timeLeft.days }}></span>
           </span>
-          <p className="c2">days</p>
+          <p className="c4">days</p>
         </div>
         <div className="flex flex-col items-center">
           <span
@@ -108,7 +108,7 @@ export const MyCountdown = ({ count, timestamp, style, size, range }) => {
           >
             <span style={{ "--value": timeLeft.hours }}></span>
           </span>
-          <p className="c2">hours</p>
+          <p className="c4">hours</p>
         </div>
         <div className="flex flex-col items-center">
           <span
@@ -118,7 +118,7 @@ export const MyCountdown = ({ count, timestamp, style, size, range }) => {
           >
             <span style={{ "--value": timeLeft.minutes }}></span>
           </span>
-          <p className="c2">min</p>
+          <p className="c4">min</p>
         </div>
         <div className="flex flex-col items-center">
           <span
@@ -128,7 +128,7 @@ export const MyCountdown = ({ count, timestamp, style, size, range }) => {
           >
             <span style={{ "--value": timeLeft.seconds }}></span>
           </span>
-          <p className="c2">sec</p>
+          <p className="c4">sec</p>
         </div>
       </div>
     </>
@@ -191,7 +191,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
           >
             <span style={{ "--value": timeRemaining.days }}></span>
           </span>
-          <p className="c2">days</p>
+          <p className="c4">days</p>
         </div>
         <div className="flex flex-col items-center">
           <span
@@ -201,7 +201,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
           >
             <span style={{ "--value": timeRemaining.hours }}></span>
           </span>
-          <p className="c2">hours</p>
+          <p className="c4">hours</p>
         </div>
         <div className="flex flex-col items-center">
           <span
@@ -211,7 +211,7 @@ export const MyCounter = ({ startDate, size, endDate }) => {
           >
             <span style={{ "--value": timeRemaining.minutes }}></span>
           </span>
-          <p className="c2">min</p>
+          <p className="c4">min</p>
         </div>
         <div className="flex flex-col items-center">
           <span
@@ -221,9 +221,57 @@ export const MyCounter = ({ startDate, size, endDate }) => {
           >
             <span style={{ "--value": timeRemaining.seconds }}></span>
           </span>
-          <p className="c2">sec</p>
+          <p className="c4">sec</p>
         </div>
       </div>
     </>
+  );
+};
+
+export const MyTimer = ({ started, style, days }) => {
+  // Calculer la date de fin en ajoutant `days` au timestamp `started`
+  if (!started) {
+    return <p className="text-xs font-light text-white/60">Not started</p>;
+  }
+  const endTime = new Date(started * 1000 + days * 24 * 60 * 60 * 1000);
+
+  // Définir l'état initial du compte à rebours
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    // Fonction pour mettre à jour le compte à rebours
+    const updateCountdown = () => {
+      const currentTime = new Date();
+      const difference = endTime - currentTime;
+
+      // Calculer le temps restant
+      const timeLeft = {
+        days: Math.max(0, Math.floor(difference / (1000 * 60 * 60 * 24))),
+        hours: Math.max(0, Math.floor((difference / (1000 * 60 * 60)) % 24)),
+        minutes: Math.max(0, Math.floor((difference / 1000 / 60) % 60)),
+        seconds: Math.max(0, Math.floor((difference / 1000) % 60)),
+      };
+
+      setTimeLeft(timeLeft);
+    };
+
+    // Mettre à jour le compte à rebours toutes les secondes
+    const interval = setInterval(updateCountdown, 1000);
+
+    // Nettoyer l'intervalle quand le composant est démonté
+    return () => clearInterval(interval);
+  }, [endTime]);
+
+  return (
+    <div>
+      <p
+        className={style}
+      >{`${timeLeft.days}d/${timeLeft.hours}h/${timeLeft.minutes}m/${timeLeft.seconds}sec`}</p>
+    </div>
   );
 };

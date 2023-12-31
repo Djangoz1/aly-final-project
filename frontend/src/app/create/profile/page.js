@@ -3,8 +3,6 @@ import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
 
 import React from "react";
 
-import { _form_create_profile } from "utils/ux-tools/form/profile";
-
 import { useAccount } from "wagmi";
 
 import { MOOCK } from "constants/moock";
@@ -13,14 +11,7 @@ import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 import { useAuthDispatch, useAuthState } from "context/auth";
 
 import { Icon } from "@iconify/react";
-import {
-  icfy,
-  icfyFB,
-  icfyGITHUB2,
-  icfyLINKEDIN,
-  icfyMAIL,
-  icfyTWITTER,
-} from "icones";
+import { icfy, icfyMAIL } from "icones";
 import { styles } from "styles/style";
 import { MyFormCreate } from "components/myComponents/form/MyForm";
 
@@ -35,7 +26,7 @@ import { FormSocial, labelFormSocial } from "components/myComponents/form";
 
 const PageCreateProfile = () => {
   let { address, isConnected } = useAccount();
-  let dispatch = useAuthDispatch();
+
   let { cv } = useAuthState();
   return (
     <MyLayoutApp

@@ -9,9 +9,6 @@ import {
   useToolsState,
 } from "context/tools";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { ADDRESSES } from "constants/web3";
 import { MyModal } from "components/myComponents/modal/MyModal";

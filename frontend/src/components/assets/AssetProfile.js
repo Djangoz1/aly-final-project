@@ -184,7 +184,7 @@ export const AssetFreelancer = ({ owner, style }) => {
         </div>
 
         <p className="text-[9px] c4">{owner?.metadatas?.email}</p>
-        <div className="flex -mb-3 text-[10px] mt-1 gap-2">
+        <div className="flex mb-3 text-[10px] mt-1 gap-2">
           {owner?.metadatas?.tjm ? (
             <MyBadge color={1}>
               <MySub size={8}>TJM:</MySub> {owner?.metadatas?.tjm} $
@@ -192,14 +192,16 @@ export const AssetFreelancer = ({ owner, style }) => {
           ) : (
             <></>
           )}
-          <MyBadge style={"text-[9px]"} color={owner?.metadatas?.domain}>
+          <MyBadge style={"text-[]"} color={owner?.metadatas?.domain}>
             {ENUMS.domain[owner?.metadatas?.domain]?.name}
           </MyBadge>
-          <MyBadge style={"items-center gap-1"} color={1}>
-            <Icon icon={icsystem.mission} />
-            <MyNum num={owner?.datas?.missions?.length} />
-            <Icon className="ml-2" icon={icsystem.feature} />
-            <MyNum num={owner?.datas?.proposals?.length} />
+          <MyBadge style={" gap-1"}>
+            <div className="flex items-center w-full">
+              <Icon icon={icsystem.mission} />
+              <MyNum num={owner?.datas?.missions?.length} />
+              <Icon className="ml-2" icon={icsystem.feature} />
+              <MyNum num={owner?.datas?.proposals?.length} />
+            </div>
           </MyBadge>
         </div>
       </div>

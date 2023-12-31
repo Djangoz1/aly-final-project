@@ -76,6 +76,9 @@ export const Avatar = ({
   designation,
   style,
 }) => {
+  if (!_cvID && !metadatas && !CID && !src && !children) {
+    return <></>;
+  }
   let ref = useRef(null);
   let isInView = useInView(ref);
   let [isMetadatas, setIsMetadatas] = useState(null);

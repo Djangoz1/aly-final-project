@@ -49,7 +49,7 @@ export const MyStatus = ({
         onClick={handleClick}
         onHoverStart={() => setIsHovered(true)} // Fonction à exécuter lorsque le survol commence
         onHoverEnd={() => setIsHovered(false)}
-        className={` ${style || "  text-xs  "}
+        className={` ${style || "  text-[9px]  "}
           ${
             allowed && status != toStatus
               ? `p-0 flex flex-col   overflow-hidden `
@@ -66,7 +66,7 @@ export const MyStatus = ({
             ]?.bg
           }
  font-semibold
-           ${padding || "py-2 px-5"}
+           ${padding || "py-1 px-2"}
          backdrop-blur
         ${allowed && status != toStatus ? " cursor-pointer" : "cursor-default"}
           `}

@@ -11,9 +11,6 @@ import {
 
 import { icfy, icsystem } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet, _apiPost } from "utils/ui-tools/web3-tools";
 
 import { CreatePub } from "sections/Pub/form/create/CreatePub";
@@ -21,7 +18,7 @@ import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashbo
 import { menus_id } from "constants/menus";
 
 import { LayoutForm } from "sections/Form/LayoutForm";
-import { MySelect, MySelects } from "components/myComponents/form/MySelects";
+import { MySelect } from "components/myComponents/form/MySelects";
 import { stateFeature } from "utils/ui-tools/state-tools";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
 import { MySub } from "components/myComponents/text/MySub";

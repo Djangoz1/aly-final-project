@@ -1,18 +1,15 @@
 "use client";
 
-import { icfy, icfyLOCK, icfySEARCH, icfyUNLOCK, icsystem } from "icones";
+import { icfy, icfySEARCH } from "icones";
 import { useEffect, useState } from "react";
 
 import { Icon } from "@iconify/react";
-
-import { _apiPost } from "utils/ui-tools/web3-tools";
 
 import { useAccount } from "wagmi";
 import { MyInput } from "components/myComponents/form/MyInput";
 import { LayoutForm } from "sections/Form/LayoutForm";
 
 import { ENUMS } from "constants/enums";
-import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
 
 import { MyLayoutDashboard } from "components/myComponents/layout/MyLayoutDashboard";
 import {
@@ -38,7 +35,7 @@ export default function PageSearch({ params }) {
     (async () => {
       setIsLoading(true);
       doStateTools(dispatch, {
-        lists: await controllers.get.profile.list({ filter: "" }),
+        lists: await controllers.get.profile.list({}),
       });
       setIsLoading(false);
     })();
@@ -55,7 +52,7 @@ export default function PageSearch({ params }) {
       isLoading={isLoading}
       target={"search"}
       owner={metadatas}
-      url={"/search/"}
+      url={"/search"}
       template={0}
     >
       <Page />
@@ -83,7 +80,7 @@ let Page = () => {
   };
   return (
     <>
-      <div className="flex relative hide-scrollbar h-full   w-full">
+      <div className="flex mt-20  relative hide-scrollbar h-full   w-full">
         <div className="flex  c1 absolute -translate-y-full -top-5 right-5 items-center">
           <LayoutForm
             stateInit={{
@@ -93,16 +90,10 @@ let Page = () => {
             }}
           >
             <MyInput label={false} target={"search"} icon={icfySEARCH} />
-            <button
-              onClick={() => setIsExtend(!isExtend)}
-              className=" btn btn-outline relative  "
-            >
-              <Icon icon={icfy.ux.filter} className="text-3xl c3  " />
-            </button>
           </LayoutForm>
         </div>
 
-        <div className=" grid grid-cols-1 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 xl:grid-cols-5 gap-5 overflow-y-scroll w-full overflow-x-hidden px-3   backdrop-blur pb-20 h-fit">
+        <div className=" grid grid-cols-1 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 xl:grid-cols-5 gap-5 overflow-y-scroll w-full overflow-x-hidden px-3    pb-20 h-fit">
           {state?.lists?.map((el) => (
             <AssetFreelancer key={v4()} owner={el} />
           ))}

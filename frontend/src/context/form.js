@@ -115,10 +115,9 @@ export const doInitStateForm = async (dispatch, form) => {
   if (form?.form) {
     dispatch({
       status: "success",
-      form: { ...form?.form, aiAssisted: true, ratingAi: 3 },
+      form: { ...form?.form, aiAssisted: 1 },
       placeholders: {
         ...form?.placeholders,
-        chatAI: "Write something to Aly ...",
         feedbacks: "What do you think about Aly",
       },
       checked: form?.checked,

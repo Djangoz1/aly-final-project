@@ -1,24 +1,11 @@
 import React from "react";
 
-import { useAnimation, useViewportScroll, motion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 
 export const MyProgress = ({ style }) => {
-  const controls = useAnimation();
-  const { scrollYProgress } = useViewportScroll();
+  const { scrollYProgress } = useScroll();
 
-  const updateScaleX = () => {
-    controls.start({
-      scaleX: scrollYProgress.current,
-      transition: {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001,
-      },
-    });
-  };
+  const scaleX = useSpring(scrollYProgress);
 
-  scrollYProgress.onChange(() => {
-    updateScaleX();
-  });
-  return <motion.div className={style} animate={controls} />;
+  return <motion.div style={{ scaleX }} className={style} />;
 };

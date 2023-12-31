@@ -6,6 +6,8 @@ import { v4 } from "uuid";
 import { MyCard } from "../card/MyCard";
 import { ENUMS } from "constants/enums";
 import { NoItems } from "../layout/NoItems";
+import { Badge } from "@lemonsqueezy/wedges";
+import { Icon } from "@iconify/react";
 
 export const MyList = ({ withoutBtn, title, arr, description, head }) => {
   return (
@@ -126,22 +128,33 @@ export const MyList = ({ withoutBtn, title, arr, description, head }) => {
   );
 };
 
-export const MyBadge = ({ style, children, color }) => {
+export const MyBadge = ({ style, shape, icon, children, color }) => {
   return (
-    <div
-      className={`${
-        style || "min-w-[40px] text-xs"
-      } flex cursor-default rounded-lg    px-2 py-1  justify-center leading-4 whitespace-nowrap w-fit flex-nowrap min-w-[40px] text-center    ${
+    <Badge
+      className={`${style || "text-xs"} flex items-center`}
+      before={icon ? <Icon icon={icon} /> : undefined}
+      stroke
+      shape={shape}
+      color={
         [
-          "text-rose-800 bg-rose-100",
-          "bg-white/5  backdrop-blur border border-white/5",
-          "bg-white/20  backdrop-blur border border-white/5",
-          "bg-gradient-to-l from-slate-800 border border-white/5 to-zinc-950 backdrop-blur",
-          ...ENUMS.colors,
-        ]?.[color || 0]
-      }`}
+          undefined,
+          "green",
+          "red",
+          "blue",
+          "orange",
+          "pink",
+          "purple",
+          "yellow",
+          "primary",
+        ][color || 0]
+      }
     >
       {children}
-    </div>
+      {/* <div
+      
+    >
+      {children}
+    </div> */}
+    </Badge>
   );
 };

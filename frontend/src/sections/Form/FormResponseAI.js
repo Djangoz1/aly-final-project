@@ -39,6 +39,13 @@ export const FormResponseAI = () => {
         style={"  gap-2   items-center h-full justify-center "}
       ></TextAI>
     );
+  } else if (!form?.description) {
+    return (
+      <TextAI
+        text={"For an AI assistance you must provide detail"}
+        style={"  gap-2   items-center h-full justify-center "}
+      ></TextAI>
+    );
   }
   const { datas } = useAuthState();
   console.log(form);
@@ -110,6 +117,7 @@ export const FormResponseAI = () => {
       mission:
         prompt || `Here is my description of mission:\n\n${parts.join("\n")}`,
     };
+    console.log(data);
     // Constructing the final prompt
 
     doInitStateForm(dispatch, {
@@ -120,7 +128,7 @@ export const FormResponseAI = () => {
     setIsLoading(true);
     await axios
       .post(
-        "https://syncflow-api.onrender.com/extract_all_details?include_raw=false",
+        "https://syncflow-api.onrender.com/mission/extract_details?include_raw=false",
         data,
         {
           headers: {
@@ -165,7 +173,9 @@ export const FormResponseAI = () => {
         </TextAI>
       ) : (
         <MyMainBtn
-          style={"btn-sm font-light text-xs mx-auto"}
+          style={
+            "btn-sm font-light absolute top-0 left-0 text-xs left-1/2 -translate-x-1/2"
+          }
           color={2}
           icon={icfy.ux.refresh}
           setter={() => fetchAI()}
@@ -176,7 +186,7 @@ export const FormResponseAI = () => {
       )}
 
       {form?.target !== "feature" && aiResponse?.name ? (
-        <div className="relative w-full  h-full ">
+        <div className="relative  w-full  h-full ">
           <MyFlowScheme
             main={{
               title: aiResponse?.name,

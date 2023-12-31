@@ -48,13 +48,14 @@ export const MyMainBtn = ({
       disabled={disabled}
       className={`${style} w-fit flex gap-2   items-center     transition  ${
         [
-          `btn normal-case  ${
+          `btn   ${
             [
-              "bg-white text-black  hover:bg-white/90 ",
+              "bg-white border-black border-3 text-black  hover:bg-white/90 ",
               "btn-ghost",
               "bg-white/5 hover:bg-black backdrop-blur  text-white",
               "btn-error font-bold text-white",
               "btn-success font-bold ",
+              "bg-gradient-to-br from-black to-zinc-900 ",
             ]?.[color || 0]
           }`,
           `font-semibold ${

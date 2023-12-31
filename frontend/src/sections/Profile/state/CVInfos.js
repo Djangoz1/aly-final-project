@@ -43,6 +43,7 @@ export const CVInfos = () => {
         ></MyStatus>
       ),
     },
+
     {
       icon: icfyTIME,
 
@@ -222,30 +223,20 @@ export const CVInfos = () => {
     {
       title: "Spécialité",
       value: (
-        <p className="flex items-center capitalize">
-          <Icon
-            className={`text-${
-              ENUMS.domain[state?.profile?.metadatas?.domain]?.color
-            } text-lg mr-1`}
-            icon={ENUMS.domain[state?.profile?.metadatas?.domain]?.icon}
-          />
+        <MyBadge className="flex items-center capitalize">
           {ENUMS.domain[state?.profile?.metadatas?.domain]?.name}
-        </p>
+        </MyBadge>
       ),
     },
 
     {
       title: <div className="flex flex-col">Skills off chain</div>,
       value: (
-        <div className="w-full gap-3 overflow-x-auto grid grid-cols-5 mt-1">
+        <div className=" flex flex-wrap gap-3  mt-1">
           {Array.isArray(state?.profile?.metadatas?.skills) ? (
-            state?.profile?.metadatas?.skills?.map((id, i) => (
-              <MyBadge color={i} key={v4()}>
-                <Icon
-                  icon={ENUMS.courts?.[id]?.badge}
-                  className="text-xs my-auto mr-3"
-                />
-                {ENUMS.courts?.[id]?.court}
+            state?.profile?.metadatas?.skills?.map((el) => (
+              <MyBadge key={v4()} color={1}>
+                {typeof el === "string" ? el : ENUMS.courts[el].court}
               </MyBadge>
             ))
           ) : state?.profile?.metadatas?.skills?.length ? (
@@ -278,40 +269,41 @@ export const CVInfos = () => {
   ];
   return (
     <div className="flex-col pt-10 font2 w-full ">
-      <MyMenusTabs
-        color={17}
-        template={2}
-        style={"ml-5 mb-8  uppercase font-light font2"}
-        value={isTabs}
-        setter={setIsTabs}
-        arr={["On chain", "Off chain"]}
-      />
-      <div className="flex  w-full">
+      <div className=" grid grid-cols-2 gap-2 w-full">
         <MyCardInfos
           title={"Work protocole "}
           style={"w-full  rounded-none "}
-          arr={[infos, infoOffChain][isTabs]}
+          arr={infos}
+        />
+
+        <MyCardInfos
+          title={"Datas protocole "}
+          style={"w-full ml-[1px]   rounded-none "}
+          arr={infosDatas}
+        />
+        <MyCardInfos
+          style={"rounded-b-none rounded-t-none text-right w-full mb-[1px] "}
+          title={"Escrow protocole"}
+          arr={infosDispute}
+        />
+        <MyCardInfos
+          style={"rounded-t-none text-right w-full "}
+          title={"Launchpad protocole"}
+          arr={infosLaunchpad}
+        />
+
+        <MyCardInfos
+          title={"Work protocole "}
+          style={"w-full  rounded-none "}
+          arr={infoOffChain}
+        />
+
+        <MyCardInfos
+          title={"Datas protocole "}
+          style={"w-full ml-[1px]   rounded-none "}
+          arr={infoOffChaindatas}
         />
       </div>
-      <MyCardInfos
-        title={"Datas protocole "}
-        style={"w-full ml-[1px]   rounded-none "}
-        arr={[infosDatas, infoOffChaindatas][isTabs]}
-      />
-      {isTabs === 0 && (
-        <div className="flex flex-col  w-full  ml-[1px]">
-          <MyCardInfos
-            style={"rounded-b-none rounded-t-none text-right w-full mb-[1px] "}
-            title={"Escrow protocole"}
-            arr={infosDispute}
-          />
-          <MyCardInfos
-            style={"rounded-t-none text-right w-full "}
-            title={"Launchpad protocole"}
-            arr={infosLaunchpad}
-          />
-        </div>
-      )}
     </div>
   );
 };

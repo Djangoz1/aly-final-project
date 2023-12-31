@@ -6,27 +6,36 @@ import { useAuthState } from "context/auth";
 import { useToolsDispatch, useToolsState } from "context/tools";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icfyMAIL, icfySEND, icsystem } from "icones";
-
-import { MyLayoutApp } from "components/myComponents/layout/MyLayoutApp";
+import { icfy, icfyETHER, icsystem } from "icones";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 import { ENUMS } from "constants/enums";
 import { v4 } from "uuid";
 
 import { MySub } from "components/myComponents/text/MySub";
-import { MyCardFolder } from "components/myComponents/card/MyCardFolder";
+
 import { LayoutProfile } from "sections/Layout/layouts/LayoutProfile";
 import { LayoutForm } from "sections/Form/LayoutForm";
 import { MySelect, MySelects } from "components/myComponents/form/MySelects";
 import { controllers } from "utils/controllers";
 import { MyLayoutHeader } from "components/myComponents/layout/MyLayoutHeader";
 import { MyStatus } from "components/myComponents/item/MyStatus";
-import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
-import { MyNum } from "components/myComponents/text/MyNum";
-import { MyChart } from "components/myComponents/box/MyChart";
+
 import { CVInfos } from "sections/Profile/state/CVInfos";
 import { MyLayoutDetails } from "components/myComponents/layout/MyLayoutDetails";
+import { MyMenusTabs } from "components/myComponents/menu/MyMenus";
+import { MissionName } from "components/links/MissionName";
+import { CVName } from "components/links/CVName";
+import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyNum } from "components/myComponents/text/MyNum";
+import { MyTitle } from "components/myComponents/text/MyTitle";
+import { MyBadge } from "components/myComponents/box/MyList";
+import {
+  MyCountdown,
+  MyCounter,
+  MyTimer,
+} from "components/myComponents/MyCountdown";
+import { Avatar } from "components/profile/ProfileAvatar";
 
 function App({ params }) {
   const { cv, metadatas } = useAuthState();
@@ -34,23 +43,155 @@ function App({ params }) {
   const { state, status, pointer, refresh } = useToolsState();
 
   const cvID = params.cvID;
-
+  let [isClick, setIsClick] = useState(0);
   return (
     <LayoutProfile controller={"overview"} cvID={cvID} url={"/"}>
-      <MyLayoutHeader
-        cvID={state?.profile?.cvID}
-        username={state?.profile?.metadatas?.username}
-        image={state?.profile?.metadatas?.avatar}
-        target={"profile"}
-        // statusObj={{
-        //   current: state?.profile?.metadatas?.visibility ? 0 : 1,
-        //   to: state?.profile?.metadatas?.visibility ? 1 : 0,
-        // }}
-        allowed={cv == state?.profile?.cvID}
-        metadatas={state?.profile?.metadatas}
-      ></MyLayoutHeader>
+      <MyMenusTabs
+        template={2}
+        color={15}
+        styleOrigin={"mb-4"}
+        value={isClick}
+        setter={setIsClick}
+        arr={["Jobs proposition", "Overview", "Works", "Launchpads", "Social"]}
+      />
+
       <div className="w-full border-y border-white/5 flex">
-        <CVInfos />
+        {
+          [
+            <div className="flex  w-full flex-col p-3 gap-2">
+              {state?.features?.map((el) => (
+                <div className="px-4 py-3 hover:bg-white/10 backdrop-blur hover:border-white/15 border border-white/5 rounded-xl bg-white/5 rouded-lg shadow flex items-center justify-between w-full">
+                  <Icon
+                    icon={ENUMS.courts[el?.datas?.specification]?.badge}
+                    className="text-[34px] mr-3 "
+                  />
+                  <div className="flex flex-col flex-auto h-full  gap-2">
+                    <MyTitle>{el?.metadatas?.title}</MyTitle>
+                    <div className="flex c4 gap-2   items-center">
+                      <div className="flex gap-2 items-center">
+                        <div className="p-2 rounded bg-white/5 ">
+                          <Icon icon={icsystem.mission} />
+                        </div>
+                        <div className="flex flex-col">
+                          <MySub size={8}>Mission</MySub>
+                          <MissionName
+                            style={
+                              "c3 whitespace-nowrap max-w-[100px] truncate hover:max-w-fit text-xs"
+                            }
+                            id={el?.datas?.missionID}
+                            missionHash={el?.metadatas?.missionID}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center c4 gap-2">
+                        <div className="p-2 rounded bg-white/5 ">
+                          <Icon icon={icfy.ux.admin} />
+                        </div>
+                        <div className="flex flex-col">
+                          <MySub size={8}>Owner</MySub>
+                          <CVName
+                            styles={"c3 text-xs"}
+                            cvID={el?.datas?.owner}
+                            metadata={
+                              el?.datas?.owner == state?.profile?.cvID
+                                ? state?.profile?.metadatas
+                                : undefined
+                            }
+                          />
+                        </div>
+                      </div>
+                      {el?.datas?.cvWorker && (
+                        <div className="flex items-center c4 gap-2">
+                          <div className="p-2 rounded bg-white/5 ">
+                            <Icon icon={icsystem.feature} />
+                          </div>
+                          <div className="flex flex-col">
+                            <MySub size={8}>worker</MySub>
+                            <CVName
+                              styles={"c3 text-xs"}
+                              cvID={el?.datas?.cvWorker}
+                              metadata={
+                                el?.datas?.cvWorker == state?.profile?.cvID
+                                  ? state?.profile?.metadatas
+                                  : undefined
+                              }
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {el?.metadatas?.abstract ? (
+                      <p className="text-[9px] max-w-[500px] text-white/70 font-light">
+                        {el?.metadatas?.abstract}
+                      </p>
+                    ) : (
+                      <></>
+                    )}
+                    <div className="mt-auto flex items-center gap-2">
+                      <MyStatus
+                        status={
+                          el?.datas?.cvWorker ? el?.datas?.status : "hiring"
+                        }
+                        target={el?.datas?.cvWorker ? "feature" : "_feature"}
+                      />
+                      <MyBadge color={1}>
+                        {ENUMS.domain[el?.metadatas?.domain]?.name}
+                      </MyBadge>
+                    </div>
+                  </div>
+                  <div className="flex h-full items-end min-w-1/4 w-1/4 justify-between flex-col">
+                    <div className="flex gap-2 justify-end">
+                      <div className="c4 flex items-center gap-4">
+                        <MySub size={8}>Claimable</MySub>
+                        <MyTimer
+                          style={"text-error text-[10px] whitespace-nowrap"}
+                          days={el?.datas?.estimatedDays}
+                          started={parseInt(el?.datas?.startedAt)}
+                        />
+                      </div>
+                      <MyMainBtn
+                        color={2}
+                        style={"btn-xs"}
+                        icon={icfy.ux.star}
+                      />
+                    </div>
+                    <div className="flex gap-1 flex-wrap max-w-full justify-end my-2 ">
+                      {el?.metadatas?.skills?.map((el) => (
+                        <MyBadge
+                          style={
+                            "text-white/70 font-light text-[9px] hover:text-white/90"
+                          }
+                          color={1}
+                          key={v4()}
+                        >
+                          <span className="truncate hover:max-w-fit max-w-[100px]">
+                            {el}
+                          </span>
+                        </MyBadge>
+                      ))}
+                    </div>
+                    <div className="flex gap-3 items-end">
+                      <div className="c4">
+                        <MySub size={8}>Wadge</MySub>
+                        <MyNum style={"c3"} num={el?.datas?.wadge}>
+                          <span className="c4 ml-1 text-xs">ETH</span>
+                        </MyNum>
+                      </div>
+
+                      <MyMainBtn
+                        url={"/mission/" + el?.datas?.missionID}
+                        style={"btn-sm"}
+                      >
+                        View more
+                      </MyMainBtn>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>,
+            <CVInfos />,
+          ]?.[isClick]
+        }
         <MyLayoutDetails
           style={"border-l"}
           arr={[
@@ -69,52 +210,14 @@ function App({ params }) {
             },
             {
               title: "Domain",
-              value:
-                cv == cvID ? (
-                  <LayoutForm
-                    stateInit={{
-                      allowed: true,
-                      placeholders: { domain: "What's your main skill ?" },
-                      form: {
-                        target: "domain",
-                        domain: state?.profile?.metadatas?.domain,
-                      },
-                    }}
-                  >
-                    <MySelect
-                      arr={ENUMS.domain.map((el) => el?.name)}
-                      target={"domain"}
-                      styles={"w-full"}
-                      label={false}
-                      setter={async (value) => {
-                        let metadatas = state?.profile?.metadatas;
-                        metadatas.domain = value?.index;
-                        await controllers.update.profile(metadatas);
-                      }}
-                    ></MySelect>
-                  </LayoutForm>
-                ) : (
-                  <MySub style={"items-center flex"}>
-                    {ENUMS?.domain[state?.profile?.metadatas?.domain]?.name}
-                  </MySub>
-                ),
-              icon: ENUMS.domain[state?.profile?.metadatas?.domain]?.icon,
+              value: (
+                <MySub style={"items-center flex"}>
+                  {ENUMS?.domain[state?.profile?.metadatas?.domain]?.name}
+                </MySub>
+              ),
+              icon: ENUMS.domain[state?.profile?.metadatas?.domain || 0]?.icon,
             },
-            {
-              title: "Total wadge",
-              num: state?.profile?.datas?.amount,
-              icon: icfyETHER,
-            },
-            state?.profile?.datas?.missions?.length && {
-              title: "Total depense",
-              num: state?.profile?.datas?.amount,
-              icon: icfyETHER,
-            },
-            {
-              title: "Total invest",
-              num: state?.profile?.datas?.amount,
-              icon: icfyETHER,
-            },
+
             state?.profile?.datas?.missions?.length && {
               title: "Missions",
               num: state?.profile?.datas?.missions?.length,
@@ -155,6 +258,17 @@ function App({ params }) {
               title: "Posts",
               num: state?.profile?.details?.social?.pubs,
               icon: icfy.msg.post,
+            },
+          ]}
+          footers={[
+            {
+              title: "Owner",
+              value: (
+                <Avatar
+                  designation={true}
+                  metadatas={state?.profile?.metadatas}
+                />
+              ),
             },
           ]}
           objStatus={{

@@ -5,7 +5,7 @@ import { Header } from "./Header";
 import { useAccount } from "wagmi";
 import { doAuthCV, useAuthDispatch, useAuthState } from "context/auth";
 
-export const LayoutTools = ({ children, template, state }) => {
+export const LayoutTools = ({ children, menus, template, state }) => {
   let { address } = useAccount();
   let { cv } = useAuthState();
 
@@ -20,18 +20,11 @@ export const LayoutTools = ({ children, template, state }) => {
 
   return (
     <div
-      className={`h-screen  flex w-screen overflow-y-scroll overflow-x-hidden ${
+      className={`  flex w-screen  ${
         template === 0 ? "flex-row-reverse" : "flex-col"
       }`}
     >
       <Child state={state} children={children} />
-      {template !== 0 ? (
-        <div className="fixed top-0 left-0 w-full">
-          <Header />
-        </div>
-      ) : (
-        <></>
-      )}
     </div>
   );
 };

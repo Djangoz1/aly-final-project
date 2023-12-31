@@ -7,7 +7,8 @@ import abis from "../../abis.json";
 import { hardhat, sepolia } from "wagmi/chains";
 import { hardhat as _hardhat, sepolia as _sepolia } from "viem/chains";
 
-export const CONFIG = "TESTNET"; // "TESTNET" || "LOCAL";
+// export const CONFIG = "TESTNET";
+export const CONFIG = "LOCAL";
 
 export const configs = {
   LOCAL: {

@@ -6,12 +6,12 @@ import { useToolsState } from "context/tools";
 
 import { _apiGetAt, _apiPost } from "utils/ui-tools/web3-tools";
 
-import { Avatar } from "components/profile/ProfileAvatar";
+import { Avatar, ProfileAvatar } from "components/profile/ProfileAvatar";
 
 import { useAuthState } from "context/auth";
 
 import { Icon } from "@iconify/react";
-import { icfy, icfyETHER, icsystem } from "icones";
+import { icfy, icfyETHER, icfySTAR, icsystem } from "icones";
 
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
@@ -29,6 +29,8 @@ import { MyBadge, MyList } from "components/myComponents/box/MyList";
 import { MyTitle } from "components/myComponents/text/MyTitle";
 import { MyLayoutDetails } from "components/myComponents/layout/MyLayoutDetails";
 import { MyMainBtn } from "components/myComponents/btn/MyMainBtn";
+import { MyBtnDropdown } from "components/myComponents/btn/MyDropdownBtn";
+import { MyStatus } from "components/myComponents/item/MyStatus";
 
 function App({ params }) {
   const { cv } = useAuthState();
@@ -40,231 +42,201 @@ function App({ params }) {
 
   return (
     <LayoutMission controller={"overview"} missionID={missionID} url={"/"}>
-      <div className="flex ">
-        <div className="w-full -z-1 border-t border-r border-white/5 flex flex-col">
-          <MySub style={"mt-5 mb-2 hover:text-white px-4 c4"}>
-            Presented {state?.mission?.metadatas?.title}
-          </MySub>
-          <div className="flex  my-3 px-4 ">
-            <MyTitle style=" text-[8px] c4 min-w-[15%]">Abstract</MyTitle>
-            <article className="hover:text-white/80 c4 font-ligt whitespace-break-spaces text-[10px] ">
-              {state?.mission?.metadatas?.abstract || (
-                <span className="text-warning">
-                  <Icon icon={icfy.ux.warning} /> Please provide an abstract
-                  description for a better referencing
-                </span>
-              )}
-            </article>
+      <div className="flex divide-x divide-white/5 pt-5">
+        <div className="w-full  -z-1 min-h-screen pb-20   flex  flex-col">
+          <div className="w-full mb-6 relative flex flex-col gap-1 p-4  bg-first rounded-lg shadow-2xl">
+            <div className="flex w-full justify-between">
+              <MyTitle style={"opacity-80"}>
+                {state?.mission?.metadatas?.title}
+              </MyTitle>
+              <MyBtnDropdown
+                arr={[{ title: "Close mission", icon: icfy.ux.check.uncheck }]}
+              />
+            </div>
+            <Avatar designation={"Owner"} metadatas={state?.owner?.metadatas} />
           </div>
-          <div className="flex  my-3 px-4 ">
-            <MyTitle style=" text-[8px] c4 min-w-[15%]">Description</MyTitle>
-
-            {/* ! TO DO : secure parse html*/}
-            <article
-              dangerouslySetInnerHTML={{
-                __html: state?.mission?.metadatas?.description,
-              }}
-              className="hover:text-white/80 c4 font-ligt whitespace-break-spaces text-[10px] "
-            />
-          </div>
-          <div className="flex  my-3 px-4 ">
-            <MyTitle style=" text-[8px] c4 min-w-[15%]">Features</MyTitle>
-
-            {/* ! TO DO : secure parse html*/}
-            <article className="flex flex-col gap-4">
-              {state?.features?.map((element) => (
-                <MyCardInfos
-                  arr={[
-                    {
-                      icon: ENUMS.courts[element?.datas?.specification]?.badge,
-                      title: element?.metadatas?.title,
-                      value: (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: (() => {
-                              return `${element?.metadatas?.abstract}<br/>${element?.metadatas?.description}`;
-                            })(),
-                          }}
-                          className="font-ligt whitespace-break-spaces text-[10px] "
-                        />
-                      ),
-                    },
-                    {
-                      title: "Badges",
-                      value: (
-                        <div className="flex flex-wrap gap-2 w-2/3">
-                          {element?.metadatas?.skills?.map((el, i) => (
-                            <MyBadge
-                              key={v4()}
-                              color={i}
-                              style={"text-[9px] h-fit"}
-                            >
-                              {el}
-                            </MyBadge>
-                          ))}
-                        </div>
-                      ),
-                    },
-                  ]}
-                  style={"w-full  "}
-                  className=" hover:opacity-100 opacity-50 c3 flex flex-col"
+          <MySub>Features</MySub>
+          <p className="opacity-50 text-xs">List of active features</p>
+          <div className="my-5  grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3  xl:grid-cols-5 lg:grid-cols-4 2xl:grid-cols-6 gap-2">
+            {state?.features
+              ?.filter(
+                (el, index, self) =>
+                  index ===
+                  self.findIndex(
+                    (o) => o.datas?.specification == el?.datas?.specification
+                  )
+              )
+              ?.map((el) => (
+                <div
+                  className={
+                    "flex flex-col gap-2 bg-first border rounded-lg border-white/5 shadow-xl px-3 py-5 relative"
+                  }
                   key={v4()}
                 >
-                  {element?.datas?.cvWorker ||
-                  cv == element?.datas?.owner ||
-                  element?.details?.workerDemand
-                    ?.map((el) => `${el}`)
-                    ?.includes(`${cv}`) ? (
-                    <></>
-                  ) : (
-                    <MyMainBtn
-                      template={1}
-                      color={2}
-                      style={"btn-xs ml-auto mt-2"}
-                      setter={async () => {
-                        await _apiPost("askToJoin", [element?.featureID]);
-                      }}
-                    >
-                      Join
-                    </MyMainBtn>
-                  )}
-                </MyCardInfos>
-              ))}
-            </article>
-          </div>
-        </div>
-        <MyLayoutDetails
-          btns={[
-            {
-              btn: (
-                <>
-                  <Icon icon={icfy.ux.experiment} className="text-lg" />{" "}
-                  Statistics features{" "}
-                  <Icon
-                    icon={icfy.ux.arrow}
-                    className="rotate-90 ml-auto text-lg "
-                  />
-                </>
-              ),
-              modal: (
-                <MyList
-                  description={"All recent payment to workers"}
-                  arr={state?.features?.map((el) => [
-                    el?.metadatas?.created,
-                    <CVName cvID={el?.datas?.cvWorker} />,
-                    el?.metadatas?.title,
-                    ENUMS.domain?.[el?.metadatas?.domain]?.name,
-                    <MyBadge>-{el?.datas?.wadge} ETH</MyBadge>,
-                  ])}
-                />
-              ),
-            },
-          ]}
-          arr={[
-            {
-              icon: ENUMS.domain[state?.mission?.metadatas?.domain]?.icon,
-              title: "Domain",
-              value: ENUMS.domain[state?.mission?.metadatas?.domain]?.name,
-            },
-            {
-              icon: icfyETHER,
-              title: "Dépenses restantes",
-              num: state?.mission?.datas?.amount,
-              value: <span className="text-[8px]">ETH</span>,
-            },
-            {
-              icon: icsystem.feature,
-              title: "Features",
-              num: state?.features?.length,
-            },
-            {
-              icon: icsystem.feature,
-              title: "Work slot(s)",
-              num: state?.features?.length - state?.mission?.datas?.workers,
-            },
-            state?.mission?.datas?.disputes?.length && {
-              icon: icsystem.escrow,
-              title: "Dispute(s)",
-              num: state?.mission?.datas?.disputes?.length,
-            },
-            state?.mission?.datas?.launchpad > 0 && {
-              icon: icsystem.launchpad,
-              title: "Launchpad",
-              value: "To do launchpad name",
-            },
-            {
-              icon: icfy.person.friend,
-              title: "Follower(s)",
-              num: state?.mission?.details?.social?.followers?.length,
-            },
-            {
-              icon: icfy.msg.post,
-              title: "Post(s)",
-              num: state?.pubs?.length,
-            },
-          ]}
-          objStatus={{
-            target: "mission",
-            status: state?.mission?.datas?.status,
-          }}
-          footers={[
-            {
-              title: "Technology",
-              value: (
-                <div className="grid gap-2 grid-cols-5">
-                  {state?.features
-                    ?.filter(
-                      (el, index, self) =>
-                        index ===
-                        self.findIndex(
-                          (o) =>
-                            o.datas?.specification == el?.datas?.specification
-                        )
-                    )
-                    ?.map((el) => (
+                  <div className="flex text-[25px] justify-between mb-5">
+                    <div className="bg-gradient-to-br from-white/5 to-white/10 p-3  border-white/5 border rounded-lg shadow-xl">
                       <Icon
-                        key={v4()}
                         icon={ENUMS.courts?.[el?.datas?.specification]?.badge}
-                        className="text-white c2 text-[24px] "
                       />
-                    ))}
+                    </div>
+                    <MyBtnDropdown
+                      arr={[{ title: "Follow" }, { title: "Join" }]}
+                    />
+                  </div>
+
+                  <MySub>{el.metadatas.title}</MySub>
+                  <p className="opacity-50 my-3 text-[10px]">
+                    {el.metadatas.abstract}
+                  </p>
+                  <MyStatus
+                    target={"feature"}
+                    status={el.datas.status}
+                    style={"w-full text-[10px] mt-auto"}
+                  />
                 </div>
-              ),
-            },
-            {
-              title: "Owner",
-              value: (
-                <Avatar
-                  metadatas={state?.owner?.metadatas}
-                  designation={true}
-                />
-              ),
-            },
-            {
-              title: "Worker(s)",
-              value: (
-                <div className="flex flex-row items-center justify-center  mb-10 w-full">
-                  {state?.features
-                    ?.filter(
-                      (el, index, self) =>
-                        index ===
-                        self.findIndex(
-                          (o) => o.datas?.cvWorker == el?.datas?.cvWorker
-                        )
-                    )
-                    ?.map((el) => (
-                      <Avatar
-                        designation={true}
-                        style={"-mr-4  group"}
-                        key={v4()}
-                        _cvID={el?.datas?.cvWorker}
-                      />
-                    ))}
-                </div>
-              ),
-            },
-          ]}
-        />
+              ))}
+          </div>
+          <MyMainBtn style={"ml-auto"} url={"/create/feature"} color={2}>
+            Create new feature
+          </MyMainBtn>
+        </div>
+        {/* <div className="flex w-[15%] min-w-[250px] flex-col  px-5">
+          <MyLayoutDetails
+            style={"w-full  "}
+            btns={[
+              {
+                btn: (
+                  <>
+                    <Icon icon={icfy.ux.experiment} className="text-lg" />{" "}
+                    Statistics features{" "}
+                    <Icon
+                      icon={icfy.ux.arrow}
+                      className="rotate-90 ml-auto text-lg "
+                    />
+                  </>
+                ),
+                modal: (
+                  <MyList
+                    description={"All recent payment to workers"}
+                    arr={state?.features?.map((el) => [
+                      el?.metadatas?.created,
+                      <CVName cvID={el?.datas?.cvWorker} />,
+                      el?.metadatas?.title,
+                      ENUMS.domain?.[el?.metadatas?.domain]?.name,
+                      <MyBadge>-{el?.datas?.wadge} ETH</MyBadge>,
+                    ])}
+                  />
+                ),
+              },
+            ]}
+            arr={[
+              {
+                icon: ENUMS.domain[state?.mission?.metadatas?.domain]?.icon,
+                title: "Domain",
+                value: ENUMS.domain[state?.mission?.metadatas?.domain]?.name,
+              },
+              {
+                icon: icfyETHER,
+                title: "Dépenses restantes",
+                num: state?.mission?.datas?.amount,
+                value: <span className="text-[8px]">ETH</span>,
+              },
+              {
+                icon: icsystem.feature,
+                title: "Features",
+                num: state?.features?.length,
+              },
+              {
+                icon: icsystem.feature,
+                title: "Work slot(s)",
+                num: state?.features?.length - state?.mission?.datas?.workers,
+              },
+              state?.mission?.datas?.disputes?.length && {
+                icon: icsystem.escrow,
+                title: "Dispute(s)",
+                num: state?.mission?.datas?.disputes?.length,
+              },
+              state?.mission?.datas?.launchpad > 0 && {
+                icon: icsystem.launchpad,
+                title: "Launchpad",
+                value: "To do launchpad name",
+              },
+              {
+                icon: icfy.person.friend,
+                title: "Follower(s)",
+                num: state?.mission?.details?.social?.followers?.length,
+              },
+              {
+                icon: icfy.msg.post,
+                title: "Post(s)",
+                num: state?.pubs?.length,
+              },
+            ]}
+            objStatus={{
+              target: "mission",
+              status: state?.mission?.datas?.status,
+            }}
+            footers={[
+              {
+                title: "Technology",
+                value: (
+                  <div className="flex flex-wrap gap-2">
+                    {state?.features
+                      ?.filter(
+                        (el, index, self) =>
+                          index ===
+                          self.findIndex(
+                            (o) =>
+                              o.datas?.specification == el?.datas?.specification
+                          )
+                      )
+                      ?.map((el) => (
+                        <MyBadge
+                          icon={ENUMS.courts?.[el?.datas?.specification]?.badge}
+                          key={v4()}
+                          color={el?.datas?.specification}
+                        >
+                          {ENUMS.courts?.[el?.datas?.specification]?.court}
+                        </MyBadge>
+                      ))}
+                  </div>
+                ),
+              },
+              {
+                title: "Owner",
+                value: (
+                  <Avatar
+                    metadatas={state?.owner?.metadatas}
+                    designation={true}
+                  />
+                ),
+              },
+              {
+                title: "Worker(s)",
+                value: (
+                  <div className="flex flex-row items-center justify-center  mb-10 w-full">
+                    {state?.features
+                      ?.filter(
+                        (el, index, self) =>
+                          index ===
+                          self.findIndex(
+                            (o) => o.datas?.cvWorker == el?.datas?.cvWorker
+                          )
+                      )
+                      ?.map((el) => (
+                        <Avatar
+                          designation={true}
+                          style={"-mr-4  group"}
+                          key={v4()}
+                          _cvID={el?.datas?.cvWorker}
+                        />
+                      ))}
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </div> */}
       </div>
     </LayoutMission>
   );

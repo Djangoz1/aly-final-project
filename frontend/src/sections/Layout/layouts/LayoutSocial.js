@@ -11,9 +11,6 @@ import { useAuthState } from "context/auth";
 import { Icon } from "@iconify/react";
 import { icfy, icfyIMG, icfySEARCH, icsystem } from "icones";
 
-import { _table_features } from "utils/states/tables/feature";
-import { _table_invites } from "utils/works/feature";
-
 import { _apiGet } from "utils/ui-tools/web3-tools";
 
 import { MySub } from "components/myComponents/text/MySub";
